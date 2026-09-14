@@ -1,0 +1,19 @@
+name: Foundation CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: PHP syntax
+        run: find theme platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Python syntax
+        run: python -m py_compile scripts/*.py
+      - name: Migration IDs
+        run: python scripts/check_migration_ids.py
