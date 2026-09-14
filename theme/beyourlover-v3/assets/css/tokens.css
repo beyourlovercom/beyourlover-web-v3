@@ -1,0 +1,47 @@
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/poppins-400.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/poppins-500.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/poppins-600.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url('../fonts/poppins-700.woff2') format('woff2')}
+:root{
+  --byl-font:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --byl-brand:#9b3749;
+  --byl-brand-hover:#812d3d;
+  --byl-brand-soft:#f7ecef;
+  --byl-ink:#111111;
+  --byl-ink-2:#444444;
+  --byl-ink-3:#6f6f73;
+  --byl-line:#e7e7e9;
+  --byl-surface:#ffffff;
+  --byl-surface-2:#f7f7f8;
+  --byl-success:#218739;
+  --byl-warning:#9a6700;
+  --byl-danger:#b42318;
+  --byl-radius-sm:10px;
+  --byl-radius-md:16px;
+  --byl-radius-lg:24px;
+  --byl-radius-pill:999px;
+
+:root{
+  --byl-space-1:4px;
+  --byl-space-2:8px;
+  --byl-space-3:12px;
+  --byl-space-4:16px;
+  --byl-space-5:24px;
+  --byl-space-6:32px;
+  --byl-space-7:48px;
+  --byl-space-8:64px;
+  --byl-space-9:96px;
+  --byl-container:1440px;
+  --byl-gutter:clamp(20px,4vw,64px);
+  --byl-shadow-1:0 1px 2px rgba(17,17,17,.05),0 8px 24px rgba(17,17,17,.06);
+  --byl-shadow-2:0 18px 48px rgba(17,17,17,.10);
+  --byl-ease:cubic-bezier(.2,.8,.2,1);
+  --byl-duration-fast:160ms;
+  --byl-duration-base:260ms;
+  --byl-duration-slow:520ms;
+}
+html{font-family:var(--byl-font);color:var(--byl-ink);background:var(--byl-surface)}
+body{margin:0;font-family:var(--byl-font);font-size:16px;line-height:1.6;color:var(--byl-ink);background:var(--byl-surface);-webkit-font-smoothing:antialiased}
+*,*:before,*:after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
