@@ -19,3 +19,4 @@ wp-content/upgrade/
 
 __pycache__/
 *.pyc
+release/*.json
