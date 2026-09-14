@@ -16,3 +16,6 @@ wp-content/cache/
 wp-content/upgrade/
 .idea/
 .vscode/
+
+__pycache__/
+*.pyc
