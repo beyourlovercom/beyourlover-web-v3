@@ -93,3 +93,11 @@ img{max-width:100%;height:auto}
   --byl-tracking-heading-tight:-.03em;
   --byl-tracking-display-l:-.04em;
 }
+
+:root{
+  --byl-motion-distance-sm:8px;
+  --byl-motion-distance-md:16px;
+  --byl-motion-distance-lg:32px;
+  --byl-motion-press-scale:.985;
+  --byl-motion-media-scale:1.025;
+}

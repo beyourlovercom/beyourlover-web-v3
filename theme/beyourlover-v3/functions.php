@@ -11,12 +11,20 @@ add_action('after_setup_theme', static function (): void {
 });
 
 add_action('wp_enqueue_scripts', static function (): void {
-    $version = wp_get_theme()->get('Version');
+    $theme_version = wp_get_theme()->get('Version');
+    $dir = get_stylesheet_directory();
     $uri = get_stylesheet_directory_uri();
-    wp_enqueue_style('byl-v3-foundation', get_stylesheet_uri(), [], $version);
-    wp_enqueue_style('byl-v3-tokens', $uri . '/assets/css/tokens.css', ['byl-v3-foundation'], $version);
-    wp_enqueue_style('byl-v3-components', $uri . '/assets/css/components.css', ['byl-v3-tokens'], $version);
+    $asset_version = static function (string $relative) use ($dir, $theme_version): string {
+        $path = $dir . '/' . ltrim($relative, '/');
+        return is_file($path) ? (string) filemtime($path) : (string) $theme_version;
+    };
+
+    wp_enqueue_style('byl-v3-foundation', get_stylesheet_uri(), [], $asset_version('style.css'));
+    wp_enqueue_style('byl-v3-tokens', $uri . '/assets/css/tokens.css', ['byl-v3-foundation'], $asset_version('assets/css/tokens.css'));
+    wp_enqueue_style('byl-v3-components', $uri . '/assets/css/components.css', ['byl-v3-tokens'], $asset_version('assets/css/components.css'));
+    wp_enqueue_style('byl-v3-motion', $uri . '/assets/css/motion.css', ['byl-v3-components'], $asset_version('assets/css/motion.css'));
+
     if (is_front_page()) {
-        wp_enqueue_style('byl-v3-preview', $uri . '/assets/css/preview.css', ['byl-v3-components'], $version);
+        wp_enqueue_style('byl-v3-preview', $uri . '/assets/css/preview.css', ['byl-v3-motion'], $asset_version('assets/css/preview.css'));
     }
 });

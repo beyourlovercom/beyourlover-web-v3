@@ -1,0 +1,18 @@
+@keyframes byl-motion-fade{from{opacity:0}to{opacity:1}}
+@keyframes byl-motion-rise{from{opacity:0;transform:translateY(var(--byl-motion-distance-md))}to{opacity:1;transform:translateY(0)}}
+@keyframes byl-motion-slide{from{opacity:0;transform:translateX(var(--byl-motion-distance-md))}to{opacity:1;transform:translateX(0)}}
+@keyframes byl-motion-scale{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+
+.byl-motion-interactive{transition:transform var(--byl-duration-fast) var(--byl-ease),opacity var(--byl-duration-fast) var(--byl-ease)}
+.byl-motion-hover-lift{transition:transform var(--byl-duration-base) var(--byl-ease),box-shadow var(--byl-duration-base) var(--byl-ease)}
+.byl-motion-hover-lift:hover{transform:translateY(-2px)}
+.byl-motion-press:active{transform:scale(var(--byl-motion-press-scale))}
+.byl-motion-media{overflow:hidden}
+.byl-motion-media img{transition:transform var(--byl-duration-slow) var(--byl-ease-emphasized)}
+.byl-motion-media:hover img{transform:scale(var(--byl-motion-media-scale))}
+[data-byl-motion="fade"]{animation:byl-motion-fade var(--byl-duration-base) var(--byl-ease) both}
+[data-byl-motion="rise"]{animation:byl-motion-rise var(--byl-duration-slow) var(--byl-ease-emphasized) both}
+[data-byl-motion="slide"]{animation:byl-motion-slide var(--byl-duration-slow) var(--byl-ease-emphasized) both}
+[data-byl-motion="scale"]{animation:byl-motion-scale var(--byl-duration-base) var(--byl-ease-emphasized) both}
+
+@media(prefers-reduced-motion:reduce){.byl-motion-hover-lift:hover,.byl-motion-press:active,.byl-motion-media:hover img{transform:none!important}[data-byl-motion]{animation:none!important}}
