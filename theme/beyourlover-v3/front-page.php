@@ -50,8 +50,8 @@ get_header();
         <p class="byl-body-m">Editorial scale for brand moments, controlled headings for commerce, and readable body copy for guides and support.</p>
       </div>
       <div class="byl-type-stack">
-        <div class="byl-type-row"><p class="byl-eyebrow">Display L · 600</p><p class="byl-display-l">Feel more. Find your fit.</p></div>
-        <div class="byl-type-row"><p class="byl-eyebrow">Heading L · 600</p><p class="byl-heading-l">Made to be explored.</p></div>
+        <div class="byl-type-row"><p class="byl-eyebrow">Display L · 500</p><p class="byl-display-l">Feel more. Find your fit.</p></div>
+        <div class="byl-type-row"><p class="byl-eyebrow">Heading L · 500</p><p class="byl-heading-l">Made to be explored.</p></div>
         <div class="byl-type-row"><p class="byl-eyebrow">Body L · 400</p><p class="byl-body-l">Comfortable reading, clear choices, and less visual noise around the action that matters.</p></div>
       </div>
     </div>

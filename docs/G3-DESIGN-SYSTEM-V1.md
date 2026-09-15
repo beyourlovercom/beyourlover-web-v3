@@ -47,3 +47,9 @@ Docs OS is a later G7 runtime; G3 only ensures editorial typography/link/focus f
 - Icon sizing is tokenized at 16 / 20 / 24px; icons inherit text color and do not carry product-specific meaning in G3.
 - Stack / cluster / grid helpers are layout primitives only; composed product and content components belong to G5.
 - Reading-width content stays capped at 760px and is compatible with future Andy Core Docs OS.
+## Apple polish contract
+- Poppins remains canonical, but large display and heading styles use weight 500 rather than relying on heavy 600/700 presentation.
+- Large type uses tighter optical tracking with slightly smaller maximum scale to keep the page premium rather than poster-heavy.
+- Buttons retain a 48px target while hover motion stays restrained; active feedback remains subtle.
+- Shadows and borders are intentionally lighter; spacing carries hierarchy before decoration does.
+- Apple/HIG is an interaction and precision reference, not a visual clone. BYL red and Poppins remain brand-owned signals.
