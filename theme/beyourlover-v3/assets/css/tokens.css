@@ -1,0 +1,124 @@
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/poppins-400.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/poppins-500.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/poppins-600.woff2') format('woff2')}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url('../fonts/poppins-700.woff2') format('woff2')}
+
+:root{
+  --byl-font:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --byl-font-weight-regular:400;
+  --byl-font-weight-medium:500;
+  --byl-font-weight-semibold:600;
+  --byl-font-weight-bold:700;
+
+  --byl-brand:#9b3749;
+  --byl-brand-hover:#7f2d3c;
+  --byl-brand-soft:#f7ecef;
+  --byl-ink:#161316;
+  --byl-ink-2:#655e62;
+  --byl-ink-3:#756e72;
+  --byl-surface:#ffffff;
+  --byl-surface-soft:#f8f6f7;
+  --byl-line:#e7e2e4;
+  --byl-success:#247a52;
+  --byl-warning:#a76514;
+  --byl-danger:#b4233e;
+  --byl-focus:#9b3749;
+}
+
+:root{
+  --byl-space-1:4px;
+  --byl-space-2:8px;
+  --byl-space-3:12px;
+  --byl-space-4:16px;
+  --byl-space-5:24px;
+  --byl-space-6:32px;
+  --byl-space-7:48px;
+  --byl-space-8:64px;
+  --byl-space-9:96px;
+
+  --byl-radius-sm:10px;
+  --byl-radius-md:16px;
+  --byl-radius-lg:24px;
+  --byl-radius-pill:999px;
+
+  --byl-shell-max:1440px;
+  --byl-content-max:1200px;
+  --byl-reading-max:760px;
+  --byl-gutter:clamp(20px,4vw,56px);
+
+  --byl-shadow-1:0 1px 2px rgba(22,19,22,.025),0 6px 20px rgba(22,19,22,.035);
+  --byl-shadow-2:0 16px 42px rgba(22,19,22,.07);
+}
+:root{
+  --byl-duration-fast:120ms;
+  --byl-duration-base:220ms;
+  --byl-duration-slow:420ms;
+  --byl-ease:cubic-bezier(.2,.8,.2,1);
+  --byl-ease-emphasized:cubic-bezier(.2,.7,0,1);
+
+  --byl-z-base:0;
+  --byl-z-dropdown:100;
+  --byl-z-sticky:200;
+  --byl-z-modal:1000;
+}
+
+html{font-family:var(--byl-font);color:var(--byl-ink);background:var(--byl-surface)}
+body{margin:0;font-family:var(--byl-font);font-size:16px;line-height:1.6;color:var(--byl-ink);background:var(--byl-surface);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+*,*:before,*:after{box-sizing:border-box}
+img{max-width:100%;height:auto}
+:focus-visible{outline:2px solid var(--byl-focus);outline-offset:3px}
+::selection{background:var(--byl-brand-soft);color:var(--byl-ink)}
+
+:root{
+  --byl-type-display-xl:clamp(46px,6.2vw,84px);
+  --byl-type-display-l:clamp(38px,5vw,64px);
+  --byl-type-heading-xl:clamp(30px,3.5vw,48px);
+  --byl-type-heading-l:clamp(25px,2.8vw,38px);
+  --byl-type-heading-m:24px;
+  --byl-type-body-l:clamp(18px,1.8vw,22px);
+  --byl-type-body-m:16px;
+  --byl-type-body-s:14px;
+  --byl-type-eyebrow:12px;
+
+  --byl-leading-display:.97;
+  --byl-leading-heading:1.1;
+  --byl-leading-body:1.55;
+  --byl-tracking-display:-.052em;
+  --byl-tracking-heading:-.03em;
+  --byl-tracking-eyebrow:.14em;
+}
+
+:root{
+  --byl-leading-heading-tight:1.04;
+  --byl-tracking-heading-tight:-.036em;
+  --byl-tracking-display-l:-.045em;
+}
+
+:root{
+  --byl-type-weight-display:500;
+  --byl-type-weight-heading:500;
+  --byl-type-weight-ui:500;
+}
+
+:root{
+  --byl-motion-distance-sm:8px;
+  --byl-motion-distance-md:16px;
+  --byl-motion-distance-lg:32px;
+  --byl-motion-press-scale:.985;
+  --byl-motion-media-scale:1.025;
+}
+
+:root{
+  --byl-icon-sm:16px;
+  --byl-icon-md:20px;
+  --byl-icon-lg:24px;
+}
+@media(max-width:640px){
+  :root{
+    --byl-type-display-xl:clamp(40px,11vw,48px);
+    --byl-type-display-l:clamp(36px,10vw,44px);
+    --byl-type-heading-xl:clamp(30px,8vw,38px);
+    --byl-type-heading-l:clamp(26px,7vw,34px);
+    --byl-gutter:20px;
+  }
+}
