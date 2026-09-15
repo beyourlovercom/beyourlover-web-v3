@@ -22,7 +22,7 @@ function byl_v3_primary_nav_items(): array {
 }
 
 function byl_v3_brand_logo(): string {
-    foreach (['logo-slogan-red-1-scaled','logo-slogan-red-1'] as $slug) {
+    foreach (['logo-slogan-red-1-scaled-webp','logo-slogan-red-1-scaled-1-webp','logo-slogan-red-1-scaled','logo-slogan-red-1'] as $slug) {
         $attachment = get_page_by_path($slug, OBJECT, 'attachment');
         if ($attachment instanceof WP_Post) {
             $url = wp_get_attachment_image_url($attachment->ID, 'full');
