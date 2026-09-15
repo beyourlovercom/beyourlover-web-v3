@@ -39,3 +39,11 @@ Status: implementation candidate for localnew UAT.
 
 G3 does not freeze final page templates. G4/G5 build shell/components from these primitives.
 Docs OS is a later G7 runtime; G3 only ensures editorial typography/link/focus foundations do not depend on BetterDocs.
+
+## Foundation primitive rules
+- Buttons use a 48px minimum touch target, visible focus, explicit disabled states, and reduced-motion-safe press feedback.
+- Links remain visibly links by default; branded link primitives may change color but must not remove discoverability.
+- Surface / soft-surface / divider primitives provide structure without page-specific styling.
+- Icon sizing is tokenized at 16 / 20 / 24px; icons inherit text color and do not carry product-specific meaning in G3.
+- Stack / cluster / grid helpers are layout primitives only; composed product and content components belong to G5.
+- Reading-width content stays capped at 760px and is compatible with future Andy Core Docs OS.

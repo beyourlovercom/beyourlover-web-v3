@@ -101,3 +101,9 @@ img{max-width:100%;height:auto}
   --byl-motion-press-scale:.985;
   --byl-motion-media-scale:1.025;
 }
+
+:root{
+  --byl-icon-sm:16px;
+  --byl-icon-md:20px;
+  --byl-icon-lg:24px;
+}
