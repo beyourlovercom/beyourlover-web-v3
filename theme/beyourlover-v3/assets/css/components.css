@@ -42,3 +42,4 @@
 .byl-reading> :last-child{margin-bottom:0}
 @media(max-width:900px){.byl-grid-3{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.byl-btn:hover,.byl-btn:active{transform:none}}
+.byl-stack>*{margin-block:0}
