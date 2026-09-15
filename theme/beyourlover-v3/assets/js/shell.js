@@ -7,6 +7,7 @@
   const searchOpeners = document.querySelectorAll('[data-byl-search-open]');
   const searchCloser = document.querySelector('[data-byl-search-close]');
   const searchInput = document.getElementById('byl-global-search');
+  let searchReturnFocus = null;
 
   const closeMenu = () => {
     if (!menuButton || !mobileMenu) return;
@@ -25,7 +26,8 @@
   });
   mobileMenu?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
 
-  const openSearch = () => {
+  const openSearch = event => {
+    searchReturnFocus = event?.currentTarget instanceof HTMLElement ? event.currentTarget : document.activeElement;
     closeMenu();
     if (!searchDialog) return;
     if (typeof searchDialog.showModal === 'function') searchDialog.showModal();
@@ -36,6 +38,8 @@
     if (!searchDialog) return;
     if (typeof searchDialog.close === 'function') searchDialog.close();
     else searchDialog.removeAttribute('open');
+    if (searchReturnFocus instanceof HTMLElement) searchReturnFocus.focus();
+    searchReturnFocus = null;
   };
   searchOpeners.forEach(button => button.addEventListener('click', openSearch));
   searchCloser?.addEventListener('click', closeSearch);

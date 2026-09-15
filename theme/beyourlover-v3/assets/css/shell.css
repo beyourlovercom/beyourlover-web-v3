@@ -12,7 +12,8 @@
 .byl-brand-dot{width:10px;height:10px;border-radius:50%;background:var(--byl-brand);box-shadow:0 0 0 4px var(--byl-brand-soft)}
 .byl-shell-nav{display:flex;align-items:center;justify-content:center;gap:30px}
 .byl-shell-nav a{position:relative;padding:18px 0 17px;color:var(--byl-ink);font-size:12.5px;font-weight:400;line-height:1;text-decoration:none;letter-spacing:-.005em;white-space:nowrap;transition:color var(--byl-duration-fast) var(--byl-ease)}
-.byl-shell-nav a:hover{color:var(--byl-brand)}
+.byl-shell-nav a:hover,.byl-shell-nav a.is-current{color:var(--byl-brand)}
+.byl-shell-nav a.is-current:after{content:'';position:absolute;left:0;right:0;bottom:11px;height:1px;background:currentColor}
 .byl-shell-actions{display:flex;align-items:center;justify-content:flex-end;gap:3px}
 .byl-shell-icon-btn{position:relative;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:var(--byl-ink);text-decoration:none;cursor:pointer;transition:background-color var(--byl-duration-fast) var(--byl-ease),color var(--byl-duration-fast) var(--byl-ease)}
 .byl-shell-icon-btn:hover{background:var(--byl-surface-soft)}
@@ -27,6 +28,7 @@
 .byl-mobile-menu nav{padding-top:30px;padding-bottom:48px}
 .byl-mobile-menu nav>a{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid rgba(22,19,22,.075);color:var(--byl-ink);font-size:27px;font-weight:500;line-height:1.2;letter-spacing:-.035em;text-decoration:none}
 .byl-mobile-menu nav>a span{font-size:27px;font-weight:300;color:var(--byl-ink-3)}
+.byl-mobile-menu nav>a.is-current{color:var(--byl-brand)}
 .byl-mobile-utility{display:flex;gap:22px;padding-top:26px}.byl-mobile-utility a{font-size:14px;color:var(--byl-ink-2);text-decoration:none}
 .byl-context-nav{position:sticky;top:54px;z-index:calc(var(--byl-z-sticky) - 2);border-bottom:1px solid rgba(22,19,22,.07);background:rgba(250,250,250,.92);backdrop-filter:blur(16px)}
 .byl-context-inner{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:24px}.byl-context-inner strong{font-size:14px;font-weight:600}.byl-context-inner>div{display:flex;gap:20px}.byl-context-inner a{font-size:12px;color:var(--byl-ink-2);text-decoration:none}

@@ -45,6 +45,15 @@ function byl_v3_context_nav(): array {
     return (array) apply_filters('byl_v3_context_nav', []);
 }
 
+function byl_v3_nav_item_is_current(array $item): bool {
+    $target = wp_parse_url((string)($item['url'] ?? ''), PHP_URL_PATH);
+    $current = wp_parse_url((string)($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+    if (!is_string($target) || !is_string($current)) { return false; }
+    $target = untrailingslashit($target) ?: '/';
+    $current = untrailingslashit($current) ?: '/';
+    return $target === $current;
+}
+
 add_action('wp_enqueue_scripts', static function (): void {
     $theme_version = wp_get_theme()->get('Version');
     $dir = get_stylesheet_directory(); $uri = get_stylesheet_directory_uri();

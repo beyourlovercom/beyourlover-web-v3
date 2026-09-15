@@ -20,8 +20,8 @@ $cart_count = byl_v3_cart_count();
       <a href="<?php echo esc_url(home_url('/')); ?>" aria-label="BeYourLover home"><?php echo byl_v3_brand_logo(); ?></a>
     </div>
     <nav class="byl-shell-nav" aria-label="Global navigation">
-      <?php foreach ($nav as $item): ?>
-        <a href="<?php echo esc_url($item['url']); ?>"><?php echo esc_html($item['label']); ?></a>
+      <?php foreach ($nav as $item): $current = byl_v3_nav_item_is_current($item); ?>
+        <a href="<?php echo esc_url($item['url']); ?>"<?php echo $current ? ' class="is-current" aria-current="page"' : ''; ?>><?php echo esc_html($item['label']); ?></a>
       <?php endforeach; ?>
     </nav>
     <div class="byl-shell-actions">
@@ -42,8 +42,8 @@ $cart_count = byl_v3_cart_count();
   </div>
   <div class="byl-mobile-menu" id="byl-mobile-menu" hidden>
     <nav class="byl-container" aria-label="Mobile navigation">
-      <?php foreach ($nav as $item): ?>
-        <a href="<?php echo esc_url($item['url']); ?>"><?php echo esc_html($item['label']); ?><span aria-hidden="true">›</span></a>
+      <?php foreach ($nav as $item): $current = byl_v3_nav_item_is_current($item); ?>
+        <a href="<?php echo esc_url($item['url']); ?>"<?php echo $current ? ' class="is-current" aria-current="page"' : ''; ?>><?php echo esc_html($item['label']); ?><span aria-hidden="true">›</span></a>
       <?php endforeach; ?>
       <div class="byl-mobile-utility">
         <a href="<?php echo esc_url(byl_v3_account_url()); ?>">Account</a>
