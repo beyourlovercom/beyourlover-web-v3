@@ -21,12 +21,23 @@ function byl_v3_primary_nav_items(): array {
     ]);
 }
 
+function byl_v3_attachment_url(int $attachment_id): string {
+    $offloaded = (string) get_post_meta($attachment_id, 'advmo_offloaded', true);
+    $path = trim((string) get_post_meta($attachment_id, 'advmo_path', true), '/');
+    $attached = (string) get_post_meta($attachment_id, '_wp_attached_file', true);
+    if ($offloaded === '1' && $path !== '' && $attached !== '') {
+        return 'https://img.beyourlover.com/'.trailingslashit($path).rawurlencode(wp_basename($attached));
+    }
+    $url = wp_get_attachment_image_url($attachment_id, 'full');
+    return is_string($url) ? $url : '';
+}
+
 function byl_v3_brand_logo(): string {
     foreach (['logo-slogan-red-1-scaled-webp','logo-slogan-red-1-scaled-1-webp','logo-slogan-red-1-scaled','logo-slogan-red-1'] as $slug) {
         $attachment = get_page_by_path($slug, OBJECT, 'attachment');
         if ($attachment instanceof WP_Post) {
-            $url = wp_get_attachment_image_url($attachment->ID, 'full');
-            if ($url) { return '<img class="byl-brand-logo" src="'.esc_url($url).'" alt="BeYourLover®">'; }
+            $url = byl_v3_attachment_url((int) $attachment->ID);
+            if ($url !== '') { return '<img class="byl-brand-logo" src="'.esc_url($url).'" alt="BeYourLover®">'; }
         }
     }
     return '<span class="byl-brand-fallback"><span class="byl-brand-dot" aria-hidden="true"></span>BEYOURLOVER</span>';
