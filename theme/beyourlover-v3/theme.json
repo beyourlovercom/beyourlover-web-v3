@@ -3,22 +3,33 @@
   "version": 3,
   "settings": {
     "appearanceTools": true,
-    "layout": {"contentSize": "760px", "wideSize": "1440px"},
+    "layout": {"contentSize": "1200px", "wideSize": "1440px"},
     "color": {
       "custom": false,
       "palette": [
-        {"slug": "byl-brand", "name": "BYL Brand Red", "color": "#9b3749"},
-        {"slug": "byl-ink", "name": "BYL Ink", "color": "#111111"},
-        {"slug": "byl-soft", "name": "BYL Brand Soft", "color": "#f7ecef"},
-        {"slug": "white", "name": "White", "color": "#ffffff"}
+        {"slug":"byl-brand","name":"BYL Brand Red","color":"#9b3749"},
+        {"slug":"byl-brand-hover","name":"BYL Brand Hover","color":"#7f2d3c"},
+        {"slug":"byl-brand-soft","name":"BYL Brand Soft","color":"#f7ecef"},
+        {"slug":"byl-ink","name":"BYL Ink","color":"#161316"},
+        {"slug":"byl-ink-secondary","name":"BYL Ink Secondary","color":"#655e62"},
+        {"slug":"byl-ink-muted","name":"BYL Ink Muted","color":"#817a7e"},
+        {"slug":"byl-surface-soft","name":"BYL Surface Soft","color":"#f8f6f7"},
+        {"slug":"byl-line","name":"BYL Line","color":"#e7e2e4"},
+        {"slug":"white","name":"White","color":"#ffffff"},
+        {"slug":"byl-success","name":"BYL Success","color":"#247a52"},
+        {"slug":"byl-warning","name":"BYL Warning","color":"#a76514"},
+        {"slug":"byl-danger","name":"BYL Danger","color":"#b4233e"}
       ]
     },
     "typography": {
       "customFontSize": false,
       "fontFamilies": [
-        {"slug": "poppins", "name": "Poppins", "fontFamily": "Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"}
+        {"slug":"poppins","name":"Poppins","fontFamily":"Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"}
       ]
     }
   },
-  "styles": {"typography": {"fontFamily": "var(--wp--preset--font-family--poppins)"}}
+  "styles": {
+    "typography": {"fontFamily":"var(--wp--preset--font-family--poppins)"},
+    "color": {"text":"#161316","background":"#ffffff"}
+  }
 }

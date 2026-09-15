@@ -2,24 +2,28 @@
 @font-face{font-family:'Poppins';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/poppins-500.woff2') format('woff2')}
 @font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/poppins-600.woff2') format('woff2')}
 @font-face{font-family:'Poppins';font-style:normal;font-weight:700;font-display:swap;src:url('../fonts/poppins-700.woff2') format('woff2')}
+
 :root{
   --byl-font:'Poppins',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --byl-font-weight-regular:400;
+  --byl-font-weight-medium:500;
+  --byl-font-weight-semibold:600;
+  --byl-font-weight-bold:700;
+
   --byl-brand:#9b3749;
-  --byl-brand-hover:#812d3d;
+  --byl-brand-hover:#7f2d3c;
   --byl-brand-soft:#f7ecef;
-  --byl-ink:#111111;
-  --byl-ink-2:#444444;
-  --byl-ink-3:#6f6f73;
-  --byl-line:#e7e7e9;
+  --byl-ink:#161316;
+  --byl-ink-2:#655e62;
+  --byl-ink-3:#817a7e;
   --byl-surface:#ffffff;
-  --byl-surface-2:#f7f7f8;
-  --byl-success:#218739;
-  --byl-warning:#9a6700;
-  --byl-danger:#b42318;
-  --byl-radius-sm:10px;
-  --byl-radius-md:16px;
-  --byl-radius-lg:24px;
-  --byl-radius-pill:999px;
+  --byl-surface-soft:#f8f6f7;
+  --byl-line:#e7e2e4;
+  --byl-success:#247a52;
+  --byl-warning:#a76514;
+  --byl-danger:#b4233e;
+  --byl-focus:#9b3749;
+}
 
 :root{
   --byl-space-1:4px;
@@ -31,17 +35,36 @@
   --byl-space-7:48px;
   --byl-space-8:64px;
   --byl-space-9:96px;
-  --byl-container:1440px;
-  --byl-gutter:clamp(20px,4vw,64px);
-  --byl-shadow-1:0 1px 2px rgba(17,17,17,.05),0 8px 24px rgba(17,17,17,.06);
-  --byl-shadow-2:0 18px 48px rgba(17,17,17,.10);
-  --byl-ease:cubic-bezier(.2,.8,.2,1);
-  --byl-duration-fast:160ms;
-  --byl-duration-base:260ms;
-  --byl-duration-slow:520ms;
+
+  --byl-radius-sm:10px;
+  --byl-radius-md:16px;
+  --byl-radius-lg:24px;
+  --byl-radius-pill:999px;
+
+  --byl-shell-max:1440px;
+  --byl-content-max:1200px;
+  --byl-reading-max:760px;
+  --byl-gutter:clamp(20px,4vw,56px);
+
+  --byl-shadow-1:0 1px 2px rgba(22,19,22,.04),0 8px 24px rgba(22,19,22,.06);
+  --byl-shadow-2:0 18px 48px rgba(22,19,22,.10);
 }
+:root{
+  --byl-duration-fast:120ms;
+  --byl-duration-base:220ms;
+  --byl-duration-slow:420ms;
+  --byl-ease:cubic-bezier(.2,.8,.2,1);
+  --byl-ease-emphasized:cubic-bezier(.2,.7,0,1);
+
+  --byl-z-base:0;
+  --byl-z-dropdown:100;
+  --byl-z-sticky:200;
+  --byl-z-modal:1000;
+}
+
 html{font-family:var(--byl-font);color:var(--byl-ink);background:var(--byl-surface)}
-body{margin:0;font-family:var(--byl-font);font-size:16px;line-height:1.6;color:var(--byl-ink);background:var(--byl-surface);-webkit-font-smoothing:antialiased}
+body{margin:0;font-family:var(--byl-font);font-size:16px;line-height:1.6;color:var(--byl-ink);background:var(--byl-surface);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 *,*:before,*:after{box-sizing:border-box}
 img{max-width:100%;height:auto}
-a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--byl-focus);outline-offset:3px}
+::selection{background:var(--byl-brand-soft);color:var(--byl-ink)}
