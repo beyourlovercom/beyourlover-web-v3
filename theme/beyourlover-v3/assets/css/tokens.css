@@ -107,3 +107,12 @@ img{max-width:100%;height:auto}
   --byl-icon-md:20px;
   --byl-icon-lg:24px;
 }
+@media(max-width:640px){
+  :root{
+    --byl-type-display-xl:clamp(40px,11vw,48px);
+    --byl-type-display-l:clamp(36px,10vw,44px);
+    --byl-type-heading-xl:clamp(30px,8vw,38px);
+    --byl-type-heading-l:clamp(26px,7vw,34px);
+    --byl-gutter:20px;
+  }
+}
