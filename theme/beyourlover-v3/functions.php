@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
+require_once get_stylesheet_directory().'/inc/components.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
@@ -103,7 +104,8 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_enqueue_style('byl-v3-foundation', get_stylesheet_uri(), [], $v('style.css'));
     wp_enqueue_style('byl-v3-tokens', $uri.'/assets/css/tokens.css', ['byl-v3-foundation'], $v('assets/css/tokens.css'));
     wp_enqueue_style('byl-v3-components', $uri.'/assets/css/components.css', ['byl-v3-tokens'], $v('assets/css/components.css'));
-    wp_enqueue_style('byl-v3-shell', $uri.'/assets/css/shell.css', ['byl-v3-components'], $v('assets/css/shell.css'));
+    wp_enqueue_style('byl-v3-component-library', $uri.'/assets/css/component-library.css', ['byl-v3-components'], $v('assets/css/component-library.css'));
+    wp_enqueue_style('byl-v3-shell', $uri.'/assets/css/shell.css', ['byl-v3-component-library'], $v('assets/css/shell.css'));
     wp_enqueue_style('byl-v3-motion', $uri.'/assets/css/motion.css', ['byl-v3-shell'], $v('assets/css/motion.css'));
     wp_enqueue_script('byl-v3-shell', $uri.'/assets/js/shell.js', [], $v('assets/js/shell.js'), true);
     wp_script_add_data('byl-v3-shell', 'strategy', 'defer');
