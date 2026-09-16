@@ -3,14 +3,7 @@ declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 get_header();
 ?>
-<main class="byl-ds" data-byl-v3-design-system="v1">
-  <nav class="byl-ds-nav" aria-label="V3 Design System preview">
-    <div class="byl-container byl-ds-nav-inner">
-      <div class="byl-ds-brand"><span class="byl-ds-mark" aria-hidden="true"></span><span>BEYOURLOVER</span></div>
-      <div class="byl-ds-nav-meta">Design System V1 · G3</div>
-    </div>
-  </nav>
-
+<main id="main-content" class="byl-ds" data-byl-v3-design-system="v1" data-byl-g4-shell-preview="true">
   <section class="byl-ds-hero">
     <div class="byl-container byl-ds-hero-grid">
       <div class="byl-ds-copy" data-byl-motion="rise">
