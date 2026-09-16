@@ -42,13 +42,13 @@ function byl_v3_product_card(WC_Product $product): string {
         <h3 class="byl-product-title"><a href="<?php echo esc_url((string)$url); ?>"><?php echo esc_html($product->get_name()); ?></a></h3>
         <div class="byl-product-meta">
           <div class="byl-rating" aria-label="<?php echo esc_attr($rating > 0 ? $rating.' out of 5 stars' : 'No ratings yet'); ?>">
-            <span aria-hidden="true">★</span><strong><?php echo $rating > 0 ? esc_html(number_format($rating, 1)) : '—'; ?></strong>
+            <span aria-hidden="true">&#9733;</span><strong><?php echo $rating > 0 ? esc_html(number_format($rating, 1)) : '—'; ?></strong>
             <?php if ($count > 0): ?><small><?php echo esc_html('('.$count.')'); ?></small><?php endif; ?>
           </div>
           <div class="byl-price"><?php echo wp_kses_post($product->get_price_html()); ?></div>
         </div>
         <a class="byl-product-cta" href="<?php echo esc_url((string)$url); ?>">
-          <span><?php echo $product->is_in_stock() ? 'Explore' : 'View product'; ?></span><?php echo byl_v3_icon('arrow'); ?>
+          <span>View product</span><?php echo byl_v3_icon('arrow'); ?>
         </a>
       </div>
     </article>

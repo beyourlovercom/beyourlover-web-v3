@@ -14,10 +14,7 @@ $products = byl_v3_showcase_products(4);
         <p class="byl-body-l">The shared UI layer for commerce, editorial, docs and support. Built on G3 tokens and independent of Shoptimizer runtime.</p>
       </div>
       <div class="byl-component-summary" aria-label="Component summary">
-        <div class="byl-component-stat"><strong>4</strong><span>component families</span></div>
-        <div class="byl-component-stat"><strong>390–1440</strong><span>responsive gate</span></div>
-        <div class="byl-component-stat"><strong>Woo</strong><span>real data source</span></div>
-        <div class="byl-component-stat"><strong>AA</strong><span>focus & semantics</span></div>
+        <span><strong>4</strong> families</span><span><strong>Woo</strong> data</span><span><strong>390–1440</strong> responsive</span><span><strong>AA</strong> focus</span>
       </div>
     </div>
   </section>
@@ -59,9 +56,9 @@ $products = byl_v3_showcase_products(4);
         <p class="byl-body-m">Editorial, Docs and Support cards share spacing and motion while preserving their own information hierarchy.</p>
       </div>
       <div class="byl-component-grid">
-        <a class="byl-content-card" href="/blog/"><?php echo byl_v3_icon('book'); ?><h3>Editorial story</h3><p>Long-form discovery with restrained hierarchy and a generous reading rhythm.</p><footer><span>Learn</span><?php echo byl_v3_icon('arrow'); ?></footer></a>
-        <a class="byl-content-card" href="/docs/"><?php echo byl_v3_icon('book'); ?><h3>Setup & care guide</h3><p>Docs-ready navigation without depending on BetterDocs visual runtime.</p><footer><span>Guide · 6 min</span><?php echo byl_v3_icon('arrow'); ?></footer></a>
-        <a class="byl-content-card" href="/customer-help/"><?php echo byl_v3_icon('info'); ?><h3>Customer support</h3><p>Clear utility entry points for shipping, returns, account and product help.</p><footer><span>Support</span><?php echo byl_v3_icon('arrow'); ?></footer></a>
+        <a class="byl-content-card is-editorial" href="/blog/"><?php echo byl_v3_icon('book'); ?><span class="byl-content-label">Editorial</span><h3>Editorial story</h3><p>Long-form discovery with restrained hierarchy and a generous reading rhythm.</p><footer><span>Story · 5 min</span><?php echo byl_v3_icon('arrow'); ?></footer></a>
+        <a class="byl-content-card is-docs" href="/docs/"><?php echo byl_v3_icon('book'); ?><span class="byl-content-label">Guide</span><h3>Setup & care guide</h3><p>Docs-ready navigation without depending on BetterDocs visual runtime.</p><footer><span>6 min · Step by step</span><?php echo byl_v3_icon('arrow'); ?></footer></a>
+        <a class="byl-content-card is-support" href="/customer-help/"><?php echo byl_v3_icon('info'); ?><span class="byl-content-label">Help center</span><h3>Customer support</h3><p>Clear utility entry points for shipping, returns, account and product help.</p><footer><span>Shipping · Returns · Account</span><?php echo byl_v3_icon('arrow'); ?></footer></a>
       </div>
     </div>
   </section>
@@ -73,9 +70,9 @@ $products = byl_v3_showcase_products(4);
         <p class="byl-body-m">Form controls and system feedback prioritize clarity, focus visibility and low visual noise.</p>
       </div>
       <div class="byl-component-grid">
-        <article class="byl-demo-panel byl-stack"><h3>Form primitives</h3><div class="byl-field"><label for="g5-email">Email</label><input class="byl-input" id="g5-email" type="email" placeholder="name@example.com"><span class="byl-field-help">Used for account, checkout and support patterns.</span></div><div class="byl-field"><label for="g5-select">Preference</label><select class="byl-select" id="g5-select"><option>Discreet delivery</option><option>Standard delivery</option></select></div><label class="byl-check"><input type="checkbox" checked><span>Remember this preference</span></label></article>
-        <article class="byl-demo-panel byl-stack"><h3>System feedback</h3><div class="byl-notice byl-notice-info"><?php echo byl_v3_icon('info'); ?><span>Helpful information stays visible without competing with the primary action.</span></div><div class="byl-notice byl-notice-success"><?php echo byl_v3_icon('check'); ?><span>Saved successfully.</span></div><div class="byl-notice byl-notice-danger"><?php echo byl_v3_icon('info'); ?><span>Something needs attention before continuing.</span></div></article>
-        <article class="byl-demo-panel byl-stack"><h3>Empty & loading</h3><div class="byl-empty"><?php echo byl_v3_icon('bag'); ?><strong>Nothing here yet</strong><span class="byl-body-s">A calm empty state with one clear next action.</span></div><div class="byl-skeleton" style="height:18px;width:72%" aria-hidden="true"></div><div class="byl-skeleton" style="height:96px;width:100%" aria-hidden="true"></div></article>
+        <article class="byl-demo-panel byl-demo-panel-quiet byl-stack"><h3>Form primitives</h3><div class="byl-field"><label for="g5-email">Email</label><input class="byl-input" id="g5-email" type="email" placeholder="name@example.com"><span class="byl-field-help">Used for account, checkout and support patterns.</span></div><div class="byl-field"><label for="g5-select">Preference</label><select class="byl-select" id="g5-select"><option>Discreet delivery</option><option>Standard delivery</option></select></div><label class="byl-check"><input type="checkbox" checked><span>Remember this preference</span></label></article>
+        <article class="byl-demo-panel byl-demo-panel-quiet byl-stack"><h3>System feedback</h3><div class="byl-notice byl-notice-info"><?php echo byl_v3_icon('info'); ?><span>Helpful information stays visible without competing with the primary action.</span></div><div class="byl-notice byl-notice-success"><?php echo byl_v3_icon('check'); ?><span>Saved successfully.</span></div><div class="byl-notice byl-notice-danger"><?php echo byl_v3_icon('info'); ?><span>Something needs attention before continuing.</span></div></article>
+        <article class="byl-demo-panel byl-demo-panel-quiet byl-stack"><h3>Empty & loading</h3><div class="byl-empty"><?php echo byl_v3_icon('bag'); ?><strong>Nothing here yet</strong><span class="byl-body-s">A calm empty state with one clear next action.</span></div><div class="byl-skeleton" style="height:18px;width:72%" aria-hidden="true"></div><div class="byl-skeleton" style="height:96px;width:100%" aria-hidden="true"></div></article>
       </div>
     </div>
   </section>

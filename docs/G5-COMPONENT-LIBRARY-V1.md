@@ -29,3 +29,9 @@ G5 does not define Homepage, Product, Category, Cart, Checkout, Account or Docs 
 
 ## UAT surface
 `/component-library/` is the canonical local showcase. It must render Foundation, Commerce with real Woo products, Content, Forms and State families in one page.
+
+## G5.6 Visual Polish
+- Product media surfaces are normalized with a consistent aspect ratio, warm neutral surface, contain-fit image treatment and safe padding.
+- Hero technical stats are compressed into one restrained meta row.
+- Editorial, Docs and Support cards share one skeleton but expose distinct information priority.
+- Forms/states reduce outer card chrome; section density is tightened without changing component contracts.
