@@ -2,6 +2,7 @@
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 require_once get_stylesheet_directory().'/inc/components.php';
+require_once get_stylesheet_directory().'/inc/homepage.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
@@ -109,7 +110,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_enqueue_style('byl-v3-motion', $uri.'/assets/css/motion.css', ['byl-v3-shell'], $v('assets/css/motion.css'));
     wp_enqueue_script('byl-v3-shell', $uri.'/assets/js/shell.js', [], $v('assets/js/shell.js'), true);
     wp_script_add_data('byl-v3-shell', 'strategy', 'defer');
-    if (is_front_page()) { wp_enqueue_style('byl-v3-preview', $uri.'/assets/css/preview.css', ['byl-v3-motion'], $v('assets/css/preview.css')); }
+    if (is_front_page()) { wp_enqueue_style('byl-v3-homepage', $uri.'/assets/css/homepage.css', ['byl-v3-motion'], $v('assets/css/homepage.css')); }
 });
 
 add_filter('body_class', static function (array $classes): array { $classes[]='byl-shell-active'; return $classes; });
