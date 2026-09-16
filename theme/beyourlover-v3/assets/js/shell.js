@@ -9,11 +9,41 @@
   const searchInput = document.getElementById('byl-global-search');
   let searchReturnFocus = null;
 
+  const setupMobileSubmenus = () => {
+    mobileMenu?.querySelectorAll('.menu-item-has-children').forEach((item, index) => {
+      const submenu = item.querySelector(':scope > .sub-menu');
+      const link = item.querySelector(':scope > a');
+      if (!submenu || !link || item.querySelector(':scope > .byl-mobile-submenu-toggle')) return;
+      const id = submenu.id || `byl-mobile-submenu-${index + 1}`;
+      submenu.id = id;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'byl-mobile-submenu-toggle';
+      button.setAttribute('aria-expanded', 'false');
+      button.setAttribute('aria-controls', id);
+      button.setAttribute('aria-label', `Expand ${link.textContent?.trim() || 'submenu'}`);
+      button.textContent = '+';
+      link.insertAdjacentElement('afterend', button);
+      button.addEventListener('click', () => {
+        const open = button.getAttribute('aria-expanded') === 'true';
+        button.setAttribute('aria-expanded', open ? 'false' : 'true');
+        button.setAttribute('aria-label', `${open ? 'Expand' : 'Collapse'} ${link.textContent?.trim() || 'submenu'}`);
+        item.classList.toggle('is-open', !open);
+      });
+    });
+  };
+
+  const resetMobileSubmenus = () => {
+    mobileMenu?.querySelectorAll('.menu-item-has-children.is-open').forEach(item => item.classList.remove('is-open'));
+    mobileMenu?.querySelectorAll('.byl-mobile-submenu-toggle[aria-expanded="true"]').forEach(button => button.setAttribute('aria-expanded', 'false'));
+  };
+
   const closeMenu = () => {
     if (!menuButton || !mobileMenu) return;
     menuButton.setAttribute('aria-expanded', 'false');
     mobileMenu.hidden = true;
     document.body.classList.remove('byl-shell-menu-open');
+    resetMobileSubmenus();
   };
   const openMenu = () => {
     if (!menuButton || !mobileMenu) return;
@@ -21,6 +51,8 @@
     mobileMenu.hidden = false;
     document.body.classList.add('byl-shell-menu-open');
   };
+
+  setupMobileSubmenus();
   menuButton?.addEventListener('click', () => {
     menuButton.getAttribute('aria-expanded') === 'true' ? closeMenu() : openMenu();
   });

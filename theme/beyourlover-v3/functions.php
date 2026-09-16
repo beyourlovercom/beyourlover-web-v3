@@ -8,17 +8,48 @@ add_action('after_setup_theme', static function (): void {
     add_theme_support('woocommerce');
     add_theme_support('custom-logo');
     add_theme_support('html5', ['search-form','comment-form','comment-list','gallery','caption','style','script']);
-    register_nav_menus(['primary' => 'Global navigation', 'footer' => 'Footer navigation']);
+    register_nav_menus(['primary' => 'Global navigation', 'mobile' => 'Mobile navigation', 'footer' => 'Footer navigation']);
 });
 
-function byl_v3_primary_nav_items(): array {
-    return apply_filters('byl_v3_primary_nav_items', [
-        ['label' => 'Products', 'url' => home_url('/shop/')],
-        ['label' => 'Explore', 'url' => home_url('/best-sellers/')],
-        ['label' => 'App', 'url' => home_url('/app-guide/')],
-        ['label' => 'Learn', 'url' => home_url('/blog/')],
+function byl_v3_legacy_nav_locations(): array {
+    $mods = get_option('theme_mods_shoptimizer-child-theme', []);
+    return is_array($mods) && isset($mods['nav_menu_locations']) && is_array($mods['nav_menu_locations']) ? $mods['nav_menu_locations'] : [];
+}
+
+function byl_v3_menu_id(string $location): int {
+    $locations = get_nav_menu_locations();
+    if (!empty($locations[$location])) { return (int) $locations[$location]; }
+    $legacy = byl_v3_legacy_nav_locations();
+    if (!empty($legacy[$location])) { return (int) $legacy[$location]; }
+    if ($location === 'mobile' && !empty($locations['primary'])) { return (int) $locations['primary']; }
+    if ($location === 'mobile' && !empty($legacy['primary'])) { return (int) $legacy['primary']; }
+    return 0;
+}
+
+function byl_v3_seed_nav_locations_from_legacy(): void {
+    $current = get_theme_mod('nav_menu_locations', []);
+    $current = is_array($current) ? $current : [];
+    $legacy = byl_v3_legacy_nav_locations();
+    $changed = false;
+    foreach (['primary', 'mobile'] as $location) {
+        if (empty($current[$location]) && !empty($legacy[$location])) {
+            $current[$location] = (int) $legacy[$location];
+            $changed = true;
+        }
+    }
+    if ($changed) { set_theme_mod('nav_menu_locations', $current); }
+}
+add_action('after_switch_theme', 'byl_v3_seed_nav_locations_from_legacy');
+
+function byl_v3_fallback_nav_items(): array {
+    return [
+        ['label' => 'New Arrivals', 'url' => home_url('/new-arrivals/')],
+        ['label' => 'Categories', 'url' => home_url('/sex-toys/')],
+        ['label' => 'Best Sellers', 'url' => home_url('/best-sellers/')],
+        ['label' => 'Apps', 'url' => home_url('/app-guide/')],
+        ['label' => 'Blog', 'url' => home_url('/blog/')],
         ['label' => 'Support', 'url' => home_url('/customer-help/')],
-    ]);
+    ];
 }
 
 function byl_v3_attachment_url(int $attachment_id): string {

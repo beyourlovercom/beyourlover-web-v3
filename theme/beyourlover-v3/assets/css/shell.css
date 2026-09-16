@@ -49,3 +49,39 @@
 @media(max-width:640px){.byl-shell-header,.byl-shell-bar{height:50px}.byl-shell-bar{padding-inline:18px}.byl-brand-logo{height:22px;max-width:160px}.byl-shell-icon-btn{width:36px;height:36px}.byl-mobile-menu{inset:50px 0 0}.byl-mobile-menu nav{padding-inline:20px}.byl-context-nav{top:50px}.byl-context-inner{overflow:auto;white-space:nowrap;padding-inline:20px}.byl-footer-main{padding-top:54px;padding-bottom:44px;gap:38px}.byl-footer-grid{grid-template-columns:1fr 1fr;row-gap:34px}.byl-footer-bottom{align-items:flex-start;flex-direction:column;padding-bottom:28px}.byl-search-panel{min-height:320px}.byl-search-form{margin-top:30px}}
 @media(max-width:420px){.byl-shell-actions{gap:0}.byl-footer-grid{grid-template-columns:1fr}.byl-search-form{width:calc(100% - 40px)}}
 @media(prefers-reduced-motion:reduce){.byl-shell-header,.byl-shell-icon-btn,.byl-shell-menu-btn span{transition:none}}
+/* G4.6 canonical WordPress navigation */
+.byl-shell-nav{align-self:stretch;min-width:0}
+.byl-shell-menu{height:100%;display:flex;align-items:stretch;justify-content:center;gap:28px;margin:0;padding:0;list-style:none}
+.byl-shell-menu li{margin:0;list-style:none}
+.byl-shell-menu>li{position:relative;display:flex;align-items:stretch}
+.byl-shell-menu>li>a{display:flex;align-items:center;position:relative;padding:0;color:var(--byl-ink);font-size:12.5px;font-weight:400;line-height:1;text-decoration:none;letter-spacing:-.005em;white-space:nowrap}
+.byl-shell-menu>li>a:hover,.byl-shell-menu>li.current-menu-item>a,.byl-shell-menu>li.current-menu-ancestor>a{color:var(--byl-brand)}
+.byl-shell-menu>li.current-menu-item>a:after,.byl-shell-menu>li.current-menu-ancestor>a:after{content:'';position:absolute;left:0;right:0;bottom:11px;height:1px;background:currentColor}
+.byl-shell-menu .sub-menu{display:none;position:absolute;top:calc(100% - 1px);left:-18px;z-index:30;width:270px;margin:0;padding:14px;border:1px solid rgba(22,19,22,.08);border-radius:16px;background:rgba(255,255,255,.985);box-shadow:0 18px 55px rgba(22,19,22,.10);list-style:none}
+.byl-shell-menu>li:hover>.sub-menu,.byl-shell-menu>li:focus-within>.sub-menu{display:block}
+.byl-shell-menu .sub-menu li{position:relative}
+.byl-shell-menu .sub-menu a{display:block;padding:8px 10px;border-radius:8px;color:var(--byl-ink-2);font-size:12px;font-weight:400;line-height:1.35;text-decoration:none;white-space:normal}
+.byl-shell-menu .sub-menu a:hover,.byl-shell-menu .sub-menu .current-menu-item>a{background:var(--byl-surface-soft);color:var(--byl-brand)}
+.byl-shell-menu .sub-menu .sub-menu{position:static;display:block;width:auto;margin:2px 0 7px;padding:0 0 0 10px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.byl-shell-menu .sub-menu .sub-menu a{padding:5px 8px;font-size:11px;color:var(--byl-ink-3)}
+.byl-shell-menu>li:has(>.sub-menu>li:nth-child(5))>.sub-menu{position:fixed;top:54px;left:50%;transform:translateX(-50%);width:min(1120px,calc(100vw - 40px));max-height:calc(100vh - 74px);overflow:auto;padding:24px;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 26px}
+.byl-shell-menu>li:has(>.sub-menu>li:nth-child(5)):hover>.sub-menu,.byl-shell-menu>li:has(>.sub-menu>li:nth-child(5)):focus-within>.sub-menu{display:grid}
+.byl-shell-menu>li:has(>.sub-menu>li:nth-child(5))>.sub-menu>li>a{font-weight:600;color:var(--byl-ink)}
+.byl-mobile-wordpress-menu,.byl-mobile-wordpress-menu ul{margin:0;padding:0;list-style:none}
+.byl-mobile-wordpress-menu>li{position:relative;border-bottom:1px solid rgba(22,19,22,.075)}
+.byl-mobile-wordpress-menu li{position:relative}
+.byl-mobile-wordpress-menu a{display:block;color:var(--byl-ink);text-decoration:none}
+.byl-mobile-wordpress-menu>li>a{padding:16px 48px 16px 0;font-size:25px;font-weight:500;line-height:1.2;letter-spacing:-.035em}
+.byl-mobile-wordpress-menu .current-menu-item>a,.byl-mobile-wordpress-menu .current-menu-ancestor>a{color:var(--byl-brand)}
+.byl-mobile-submenu-toggle{position:absolute;right:0;top:10px;width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:var(--byl-ink-3);font-size:23px;font-weight:300;line-height:1;cursor:pointer;transition:background-color var(--byl-duration-fast) var(--byl-ease),transform var(--byl-duration-base) var(--byl-ease)}
+.byl-mobile-submenu-toggle:hover{background:var(--byl-surface-soft)}
+.byl-mobile-submenu-toggle[aria-expanded="true"]{transform:rotate(45deg)}
+.byl-mobile-wordpress-menu .sub-menu{display:none;padding:0 0 14px 16px}
+.byl-mobile-wordpress-menu li.is-open>.sub-menu{display:block}
+.byl-mobile-wordpress-menu .sub-menu li{border-top:1px solid rgba(22,19,22,.05)}
+.byl-mobile-wordpress-menu .sub-menu a{padding:10px 44px 10px 0;font-size:16px;line-height:1.35;color:var(--byl-ink-2)}
+.byl-mobile-wordpress-menu .sub-menu .sub-menu{padding-left:14px}
+.byl-mobile-wordpress-menu .sub-menu .sub-menu a{font-size:14px;color:var(--byl-ink-3)}
+@media(max-width:980px){.byl-shell-menu{display:none}}
+@media(max-width:640px){.byl-shell-menu>li:has(>.sub-menu>li:nth-child(5))>.sub-menu{top:50px}.byl-mobile-wordpress-menu>li>a{font-size:23px}}
+@media(prefers-reduced-motion:reduce){.byl-mobile-submenu-toggle{transition:none}}

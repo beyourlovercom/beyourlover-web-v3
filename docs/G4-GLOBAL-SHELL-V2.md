@@ -7,10 +7,16 @@ G4 owns the persistent site chrome only. It turns the G3 Design System into a re
 
 ## Canonical desktop shell
 - Existing BeYourLover logo; media resolves through the canonical R2 origin when offloaded.
-- Primary navigation: Products / Explore / App / Learn / Support.
+- Primary navigation is sourced from the canonical WordPress `primary` menu location; no hard-coded production menu labels.
 - Utility actions: Search / Account / Cart.
 - Sticky translucent header with restrained blur and low-contrast divider.
 - Optional context local navigation below the global header.
+
+## Navigation data contract
+- WordPress menu data is the content/source of truth; the V3 theme owns rendering, interaction, and visual treatment only.
+- Desktop reads `primary`; mobile reads `mobile`, with safe fallback to `primary` only when the mobile location is unassigned.
+- During cutover, matching legacy menu-location IDs may be seeded into V3 theme mods without copying Shoptimizer markup, CSS, or runtime code.
+- Current cloned baseline resolves `primary=652` and `mobile=652` (`Main-Header-2026`, 85 items).
 
 ## Canonical mobile shell
 - Brand logo remains visible.
