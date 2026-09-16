@@ -14,7 +14,7 @@ $categories = array_filter([
   <section class="byl-home-hero">
     <div class="byl-container byl-home-hero-grid">
       <div class="byl-home-hero-copy" data-byl-motion="rise">
-        <p class="byl-eyebrow">BEYOURLOVER®</p>
+        <p class="byl-eyebrow">BeYourLover®</p>
         <h1>BeYourLover Sex Toys</h1>
         <p class="byl-home-lede">Cute, original adult toys designed around intimacy, curiosity and pleasure — with a calmer way to discover what fits you.</p>
         <div class="byl-home-actions">

@@ -73,7 +73,7 @@ function byl_v3_brand_logo(): string {
             if ($url !== '') { return '<img class="byl-brand-logo" src="'.esc_url($url).'" alt="BeYourLover®">'; }
         }
     }
-    return '<span class="byl-brand-fallback"><span class="byl-brand-dot" aria-hidden="true"></span>BEYOURLOVER</span>';
+    return '<span class="byl-brand-fallback"><span class="byl-brand-dot" aria-hidden="true"></span>BeYourLover</span>';
 }
 
 function byl_v3_account_url(): string {

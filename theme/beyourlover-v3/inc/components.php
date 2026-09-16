@@ -38,7 +38,7 @@ function byl_v3_product_card(WC_Product $product): string {
         <?php if ($image !== ''): ?><img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($product->get_name()); ?>" loading="lazy"><?php endif; ?>
       </a>
       <div class="byl-product-body">
-        <div class="byl-product-kicker"><?php echo esc_html($product->get_sku() ?: 'BEYOURLOVER'); ?></div>
+        <div class="byl-product-kicker"><?php echo esc_html($product->get_sku() ?: 'BeYourLover'); ?></div>
         <h3 class="byl-product-title"><a href="<?php echo esc_url((string)$url); ?>"><?php echo esc_html($product->get_name()); ?></a></h3>
         <div class="byl-product-meta">
           <div class="byl-rating" aria-label="<?php echo esc_attr($rating > 0 ? $rating.' out of 5 stars' : 'No ratings yet'); ?>">
