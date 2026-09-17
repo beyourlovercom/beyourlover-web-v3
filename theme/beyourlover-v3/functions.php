@@ -2,6 +2,7 @@
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 require_once get_stylesheet_directory().'/inc/components.php';
+require_once get_stylesheet_directory().'/inc/shell-profiles.php';
 require_once get_stylesheet_directory().'/inc/homepage.php';
 require_once get_stylesheet_directory().'/inc/archive.php';
 
@@ -115,4 +116,12 @@ add_action('wp_enqueue_scripts', static function (): void {
     if (function_exists('is_shop') && (is_shop() || (function_exists('is_product_taxonomy') && is_product_taxonomy()))) { wp_enqueue_style('byl-v3-archive', $uri.'/assets/css/archive.css', ['byl-v3-motion'], $v('assets/css/archive.css')); }
 });
 
-add_filter('body_class', static function (array $classes): array { $classes[]='byl-shell-active'; return $classes; });
+add_filter('body_class', static function (array $classes): array {
+    $classes[] = 'byl-shell-active';
+    $header = byl_v3_current_header_profile();
+    $footer = byl_v3_current_footer_profile();
+    $classes[] = 'byl-header-profile-'.sanitize_html_class($header);
+    $classes[] = 'byl-footer-profile-'.sanitize_html_class($footer);
+    if (byl_v3_shell_overlay_enabled($header)) { $classes[] = 'byl-shell-overlay'; }
+    return $classes;
+});
