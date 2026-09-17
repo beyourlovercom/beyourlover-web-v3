@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M02 Highlights Gallery — Naughty Clock Pink</title>
+<style>
+:root{--ink:#111;--muted:#6e6e73;--bg:#f5f5f7;--accent:#c95a72;--gutter:clamp(20px,6vw,96px)}
+*{box-sizing:border-box}html,body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif}
+header{height:64px;border-bottom:1px solid #e8e8ed;display:flex;align-items:center;justify-content:space-between;padding:0 var(--gutter);background:#fff;position:sticky;top:0;z-index:10}
+.brand{font-size:24px;font-weight:700;letter-spacing:-.04em}.nav{display:flex;gap:32px;font-size:13px}.icons{display:flex;gap:18px}
+.m02{min-height:calc(100svh - 64px);padding:72px 0 72px;background:var(--bg);overflow:hidden}
+.head{max-width:1320px;margin:0 auto 38px;padding:0 var(--gutter);display:flex;align-items:end;justify-content:space-between;gap:20px}
+.head h1{margin:0;font-size:clamp(42px,5vw,76px);line-height:.98;letter-spacing:-.055em}.head p{margin:0 0 5px;color:var(--muted);font-size:16px}
+.rail{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 var(--gutter) 18px;scrollbar-width:none;overscroll-behavior-inline:contain}.rail::-webkit-scrollbar{display:none}
+.card{scroll-snap-align:center;position:relative;flex:0 0 min(78vw,980px);height:min(63vw,630px);min-height:520px;border-radius:30px;overflow:hidden;background:#ddd;box-shadow:0 20px 60px rgba(0,0,0,.08)}
+.card img{width:100%;height:100%;object-fit:cover;display:block}.card::after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.copy{position:absolute;left:42px;right:42px;bottom:36px;z-index:2;color:#fff;max-width:560px}.copy .eyebrow{font-size:13px;letter-spacing:.16em;text-transform:uppercase;opacity:.82}.copy h2{font-size:clamp(32px,4vw,56px);line-height:1;margin:10px 0 12px;letter-spacing:-.04em}.copy p{font-size:18px;line-height:1.45;margin:0;max-width:520px}
+.controls{max-width:1320px;margin:12px auto 0;padding:0 var(--gutter);display:flex;justify-content:flex-end;gap:10px}.controls button{width:46px;height:46px;border:0;border-radius:50%;background:#1d1d1f;color:#fff;font-size:22px;cursor:pointer}
+@media(max-width:760px){header{height:54px}.nav{display:none}.m02{min-height:calc(100svh - 54px);padding:52px 0}.head{display:block;margin-bottom:28px}.head h1{font-size:44px}.head p{margin-top:14px}.rail{gap:14px}.card{flex-basis:86vw;height:72svh;min-height:560px;border-radius:24px}.copy{left:24px;right:24px;bottom:24px}.copy p{font-size:16px}.controls{display:none}}
+</style></head><body>
+<header><div class="brand">BeYourLover</div><nav class="nav"><span>New Arrivals</span><span>Categories</span><span>Best Sellers</span><span>Apps</span><span>Blog</span><span>Support</span></nav><div class="icons"><span>⌕</span><span>♙</span><span>🛒</span></div></header>
+<section class="m02">
+<div class="head"><h1>Get the highlights.</h1><p>Three reasons Naughty Clock feels different.</p></div>
+<div class="rail" id="rail">
+<article class="card"><img src="https://www.beyourlover.com/wp-content/uploads/2026/02/naughty-clock-pink-selling-points-01.gif" alt="2-in-1 Design"><div class="copy"><div class="eyebrow">Naughty Clock Pink</div><h2>2‑in‑1 Design</h2><p>A working alarm clock on the outside. Detachable suction and vibration functions for private moments.</p></div></article>
+<article class="card"><img src="https://www.beyourlover.com/wp-content/uploads/2026/02/naughty-clock-pink-selling-points-02.png" alt="Cute, Yet Discreet"><div class="copy"><div class="eyebrow">Hidden in plain sight</div><h2>Cute, Yet Discreet</h2><p>Designed to live naturally on your nightstand without giving away what it can really do.</p></div></article>
+<article class="card"><img src="https://www.beyourlover.com/wp-content/uploads/2026/02/naughty-clock-pink-selling-points-03.png" alt="A Gift for Special Moments"><div class="copy"><div class="eyebrow">Made to surprise</div><h2>A Gift for Special Moments</h2><p>A playful, polished gift idea for anniversaries, Valentine’s Day, and nights worth remembering.</p></div></article>
+</div>
+<div class="controls"><button type="button" aria-label="Previous" onclick="move(-1)">‹</button><button type="button" aria-label="Next" onclick="move(1)">›</button></div>
+</section>
+<script>function move(d){const r=document.getElementById('rail'),c=r.querySelector('.card');r.scrollBy({left:d*(c.getBoundingClientRect().width+22),behavior:'smooth'})}</script>
+</body></html>
