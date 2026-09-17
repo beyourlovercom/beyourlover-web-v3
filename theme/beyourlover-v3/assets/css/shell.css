@@ -138,3 +138,8 @@
   .byl-shell-footer--global .byl-footer-group,.byl-shell-footer--landing .byl-footer-group,.byl-shell-footer--utility .byl-footer-group{gap:9px 15px}
 }
 @media(prefers-reduced-motion:reduce){.byl-shell-cta{transition:none}.byl-mobile-wordpress-menu .byl-mobile-next{transition:none}}
+
+/* G6.2.5 canonical shell logo sizing: isolate from legacy/Woo image rules */
+.byl-shell-header .byl-brand-logo{display:block!important;width:auto!important;height:24px!important;max-width:190px!important;min-width:0!important;object-fit:contain!important;object-position:left center!important}
+.byl-shell-footer .byl-brand-logo{display:block!important;width:auto!important;height:28px!important;max-width:210px!important;min-width:0!important;object-fit:contain!important;object-position:left center!important}
+@media(max-width:640px){.byl-shell-header .byl-brand-logo{height:22px!important;max-width:160px!important}.byl-shell-footer .byl-brand-logo{height:25px!important;max-width:185px!important}}
