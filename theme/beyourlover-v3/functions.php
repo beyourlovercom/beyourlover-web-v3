@@ -5,6 +5,7 @@ require_once get_stylesheet_directory().'/inc/components.php';
 require_once get_stylesheet_directory().'/inc/shell-profiles.php';
 require_once get_stylesheet_directory().'/inc/homepage.php';
 require_once get_stylesheet_directory().'/inc/archive.php';
+require_once get_stylesheet_directory().'/inc/product.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
@@ -114,6 +115,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_script_add_data('byl-v3-shell', 'strategy', 'defer');
     if (is_front_page()) { wp_enqueue_style('byl-v3-homepage', $uri.'/assets/css/homepage.css', ['byl-v3-motion'], $v('assets/css/homepage.css')); }
     if (function_exists('is_shop') && (is_shop() || (function_exists('is_product_taxonomy') && is_product_taxonomy()))) { wp_enqueue_style('byl-v3-archive', $uri.'/assets/css/archive.css', ['byl-v3-motion'], $v('assets/css/archive.css')); }
+    if (function_exists('is_product') && is_product()) { wp_enqueue_style('byl-v3-product', $uri.'/assets/css/product.css', ['byl-v3-motion'], $v('assets/css/product.css')); }
 });
 
 add_filter('body_class', static function (array $classes): array {
