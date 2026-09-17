@@ -55,8 +55,9 @@ function byl_v3_shell_surface(): string {
         $forced = $id ? (string) get_post_meta($id, '_byl_v3_surface', true) : '';
         if (in_array($forced, ['landing','support'], true)) { return $forced; }
         $template = $id ? (string) get_page_template_slug($id) : '';
-        if (str_contains($template, 'landing')) { return 'landing'; }
         $slug = $id ? (string) get_post_field('post_name', $id) : '';
+        if (str_contains($template, 'blog') || $slug === 'blog') { return 'blog_archive'; }
+        if (str_contains($template, 'landing')) { return 'landing'; }
         if (in_array($slug, ['support','customer-help','docs','help','faq'], true)) { return 'support'; }
     }
     return 'global';
