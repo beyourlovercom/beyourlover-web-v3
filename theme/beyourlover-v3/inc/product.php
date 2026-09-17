@@ -97,12 +97,36 @@ function byl_v3_product_subtitle(WC_Product $product): string {
 
 
 function byl_v3_product_description_html(WC_Product $product): string {
-    $html = (string)$product->get_description();
+    $html = trim((string)$product->get_description());
     if ($html === '') { return ''; }
     $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html) ?? $html;
     $html = preg_replace('#<style\b[^>]*>.*?</style>#is', '', $html) ?? $html;
     $html = preg_replace('#<link\b[^>]*>#is', '', $html) ?? $html;
     $html = do_shortcode($html);
+
+    if (class_exists('DOMDocument')) {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $previous = libxml_use_internal_errors(true);
+        $dom->loadHTML('<?xml encoding="utf-8" ?><div data-byl-description-root>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        foreach ($dom->getElementsByTagName('*') as $node) {
+            if (!$node->hasAttributes()) { continue; }
+            $drop = [];
+            foreach ($node->attributes as $attr) {
+                $name = strtolower($attr->name);
+                if (in_array($name, ['class', 'id', 'style'], true) || str_starts_with($name, 'data-') || str_starts_with($name, 'aria-')) { $drop[] = $attr->name; }
+            }
+            foreach ($drop as $name) { $node->removeAttribute($name); }
+        }
+        $root = $dom->getElementsByTagName('div')->item(0);
+        if ($root instanceof DOMElement) {
+            $normalized = '';
+            foreach ($root->childNodes as $child) { $normalized .= $dom->saveHTML($child); }
+            $html = $normalized;
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+    }
+
     return wp_kses_post($html);
 }
 

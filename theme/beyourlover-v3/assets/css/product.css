@@ -36,3 +36,29 @@
 .byl-product-description{max-width:920px}.byl-product-description script,.byl-product-description style,.byl-product-description link{display:none!important}.byl-product-description [class*="swiper"]{max-width:100%;overflow:visible}.byl-product-description img,.byl-product-description video{max-width:100%;height:auto;border-radius:18px}.byl-product-description>*{max-width:100%}
 .byl-product-attributes,.byl-product-reviews{margin-top:clamp(64px,8vw,112px);padding-top:clamp(40px,5vw,72px);border-top:1px solid var(--byl-line)}.byl-product-attributes-native{max-width:920px}.byl-product-attributes-native table{width:100%;border-collapse:collapse}.byl-product-attributes-native th,.byl-product-attributes-native td{padding:12px 0;border-bottom:1px solid var(--byl-line);text-align:left;vertical-align:top}.byl-product-attributes-native th{width:180px;color:var(--byl-ink-3);font-weight:500}.byl-product-review-native{max-width:920px}.byl-product-review-native .commentlist{list-style:none;margin:0;padding:0}.byl-product-review-native .comment{padding:20px 0;border-bottom:1px solid var(--byl-line)}.byl-product-review-native img.avatar{display:none}.byl-product-review-native textarea,.byl-product-review-native input:not([type=checkbox]){max-width:100%;border:1px solid var(--byl-line);border-radius:12px;padding:12px;font:inherit}.byl-product-review-native .submit{min-height:46px;border:0;border-radius:999px;padding:0 22px;background:var(--byl-brand);color:#fff;font:600 14px var(--byl-font)}
 .byl-product-description .swiper-button-prev,.byl-product-description .swiper-button-next,.byl-product-description .swiper-pagination{display:none!important}.byl-product-description .swiper-wrapper{display:block!important;transform:none!important;height:auto!important}.byl-product-description .swiper-slide{width:auto!important;height:auto!important;margin:0 0 24px!important}.byl-product-description .swiper{overflow:visible!important}
+
+/* G6.3 legacy-description normalization: content only, V3 owns layout */
+.byl-product-details{display:grid;grid-template-columns:minmax(0,1fr);justify-items:start}
+.byl-product-details .byl-product-section-heading{width:100%}
+.byl-product-description{width:min(100%,860px);margin:0 auto;color:var(--byl-ink-2);font-size:16px;line-height:1.7}
+.byl-product-description p{margin:0 0 20px}
+.byl-product-description h2,.byl-product-description h3,.byl-product-description h4{margin:42px 0 14px;color:var(--byl-ink);font-weight:500;letter-spacing:-.025em;line-height:1.15}
+.byl-product-description h2{font-size:clamp(26px,3vw,36px)}
+.byl-product-description h3{font-size:clamp(21px,2.4vw,28px)}
+.byl-product-description ul,.byl-product-description ol{margin:0 0 24px;padding-left:1.25em}
+.byl-product-description li+li{margin-top:8px}
+.byl-product-description img,.byl-product-description video{display:block;width:auto;max-width:100%;height:auto;margin:28px auto;border-radius:20px}
+.byl-product-description figure{margin:28px 0;max-width:100%}
+.byl-product-description table{width:100%;border-collapse:collapse;margin:28px 0}
+.byl-product-description th,.byl-product-description td{padding:12px 0;border-bottom:1px solid var(--byl-line);text-align:left;vertical-align:top}
+.byl-product-description a{overflow-wrap:anywhere;text-underline-offset:3px}
+.byl-product-description div,.byl-product-description section,.byl-product-description article{width:auto;max-width:100%;min-height:0;margin:0;padding:0;background:none;border:0;transform:none}
+.byl-product-description br+br{display:none}
+.byl-product-reviews,.byl-product-related{max-width:100%}
+@media(max-width:760px){
+  .byl-product-description{font-size:15px;line-height:1.68}
+  .byl-product-description p{margin-bottom:18px}
+  .byl-product-description h2,.byl-product-description h3,.byl-product-description h4{margin-top:34px}
+  .byl-product-description img,.byl-product-description video{margin:22px auto;border-radius:16px}
+  .byl-product-related-grid{gap:16px}
+}
