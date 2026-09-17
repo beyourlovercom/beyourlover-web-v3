@@ -2,6 +2,11 @@
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 
+function byl_v3_brand_display_text(string $text): string {
+    $normalized = preg_replace('/\bBeYourLover\b/i', 'BeYourLover', $text);
+    return is_string($normalized) ? $normalized : $text;
+}
+
 function byl_v3_icon(string $name): string {
     $paths = [
         'arrow' => '<path d="M5 12h14M13 6l6 6-6 6"/>',
@@ -15,18 +20,34 @@ function byl_v3_icon(string $name): string {
     return '<span class="byl-icon" aria-hidden="true"><svg viewBox="0 0 24 24">'.$path.'</svg></span>';
 }
 
-function byl_v3_product_image_url(WC_Product $product): string {
+function byl_v3_product_image_data(WC_Product $product): array {
     $image_id = (int) $product->get_image_id();
     if ($image_id > 0) {
+        $meta = wp_get_attachment_metadata($image_id);
+        $size = is_array($meta) && !empty($meta['sizes']['woocommerce_thumbnail']) ? $meta['sizes']['woocommerce_thumbnail'] : [];
+        $path = trim((string) get_post_meta($image_id, 'advmo_path', true), '/');
+        $offloaded = (string) get_post_meta($image_id, 'advmo_offloaded', true);
+        if ($offloaded === '1' && $path !== '' && !empty($size['file'])) {
+            return ['url' => 'https://img.beyourlover.com/'.trailingslashit($path).rawurlencode((string)$size['file']), 'width' => (int)($size['width'] ?? 0), 'height' => (int)($size['height'] ?? 0)];
+        }
+        $src = wp_get_attachment_image_src($image_id, 'woocommerce_thumbnail');
+        if (is_array($src) && !empty($src[0])) { return ['url'=>(string)$src[0], 'width'=>(int)$src[1], 'height'=>(int)$src[2]]; }
         $url = byl_v3_attachment_url($image_id);
-        if ($url !== '') { return $url; }
+        if ($url !== '') { return ['url'=>$url, 'width'=>(int)($meta['width'] ?? 0), 'height'=>(int)($meta['height'] ?? 0)]; }
     }
-    return function_exists('wc_placeholder_img_src') ? (string) wc_placeholder_img_src('woocommerce_thumbnail') : '';
+    return ['url' => function_exists('wc_placeholder_img_src') ? (string) wc_placeholder_img_src('woocommerce_thumbnail') : '', 'width' => 0, 'height' => 0];
 }
 
-function byl_v3_product_card(WC_Product $product): string {
+function byl_v3_product_image_url(WC_Product $product): string {
+    $image = byl_v3_product_image_data($product);
+    return (string)($image['url'] ?? '');
+}
+
+function byl_v3_product_card(WC_Product $product, string $image_loading = 'lazy'): string {
     $url = get_permalink($product->get_id());
-    $image = byl_v3_product_image_url($product);
+    $image_data = byl_v3_product_image_data($product);
+    $image = (string)($image_data['url'] ?? '');
+    $display_name = byl_v3_brand_display_text($product->get_name());
     $rating = (float) $product->get_average_rating();
     $count = (int) $product->get_review_count();
     $badge = $product->is_on_sale() ? 'Sale' : (!$product->is_in_stock() ? 'Out of stock' : '');
@@ -35,11 +56,11 @@ function byl_v3_product_card(WC_Product $product): string {
     <article class="byl-product-card<?php echo !$product->is_in_stock() ? ' is-unavailable' : ''; ?>">
       <a class="byl-product-media" href="<?php echo esc_url((string)$url); ?>">
         <?php if ($badge !== ''): ?><span class="byl-badge byl-badge-overlay"><?php echo esc_html($badge); ?></span><?php endif; ?>
-        <?php if ($image !== ''): ?><img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($product->get_name()); ?>" loading="lazy"><?php endif; ?>
+        <?php if ($image !== ''): ?><img src="<?php echo esc_url($image); ?>" alt="<?php echo esc_attr($display_name); ?>" loading="<?php echo esc_attr($image_loading === 'eager' ? 'eager' : 'lazy'); ?>" decoding="async"<?php if (!empty($image_data['width']) && !empty($image_data['height'])): ?> width="<?php echo (int)$image_data['width']; ?>" height="<?php echo (int)$image_data['height']; ?>"<?php endif; ?>><?php endif; ?>
       </a>
       <div class="byl-product-body">
         <div class="byl-product-kicker"><?php echo esc_html($product->get_sku() ?: 'BeYourLover'); ?></div>
-        <h3 class="byl-product-title"><a href="<?php echo esc_url((string)$url); ?>"><?php echo esc_html($product->get_name()); ?></a></h3>
+        <h3 class="byl-product-title"><a href="<?php echo esc_url((string)$url); ?>"><?php echo esc_html($display_name); ?></a></h3>
         <div class="byl-product-meta">
           <div class="byl-rating" aria-label="<?php echo esc_attr($rating > 0 ? $rating.' out of 5 stars' : 'No ratings yet'); ?>">
             <span aria-hidden="true">&#9733;</span><strong><?php echo $rating > 0 ? esc_html(number_format($rating, 1)) : '—'; ?></strong>
