@@ -95,6 +95,24 @@ function byl_v3_product_subtitle(WC_Product $product): string {
     return trim((string)get_post_meta($product->get_id(), 'subtitle', true));
 }
 
+
+function byl_v3_product_description_html(WC_Product $product): string {
+    $html = (string)$product->get_description();
+    if ($html === '') { return ''; }
+    $html = preg_replace('#<script\b[^>]*>.*?</script>#is', '', $html) ?? $html;
+    $html = preg_replace('#<style\b[^>]*>.*?</style>#is', '', $html) ?? $html;
+    $html = preg_replace('#<link\b[^>]*>#is', '', $html) ?? $html;
+    $html = do_shortcode($html);
+    return wp_kses_post($html);
+}
+
+function byl_v3_product_attributes_html(WC_Product $product): string {
+    if (!$product->has_attributes() && !$product->has_weight() && !$product->has_dimensions()) { return ''; }
+    ob_start();
+    wc_display_product_attributes($product);
+    return (string)ob_get_clean();
+}
+
 function byl_v3_product_rich_text(WC_Product $product): string {
     $content = (string)get_post_meta($product->get_id(), '_custom_rich_text', true);
     return $content === '' ? '' : wp_kses_post(do_shortcode($content));
