@@ -2,34 +2,85 @@
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 
-function byl_v3_product_attachment_data(int $attachment_id): array {
-    if ($attachment_id <= 0) { return ['url'=>'','width'=>0,'height'=>0,'alt'=>'']; }
+function byl_v3_attachment_image_data(int $attachment_id, string $size = 'full'): array {
+    if ($attachment_id <= 0) { return []; }
     $meta = wp_get_attachment_metadata($attachment_id);
-    $url = byl_v3_attachment_url($attachment_id);
-    $alt = trim((string) get_post_meta($attachment_id, '_wp_attachment_image_alt', true));
-    return [
-        'url' => $url,
-        'width' => is_array($meta) ? (int)($meta['width'] ?? 0) : 0,
-        'height' => is_array($meta) ? (int)($meta['height'] ?? 0) : 0,
-        'alt' => $alt,
-    ];
+    $meta = is_array($meta) ? $meta : [];
+    $attached = (string) get_post_meta($attachment_id, '_wp_attached_file', true);
+    $path = trim((string) get_post_meta($attachment_id, 'advmo_path', true), '/');
+    $offloaded = (string) get_post_meta($attachment_id, 'advmo_offloaded', true);
+    $file = wp_basename($attached);
+    $width = (int)($meta['width'] ?? 0);
+    $height = (int)($meta['height'] ?? 0);
+    if ($size !== 'full' && !empty($meta['sizes'][$size]) && is_array($meta['sizes'][$size])) {
+        $file = (string)($meta['sizes'][$size]['file'] ?? $file);
+        $width = (int)($meta['sizes'][$size]['width'] ?? $width);
+        $height = (int)($meta['sizes'][$size]['height'] ?? $height);
+    }
+    if ($offloaded === '1' && $path !== '' && $file !== '') {
+        $url = 'https://img.beyourlover.com/'.trailingslashit($path).rawurlencode($file);
+    } else {
+        $src = wp_get_attachment_image_src($attachment_id, $size);
+        $url = is_array($src) && !empty($src[0]) ? (string)$src[0] : byl_v3_attachment_url($attachment_id);
+        if (is_array($src)) { $width = (int)$src[1]; $height = (int)$src[2]; }
+    }    $alt = trim((string) get_post_meta($attachment_id, '_wp_attachment_image_alt', true));
+    if ($alt === '') { $alt = byl_v3_brand_display_text((string) get_the_title($attachment_id)); }
+    return ['id'=>$attachment_id,'url'=>$url,'width'=>$width,'height'=>$height,'alt'=>$alt];
 }
 
 function byl_v3_product_gallery(WC_Product $product): array {
-    $ids = array_values(array_unique(array_filter(array_merge(
-        [(int)$product->get_image_id()],
-        array_map('absint', $product->get_gallery_image_ids())
-    ))));
+    $ids = array_filter(array_merge([(int)$product->get_image_id()], array_map('intval', $product->get_gallery_image_ids())));
+    $ids = array_values(array_unique($ids));
+    $gallery = [];
+    foreach (array_slice($ids, 0, 12) as $id) {
+        $main = byl_v3_attachment_image_data((int)$id, 'woocommerce_single');
+        if (empty($main['url'])) { $main = byl_v3_attachment_image_data((int)$id, 'full'); }
+        if (empty($main['url'])) { continue; }
+        $thumb = byl_v3_attachment_image_data((int)$id, 'woocommerce_thumbnail');
+        $main['thumb_url'] = (string)($thumb['url'] ?? $main['url']);
+        $main['full_url'] = (string)(byl_v3_attachment_image_data((int)$id, 'full')['url'] ?? $main['url']);
+        $gallery[] = $main;
+    }
+    return $gallery;
+}
+
+function byl_v3_product_primary_category(WC_Product $product): ?WP_Term {
+    $terms = wp_get_post_terms($product->get_id(), 'product_cat');
+    if (is_wp_error($terms) || !$terms) { return null; }
+    $generic = ['all-sex-toys','sex-toys','all-female-sex-toys','all-male-sex-toys'];
+    foreach ($terms as $term) { if ($term instanceof WP_Term && !in_array($term->slug, $generic, true)) { return $term; } }
+    return $terms[0] instanceof WP_Term ? $terms[0] : null;
+}
+function byl_v3_product_lead(WC_Product $product, int $words = 52): string {
+    $text = trim(wp_strip_all_tags($product->get_short_description()));
+    return $text === '' ? '' : wp_trim_words($text, $words, '…');
+}
+
+function byl_v3_product_rating(WC_Product $product): string {
+    $rating = (float)$product->get_average_rating();
+    $count = (int)$product->get_review_count();
+    if ($count <= 0) { return '<span class="byl-product-rating is-empty">No reviews yet</span>'; }
+    $label = number_format($rating, 1).' out of 5 from '.$count.' reviews';
+    return '<a class="byl-product-rating" href="#reviews" aria-label="'.esc_attr($label).'"><span aria-hidden="true">★</span><strong>'.esc_html(number_format($rating, 1)).'</strong><span>'.esc_html('('.$count.')').'</span></a>';
+}
+
+function byl_v3_related_products(WC_Product $product, int $limit = 4): array {
+    if (!function_exists('wc_get_related_products')) { return []; }
+    $ids = wc_get_related_products($product->get_id(), $limit, [$product->get_id()]);
     $items = [];
     foreach ($ids as $id) {
-        $image = byl_v3_product_attachment_data($id);
-        if (($image['url'] ?? '') === '') { continue; }
-        if (($image['alt'] ?? '') === '') { $image['alt'] = byl_v3_brand_display_text($product->get_name()); }
-        $image['id'] = $id;
-        $items[] = $image;
+        $related = wc_get_product((int)$id);
+        if ($related instanceof WC_Product && $related->get_status() === 'publish') { $items[] = $related; }
     }
     return $items;
 }
+
+function byl_v3_product_availability_label(WC_Product $product): string {
+    if (!$product->is_in_stock()) { return 'Out of stock'; }
+    if ($product->is_on_backorder(1)) { return 'Available on backorder'; }
+    return 'In stock';
+}
+
 
 function byl_v3_product_display_name(WC_Product $product): string {
     $acf = function_exists('get_field') ? trim((string)get_field('productname', $product->get_id())) : '';
@@ -44,43 +95,9 @@ function byl_v3_product_subtitle(WC_Product $product): string {
     return trim((string)get_post_meta($product->get_id(), 'subtitle', true));
 }
 
-function byl_v3_product_breadcrumbs(WC_Product $product): array {
-    $items = [['label'=>'Home','url'=>home_url('/')]];
-    $shop = function_exists('wc_get_page_permalink') ? (string)wc_get_page_permalink('shop') : home_url('/shop/');
-    $items[] = ['label'=>'Shop','url'=>$shop];
-    $terms = get_the_terms($product->get_id(), 'product_cat');
-    if (is_array($terms) && $terms !== []) {
-        usort($terms, static fn(WP_Term $a, WP_Term $b): int => count(get_ancestors($b->term_id,'product_cat')) <=> count(get_ancestors($a->term_id,'product_cat')));
-        $term = $terms[0];
-        foreach (array_reverse(get_ancestors($term->term_id, 'product_cat')) as $ancestor_id) {
-            $ancestor = get_term((int)$ancestor_id, 'product_cat');
-            if ($ancestor instanceof WP_Term) {
-                $url = get_term_link($ancestor);
-                $items[] = ['label'=>$ancestor->name,'url'=>is_wp_error($url)?'':(string)$url];
-            }
-        }
-        $url = get_term_link($term);
-        $items[] = ['label'=>$term->name,'url'=>is_wp_error($url)?'':(string)$url];
-    }
-    $items[] = ['label'=>byl_v3_product_display_name($product),'url'=>''];
-    return $items;
-}
-
 function byl_v3_product_rich_text(WC_Product $product): string {
     $content = (string)get_post_meta($product->get_id(), '_custom_rich_text', true);
-    if ($content === '') { return ''; }
-    return wp_kses_post(do_shortcode($content));
-}
-
-function byl_v3_product_related(WC_Product $product, int $limit = 4): array {
-    if (!function_exists('wc_get_related_products')) { return []; }
-    $ids = wc_get_related_products($product->get_id(), $limit, $product->get_upsell_ids());
-    $products = [];
-    foreach ($ids as $id) {
-        $candidate = wc_get_product((int)$id);
-        if ($candidate instanceof WC_Product && $candidate->is_visible()) { $products[] = $candidate; }
-    }
-    return $products;
+    return $content === '' ? '' : wp_kses_post(do_shortcode($content));
 }
 
 add_action('wp', static function (): void {

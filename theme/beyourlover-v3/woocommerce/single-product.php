@@ -1,95 +1,99 @@
 <?php
 declare(strict_types=1);
-if (!defined('ABSPATH')) { exit; }
+defined('ABSPATH') || exit;
 get_header();
 
-global $product;
-if (!$product instanceof WC_Product) { $product = wc_get_product(get_the_ID()); }
-if (!$product instanceof WC_Product) { get_footer(); return; }
-
-do_action('woocommerce_before_single_product');
-$name = byl_v3_product_display_name($product);
-$subtitle = byl_v3_product_subtitle($product);
-$gallery = byl_v3_product_gallery($product);
-$rating = (float)$product->get_average_rating();
-$reviews = (int)$product->get_review_count();
-$short = (string)$product->get_short_description();
-$rich = byl_v3_product_rich_text($product);
-$related = byl_v3_product_related($product, 4);
+while (have_posts()) : the_post();
+    global $product;
+    if (!$product instanceof WC_Product) { $product = wc_get_product(get_the_ID()); }
+    if (!$product instanceof WC_Product) { continue; }
+    $gallery = byl_v3_product_gallery($product);
+    $primary = byl_v3_product_primary_category($product);
+    $display_name = byl_v3_product_display_name($product);
+    $subtitle = byl_v3_product_subtitle($product);
+    $rich = byl_v3_product_rich_text($product);
+    $lead = byl_v3_product_lead($product);
+    $related = byl_v3_related_products($product, 4);
+    $availability = byl_v3_product_availability_label($product);
 ?>
-<main id="main" class="byl-product-page">
-  <div class="byl-content">
-    <nav class="byl-product-breadcrumbs" aria-label="Breadcrumb">
-      <?php foreach (byl_v3_product_breadcrumbs($product) as $i=>$item): ?>
-        <?php if ($i): ?><span aria-hidden="true">/</span><?php endif; ?>
-        <?php if ($item['url'] !== ''): ?><a href="<?php echo esc_url($item['url']); ?>"><?php echo esc_html($item['label']); ?></a><?php else: ?><span aria-current="page"><?php echo esc_html($item['label']); ?></span><?php endif; ?>
-      <?php endforeach; ?>
+<main id="main" class="byl-product-page" data-product-id="<?php echo (int)$product->get_id(); ?>">
+  <div class="byl-product-shell">
+    <nav class="byl-product-breadcrumb" aria-label="Breadcrumb">
+      <?php woocommerce_breadcrumb(['delimiter'=>'<span aria-hidden="true">/</span>','wrap_before'=>'<div>','wrap_after'=>'</div>']); ?>
     </nav>
+    <?php woocommerce_output_all_notices(); ?>
 
-    <section class="byl-product-hero">
-      <div class="byl-product-gallery" aria-label="Product gallery">
-        <?php if ($gallery !== []): ?>
-          <div class="byl-product-gallery-grid">
-          <?php foreach ($gallery as $index=>$image): ?>
-            <figure class="byl-product-gallery-item<?php echo $index===0?' is-primary':''; ?>">
-              <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>" loading="<?php echo $index===0?'eager':'lazy'; ?>" decoding="async"<?php if ($image['width'] && $image['height']): ?> width="<?php echo (int)$image['width']; ?>" height="<?php echo (int)$image['height']; ?>"<?php endif; ?>>
-            </figure>
-          <?php endforeach; ?>
+    <section class="byl-product-hero" aria-labelledby="byl-product-title">
+      <div class="byl-product-gallery" data-byl-product-gallery>
+        <?php if ($gallery): $first = $gallery[0]; ?>
+          <div class="byl-product-main-media">
+            <?php if ($product->is_on_sale()): ?><span class="byl-product-sale-badge">Sale</span><?php endif; ?>            <img class="byl-product-main-image" src="<?php echo esc_url((string)$first['url']); ?>" data-full-src="<?php echo esc_url((string)$first['full_url']); ?>" alt="<?php echo esc_attr((string)($first['alt'] ?: $display_name)); ?>" loading="eager" fetchpriority="high" decoding="async"<?php if (!empty($first['width']) && !empty($first['height'])): ?> width="<?php echo (int)$first['width']; ?>" height="<?php echo (int)$first['height']; ?>"<?php endif; ?>>
           </div>
+          <?php if (count($gallery) > 1): ?>
+          <div class="byl-product-thumbs" role="list" aria-label="Product images">
+            <?php foreach ($gallery as $index => $item): ?>
+              <button type="button" class="byl-product-thumb<?php echo $index === 0 ? ' is-active' : ''; ?>" data-byl-product-thumb data-src="<?php echo esc_url((string)$item['url']); ?>" data-full-src="<?php echo esc_url((string)$item['full_url']); ?>" data-alt="<?php echo esc_attr((string)($item['alt'] ?: $display_name)); ?>" aria-pressed="<?php echo $index === 0 ? 'true' : 'false'; ?>">
+                <img src="<?php echo esc_url((string)$item['thumb_url']); ?>" alt="" loading="lazy" decoding="async">
+              </button>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
         <?php else: ?>
-          <div class="byl-product-gallery-empty"><?php echo wp_kses_post(wc_placeholder_img('woocommerce_single')); ?></div>
+          <div class="byl-product-main-media is-empty"><span>Product image unavailable</span></div>
         <?php endif; ?>
       </div>
 
       <div class="byl-product-summary">
-        <div class="byl-product-summary-inner">
-          <?php if ($product->is_on_sale()): ?><span class="byl-chip">Sale</span><?php endif; ?>
-          <p class="byl-eyebrow"><?php echo esc_html($product->get_sku() ?: 'BeYourLover'); ?></p>
-          <h1 class="byl-product-name"><?php echo esc_html($name); ?></h1>
-          <?php if ($subtitle !== ''): ?><p class="byl-product-subtitle"><?php echo esc_html($subtitle); ?></p><?php endif; ?>
-          <div class="byl-product-rating" aria-label="<?php echo esc_attr($rating > 0 ? $rating.' out of 5 stars' : 'No ratings yet'); ?>">
-            <span aria-hidden="true">★</span><strong><?php echo $rating > 0 ? esc_html(number_format($rating,1)) : '—'; ?></strong>
-            <?php if ($reviews): ?><a href="#reviews"><?php echo esc_html(sprintf(_n('%d review','%d reviews',$reviews,'beyourlover-v3'),$reviews)); ?></a><?php endif; ?>
-          </div>
-          <div class="byl-product-price"><?php echo wp_kses_post($product->get_price_html()); ?></div>
-          <?php if ($short !== ''): ?><div class="byl-product-short"><?php echo wp_kses_post(wpautop($short)); ?></div><?php endif; ?>
-          <div class="byl-product-purchase">
-            <?php woocommerce_template_single_add_to_cart(); ?>
-          </div>
-          <div class="byl-product-trust" aria-label="Shopping assurances">
-            <span><?php echo byl_v3_icon('check'); ?> Secure checkout</span>
-            <span><?php echo byl_v3_icon('check'); ?> Discreet shipping</span>
-            <span><?php echo byl_v3_icon('check'); ?> Support when you need it</span>
-          </div>
-          <div class="byl-product-meta-native"><?php woocommerce_template_single_meta(); ?></div>
+        <div class="byl-product-eyebrow"><?php echo esc_html($primary instanceof WP_Term ? $primary->name : ($product->get_sku() ?: 'BeYourLover')); ?></div>
+        <h1 id="byl-product-title"><?php echo esc_html($display_name); ?></h1>
+        <?php if ($subtitle !== ''): ?><p class="byl-product-subtitle"><?php echo esc_html($subtitle); ?></p><?php endif; ?>
+        <div class="byl-product-summary-row">
+          <?php echo byl_v3_product_rating($product); ?>
+          <?php if ($product->get_sku()): ?><span class="byl-product-sku">SKU <?php echo esc_html($product->get_sku()); ?></span><?php endif; ?>
         </div>
+        <div class="byl-product-price"><?php echo wp_kses_post($product->get_price_html()); ?></div>        <?php if ($lead !== ''): ?><p class="byl-product-lead"><?php echo esc_html($lead); ?></p><?php endif; ?>
+        <div class="byl-product-availability<?php echo $product->is_in_stock() ? ' is-in-stock' : ' is-out'; ?>">
+          <span aria-hidden="true"></span><?php echo esc_html($availability); ?>
+        </div>
+
+        <div class="byl-product-buybox">
+          <?php woocommerce_template_single_add_to_cart(); ?>
+        </div>
+
+        <dl class="byl-product-facts">
+          <div><dt>Availability</dt><dd><?php echo esc_html($availability); ?></dd></div>
+          <?php if ($product->get_sku()): ?><div><dt>SKU</dt><dd><?php echo esc_html($product->get_sku()); ?></dd></div><?php endif; ?>
+          <?php if ($primary instanceof WP_Term): ?><div><dt>Category</dt><dd><a href="<?php echo esc_url((string)get_term_link($primary)); ?>"><?php echo esc_html($primary->name); ?></a></dd></div><?php endif; ?>
+        </dl>
       </div>
     </section>
 
-    <section class="byl-product-details byl-section-compact" aria-labelledby="product-details-title">
-      <div class="byl-product-details-head"><p class="byl-eyebrow">Product details</p><h2 id="product-details-title" class="byl-heading-xl">Everything you need to know.</h2></div>
-      <div class="byl-product-details-body byl-reading"><?php the_content(); ?></div>
+    <?php if (trim($product->get_short_description()) !== ''): ?>
+    <section class="byl-product-highlights" aria-labelledby="byl-product-highlights-title">
+      <div class="byl-product-section-heading"><span>Product</span><h2 id="byl-product-highlights-title">Highlights</h2></div>
+      <div class="byl-product-richtext"><?php echo wp_kses_post(wpautop($product->get_short_description())); ?></div>
     </section>
+    <?php endif; ?>
 
+    <section class="byl-product-details" aria-label="Product information">
+      <?php woocommerce_output_product_data_tabs(); ?>
+    </section>
     <?php if ($rich !== ''): ?>
-    <section class="byl-product-rich byl-section-compact" aria-label="Additional product information"><div class="byl-reading"><?php echo $rich; ?></div></section>
-    <?php endif; ?>
-
-    <?php if (comments_open() || $reviews > 0): ?>
-    <section id="reviews" class="byl-product-reviews byl-section-compact" aria-labelledby="reviews-title">
-      <div class="byl-product-details-head"><p class="byl-eyebrow">Reviews</p><h2 id="reviews-title" class="byl-heading-xl">What customers say.</h2></div>
-      <div class="byl-product-review-native"><?php comments_template(); ?></div>
+    <section class="byl-product-legacy-rich" aria-label="Additional product information">
+      <div class="byl-product-section-heading"><span>More</span><h2>Additional information</h2></div>
+      <div class="byl-product-richtext"><?php echo $rich; ?></div>
     </section>
     <?php endif; ?>
-
-    <?php if ($related !== []): ?>
-    <section class="byl-product-related byl-section-compact" aria-labelledby="related-products-title">
-      <div class="byl-product-section-head"><div><p class="byl-eyebrow">Continue exploring</p><h2 id="related-products-title" class="byl-heading-xl">You may also like.</h2></div><a class="byl-link" href="<?php echo esc_url(wc_get_page_permalink('shop')); ?>">Shop all products</a></div>
-      <div class="byl-product-related-grid"><?php foreach ($related as $item) { echo byl_v3_product_card($item); } ?></div>
+    <?php if ($related): ?>
+    <section class="byl-product-related" aria-labelledby="byl-product-related-title">
+      <div class="byl-product-section-heading"><span>Discover</span><h2 id="byl-product-related-title">You may also like</h2></div>
+      <div class="byl-product-related-grid">
+        <?php foreach ($related as $item): echo byl_v3_product_card($item, 'lazy'); endforeach; ?>
+      </div>
     </section>
     <?php endif; ?>
   </div>
 </main>
 <?php
-do_action('woocommerce_after_single_product');
+endwhile;
 get_footer();
