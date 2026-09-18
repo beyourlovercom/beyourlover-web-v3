@@ -13,3 +13,10 @@
   };
   thumbs.forEach(button=>button.addEventListener('click',()=>activate(button)));
 })();
+
+(()=>{
+  const rail=document.querySelector('[data-byl-pdp-m02-rail]');
+  if(!rail)return;
+  const cards=[...rail.querySelectorAll('.byl-pdp-m02-card')];
+  cards.forEach(card=>card.setAttribute('tabindex','0'));
+})();

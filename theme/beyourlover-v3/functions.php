@@ -6,6 +6,7 @@ require_once get_stylesheet_directory().'/inc/shell-profiles.php';
 require_once get_stylesheet_directory().'/inc/homepage.php';
 require_once get_stylesheet_directory().'/inc/archive.php';
 require_once get_stylesheet_directory().'/inc/product.php';
+require_once get_stylesheet_directory().'/inc/product-modules.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');

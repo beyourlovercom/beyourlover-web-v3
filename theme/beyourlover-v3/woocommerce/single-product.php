@@ -70,6 +70,8 @@ while (have_posts()) : the_post();
       </div>
     </section>
 
+    <?php byl_v3_render_product_modules($product); ?>
+
     <?php if (trim($product->get_short_description()) !== ''): ?>
     <section class="byl-product-highlights" aria-labelledby="byl-product-highlights-title">
       <div class="byl-product-section-heading"><span>Product</span><h2 id="byl-product-highlights-title">Highlights</h2></div>
