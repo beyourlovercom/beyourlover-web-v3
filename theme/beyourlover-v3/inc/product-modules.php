@@ -100,6 +100,45 @@ function byl_v3_product_module_config(WC_Product $product): array {
                     ['src'=>'https://img.beyourlover.com/2026/06/12060816/clock-4.mp4','creator'=>'@heymissbehave','url'=>'https://www.instagram.com/heymissbehave/'],
                 ],
             ],
+            'm11' => [
+                'title' => 'Everything in the box.',
+                'items' => [
+                    ['name'=>'Packaging Box','media'=>'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_packing_01.webp?v=1766383070'],
+                    ['name'=>'Naughty Clock','media'=>'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_packing_02.webp?v=1766383070'],
+                    ['name'=>'Charging Cable','media'=>'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_packing_03.webp?v=1766383070'],
+                    ['name'=>'User Manual','media'=>'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_packing_04.webp?v=1766383070'],
+                ],
+            ],
+            'm12' => [
+                'title' => 'The details that matter.',
+                'media' => 'https://www.beyourlover.com/wp-content/uploads/2026/02/naughty-clock-pink-banner.png',
+                'dimensions' => [['Clock','108 × 103 × 59 mm'],['Vibration Wand','104 × 49 × 40 mm'],['Suction Stimulator','48 × 49 × 40 mm']],
+                'specs' => [['Material','Silicone + ABS'],['Battery','210 mAh polymer lithium'],['Charging','5V / 200mA · ≤1.5 h'],['Working time','≥40 min'],['Modes','8 suction + 9 vibration'],['Noise','<55 dB'],['Water resistance','IPX6 detachable parts']],
+                'note' => 'IPX6 applies to the detachable suction and vibration parts only. The main clock body is not waterproof.',
+            ],
+            'm13' => [
+                'title' => 'Help, when you need it.',
+                'faq_url' => 'https://www.beyourlover.com/faqs/',
+                'manual_url' => 'https://www.beyourlover.com/wp-content/uploads/2025/03/VA617A-Naughty-Clock-User-Manual.pdf',
+                'warranty_url' => 'https://www.beyourlover.com/warranty/',
+                'guarantee' => '10 yr',
+                'replacement' => '1 yr',
+            ],
+            'm14' => [
+                'title' => 'Find Your Perfect Match',
+                'products' => ['naughty-clock-pink','fatima-app'],
+                'rows' => [
+                    ['Best for','Daily fun & discreet bedside play','Deeper, multi-sensation play'],
+                    ['Control','App control','App + remote'],
+                    ['Stimulation','Vibration + suction','Suction + thrusting + vibration + heating'],
+                    ['Modes','9 vibration + 8 suction','10 vibration + 7 thrusting + suction patterns'],
+                    ['Water resistance','IPX6 detachable parts','IPX7 full waterproof'],
+                ],
+            ],
+            'm15' => [
+                'title' => 'Your Pleasure. Our Promise.',
+                'copy' => 'Discreet shipping, secure checkout, and real support — so you can shop with total confidence.',
+            ],
         ],
     ];
     return (array)apply_filters('byl_v3_product_module_config', $configs[$slug] ?? [], $product);
@@ -268,6 +307,25 @@ function byl_v3_render_product_module_m10(array $module): void {
 <?php
 }
 
+function byl_v3_render_product_module_m11(array $m): void {
+ $items=is_array($m['items']??null)?$m['items']:[]; if(!$items)return; ?>
+<section class="byl-pdp-module byl-pdp-m11"><div class="byl-pdp-section-head"><div class="byl-pdp-module-kicker">What's Included</div><h2><?php echo esc_html((string)($m['title']??'')); ?></h2></div><div class="byl-pdp-m11-grid"><?php foreach($items as $i=>$it): ?><article><img src="<?php echo esc_url((string)$it['media']); ?>" alt="<?php echo esc_attr((string)$it['name']); ?>" loading="lazy"><span><?php echo esc_html(str_pad((string)($i+1),2,'0',STR_PAD_LEFT)); ?></span><h3><?php echo esc_html((string)$it['name']); ?></h3></article><?php endforeach; ?></div></section><?php
+}
+function byl_v3_render_product_module_m12(array $m): void {
+ $dims=is_array($m['dimensions']??null)?$m['dimensions']:[];$specs=is_array($m['specs']??null)?$m['specs']:[]; ?>
+<section class="byl-pdp-module byl-pdp-m12"><div class="byl-pdp-section-head"><div class="byl-pdp-module-kicker">Specs & Dimensions</div><h2><?php echo esc_html((string)($m['title']??'')); ?></h2></div><div class="byl-pdp-m12-stage"><div class="byl-pdp-m12-visual"><?php if(!empty($m['media'])): ?><img src="<?php echo esc_url((string)$m['media']); ?>" alt="Naughty Clock Pink" loading="lazy"><?php endif; ?><div class="byl-pdp-m12-dims"><?php foreach($dims as $d): ?><div><b><?php echo esc_html((string)$d[1]); ?></b><span><?php echo esc_html((string)$d[0]); ?></span></div><?php endforeach; ?></div></div><div class="byl-pdp-m12-specs"><?php foreach($specs as $s): ?><div><span><?php echo esc_html((string)$s[0]); ?></span><b><?php echo esc_html((string)$s[1]); ?></b></div><?php endforeach; ?><?php if(!empty($m['note'])): ?><p><?php echo esc_html((string)$m['note']); ?></p><?php endif; ?></div></div></section><?php
+}
+function byl_v3_render_product_module_m13(array $m): void { ?>
+<section class="byl-pdp-module byl-pdp-m13"><div class="byl-pdp-section-head"><div class="byl-pdp-module-kicker">Support & Documents</div><h2><?php echo esc_html((string)($m['title']??'')); ?></h2></div><div class="byl-pdp-m13-grid"><a href="<?php echo esc_url((string)$m['faq_url']); ?>"><small>POPULAR FAQS</small><h3>Quick answers.</h3><span>View FAQs →</span></a><a class="is-dark" href="<?php echo esc_url((string)$m['manual_url']); ?>" target="_blank" rel="nofollow noopener"><small>USER MANUAL</small><h3>Read the guide.</h3><span>Download manual ↓</span></a><a href="<?php echo esc_url((string)$m['warranty_url']); ?>"><small>WARRANTY</small><div class="byl-pdp-m13-warranty"><div><b><?php echo esc_html((string)$m['guarantee']); ?></b><span>Quality Guarantee</span></div><div><b><?php echo esc_html((string)$m['replacement']); ?></b><span>Free Replacement</span></div></div><span>Warranty details →</span></a></div></section><?php
+}
+function byl_v3_render_product_module_m14(array $m): void {
+ $slugs=is_array($m['products']??null)?$m['products']:[];$ps=[];foreach($slugs as $slug){$post=get_page_by_path((string)$slug,OBJECT,'product');if($post instanceof WP_Post){$wp=wc_get_product($post->ID);if($wp instanceof WC_Product)$ps[]=$wp;}} if(count($ps)<2)return; ?>
+<section class="byl-pdp-module byl-pdp-m14"><div class="byl-pdp-section-head"><div class="byl-pdp-module-kicker">Compare Models</div><h2><?php echo esc_html((string)($m['title']??'')); ?></h2></div><div class="byl-pdp-m14-products"><?php foreach($ps as $wp): ?><article><?php echo $wp->get_image('woocommerce_single'); ?><h3><?php echo esc_html($wp->get_name()); ?></h3><div><?php echo wp_kses_post($wp->get_price_html()); ?></div><a href="<?php echo esc_url(get_permalink($wp->get_id())); ?>">View Product</a></article><?php endforeach; ?></div><div class="byl-pdp-m14-table"><?php foreach((array)($m['rows']??[]) as $r): ?><div><b><?php echo esc_html((string)$r[0]); ?></b><span><?php echo esc_html((string)$r[1]); ?></span><span><?php echo esc_html((string)$r[2]); ?></span></div><?php endforeach; ?></div></section><?php
+}
+function byl_v3_render_product_module_m15(array $m): void { ?>
+<section class="byl-pdp-module byl-pdp-m15"><div class="byl-pdp-section-head"><div class="byl-pdp-module-kicker">Trust & Service</div><h2><?php echo esc_html((string)($m['title']??'')); ?></h2><p><?php echo esc_html((string)($m['copy']??'')); ?></p></div><div class="byl-pdp-m15-services"><article><h3>Discreet Shipping</h3><p>Plain packaging with no BeYourLover or adult company name visible.</p></article><article><h3>Secure Checkout</h3><p>Secure purchase flow on BeYourLover.</p></article><article><h3>Returns Support</h3><p>30-day return policy for eligible unused products in original packaging.</p></article><article><h3>Real Support</h3><p>Email, live chat and support resources are available.</p></article></div><div class="byl-pdp-m15-links"><a href="https://www.beyourlover.com/shipping-policies/">Shipping & Tracking</a><a href="https://www.beyourlover.com/return-policies/">Returns Policy</a><a href="https://www.beyourlover.com/customer-help/">Customer Help</a></div></section><?php
+}
+
 function byl_v3_render_product_modules(WC_Product $product): void {
     $config = byl_v3_product_module_config($product);
     if (!$config) { return; }
@@ -282,5 +340,10 @@ function byl_v3_render_product_modules(WC_Product $product): void {
     if (byl_v3_product_module_enabled($config, 'm08')) { byl_v3_render_product_module_m08($config['m08']); }
     if (byl_v3_product_module_enabled($config, 'm09')) { byl_v3_render_product_module_m09($config['m09']); }
     if (byl_v3_product_module_enabled($config, 'm10')) { byl_v3_render_product_module_m10($config['m10']); }
+    if (byl_v3_product_module_enabled($config, 'm11')) { byl_v3_render_product_module_m11($config['m11']); }
+    if (byl_v3_product_module_enabled($config, 'm12')) { byl_v3_render_product_module_m12($config['m12']); }
+    if (byl_v3_product_module_enabled($config, 'm13')) { byl_v3_render_product_module_m13($config['m13']); }
+    if (byl_v3_product_module_enabled($config, 'm14')) { byl_v3_render_product_module_m14($config['m14']); }
+    if (byl_v3_product_module_enabled($config, 'm15')) { byl_v3_render_product_module_m15($config['m15']); }
     echo '</div>';
 }
