@@ -68,6 +68,38 @@ function byl_v3_product_module_config(WC_Product $product): array {
                     ['title'=>'IPX6 Waterproof','short'=>'Detachable suction and vibrator parts are IPX6 waterproof.','detail'=>'The detachable parts are IPX6 waterproof, making them easy to rinse and clean. The main device itself is not waterproof.','media'=>'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_02.webp?v=1766383071'],
                 ],
             ],
+            'm07' => [
+                'title' => 'Small clock. Serious numbers.',
+                'copy' => 'The performance story, reduced to the few numbers that matter.',
+                'items' => [
+                    ['value'=>'6000','unit'=>'RPM ultra-pulse engine','copy'=>'High-speed pulse performance for focused, deeper sensations.'],
+                    ['value'=>'185+','unit'=>'vibrations / second','copy'=>'Precision tungsten-steel motor tuned for fast, intense vibration.'],
+                    ['value'=>'<55','unit'=>'dB whisper-quiet','copy'=>'Noise-reduction design intended to keep private moments discreet.'],
+                    ['value'=>'8+9','unit'=>'suction + vibration modes','copy'=>'Eight suction patterns and nine vibration modes for mix-and-match control.'],
+                ],
+            ],
+            'm08' => [
+                'title' => 'Stay close, from anywhere.',
+                'copy' => 'Control Naughty Clock Pink in real time through the app — solo or with a partner, even when you’re miles apart.',
+                'media' => 'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_05.webp?v=1766383071',
+                'alt' => 'Naughty Clock Pink app controlled',
+                'chips' => ['Real-time control','Solo or partner','Long-distance play'],
+            ],
+            'm09' => [
+                'title' => 'See it in action.',
+                'copy' => 'A simple visual guide using the product’s real instructional video.',
+                'video' => 'https://cdn.shopify.com/videos/c/o/v/f48b9851eda4412f9f3fb84022f72cb5.mp4',
+            ],
+            'm10' => [
+                'title' => 'Watch It in Real Life.',
+                'copy' => 'Real creator videos, one active story at a time.',
+                'items' => [
+                    ['src'=>'https://img.beyourlover.com/2026/07/14080933/clock-6.mp4','creator'=>'@sandy_blux','url'=>'https://www.instagram.com/p/DatIjJHIgRB/'],
+                    ['src'=>'https://img.beyourlover.com/2026/06/12060706/clock-2.mp4','creator'=>'@missfetilicious','url'=>'https://www.instagram.com/missfetilicious_/'],
+                    ['src'=>'https://img.beyourlover.com/2026/06/12060759/clock-3.mp4','creator'=>'@byannss_csp','url'=>'https://www.instagram.com/byannss_csp/'],
+                    ['src'=>'https://img.beyourlover.com/2026/06/12060816/clock-4.mp4','creator'=>'@heymissbehave','url'=>'https://www.instagram.com/heymissbehave/'],
+                ],
+            ],
         ],
     ];
     return (array)apply_filters('byl_v3_product_module_config', $configs[$slug] ?? [], $product);
@@ -187,6 +219,55 @@ function byl_v3_render_product_module_m06(array $module): void {
 <?php
 }
 
+function byl_v3_render_product_module_m07(array $module): void {
+    $items = isset($module['items']) && is_array($module['items']) ? array_values(array_filter($module['items'], 'is_array')) : [];
+    if (!$items) { return; }
+?>
+<section class="byl-pdp-module byl-pdp-m07" aria-labelledby="byl-pdp-m07-title">
+  <div class="byl-pdp-m07-copy"><div class="byl-pdp-module-kicker">Naughty Clock · Performance</div><h2 id="byl-pdp-m07-title"><?php echo esc_html((string)($module['title'] ?? '')); ?></h2><?php if (!empty($module['copy'])): ?><p><?php echo esc_html((string)$module['copy']); ?></p><?php endif; ?></div>
+  <div class="byl-pdp-m07-metrics"><?php foreach ($items as $item): ?><article class="byl-pdp-m07-metric"><div class="byl-pdp-m07-value"><?php echo esc_html((string)($item['value'] ?? '')); ?></div><div class="byl-pdp-m07-unit"><?php echo esc_html((string)($item['unit'] ?? '')); ?></div><?php if (!empty($item['copy'])): ?><p><?php echo esc_html((string)$item['copy']); ?></p><?php endif; ?></article><?php endforeach; ?></div>
+</section>
+<?php
+}
+
+function byl_v3_render_product_module_m08(array $module): void {
+    if (empty($module['media'])) { return; }
+    $chips = isset($module['chips']) && is_array($module['chips']) ? $module['chips'] : [];
+?>
+<section class="byl-pdp-module byl-pdp-m08" aria-labelledby="byl-pdp-m08-title">
+  <div class="byl-pdp-m08-wrap">
+    <div class="byl-pdp-m08-copy"><div class="byl-pdp-module-kicker">App Ecosystem</div><h2 id="byl-pdp-m08-title"><?php echo esc_html((string)($module['title'] ?? '')); ?></h2><?php if (!empty($module['copy'])): ?><p><?php echo esc_html((string)$module['copy']); ?></p><?php endif; ?><?php if ($chips): ?><div class="byl-pdp-m08-chips"><?php foreach ($chips as $chip): ?><span><?php echo esc_html((string)$chip); ?></span><?php endforeach; ?></div><?php endif; ?></div>
+    <div class="byl-pdp-m08-media"><img src="<?php echo esc_url((string)$module['media']); ?>" alt="<?php echo esc_attr((string)($module['alt'] ?? '')); ?>" loading="lazy" decoding="async"></div>
+  </div>
+</section>
+<?php
+}
+
+function byl_v3_render_product_module_m09(array $module): void {
+    $video = trim((string)($module['video'] ?? ''));
+    if ($video === '') { return; }
+?>
+<section class="byl-pdp-module byl-pdp-m09" aria-labelledby="byl-pdp-m09-title">
+  <div class="byl-pdp-m09-wrap"><div class="byl-pdp-module-kicker">How to Use</div><h2 id="byl-pdp-m09-title"><?php echo esc_html((string)($module['title'] ?? '')); ?></h2><?php if (!empty($module['copy'])): ?><p><?php echo esc_html((string)$module['copy']); ?></p><?php endif; ?><div class="byl-pdp-m09-stage"><video controls muted playsinline preload="metadata" src="<?php echo esc_url($video); ?>"></video></div></div>
+</section>
+<?php
+}
+
+function byl_v3_render_product_module_m10(array $module): void {
+    $items = isset($module['items']) && is_array($module['items']) ? array_values(array_filter($module['items'], 'is_array')) : [];
+    if (!$items) { return; }
+?>
+<section class="byl-pdp-module byl-pdp-m10" aria-labelledby="byl-pdp-m10-title" data-byl-pdp-m10>
+  <div class="byl-pdp-m10-head"><div class="byl-pdp-module-kicker">Use Video Gallery</div><h2 id="byl-pdp-m10-title"><?php echo esc_html((string)($module['title'] ?? '')); ?></h2><?php if (!empty($module['copy'])): ?><p><?php echo esc_html((string)$module['copy']); ?></p><?php endif; ?></div>
+  <script type="application/json" class="byl-pdp-m10-data"><?php echo wp_json_encode($items, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); ?></script>
+  <div class="byl-pdp-m10-stage" data-byl-pdp-m10-stage></div>
+  <div class="byl-pdp-m10-mobile-rail" data-byl-pdp-m10-mobile-rail><article class="byl-pdp-m10-mobile-card is-active" data-byl-pdp-m10-mobile-active></article><article class="byl-pdp-m10-mobile-card is-next" data-byl-pdp-m10-mobile-next></article></div>
+  <div class="byl-pdp-m10-nav"><button type="button" data-byl-pdp-m10-prev aria-label="Previous video">←</button><span data-byl-pdp-m10-count></span><button type="button" data-byl-pdp-m10-next aria-label="Next video">→</button></div>
+  <div class="byl-pdp-m10-swipe-hint">SWIPE TO EXPLORE</div>
+</section>
+<?php
+}
+
 function byl_v3_render_product_modules(WC_Product $product): void {
     $config = byl_v3_product_module_config($product);
     if (!$config) { return; }
@@ -197,5 +278,9 @@ function byl_v3_render_product_modules(WC_Product $product): void {
     if (byl_v3_product_module_enabled($config, 'm04')) { byl_v3_render_product_module_m04($config['m04']); }
     if (byl_v3_product_module_enabled($config, 'm05')) { byl_v3_render_product_module_m05($config['m05']); }
     if (byl_v3_product_module_enabled($config, 'm06')) { byl_v3_render_product_module_m06($config['m06']); }
+    if (byl_v3_product_module_enabled($config, 'm07')) { byl_v3_render_product_module_m07($config['m07']); }
+    if (byl_v3_product_module_enabled($config, 'm08')) { byl_v3_render_product_module_m08($config['m08']); }
+    if (byl_v3_product_module_enabled($config, 'm09')) { byl_v3_render_product_module_m09($config['m09']); }
+    if (byl_v3_product_module_enabled($config, 'm10')) { byl_v3_render_product_module_m10($config['m10']); }
     echo '</div>';
 }
