@@ -1,0 +1,55 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M06 Feature Gallery — Mobile Interactive Draft</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#f5f5f7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+.page{min-height:100vh;padding:34px 0 24px;overflow:hidden}.wrap{width:calc(100% - 28px);max-width:390px;margin:auto}
+.head{text-align:center;margin-bottom:18px}.kicker{font-size:10px;letter-spacing:.22em;font-weight:800;color:#d94d80;margin-bottom:9px}
+h1{font-size:38px;line-height:1.02;letter-spacing:-.045em;margin:0 0 8px}.lead{font-size:14px;line-height:1.4;color:#6e6e73;max-width:330px;margin:auto}
+.gallery{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 14px 2px;scrollbar-width:none}.gallery::-webkit-scrollbar{display:none}
+.card{position:relative;flex:0 0 calc(100vw - 28px);max-width:362px;height:505px;border-radius:26px;overflow:hidden;scroll-snap-align:start;background:#ddd}
+.card.next{flex-basis:76%;max-width:275px}.media{position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity .32s ease,transform .42s ease,filter .32s ease}
+.scrim{position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(0,0,0,.66));transition:opacity .3s ease}
+.card.expanded .media{opacity:.12;transform:scale(1.04);filter:saturate(.65)}
+.card.expanded .scrim{opacity:0}
+.copy{position:absolute;left:20px;right:20px;bottom:20px;color:#fff;z-index:2}.eyebrow{font-size:9px;letter-spacing:.15em;font-weight:700;opacity:.82;margin-bottom:7px}
+.copy h2{font-size:28px;line-height:1.04;letter-spacing:-.035em;margin:0 0 7px}.copy p{font-size:13px;line-height:1.42;color:rgba(255,255,255,.84);margin:0}
+.next .copy h2{font-size:21px}.next .copy p{display:none}.more{position:absolute;right:16px;top:16px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.55);display:grid;place-items:center;color:#fff;font-size:28px;z-index:4;background:rgba(0,0,0,.18)}
+.more.open{transform:rotate(45deg);background:rgba(0,0,0,.4)}
+.detail{position:absolute;inset:0;z-index:3;background:linear-gradient(180deg,rgba(248,246,250,.92),rgba(239,233,243,.98));color:#161616;padding:92px 24px 28px;display:flex;flex-direction:column;justify-content:center;opacity:0;pointer-events:none;transition:opacity .28s ease}
+.card.expanded .detail{opacity:1;pointer-events:auto}.detail .detail-eyebrow{font-size:10px;letter-spacing:.15em;font-weight:800;color:#a44a6c;margin-bottom:12px}.detail h3{font-size:31px;line-height:1.04;letter-spacing:-.035em;margin:0 0 14px}.detail p{font-size:15px;line-height:1.58;color:#55515a;margin:0;max-width:300px}.detail .detail-rule{width:42px;height:2px;background:#a44a6c;margin:0 0 18px}
+.nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px}.btn{width:46px;height:46px;border-radius:50%;border:1px solid #d2d2d7;background:#fff;font-size:20px}.count{font-size:12px;color:#86868b;min-width:58px;text-align:center}
+.note{text-align:center;color:#86868b;font-size:10.5px;line-height:1.35;margin-top:10px}
+</style></head><body><section class="page">
+<div class="wrap"><div class="head"><div class="kicker">FEATURE GALLERY</div><h1>Discover More.</h1><p class="lead">Swipe through real Naughty Clock features. Tap + for the full story.</p></div></div>
+<div class="gallery" id="gallery"><article class="card active" id="activeCard"></article><article class="card next" id="nextCard"></article></div>
+<div class="wrap"><div class="nav"><button class="btn" id="prev">←</button><div class="count" id="count">01 / 06</div><button class="btn" id="next">→</button></div>
+<div class="note">Naughty Clock Pink · real feature media and verified product copy.</div></div></section>
+<script>
+const features=[
+{eyebrow:'FEATURE 01',title:'100% Discreet',short:'Discreet payment and packaging keep what is inside private.',detail:'Both payment and packaging are discreet, so there’s no need to worry about anyone knowing what’s inside the box.',image:'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_06.jpg?v=1769152391'},
+{eyebrow:'FEATURE 02',title:'3 Playful Colors',short:'Choose the color that best suits your nightstand.',detail:'Choose the color that best suits your nightstand. Available in cute pink-yellow, green, or pink.',image:'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_04.webp?v=1766383071'},
+{eyebrow:'FEATURE 03',title:'App Controlled',short:'Control the toy in real time through the app.',detail:'Whether you’re playing solo or with a partner, control your toys in real time through the app even when you’re miles apart.',image:'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_05.webp?v=1766383071'},
+{eyebrow:'FEATURE 04',title:'Whisper-Quiet',short:'Designed to keep sound levels under 55 dB.',detail:'Designed with advanced noise-reduction technology to keep sound levels under 55 dB, so your intimate moments stay private.',image:'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_03.webp?v=1766383071'},
+{eyebrow:'FEATURE 05',title:'Customizable Modes',short:'8 suction modes and 9 vibration modes.',detail:'Features 8 suction modes and 9 vibration modes. Mix and match based on your mood, and take control of your pleasure your way.',image:'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_01.webp?v=1766383071'},
+{eyebrow:'FEATURE 06',title:'IPX6 Waterproof',short:'Detachable suction and vibrator parts are IPX6 waterproof.',detail:'The detachable parts are IPX6 waterproof, making them easy to rinse and clean. The main device itself is not waterproof.',image:'https://cdn.shopify.com/s/files/1/0606/8423/9010/files/naughty_clock_pink_more_features_02.webp?v=1766383071'}
+];
+let index=0;
+const activeCard=document.getElementById('activeCard'),nextCard=document.getElementById('nextCard'),count=document.getElementById('count'),gallery=document.getElementById('gallery');
+function cardHTML(f,isActive){
+ return '<div class="media" style="background-image:url(&quot;'+f.image+'&quot;)"></div><div class="scrim"></div>'+
+ (isActive&&f.detail?'<button class="more" aria-label="Toggle details">＋</button>':'')+
+ '<div class="copy"><div class="eyebrow">'+f.eyebrow+'</div><h2>'+f.title+'</h2><p>'+f.short+'</p></div>'+
+ (isActive&&f.detail?'<div class="detail"><div class="detail-eyebrow">'+f.eyebrow+'</div><div class="detail-rule"></div><h3>'+f.title+'</h3><p>'+f.detail+'</p></div>':'');
+}
+function render(){
+ const a=features[index],n=features[(index+1)%features.length];
+ activeCard.classList.remove('expanded');activeCard.innerHTML=cardHTML(a,true);nextCard.innerHTML=cardHTML(n,false);
+ count.textContent=String(index+1).padStart(2,'0')+' / '+String(features.length).padStart(2,'0');
+ const more=activeCard.querySelector('.more'); if(more){more.addEventListener('click',()=>{activeCard.classList.toggle('expanded');more.classList.toggle('open')});}
+}
+function go(delta){index=(index+delta+features.length)%features.length;render();gallery.scrollTo({left:0,behavior:'smooth'});}
+document.getElementById('next').addEventListener('click',()=>go(1));
+document.getElementById('prev').addEventListener('click',()=>go(-1));
+nextCard.addEventListener('click',()=>go(1));
+render();
+</script></body></html>
