@@ -17,6 +17,7 @@ while (have_posts()) : the_post();
     $lead = byl_v3_product_lead($product);
     $related = byl_v3_related_products($product, 4);
     $availability = byl_v3_product_availability_label($product);
+    $uses_modular_pdp = byl_v3_product_module_config($product) !== [];
 ?>
 <main id="main" class="byl-product-page" data-product-id="<?php echo (int)$product->get_id(); ?>">
   <div class="byl-product-shell">
@@ -72,21 +73,21 @@ while (have_posts()) : the_post();
 
     <?php byl_v3_render_product_modules($product); ?>
 
-    <?php if (trim($product->get_short_description()) !== ''): ?>
+    <?php if (!$uses_modular_pdp && trim($product->get_short_description()) !== ''): ?>
     <section class="byl-product-highlights" aria-labelledby="byl-product-highlights-title">
       <div class="byl-product-section-heading"><span>Product</span><h2 id="byl-product-highlights-title">Highlights</h2></div>
       <div class="byl-product-richtext"><?php echo wp_kses_post(wpautop($product->get_short_description())); ?></div>
     </section>
     <?php endif; ?>
 
-    <?php if ($description !== ''): ?>
+    <?php if (!$uses_modular_pdp && $description !== ''): ?>
     <section class="byl-product-details" aria-labelledby="byl-product-description-title">
       <div class="byl-product-section-heading"><span>Details</span><h2 id="byl-product-description-title">Description</h2></div>
       <div class="byl-product-description byl-product-richtext"><?php echo $description; ?></div>
     </section>
     <?php endif; ?>
 
-    <?php if ($attributes !== ''): ?>
+    <?php if (!$uses_modular_pdp && $attributes !== ''): ?>
     <section class="byl-product-attributes" aria-labelledby="byl-product-attributes-title">
       <div class="byl-product-section-heading"><span>Specifications</span><h2 id="byl-product-attributes-title">Product information</h2></div>
       <div class="byl-product-attributes-native"><?php echo $attributes; ?></div>
@@ -99,7 +100,7 @@ while (have_posts()) : the_post();
       <div class="byl-product-review-native"><?php comments_template(); ?></div>
     </section>
     <?php endif; ?>
-    <?php if ($rich !== ''): ?>
+    <?php if (!$uses_modular_pdp && $rich !== ''): ?>
     <section class="byl-product-legacy-rich" aria-label="Additional product information">
       <div class="byl-product-section-heading"><span>More</span><h2>Additional information</h2></div>
       <div class="byl-product-richtext"><?php echo $rich; ?></div>
