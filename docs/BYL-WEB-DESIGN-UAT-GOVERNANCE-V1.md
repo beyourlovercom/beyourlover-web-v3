@@ -30,3 +30,34 @@ The same workflow applies to later page edits, maintenance, refactors, visual ch
 - Implemented UAT must be opened on the CN Mac whenever locally reachable.
 - Windows-only availability is not sufficient for Owner UAT.
 - Production remains untouched until the relevant release/deploy gate is explicitly approved.
+
+## Default page-development priority
+
+Page development defaults to P0 unless the change is explicitly classified as lower-risk.
+
+### P0 — highest priority / default for important pages
+Required for new pages, core-page rebuilds, difficult pages, high-aesthetic pages, high-conversion pages, and any page whose visual accuracy matters.
+
+Mandatory sequence:
+1. Desktop design draft -> Owner PASS.
+2. Mobile design draft -> Owner PASS.
+3. Implementation with real content/assets.
+4. Screenshot UAT through DC/MCP at 1440 / 768 / 390, producing PNGs plus manifest.
+5. Manual visual review using the M14 method: compare approved design vs implementation for spacing, proportions, alignment, typography, CTA treatment, iconography, wrapping, vertical rhythm, and mobile composition.
+6. Fix mismatches before Owner review.
+7. Open the real implementation on the CN Mac for Desktop + Mobile Owner UAT.
+8. Mobile is the final acceptance priority.
+9. LOCK only after final PASS.
+
+M14 Compare Models is the canonical reference for this P0 review method.
+DC through MCP screenshot generation/retrieval is a P0 capability, not an optional convenience.
+
+### P1 — standard
+May be used only for medium-complexity pages or extensions that inherit an already-LOCKED visual template and do not materially change composition.
+
+### P2 — lightweight
+May be used only for clearly trivial/non-visual maintenance such as small copy edits, tiny style fixes, or low-risk maintenance.
+
+Downgrade rule:
+- Do not ask whether an important page should use P0; P0 is the default.
+- Downgrade to P1/P2 only when the task is clearly lower risk or Owner explicitly requests a lighter workflow.
