@@ -94,7 +94,14 @@ while (have_posts()) : the_post();
     </section>
     <?php endif; ?>
 
-    <?php if (comments_open() || $product->get_review_count() > 0): ?>
+    <?php if ($uses_modular_pdp && shortcode_exists('cusrev_all_reviews')): ?>
+    <section id="reviews" class="byl-product-reviews byl-product-reviews-cusrev" aria-labelledby="byl-product-reviews-title">
+      <div class="byl-product-section-heading"><span>Reviews</span><h2 id="byl-product-reviews-title">What customers say</h2></div>
+      <div class="byl-product-review-native">
+        <?php echo do_shortcode('[cusrev_all_reviews products="current" product_reviews="true" shop_reviews="false" show_summary_bar="true" show_media="true" show_products="false" show_more="5" avatars="initials" add_review="true" schema_markup="false"]'); ?>
+      </div>
+    </section>
+    <?php elseif (comments_open() || $product->get_review_count() > 0): ?>
     <section id="reviews" class="byl-product-reviews" aria-labelledby="byl-product-reviews-title">
       <div class="byl-product-section-heading"><span>Reviews</span><h2 id="byl-product-reviews-title">What customers say</h2></div>
       <div class="byl-product-review-native"><?php comments_template(); ?></div>

@@ -167,3 +167,51 @@
  .byl-pdp-m14-products{gap:8px}.byl-pdp-m14-products article{padding:10px;border-radius:18px}.byl-pdp-m14-products img{height:170px}.byl-pdp-m14-products h3{font-size:16px;min-height:36px}.byl-pdp-m14-products a{width:100%;justify-content:center;padding:10px 6px;font-size:12px}.byl-pdp-m14-table>div{grid-template-columns:98px 1fr 1fr}.byl-pdp-m14-table b,.byl-pdp-m14-table span{padding:10px 7px;font-size:11px}
  .byl-pdp-m15-services{grid-template-columns:repeat(4,1fr)}.byl-pdp-m15-services article{padding:8px 4px}.byl-pdp-m15-services article+article{border-left:1px solid #ececef}.byl-pdp-m15-services h3{font-size:11px}.byl-pdp-m15-services p{display:none}.byl-pdp-m15-links{grid-template-columns:1fr;gap:9px}.byl-pdp-m15-links a{padding:15px 16px}
 }
+/* G6.3 Review Core V1 — CusRev behavior, BYL V3 visual shell */
+.byl-product-reviews-cusrev{max-width:1120px;margin-left:auto;margin-right:auto}
+.byl-product-reviews-cusrev>.byl-product-section-heading{display:block;text-align:center;margin:0 auto 34px}
+.byl-product-reviews-cusrev>.byl-product-section-heading span{display:block;margin-bottom:12px}
+.byl-product-reviews-cusrev>.byl-product-section-heading h2{font-size:clamp(42px,5vw,64px);font-weight:600}
+.byl-product-reviews-cusrev .byl-product-review-native{width:100%;max-width:980px;margin:0 auto}
+.byl-product-reviews-cusrev .cr-all-reviews-shortcode{font-family:var(--byl-font);color:var(--byl-ink)}
+.byl-product-reviews-cusrev .cr-summaryBox-wrap{border:1px solid rgba(199,100,121,.16)!important;border-radius:24px!important;background:linear-gradient(135deg,#fff 0%,#fff8fa 100%)!important;padding:28px!important}
+.byl-product-reviews-cusrev .cr-average-rating{font-size:44px!important;font-weight:650!important;color:var(--byl-ink)!important}
+.byl-product-reviews-cusrev .cr-total-rating-count{color:var(--byl-ink-3)!important}
+.byl-product-reviews-cusrev .cr-all-reviews-add-review,
+.byl-product-reviews-cusrev .cr-review-form-submit,
+.byl-product-reviews-cusrev .cr-show-more-button{background:var(--byl-brand)!important;border-color:var(--byl-brand)!important;color:#fff!important;border-radius:999px!important;box-shadow:none!important}
+.byl-product-reviews-cusrev .cr-all-reviews-add-review:hover,
+.byl-product-reviews-cusrev .cr-review-form-submit:hover,
+.byl-product-reviews-cusrev .cr-show-more-button:hover{background:var(--byl-brand-hover)!important}
+.byl-product-reviews-cusrev .cr-histogramTable .ivole-histogramRow .ivole-histogramCell2 .ivole-meter-bar,
+.byl-product-reviews-cusrev .ivole-meter-bar{background:var(--byl-brand)!important}
+.byl-product-reviews-cusrev .cr-ajax-search,
+.byl-product-reviews-cusrev .cr-ajax-reviews-sort{border-color:var(--byl-line)!important;border-radius:14px!important;background:#fff!important;box-shadow:none!important}
+.byl-product-reviews-cusrev .commentlist{margin-top:18px!important}
+.byl-product-reviews-cusrev .commentlist>li,
+.byl-product-reviews-cusrev .review{border:1px solid var(--byl-line)!important;border-radius:20px!important;background:#fff!important;padding:20px!important;margin-bottom:14px!important}
+.byl-product-reviews-cusrev .cr-avatar{background:#f9e4ea!important;color:var(--byl-ink)!important}
+.byl-product-reviews-cusrev .cr-avatar-check{background:var(--byl-brand)!important}
+.byl-product-reviews-cusrev .cr-comment-images{display:flex!important;flex-wrap:wrap!important;gap:10px!important;margin-top:14px!important}
+.byl-product-reviews-cusrev .cr-comment-images img,
+.byl-product-reviews-cusrev .cr-comment-video{width:112px!important;height:112px!important;object-fit:cover!important;border-radius:14px!important;overflow:hidden!important}
+.byl-product-reviews-cusrev .cr-comment-video{position:relative!important}
+.byl-product-reviews-cusrev .cr-comment-videoicon{width:34px!important;height:34px!important}
+.byl-product-reviews-cusrev .cr-ajax-reviews-cus-images-div{margin:22px 0!important;padding:18px!important;border:1px solid rgba(199,100,121,.14)!important;border-radius:20px!important;background:#fff9fb!important}
+.byl-product-reviews-cusrev .cr-ajax-reviews-cus-images-title{font-weight:650!important;color:var(--byl-ink)!important}
+.byl-product-reviews-cusrev .cr-ajax-reviews-cus-images-div2{display:flex!important;gap:10px!important;overflow-x:auto!important;scrollbar-width:none}
+.byl-product-reviews-cusrev .cr-ajax-reviews-cus-images-div2::-webkit-scrollbar{display:none}
+.byl-product-reviews-cusrev .cr-voting-a{color:var(--byl-brand)!important}
+@media(max-width:760px){
+ .byl-product-reviews-cusrev{padding-top:48px!important}
+ .byl-product-reviews-cusrev>.byl-product-section-heading{margin-bottom:24px}
+ .byl-product-reviews-cusrev>.byl-product-section-heading h2{font-size:38px}
+ .byl-product-reviews-cusrev .byl-product-review-native{max-width:none}
+ .byl-product-reviews-cusrev .cr-summaryBox-wrap{padding:20px 14px!important;border-radius:20px!important}
+ .byl-product-reviews-cusrev .cr-all-reviews-add-review{width:100%!important}
+ .byl-product-reviews-cusrev .cr-comment-images{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:4px!important;scrollbar-width:none}
+ .byl-product-reviews-cusrev .cr-comment-images img,
+ .byl-product-reviews-cusrev .cr-comment-video{flex:0 0 104px!important;width:104px!important;height:104px!important}
+ .byl-product-reviews-cusrev .commentlist>li,
+ .byl-product-reviews-cusrev .review{padding:16px!important;border-radius:18px!important}
+}
