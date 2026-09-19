@@ -3,7 +3,9 @@
 Status: implementation candidate for localnew UAT.
 
 ## Frozen brand inputs
-- Canonical brand: BEYOURLOVER existing logo/identity.
+- Inherits docs/BYL-VI-CANONICAL.md as the higher-priority global VI authority.
+- Visible brand name / wordmark text is always exactly BeYourLover.
+- Canonical brand: BeYourLover existing logo/identity.
 - Canonical brand red: `#9B3749` (legacy code also contains near-identical `#9C3749`; V3 normalizes to one token).
 - Typeface: Poppins, weights 400/500/600/700.
 - Visual direction: calm, premium, commerce-first, Apple/HIG-informed without copying Apple UI.

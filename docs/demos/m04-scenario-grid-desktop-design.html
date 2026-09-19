@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M04 Scenario Grid — Desktop Design Draft</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#f5f5f7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+.page{min-height:100vh;padding:72px 28px 60px;display:flex;align-items:center;justify-content:center}
+.wrap{width:min(1180px,100%)}.head{text-align:center;margin-bottom:38px}
+.kicker{font-size:12px;letter-spacing:.22em;font-weight:800;color:#d94d80;margin-bottom:13px}
+h1{font-size:56px;line-height:1.02;letter-spacing:-.045em;margin:0 0 12px}
+.lead{font-size:18px;line-height:1.45;color:#6e6e73;max-width:680px;margin:auto}
+.grid{display:grid;grid-template-columns:1.35fr .9fr;grid-template-rows:1fr 1fr;gap:18px;height:640px}
+.card{position:relative;overflow:hidden;border-radius:28px;background:#ddd}
+.card.main{grid-row:1/3}.media{position:absolute;inset:0;background:linear-gradient(145deg,#efb8ca,#f7dce6)}
+.card:nth-child(2) .media{background:linear-gradient(145deg,#c8c5d6,#eceaf2)}
+.card:nth-child(3) .media{background:linear-gradient(145deg,#c7d9d2,#edf4f1)}
+.media:after{content:"REAL SCENARIO IMAGE";position:absolute;inset:0;display:grid;place-items:center;color:rgba(30,30,30,.42);font-size:12px;letter-spacing:.14em;font-weight:800}
+.card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 48%,rgba(0,0,0,.62))}
+.copy{position:absolute;left:28px;right:28px;bottom:26px;color:#fff;z-index:2}
+.eyebrow{font-size:11px;letter-spacing:.16em;font-weight:700;opacity:.78;margin-bottom:8px}
+.copy h2{font-size:30px;line-height:1.05;letter-spacing:-.03em;margin:0 0 7px}
+.card:not(.main) .copy h2{font-size:24px}.copy p{font-size:14px;line-height:1.4;max-width:440px;margin:0;color:rgba(255,255,255,.82)}
+.note{text-align:center;color:#86868b;font-size:12px;margin-top:18px}
+</style></head><body>
+<section class="page"><div class="wrap"><div class="head">
+<div class="kicker">SCENARIO GRID</div><h1>Made for Every Mood.</h1>
+<p class="lead">One dominant lifestyle story, supported by two secondary scenarios. The module shows context of use — not another feature list.</p>
+</div><div class="grid">
+<article class="card main"><div class="media"></div><div class="copy"><div class="eyebrow">PRIMARY SCENARIO</div><h2>Scenario Title</h2><p>Short real-world context copy goes here. One idea only.</p></div></article>
+<article class="card"><div class="media"></div><div class="copy"><div class="eyebrow">SCENARIO 02</div><h2>Scenario Title</h2><p>Compact supporting context.</p></div></article>
+<article class="card"><div class="media"></div><div class="copy"><div class="eyebrow">SCENARIO 03</div><h2>Scenario Title</h2><p>Compact supporting context.</p></div></article>
+</div><div class="note">Design-only placeholders. TARA S2 / product-specific real scenario imagery and copy replace these after content audit.</div>
+</div></section></body></html>

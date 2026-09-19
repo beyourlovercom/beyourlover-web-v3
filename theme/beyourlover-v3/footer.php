@@ -1,37 +1,39 @@
 <?php
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
+$footer_profile = byl_v3_current_footer_profile();
+$footer_groups = byl_v3_footer_groups($footer_profile);
 ?>
-<footer class="byl-shell-footer">
+<footer class="byl-shell-footer byl-shell-footer--<?php echo esc_attr($footer_profile); ?>" data-byl-footer-profile="<?php echo esc_attr($footer_profile); ?>">
   <div class="byl-container byl-footer-main">
     <div class="byl-footer-brand">
       <a href="<?php echo esc_url(home_url('/')); ?>" aria-label="BeYourLover home"><?php echo byl_v3_brand_logo(); ?></a>
-      <p>Designed for desire. Built for clarity.</p>
+      <?php if ($footer_profile === 'commerce'): ?>
+        <p>Shopping made clear, discreet and easy to support.</p>
+      <?php elseif ($footer_profile === 'editorial'): ?>
+        <p>Guides, stories and thoughtful discovery from BeYourLover.</p>
+      <?php elseif ($footer_profile === 'landing'): ?>
+        <p>Discreet by design.</p>
+      <?php elseif ($footer_profile === 'utility'): ?>
+        <p>Help when you need it.</p>
+      <?php else: ?>
+        <p>Designed for desire. Built for clarity.</p>
+      <?php endif; ?>
     </div>
     <nav class="byl-footer-grid" aria-label="Footer navigation">
-      <div>
-        <h2>Shop</h2>
-        <a href="<?php echo esc_url(home_url('/shop/')); ?>">All Products</a>
-        <a href="<?php echo esc_url(home_url('/new-arrivals/')); ?>">New Arrivals</a>
-        <a href="<?php echo esc_url(home_url('/best-sellers/')); ?>">Best Sellers</a>
-      </div>
-      <div>
-        <h2>Explore</h2>
-        <a href="<?php echo esc_url(home_url('/app-guide/')); ?>">App</a>
-        <a href="<?php echo esc_url(home_url('/blog/')); ?>">Learn</a>
-        <a href="<?php echo esc_url(home_url('/docs/')); ?>">Guides & FAQ</a>
-      </div>
-      <div>
-        <h2>Support</h2>
-        <a href="<?php echo esc_url(home_url('/customer-help/')); ?>">Customer Help</a>
-        <a href="<?php echo esc_url(byl_v3_account_url()); ?>">My Account</a>
-        <a href="<?php echo esc_url(byl_v3_cart_url()); ?>">Cart</a>
-      </div>
+      <?php foreach ($footer_groups as $group): ?>
+        <div class="byl-footer-group">
+          <?php if (!empty($group['label'])): ?><h2><?php echo esc_html((string)$group['label']); ?></h2><?php endif; ?>
+          <?php foreach (($group['items'] ?? []) as $item): ?>
+            <a href="<?php echo esc_url((string)$item['url']); ?>"><?php echo esc_html((string)$item['label']); ?></a>
+          <?php endforeach; ?>
+        </div>
+      <?php endforeach; ?>
     </nav>
   </div>
   <div class="byl-container byl-footer-bottom">
     <p>© <?php echo esc_html(wp_date('Y')); ?> BeYourLover. All rights reserved.</p>
-    <p>Discreet by design.</p>
+    <p><?php echo $footer_profile === 'landing' ? 'Secure · Discreet · Supported' : 'Discreet by design.'; ?></p>
   </div>
 </footer>
 <?php wp_footer(); ?>

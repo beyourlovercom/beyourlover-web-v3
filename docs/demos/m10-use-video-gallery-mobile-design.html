@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M10 Use Video Gallery — Mobile V3</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#0b0b0f;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+.page{min-height:100vh;padding:28px 0 20px;overflow:hidden;background:
+radial-gradient(circle at 20% 8%,rgba(255,112,167,.22),transparent 28%),
+radial-gradient(circle at 88% 28%,rgba(117,96,255,.22),transparent 26%),
+linear-gradient(180deg,#111117 0%,#09090d 72%,#111117 100%)}
+.wrap{width:calc(100% - 28px);max-width:390px;margin:auto}.head{text-align:center;margin-bottom:16px}
+.kicker{font-size:10px;letter-spacing:.24em;font-weight:800;color:#ff7dac;margin-bottom:9px}
+h1{font-size:38px;line-height:1.02;letter-spacing:-.045em;margin:0 0 8px}.lead{font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.62);max-width:320px;margin:auto}
+.stage-shell{position:relative}.stage-shell:before{content:"";position:absolute;left:50%;top:45%;width:72%;height:68%;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,90,155,.2),transparent 66%);filter:blur(22px);pointer-events:none}
+.rail{position:relative;display:flex;gap:12px;overflow:hidden;padding:2px 14px 8px;touch-action:pan-y;user-select:none}
+.card{position:relative;flex:0 0 calc(100vw - 42px);max-width:348px;height:535px;border-radius:30px;overflow:hidden;background:#111;border:1px solid rgba(255,255,255,.11);box-shadow:0 28px 70px rgba(0,0,0,.5);transition:transform .34s ease,opacity .34s ease,filter .34s ease}
+.card.active{transform:scale(1)}.card.next{flex-basis:64%;max-width:235px;opacity:.48;filter:saturate(.72)}
+.card video{width:100%;height:100%;object-fit:cover;background:#111}.card.next video{pointer-events:none}
+.card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),transparent 42%,rgba(0,0,0,.78));pointer-events:none}
+.creator{position:absolute;left:16px;bottom:16px;z-index:2;display:inline-flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(16,16,22,.34);backdrop-filter:blur(16px);box-shadow:inset 0 1px rgba(255,255,255,.08)}
+.creator:before{content:"";width:7px;height:7px;border-radius:50%;background:#ff7dac;box-shadow:0 0 16px rgba(255,125,172,.9)}
+.creator a{color:#fff;text-decoration:none;font-size:13px;font-weight:650}.card.next .creator{transform:scale(.88);transform-origin:left bottom}
+.badge{position:absolute;top:16px;left:16px;z-index:2;color:#fff;font-size:9px;letter-spacing:.14em;font-weight:750;padding:8px 11px;border-radius:999px;background:rgba(16,16,22,.28);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(14px)}
+.swipe-hint{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:9px;color:rgba(255,255,255,.42);font-size:10px;letter-spacing:.08em}
+.swipe-hint:before,.swipe-hint:after{content:"";width:26px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3))}
+.swipe-hint:after{background:linear-gradient(90deg,rgba(255,255,255,.3),transparent)}
+.note{text-align:center;color:rgba(255,255,255,.3);font-size:9.5px;margin-top:7px}
+</style></head><body><section class="page"><div class="wrap"><div class="head">
+<div class="kicker">USE VIDEO GALLERY</div><h1>Watch It in Real Life.</h1><p class="lead">Swipe left or right through real creator videos.</p>
+</div></div><div class="stage-shell"><div class="rail" id="rail"><article class="card active" id="activeCard"></article><article class="card next" id="nextCard"></article></div></div>
+<div class="wrap"><div class="swipe-hint">SWIPE TO EXPLORE</div><div class="note">Continuous loop · one active video at a time.</div></div>
+</section><script>
+const videos=[
+{src:'https://img.beyourlover.com/2026/07/14080933/clock-6.mp4',creator:'@sandy_blux',url:'https://www.instagram.com/p/DatIjJHIgRB/'},
+{src:'https://img.beyourlover.com/2026/06/12060706/clock-2.mp4',creator:'@missfetilicious',url:'https://www.instagram.com/missfetilicious_/'},
+{src:'https://img.beyourlover.com/2026/06/12060759/clock-3.mp4',creator:'@byannss_csp',url:'https://www.instagram.com/byannss_csp/'},
+{src:'https://img.beyourlover.com/2026/06/12060816/clock-4.mp4',creator:'@heymissbehave',url:'https://www.instagram.com/heymissbehave/'}
+];
+let index=0,startX=null,dragX=0;
+const activeCard=document.getElementById('activeCard'),nextCard=document.getElementById('nextCard'),rail=document.getElementById('rail');
+function html(f,active){
+ return '<video muted playsinline preload="metadata" '+(active?'controls':'')+' src="'+f.src+'"></video>'+
+ '<div class="badge">'+(active?'ACTIVE VIDEO':'NEXT')+'</div>'+
+ '<div class="creator"><a href="'+f.url+'" target="_blank" rel="nofollow noopener">'+f.creator+'</a></div>';
+}
+function render(dir=0){
+ const a=videos[index],n=videos[(index+1)%videos.length];
+ activeCard.innerHTML=html(a,true);nextCard.innerHTML=html(n,false);
+ activeCard.querySelector('video').controls=true;nextCard.querySelector('video').controls=false;nextCard.querySelector('video').pause();
+ activeCard.animate([{opacity:.35,transform:'translateX('+(dir>0?'24px':dir<0?'-24px':'0')+') scale(.96)'},{opacity:1,transform:'translateX(0) scale(1)'}],{duration:320,easing:'cubic-bezier(.2,.7,.2,1)'});
+}
+function go(d){const v=activeCard.querySelector('video');if(v)v.pause();index=(index+d+videos.length)%videos.length;render(d);}
+rail.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;startX=e.touches[0].clientX;dragX=startX},{passive:true});
+rail.addEventListener('touchmove',e=>{if(startX===null||e.touches.length!==1)return;dragX=e.touches[0].clientX},{passive:true});
+rail.addEventListener('touchend',()=>{
+ if(startX===null)return;
+ const dx=dragX-startX;
+ if(Math.abs(dx)>42) go(dx<0?1:-1);
+ startX=null;dragX=0;
+},{passive:true});
+rail.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;startX=e.clientX;dragX=e.clientX});
+rail.addEventListener('pointermove',e=>{if(startX===null||e.pointerType==='touch')return;dragX=e.clientX});
+rail.addEventListener('pointerup',e=>{if(startX===null||e.pointerType==='touch')return;const dx=dragX-startX;if(Math.abs(dx)>42)go(dx<0?1:-1);startX=null;dragX=0});
+nextCard.addEventListener('click',e=>{if(e.target.tagName!=='A')go(1)});
+render();
+</script></body></html>

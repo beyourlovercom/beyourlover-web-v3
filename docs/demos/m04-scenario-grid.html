@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M04 — Scenario Grid</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#f5f5f7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+.m04{min-height:100vh;padding:72px 28px 58px}.m04__wrap{width:min(1180px,100%);margin:auto}
+.m04__head{text-align:center;margin-bottom:38px}.m04__kicker{font-size:12px;letter-spacing:.22em;font-weight:800;color:#d94d80;margin-bottom:13px}
+.m04 h1{font-size:56px;line-height:1.02;letter-spacing:-.045em;margin:0 0 12px}.m04__lead{font-size:18px;line-height:1.45;color:#6e6e73;max-width:680px;margin:auto}
+.m04__grid{display:grid;grid-template-columns:1.35fr .9fr;gap:18px;height:640px}
+.m04__secondary{display:grid;grid-template-rows:1fr 1fr;gap:18px;min-width:0}
+.m04-card{position:relative;overflow:hidden;border-radius:28px;background:#ddd;isolation:isolate}.m04-card--primary{height:640px}
+.m04-card__media{position:absolute;inset:0;background:#e9e9ec center/cover no-repeat}.m04-card__media:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 46%,rgba(0,0,0,.62))}
+.m04-card__empty{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center;color:#777;background:linear-gradient(145deg,#ececf0,#dddde3)}
+.m04-card__empty span{font-size:12px;letter-spacing:.12em;font-weight:700}.m04-card__copy{position:absolute;left:28px;right:28px;bottom:26px;z-index:2;color:#fff}
+.m04-card__eyebrow{font-size:11px;letter-spacing:.16em;font-weight:700;opacity:.78;margin-bottom:8px}.m04-card h2{font-size:30px;line-height:1.05;letter-spacing:-.03em;margin:0 0 7px}
+.m04-card:not(.m04-card--primary) h2{font-size:24px}.m04-card p{font-size:14px;line-height:1.4;max-width:440px;margin:0;color:rgba(255,255,255,.82)}
+.m04__note{text-align:center;color:#86868b;font-size:12px;margin-top:18px}
+@media(max-width:760px){
+.m04{padding:34px 14px 26px}.m04__wrap{max-width:390px}.m04__head{margin-bottom:20px}
+.m04__kicker{font-size:10px;margin-bottom:10px}.m04 h1{font-size:38px;margin-bottom:9px}.m04__lead{font-size:14px;line-height:1.4;max-width:330px}
+.m04__grid{display:block;height:auto}.m04-card--primary{width:100%;height:430px}
+.m04__secondary{display:flex;height:auto;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin-top:14px;margin-right:-14px;padding-right:14px;scrollbar-width:none}.m04__secondary::-webkit-scrollbar{display:none}
+.m04__secondary .m04-card{flex:0 0 78%;height:230px;border-radius:22px;scroll-snap-align:start}
+.m04-card__copy{left:18px;right:18px;bottom:18px}.m04-card h2,.m04-card:not(.m04-card--primary) h2{font-size:21px}.m04-card--primary h2{font-size:25px}
+.m04-card p{font-size:12px}.m04-card__eyebrow{font-size:9px}.m04__note{font-size:10.5px;margin-top:10px}
+}
+</style></head><body><section class="m04" data-module="M04"><div class="m04__wrap">
+<div class="m04__head"><div class="m04__kicker">SCENARIO GRID</div><h1>Made for Every Mood.</h1><p class="m04__lead">A visual context module for real-life scenarios, not another feature list.</p></div>
+<div class="m04__grid" id="m04-grid"></div>
+<div class="m04__note">Canonical component demo · real product scenario media/content is supplied by module configuration.</div>
+</div></section>
+<script>
+const scenarios=[
+ {role:'PRIMARY SCENARIO',title:'Scenario content pending',body:'Verified product-specific scenario copy will be injected here.',image:''},
+ {role:'SCENARIO 02',title:'Scenario content pending',body:'Verified supporting scenario copy will be injected here.',image:''},
+ {role:'SCENARIO 03',title:'Scenario content pending',body:'Verified supporting scenario copy will be injected here.',image:''}
+];
+const grid=document.getElementById('m04-grid');
+const secondary=document.createElement('div');secondary.className='m04__secondary';
+scenarios.forEach((s,i)=>{
+ const card=document.createElement('article');card.className='m04-card'+(i===0?' m04-card--primary':'');
+ const media=document.createElement('div');media.className='m04-card__media';
+ if(s.image){media.style.backgroundImage='url("'+s.image.replace(/"/g,'')+'")'}
+ else{const empty=document.createElement('div');empty.className='m04-card__empty';empty.innerHTML='<span>REAL SCENARIO MEDIA SLOT</span>';media.appendChild(empty)}
+ const copy=document.createElement('div');copy.className='m04-card__copy';
+ copy.innerHTML='<div class="m04-card__eyebrow"></div><h2></h2><p></p>';
+ copy.querySelector('.m04-card__eyebrow').textContent=s.role;
+ copy.querySelector('h2').textContent=s.title;
+ copy.querySelector('p').textContent=s.body;
+ card.append(media,copy);
+ if(i===0) grid.appendChild(card); else secondary.appendChild(card);
+});
+grid.appendChild(secondary);
+</script></body></html>

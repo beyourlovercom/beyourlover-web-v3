@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M03 Product Film — Desktop Design Draft</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#f5f5f7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+.page{min-height:100vh;padding:70px 32px 60px;display:flex;align-items:center;justify-content:center}
+.wrap{width:min(1180px,100%);text-align:center}
+.kicker{font-size:12px;letter-spacing:.22em;font-weight:800;color:#d94d80;margin-bottom:14px}
+h1{font-size:58px;line-height:1.02;letter-spacing:-.045em;margin:0 0 14px}
+.lead{font-size:19px;line-height:1.5;color:#6e6e73;max-width:650px;margin:0 auto 38px}
+.stage{position:relative;width:100%;aspect-ratio:16/8.7;border-radius:32px;overflow:hidden;background:
+radial-gradient(circle at 70% 40%,rgba(255,153,190,.28),transparent 34%),
+linear-gradient(135deg,#121214 0%,#242126 45%,#0f0f11 100%);
+box-shadow:0 24px 70px rgba(0,0,0,.12)}
+.stage:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.38))}
+.film-label{position:absolute;left:34px;top:30px;color:rgba(255,255,255,.76);font-size:11px;font-weight:700;letter-spacing:.17em}
+.product-orbit{position:absolute;left:50%;top:48%;width:390px;height:390px;transform:translate(-50%,-50%);border-radius:50%;
+background:radial-gradient(circle,rgba(255,159,194,.32),rgba(255,159,194,.08) 45%,transparent 70%);
+filter:blur(.2px)}
+.product-mark{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%) rotate(-7deg);width:190px;height:250px;border-radius:48% 48% 40% 40%;
+background:linear-gradient(160deg,#ff9dbc,#f1729c);box-shadow:0 22px 50px rgba(241,114,156,.32)}
+.product-mark:after{content:"REAL PRODUCT VIDEO";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(7deg);
+font-size:11px;letter-spacing:.08em;font-weight:800;color:rgba(255,255,255,.78);white-space:nowrap}
+.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:78px;height:78px;border-radius:50%;
+background:rgba(255,255,255,.92);display:grid;place-items:center;box-shadow:0 8px 28px rgba(0,0,0,.25)}
+.play:before{content:"";margin-left:5px;border-left:20px solid #111;border-top:12px solid transparent;border-bottom:12px solid transparent}
+.meta{position:absolute;left:34px;right:34px;bottom:28px;display:flex;align-items:end;justify-content:space-between;text-align:left;color:#fff}
+.meta h2{font-size:24px;letter-spacing:-.025em;margin:0 0 5px}.meta p{margin:0;color:rgba(255,255,255,.72);font-size:14px}
+.controls{display:flex;gap:8px;align-items:center}.pill{border:1px solid rgba(255,255,255,.38);border-radius:999px;padding:9px 13px;font-size:12px;color:#fff}
+.note{margin-top:22px;font-size:13px;color:#86868b}
+@media(max-width:800px){h1{font-size:42px}.page{padding:50px 18px}.stage{border-radius:24px}.product-mark{width:150px;height:195px}.meta{left:22px;right:22px}}
+</style>
+</head>
+<body>
+<section class="page"><div class="wrap">
+<div class="kicker">PRODUCT FILM</div>
+<h1>See It in Motion.</h1>
+<p class="lead">One cinematic moment. No feature grid, no parameter wall — just the product story, movement and mood.</p>
+<div class="stage">
+<div class="film-label">M03 · PRODUCT FILM · DESKTOP DRAFT</div>
+<div class="product-orbit"></div><div class="product-mark"></div><div class="play"></div>
+<div class="meta"><div><h2>Naughty Clock Pink</h2><p>Product film · sound optional · captions available</p></div><div class="controls"><span class="pill">CC</span><span class="pill">Sound</span><span class="pill">Full screen</span></div></div>
+</div>
+<div class="note">Design-only placeholder. Real product video and poster frame will replace the abstract media at implementation.</div>
+</div></section>
+</body></html>

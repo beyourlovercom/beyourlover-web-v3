@@ -2,116 +2,93 @@
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 get_header();
+$hero_products = byl_v3_showcase_products(3);
+$popular_products = byl_v3_home_products(4);
+$categories = array_filter([
+    byl_v3_home_category('sex-toys-for-women'),
+    byl_v3_home_category('sex-toys-for-men'),
+    byl_v3_home_category('sex-toys-for-couples'),
+]);
 ?>
-<main id="main-content" class="byl-ds" data-byl-v3-design-system="v1" data-byl-g4-shell-preview="true">
-  <section class="byl-ds-hero">
-    <div class="byl-container byl-ds-hero-grid">
-      <div class="byl-ds-copy" data-byl-motion="rise">
-        <p class="byl-eyebrow">BEYOURLOVER · V3</p>
-        <h1 class="byl-display-xl">Designed for desire.<br>Built for clarity.</h1>
-        <p class="byl-body-l">A calm, premium commerce system built from reusable tokens, accessible primitives and restrained motion.</p>
-        <div class="byl-ds-actions">
-          <a class="byl-btn byl-btn-primary" href="#primitives">Explore primitives</a>
-          <a class="byl-btn byl-btn-secondary" href="#type">View typography</a>
+<main id="main-content" class="byl-home" data-byl-template="home-v1">
+  <section class="byl-home-hero">
+    <div class="byl-container byl-home-hero-grid">
+      <div class="byl-home-hero-copy" data-byl-motion="rise">
+        <p class="byl-eyebrow">BeYourLover®</p>
+        <h1>BeYourLover Sex Toys</h1>
+        <p class="byl-home-lede">Cute, original adult toys designed around intimacy, curiosity and pleasure — with a calmer way to discover what fits you.</p>
+        <div class="byl-home-actions">
+          <a class="byl-btn byl-btn-primary" href="<?php echo esc_url(home_url('/shop/')); ?>">Shop all</a>
+          <a class="byl-btn byl-btn-secondary" href="<?php echo esc_url(home_url('/best-sellers/')); ?>">Best sellers</a>
         </div>
       </div>
-      <aside class="byl-ds-brand-panel" aria-label="Canonical brand color" data-byl-motion="scale">
-        <p class="byl-eyebrow byl-ds-on-brand">Canonical brand</p>
-        <strong>#9B3749</strong><span>Existing BYL red · preserved, not reinvented.</span>
-      </aside>
-    </div>
-  </section>
-
-  <section class="byl-ds-section" id="color">
-    <div class="byl-container">
-      <div class="byl-ds-section-head">
-        <div><p class="byl-eyebrow">Color</p><h2 class="byl-heading-xl">Brand first. Neutral by default.</h2></div>
-        <p class="byl-body-m">Brand red carries emphasis and conversion. Ink, white and soft neutrals carry the interface.</p>
-      </div>
-      <div class="byl-grid-3">
-        <div class="byl-swatch byl-swatch-brand">Brand Red<small>#9B3749</small></div>
-        <div class="byl-swatch byl-swatch-ink">Ink<small>#161316</small></div>
-        <div class="byl-swatch byl-swatch-soft">Brand Soft<small>#F7ECEF</small></div>
+      <div class="byl-home-hero-media" aria-label="Featured products">
+        <?php foreach ($hero_products as $i => $product): ?>
+          <a class="byl-home-hero-product byl-home-hero-product-<?php echo (int)$i + 1; ?>" href="<?php echo esc_url(get_permalink($product->get_id())); ?>">
+            <img src="<?php echo esc_url(byl_v3_product_image_url($product)); ?>" alt="<?php echo esc_attr($product->get_name()); ?>">
+            <span><?php echo esc_html($product->get_name()); ?></span>
+          </a>
+        <?php endforeach; ?>
       </div>
     </div>
   </section>
 
-  <section class="byl-ds-section" id="type">
+  <section class="byl-home-section byl-home-categories">
     <div class="byl-container">
-      <div class="byl-ds-section-head">
-        <div><p class="byl-eyebrow">Typography</p><h2 class="byl-heading-xl">Poppins, with hierarchy.</h2></div>
-        <p class="byl-body-m">Editorial scale for brand moments, controlled headings for commerce, and readable body copy for guides and support.</p>
+      <div class="byl-home-section-head">
+        <div><p class="byl-eyebrow">Discover</p><h2>What can you get from BeYourLover?</h2></div>
+        <p>Explore by who it is for, then narrow by the experience you want.</p>
       </div>
-      <div class="byl-type-stack">
-        <div class="byl-type-row"><p class="byl-eyebrow">Display L · 500</p><p class="byl-display-l">Feel more. Find your fit.</p></div>
-        <div class="byl-type-row"><p class="byl-eyebrow">Heading L · 500</p><p class="byl-heading-l">Made to be explored.</p></div>
-        <div class="byl-type-row"><p class="byl-eyebrow">Body L · 400</p><p class="byl-body-l">Comfortable reading, clear choices, and less visual noise around the action that matters.</p></div>
+      <div class="byl-home-category-grid">
+        <?php foreach ($categories as $category): ?>
+          <a class="byl-home-category" href="<?php echo esc_url((string)$category['url']); ?>">
+            <div class="byl-home-category-media">
+              <?php if ($category['image'] !== ''): ?><img src="<?php echo esc_url($category['image']); ?>" alt=""><?php endif; ?>
+            </div>
+            <div><span><?php echo esc_html($category['count'].' products'); ?></span><h3><?php echo esc_html($category['name']); ?></h3></div>
+            <?php echo byl_v3_icon('arrow'); ?>
+          </a>
+        <?php endforeach; ?>
       </div>
     </div>
   </section>
 
-  <section class="byl-ds-section" id="primitives">
+  <section class="byl-home-section byl-home-explore">
     <div class="byl-container">
-      <div class="byl-ds-section-head">
-        <div><p class="byl-eyebrow">Foundation primitives</p><h2 class="byl-heading-xl">One behavior system, everywhere.</h2></div>
-        <p class="byl-body-m">These are low-level building blocks only. Product cards, galleries, tabs and commerce patterns arrive later in G5.</p>
+      <div class="byl-home-section-head">
+        <div><p class="byl-eyebrow">Explore</p><h2>What's on BeYourLover?</h2></div>
+        <p>Products, app experiences and editorial content share one clear path.</p>
       </div>
-      <div class="byl-grid-3">
-        <article class="byl-card byl-stack">
-          <span class="byl-chip">Buttons</span>
-          <h3 class="byl-heading-m">Clear actions</h3>
-          <p class="byl-body-m">48px minimum target, visible focus, disabled state and reduced-motion-safe press feedback.</p>
-          <div class="byl-cluster">
-            <button class="byl-btn byl-btn-primary">Primary</button>
-            <button class="byl-btn byl-btn-secondary">Secondary</button>
-            <button class="byl-btn byl-btn-quiet">Quiet</button>
-            <button class="byl-btn byl-btn-secondary" disabled>Disabled</button>
-          </div>
-        </article>
-        <article class="byl-card byl-card-soft byl-stack">
-          <span class="byl-chip">Surface</span>
-          <h3 class="byl-heading-m">Soft structure</h3>
-          <p class="byl-body-m">Low-contrast borders, restrained shadow and consistent section spacing keep the interface calm.</p>
-          <hr class="byl-divider">
-          <a class="byl-link" href="#reading">Discoverable text link</a>
-        </article>
-        <article class="byl-card byl-stack byl-motion-hover-lift">
-          <span class="byl-chip">Icon + motion</span>
-          <h3 class="byl-heading-m">Purposeful feedback</h3>          <p class="byl-body-m">Icons inherit text color; motion reinforces state instead of decorating every surface.</p>
-          <div class="byl-cluster" aria-label="Icon size examples">
-            <span class="byl-icon byl-icon-sm" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-            <span class="byl-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-            <span class="byl-icon byl-icon-lg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-          </div>
-        </article>
+      <div class="byl-home-explore-grid">
+        <a class="byl-home-feature byl-home-feature-brand" href="<?php echo esc_url(home_url('/new-arrivals/')); ?>">
+          <span>New arrivals</span><h3>See what's new.</h3><p>Fresh launches and recent additions from the live catalog.</p><?php echo byl_v3_icon('arrow'); ?>
+        </a>
+        <a class="byl-home-feature" href="<?php echo esc_url(home_url('/app-guide/')); ?>">
+          <span>Apps</span><h3>Connected experiences.</h3><p>Find the app or guide that matches your product.</p><?php echo byl_v3_icon('arrow'); ?>
+        </a>
+        <a class="byl-home-feature" href="<?php echo esc_url(home_url('/blog/')); ?>">
+          <span>Editorial</span><h3>Learn at your pace.</h3><p>Guides, ideas and practical reading from BeYourLover.</p><?php echo byl_v3_icon('arrow'); ?>
+        </a>
       </div>
     </div>
   </section>
 
-  <section class="byl-ds-section byl-surface-soft" id="reading">
+  <section class="byl-home-section byl-home-products">
     <div class="byl-container">
-      <div class="byl-reading byl-ds-reading-card">
-        <p class="byl-eyebrow">Editorial / Docs foundation</p>
-        <h2 class="byl-heading-l">Readable enough for a guide. Focused enough for support.</h2>
-        <p class="byl-body-l">The reading column is capped at 760px so future tutorials, FAQs and support articles remain comfortable on large displays without depending on BetterDocs styling.</p>
-        <p class="byl-body-m">Links stay visible and keyboard focus stays explicit. This gives the future <strong>Andy Core Docs OS</strong> a native foundation while keeping the actual tutorial content in WordPress posts.</p>
-        <p><a class="byl-link" href="#motion">See motion policy</a></p>
+      <div class="byl-home-section-head">
+        <div><p class="byl-eyebrow">Best sellers</p><h2>Most Popular product on BeYourLover</h2></div>
+        <a class="byl-link" href="<?php echo esc_url(home_url('/best-sellers/')); ?>">View all best sellers</a>
+      </div>
+      <div class="byl-product-grid">
+        <?php foreach ($popular_products as $product): echo byl_v3_product_card($product); endforeach; ?>
       </div>
     </div>
   </section>
 
-  <section class="byl-ds-section" id="motion">
-    <div class="byl-container">
-      <div class="byl-ds-section-head">
-        <div><p class="byl-eyebrow">Motion levels</p><h2 class="byl-heading-xl">Motion follows the job.</h2></div>
-        <p class="byl-body-m">L0 utility stays nearly still. L1 editorial orients. L2 commerce supports product exploration. L3 brand can tell a richer story.</p>
-      </div>
-      <div class="byl-grid-3">
-        <article class="byl-card byl-stack"><span class="byl-chip">L0</span><h3 class="byl-heading-m">Utility</h3><p class="byl-body-s">Cart · Checkout · Login · Account</p><div class="byl-motion-demo byl-motion-press" aria-hidden="true"></div></article>
-        <article class="byl-card byl-stack"><span class="byl-chip">L1–L2</span><h3 class="byl-heading-m">Content + Commerce</h3><p class="byl-body-s">Blog · Guide · Product · Category</p><div class="byl-motion-demo" data-byl-motion="rise" aria-hidden="true"></div></article>
-        <article class="byl-card byl-stack"><span class="byl-chip">L3</span><h3 class="byl-heading-m">Experience</h3><p class="byl-body-s">Homepage · App · Brand · Campaign</p><div class="byl-motion-demo" data-byl-motion="scale" aria-hidden="true"></div></article>
-      </div>
-      <p class="byl-ds-footnote">All motion automatically respects <code>prefers-reduced-motion</code>.</p>
+  <section class="byl-home-section byl-home-support">
+    <div class="byl-container byl-home-support-inner">
+      <div><p class="byl-eyebrow">Support</p><h2>Stay curious. Stay supported.</h2><p>Product help, discreet delivery information and guides stay one step away.</p></div>
+      <a class="byl-btn byl-btn-secondary" href="<?php echo esc_url(home_url('/customer-help/')); ?>">Customer help</a>
     </div>
   </section>
 </main>

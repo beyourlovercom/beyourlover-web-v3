@@ -1,8 +1,9 @@
-# BEYOURLOVER WEB PLATFORM V3
+# BeYourLover WEB PLATFORM V3
 
-Greenfield foundation for the BEYOURLOVER V3 rebuild.
+Greenfield foundation for the BeYourLover V3 rebuild.
 
 ## Canonical rules
+- Highest VI authority: docs/BYL-VI-CANONICAL.md; visible brand name is always exactly BeYourLover.
 - Code source of truth: GitHub.
 - Transactional data source of truth: Production.
 - Code flows GitHub -> localnew -> staging -> Production.

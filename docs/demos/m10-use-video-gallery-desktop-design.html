@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M10 Use Video Gallery — Desktop Design Draft</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#f5f5f7;color:#111;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+.page{min-height:100vh;padding:66px 0 46px;overflow:hidden}.wrap{width:min(1180px,calc(100% - 56px));margin:auto}
+.head{text-align:center;margin-bottom:30px}.kicker{font-size:12px;letter-spacing:.22em;font-weight:800;color:#d94d80;margin-bottom:12px}
+h1{font-size:54px;line-height:1.02;letter-spacing:-.045em;margin:0 0 10px}.lead{font-size:17px;line-height:1.45;color:#6e6e73;max-width:620px;margin:auto}
+.stage{display:flex;align-items:center;justify-content:center;gap:18px;height:650px}
+.card{position:relative;flex:0 0 230px;height:500px;border-radius:28px;overflow:hidden;background:#111;opacity:.64;transform:scale(.92);transition:.35s ease;cursor:pointer}
+.card.active{flex-basis:360px;height:620px;opacity:1;transform:scale(1);box-shadow:0 26px 70px rgba(0,0,0,.15)}
+.card video{width:100%;height:100%;object-fit:cover;background:#111}.card:not(.active) video{pointer-events:none}
+.card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 62%,rgba(0,0,0,.62));pointer-events:none}
+.creator{position:absolute;left:18px;right:18px;bottom:18px;z-index:2;color:#fff}.creator .label{font-size:9px;letter-spacing:.14em;font-weight:700;opacity:.72;margin-bottom:5px}.creator a{color:#fff;text-decoration:none;font-size:15px;font-weight:650}
+.card.active .creator a{font-size:18px}.playhint{position:absolute;top:18px;left:18px;z-index:2;color:#fff;font-size:10px;letter-spacing:.1em;padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.28);backdrop-filter:blur(8px)}
+.nav{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px}.btn{width:46px;height:46px;border-radius:50%;border:1px solid #d2d2d7;background:#fff;font-size:20px;cursor:pointer}.count{font-size:12px;color:#86868b;min-width:62px;text-align:center}
+.note{text-align:center;color:#86868b;font-size:11px;margin-top:10px}
+</style></head><body><section class="page"><div class="wrap"><div class="head">
+<div class="kicker">USE VIDEO GALLERY</div><h1>Watch It in Real Life.</h1><p class="lead">Real creator videos, one active story at a time. Tap a side card or use the arrows to switch.</p>
+</div><div class="stage" id="stage"></div>
+<div class="nav"><button class="btn" id="prev">←</button><div class="count" id="count">01 / 04</div><button class="btn" id="next">→</button></div>
+<div class="note">Real Naughty Clock UGC sources · only the active video is allowed to play.</div>
+</div></section><script>
+const videos=[
+{src:'https://img.beyourlover.com/2026/07/14080933/clock-6.mp4',creator:'@sandy_blux',url:'https://www.instagram.com/p/DatIjJHIgRB/'},
+{src:'https://img.beyourlover.com/2026/06/12060706/clock-2.mp4',creator:'@missfetilicious',url:'https://www.instagram.com/missfetilicious_/'},
+{src:'https://img.beyourlover.com/2026/06/12060759/clock-3.mp4',creator:'@byannss_csp',url:'https://www.instagram.com/byannss_csp/'},
+{src:'https://img.beyourlover.com/2026/06/12060816/clock-4.mp4',creator:'@heymissbehave',url:'https://www.instagram.com/heymissbehave/'}
+];
+let index=0; const stage=document.getElementById('stage'),count=document.getElementById('count');
+function render(){
+ stage.innerHTML='';
+ [-1,0,1].forEach(offset=>{
+  const i=(index+offset+videos.length)%videos.length,f=videos[i];
+  const card=document.createElement('article');card.className='card'+(offset===0?' active':'');
+  card.innerHTML='<video muted playsinline preload="metadata"'+(offset===0?' controls':'')+' src="'+f.src+'"></video><div class="playhint">'+(offset===0?'ACTIVE VIDEO':'NEXT')+'</div><div class="creator"><div class="label">CREATOR</div><a href="'+f.url+'" target="_blank" rel="nofollow noopener">'+f.creator+'</a></div>';
+  card.addEventListener('click',e=>{if(e.target.tagName==='A')return;if(offset!==0){index=i;render()}});
+  stage.appendChild(card);
+ });
+ count.textContent=String(index+1).padStart(2,'0')+' / '+String(videos.length).padStart(2,'0');
+ const all=[...stage.querySelectorAll('video')]; all.forEach((v,i)=>{if(i!==1){v.pause();v.controls=false}else{v.controls=true}});
+}
+function go(d){index=(index+d+videos.length)%videos.length;render()}
+document.getElementById('prev').addEventListener('click',()=>go(-1));
+document.getElementById('next').addEventListener('click',()=>go(1));
+render();
+</script></body></html>
