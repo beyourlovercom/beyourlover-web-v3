@@ -17,3 +17,13 @@ jobs:
         run: python -m py_compile scripts/*.py
       - name: Migration IDs
         run: python scripts/check_migration_ids.py
+      - name: Shipping promotion contract
+        run: python scripts/test_shipping_promotion_contract.py
+      - name: Shipping promotion runtime contract
+        run: python scripts/test_shipping_promotion_runtime_contract.py
+      - name: Checkout shipping promotion docs
+        run: python scripts/test_checkout_shipping_promotion_docs.py
+      - name: Cart promotion UX contract
+        run: python scripts/test_cart_promotion_ux_contract.py
+      - name: Checkout progressive UX contract
+        run: python scripts/test_checkout_progressive_ux_contract.py
