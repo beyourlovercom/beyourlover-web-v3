@@ -69,19 +69,21 @@ add_filter('woocommerce_available_payment_gateways', static function (array $gat
 
 add_filter('woocommerce_allow_tracking', '__return_false', 99);
 
-// Classic checkout is not the only order-creation path. Store API's Checkout
-// GET can create a draft order; POST can process a payment without triggering
-// woocommerce_checkout_process. Deny both until the exact test permit validates.
+// Store API Checkout is a separate order-creation/payment path from classic
+// checkout. Its checkout/{order_id} route can also process an existing order.
+// The existing synthetic email, six-order cap and audit marker are implemented
+// ONLY for classic Checkout. Never open Store API using that classic permit.
+// Until Store API has independently verified equivalent safeguards, deny its
+// Checkout routes even when a classic-only sandbox test permit is valid.
 add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
     if ($result !== null || !($request instanceof WP_REST_Request)) { return $result; }
     $route = $request->get_route();
-    if (!in_array($route, ['/wc/store/v1/checkout', '/wc/store/checkout'], true)) { return $result; }
+    if (!preg_match('#^/wc/store(?:/v1)?/checkout(?:/[0-9]+)?/?$#', $route)) { return $result; }
     // OPTIONS advertises endpoint metadata and has no order-creation effect.
     if ($request->get_method() === 'OPTIONS') { return $result; }
-    if (byl_dev_p13_checkout_gate()) { return $result; }
     return new WP_Error(
         'byl_dev_sandbox_checkout_closed',
-        'Orders are disabled on the development environment.',
+        'Store API Checkout is disabled on the development environment.',
         ['status' => 403]
     );
 }, 99, 3);
