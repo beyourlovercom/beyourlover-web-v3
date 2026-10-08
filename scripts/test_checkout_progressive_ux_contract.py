@@ -34,6 +34,8 @@ for marker in (
 
 for marker in (
     "unset($fields['billing']['billing_phone'])",
+    "unset($fields['billing']['billing_company'])",
+    "unset($fields['shipping']['shipping_company'])",
     "['shipping_phone']",
     "'required' => true",
     "'label' => 'Shipping phone'",
