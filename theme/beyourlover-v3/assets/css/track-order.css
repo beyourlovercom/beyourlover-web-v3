@@ -120,3 +120,78 @@
  .byl-track-hint{font-size:12px}
 }
 @media(prefers-reduced-motion:reduce){.byl-track-chevron,.byl-track-query form.track_order button{transition:none}}
+
+
+/* FAQ V2: preserve the six WWW help topics with readable, accessible native details. */
+.byl-track-answer p + p{margin-top:12px}
+.byl-track-answer .byl-track-carriers{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;
+  list-style:none;margin:14px 0;padding:0
+}
+.byl-track-carriers li{display:flex;flex-direction:column;gap:4px;min-width:0;border:1px solid #eee4e7;background:#fffafb;border-radius:10px;padding:12px 11px}
+.byl-track-carriers strong{font-size:13px;color:var(--byl-ink);font-weight:700}
+.byl-track-carriers span{font-size:11px;line-height:1.55;color:var(--byl-ink-2)}
+.byl-track-tip{background:#fbf3f5;padding:11px 13px;border-radius:9px;color:var(--byl-ink-2);font-size:12px;line-height:1.65}
+.byl-track-steps,.byl-track-checks,.byl-track-timeline{margin:12px 0 16px;padding-left:20px}
+.byl-track-steps li{margin:0 0 11px;padding-left:3px}
+.byl-track-steps strong,.byl-track-timeline strong{display:block;color:var(--byl-ink);font-weight:600}
+.byl-track-steps span,.byl-track-timeline span{display:block;color:var(--byl-ink-2);font-size:12px;line-height:1.6;margin-top:1px}
+.byl-track-checks li{margin-bottom:8px;padding-left:2px}
+.byl-track-inline-link{display:inline-flex;gap:6px;font-weight:600;color:var(--byl-brand);margin-top:6px}
+.byl-track-timeline{list-style:none;position:relative;padding-left:30px;margin-top:16px}
+.byl-track-timeline::before{content:'';position:absolute;top:9px;bottom:14px;left:9px;width:2px;background:#f1dce3}
+.byl-track-timeline li{position:relative;min-height:48px;padding-bottom:12px}
+.byl-track-timeline li:last-child{padding-bottom:0}
+.byl-track-timeline li::before{content:'';position:absolute;top:3px;left:-26px;width:12px;height:12px;border:3px solid #fff;border-radius:50%;background:var(--byl-brand);box-shadow:0 0 0 1px #f0cfd8}
+
+/* Post-FAQ resources are scoped to this page, not the global footer. */
+.byl-track-assist{
+  display:flex;gap:24px;align-items:center;justify-content:space-between;
+  background:linear-gradient(112deg,#fff7f9 0%,#f8edf1 100%);
+  border:1px solid #f2dce3;border-radius:var(--byl-radius-md);
+  padding:clamp(25px,3.4vw,39px);min-width:0;overflow:hidden;
+}
+.byl-track-assist-main{min-width:0;flex:1 1 auto;max-width:760px}
+.byl-track-assist .byl-track-kicker{margin-bottom:9px}
+.byl-track-assist h2{font-family:Georgia,'Times New Roman',serif;color:var(--byl-ink);font-size:clamp(23px,2.5vw,30px);line-height:1.25;letter-spacing:-.028em;margin:0 0 8px;font-weight:600}
+.byl-track-assist-main > p:not(.byl-track-kicker){font-size:13px;line-height:1.7;color:var(--byl-ink-2);margin:0}
+.byl-track-assist-actions{display:flex;align-items:center;gap:14px 22px;flex-wrap:wrap;margin-top:18px}
+.byl-track-guide-button{
+  display:inline-flex;justify-content:center;align-items:center;gap:12px;
+  min-height:45px;padding:10px 21px;border-radius:8px;border:1px solid var(--byl-brand);
+  background:var(--byl-brand);color:#fff;text-decoration:none;
+  font:600 13px/1.3 var(--byl-font);
+  transition:background-color var(--byl-duration-fast) var(--byl-ease)
+}
+.byl-track-guide-button:hover{color:#fff;background:var(--byl-brand-hover)}
+.byl-track-guide-button:focus-visible{outline:2px solid var(--byl-focus);outline-offset:4px}
+.byl-track-guide-button span{font-size:19px;font-weight:400;line-height:1}
+.byl-track-assist-email{font-size:13px;font-weight:600;color:var(--byl-brand);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.byl-track-assist-email:hover{color:var(--byl-brand-hover)}
+.byl-track-assist-main > .byl-track-assist-thanks{font-size:12px;font-style:italic;color:var(--byl-ink-3);margin:18px 0 0}
+.byl-track-assist-aside{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;flex:none;width:155px;height:148px;border-radius:50%;background:rgba(255,255,255,.52);color:var(--byl-brand);transform:rotate(-7deg)}
+.byl-track-assist-symbol{font-size:58px;line-height:1}
+.byl-track-assist-aside-copy{font-size:12px;font-weight:600}
+.byl-track-reassurance{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;padding:17px 23px;border-radius:var(--byl-radius-md);background:#faf8f9;border:1px solid #f0eaec}
+.byl-track-reassurance > div{display:flex;gap:12px;min-width:0;align-items:center}
+.byl-track-reassure-icon{display:flex;align-items:center;justify-content:center;flex:none;width:36px;height:36px;background:#f8e5eb;border-radius:50%;color:var(--byl-brand);font-size:18px;font-weight:600}
+.byl-track-reassurance strong{display:block;color:var(--byl-ink);font-size:12px;font-weight:600;line-height:1.6}
+.byl-track-reassurance small{display:block;color:var(--byl-ink-3);font-size:11px;line-height:1.5}
+@media(max-width:860px){
+  .byl-track-answer .byl-track-carriers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .byl-track-assist-aside{width:105px;height:105px}
+  .byl-track-reassurance{gap:10px;padding:15px}
+}
+@media(max-width:700px){
+  .byl-track-answer .byl-track-carriers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .byl-track-carriers li{padding:10px}
+  .byl-track-assist{padding:23px 20px;display:block}
+  .byl-track-assist-aside{display:none}
+  .byl-track-assist-actions{align-items:stretch;gap:10px;margin-top:18px;flex-direction:column}
+  .byl-track-guide-button{width:100%;min-height:48px}
+  .byl-track-assist-email{padding:8px 0}
+  .byl-track-reassurance{grid-template-columns:1fr;gap:13px;padding:20px}
+}
+@media(max-width:350px){
+  .byl-track-answer .byl-track-carriers{grid-template-columns:1fr}
+}
