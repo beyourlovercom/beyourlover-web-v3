@@ -155,10 +155,15 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
 
 .byl-progressive-checkout #shipping_phone-description {
   display:block!important;
-  margin-top:5px;
-  color:var(--pc-muted);
-  font-size:11px;
-  line-height:1.45;
+  margin-top:8px;
+  color:var(--byl-ink-2)!important;
+  font-size:13px!important;
+  line-height:1.6;
+  opacity:1!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0!important;
 }
 
 .byl-summary-promo[hidden] { display:none!important; }
