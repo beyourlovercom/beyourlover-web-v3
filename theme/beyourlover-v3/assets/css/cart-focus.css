@@ -129,3 +129,8 @@
 .byl-cart-runtime .byl-cart-qty-stepper input.qty{width:37px!important;max-width:37px!important;margin:0!important;padding:0!important;min-height:40px!important;border:0!important;border-radius:0!important;text-align:center;-moz-appearance:textfield}
 .byl-cart-runtime .byl-cart-qty-stepper input::-webkit-inner-spin-button,.byl-cart-runtime .byl-cart-qty-stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 @media(max-width:600px){.byl-cart-runtime .woocommerce-cart-form .product-quantity{grid-column:3/5!important;grid-row:3!important}.byl-cart-runtime .woocommerce-cart-form .product-subtotal{grid-column:3/5!important;grid-row:4!important}.byl-cart-runtime .byl-cart-qty-stepper button{min-height:36px}.byl-cart-runtime .byl-cart-qty-stepper input.qty{min-height:36px!important}}
+
+/* Existing Andy Commerce promotion slot follows the approved Cart green VI. */
+.byl-focus-cart-shell .byl-cart-promotion__form button{min-height:42px;padding:0 16px;border:1px solid #075b46;border-radius:8px;background:#075b46;color:#fff;font-weight:700}
+.byl-focus-cart-shell .byl-cart-promotion__form button:hover{background:#064b3a}
+.byl-focus-cart-shell .byl-cart-promotion__form input{min-height:42px;border:1px solid #dce2df;border-radius:8px;padding:0 12px}
