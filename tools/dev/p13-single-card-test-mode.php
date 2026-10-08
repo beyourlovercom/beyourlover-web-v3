@@ -51,6 +51,8 @@ if (!is_string($payload) || file_put_contents($backup, $payload, LOCK_EX) === fa
     throw new RuntimeException('Private options backup failed.');
 }
 chmod($backup, 0600);
+$original_woo = $woo;
+$original_stripe = $stripe;
 $woo['payment_request_button_locations'] = $target_locations;
 $woo['express_checkout_product_methods'] = [];
 $stripe['enabled'] = 'no';
@@ -65,9 +67,9 @@ $pass = $woo_now['payment_request_button_locations'] === $target_locations
     && ($stripe_now['enabled'] ?? '') === 'no'
     && ($stripe_now['testmode'] ?? '') === 'yes';
 if (!$pass) {
-    update_option('woocommerce_woocommerce_payments_settings', $woo, false);
-    update_option('woocommerce_stripe_settings', $stripe, false);
-    throw new RuntimeException('Read-back verification failed; STOP and inspect private backup.');
+    update_option('woocommerce_woocommerce_payments_settings', $original_woo, false);
+    update_option('woocommerce_stripe_settings', $original_stripe, false);
+    throw new RuntimeException('Read-back verification failed; original option values restored.');
 }
 echo "P13_SINGLE_CARD_DEV_TEST_MODE=PASS\n";
 echo "VISIBLE_CARD_PROVIDER=woocommerce_payments\n";
