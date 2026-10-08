@@ -142,3 +142,40 @@ body.woocommerce-checkout .woocommerce-form-coupon-toggle{display:none!important
  .byl-summary-toggle{min-height:26px}
  .byl-summary-promo{padding-top:12px}
 }
+
+/* Shipping promotion integration on the accepted Checkout V2 summary. */
+body.woocommerce-checkout form.checkout_coupon,
+body.woocommerce-checkout #coupons_list,
+body.woocommerce-checkout [data-block-name="woocommerce/checkout-coupon-form"],
+body.woocommerce-checkout [data-block-name="smart-coupons/available-coupons"],
+body.woocommerce-checkout .smart-coupons-available-coupons,
+body.woocommerce-checkout .wt_coupon_wrapper,
+body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
+
+.byl-progressive-checkout #shipping_phone-description {
+  display:block!important;
+  margin-top:5px;
+  color:var(--pc-muted);
+  font-size:11px;
+  line-height:1.45;
+}
+
+.byl-summary-promo[hidden] { display:none!important; }
+.byl-summary-promo .byl-promo-title { display:block;font-size:12px;margin-bottom:6px; }
+.byl-summary-promo .byl-promo-message,
+.byl-summary-promo .byl-promo-hint,
+.byl-summary-promo .byl-promo-applied { margin:6px 0 0;color:var(--pc-muted);font-size:11px; }
+.byl-summary-promo .byl-promo-applied strong { color:#151a19; }
+.byl-summary-promo .byl-promo-edit,
+.byl-summary-promo .byl-promo-remove {
+  border:0;
+  padding:0;
+  margin-top:7px;
+  background:transparent;
+  color:#1b2723;
+  font:inherit;
+  font-size:11px;
+  text-decoration:underline;
+  cursor:pointer;
+}
+.byl-summary-promo .byl-promo-error { margin:7px 0 0;color:#ab2d37;font-size:11px; }

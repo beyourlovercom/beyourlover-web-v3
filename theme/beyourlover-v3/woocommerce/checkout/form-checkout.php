@@ -50,7 +50,7 @@ $cart = WC()->cart;
                 if (!$product instanceof WC_Product || !$product->exists()) { continue; }
               ?><div class="byl-summary-product"><div class="byl-summary-image"><?php echo wp_kses_post($product->get_image('woocommerce_thumbnail')); ?></div><div><strong><?php echo esc_html($product->get_name()); ?></strong><small>Qty: <?php echo esc_html((string) $line['quantity']); ?></small></div><span><?php echo wp_kses_post($cart->get_product_subtotal($product, $line['quantity'])); ?></span></div><?php endforeach; endif; ?>
             </div>
-            <div class="byl-summary-promo">
+            <div class="byl-summary-promo" data-byl-promotion>
               <label for="byl-promo-code">Promo code</label>
               <div class="byl-summary-promo-row"><input id="byl-promo-code" type="text" autocomplete="off" placeholder="Enter promo code"><button type="button" data-byl-apply-coupon>Apply</button></div>
               <p data-byl-promo-status>Only one promo code can be applied per order.</p>
