@@ -76,7 +76,7 @@
       privacy.dataset.bylCompact = '1';
     }
     const reviewInvite = termsHost.querySelector('.cr-customer-consent .woocommerce-terms-and-conditions-checkbox-text');
-    if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation from CusRev.';
+    if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation with gift card rewards.';
     const notes = document.querySelector('.woocommerce-additional-fields');
     if (notes && notes.parentElement !== notesHost) notesHost.appendChild(notes);
   }
