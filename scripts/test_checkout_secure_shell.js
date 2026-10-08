@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
@@ -37,6 +37,7 @@ ok(css.includes('color:var(--byl-brand)'),'Burgundy links/icon');
 ok(!/#00643f|#075b46|#064b3a|PingFang|background:\s*green/i.test(css),'no cross-brand green');
 ok(css.includes('@media(max-width:760px)'),'mobile shell response');
 ok(checkout.includes('byl-progressive-checkout'),'existing progressive Checkout untouched');
+ok(footer.includes("wc_get_page_id('terms')") && footer.includes("$terms_page_id > 0") && footer.includes("home_url('/terms-and-conditions/')"),'Woo Terms unset falls back to published Terms page, not site home');
 ok(footer.includes("home_url('/shipping-policies/')"),'checkout shipping link uses live Dev policy route');
 ok(footer.includes("home_url('/privacy-policies/')"),'checkout privacy fallback uses published WordPress policy route');
 ok(cartFooter.includes("home_url('/shipping-policies/')") && cartFooter.includes("home_url('/return-policies/')"),'cart shipping and return links use published routes');
