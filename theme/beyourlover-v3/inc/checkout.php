@@ -18,4 +18,10 @@ add_filter('woocommerce_checkout_fields', static function (array $fields): array
         'validate' => ['phone'],
     ];
     return $fields;
-}, 20);
+}, 9999);
+
+add_action('wp', static function (): void {
+    if (function_exists('is_checkout') && is_checkout() && !(function_exists('is_order_received_page') && is_order_received_page())) {
+        remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
+    }
+});

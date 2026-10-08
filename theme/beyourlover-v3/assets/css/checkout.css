@@ -110,3 +110,35 @@ body.woocommerce-checkout #main-content.byl-commerce-content{max-width:1200px;ma
 }
 @media(max-width:375px){.byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row-first,.byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row-last{grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){.byl-progressive-checkout *{scroll-behavior:auto!important;transition:none!important}}
+
+/* P2 mobile-first polish after real-browser screenshot inspection. */
+body.woocommerce-checkout .woocommerce-message:has(.wc-forward){display:none!important}
+body.woocommerce-checkout .woocommerce-form-coupon-toggle{display:none!important}
+.byl-summary-promo{padding:15px 0;border-bottom:1px solid var(--pc-border)}
+.byl-summary-promo>label{display:block;font-weight:600;font-size:12px;margin-bottom:8px}
+.byl-summary-promo-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.byl-summary-promo-row input{height:39px!important;min-height:39px!important;width:100%;min-width:0;border:1px solid #d8dddf!important;border-radius:8px!important;padding:8px 10px!important;background:#fff;font-size:12px!important}
+.byl-summary-promo-row button{height:39px;padding:0 13px;border:0;border-radius:8px;background:#edf1ef;color:#1b2723;font-weight:600;font-size:12px;cursor:pointer}
+.byl-summary-promo-row button:disabled{opacity:.5;cursor:wait}
+.byl-summary-promo p{margin:7px 0 0;color:var(--pc-muted);font-size:11px}
+.byl-summary-total{margin-left:auto;font-weight:700!important;font-size:13px!important;color:var(--pc-green)!important}
+.byl-summary-chevron{margin-left:5px}
+.byl-progressive-checkout #order_review table.shop_table{border:0!important;box-shadow:none!important;border-radius:0!important;background:transparent!important}
+.byl-progressive-checkout #order_review table.shop_table tfoot tr,.byl-progressive-checkout #order_review table.shop_table tfoot td,.byl-progressive-checkout #order_review table.shop_table tfoot th{background:transparent!important;border-color:#e8ebe9!important}
+.byl-progressive-checkout #order_review tr.woocommerce-shipping-totals td,.byl-progressive-checkout #order_review tr.shipping td{position:relative;padding:10px 0!important;height:auto!important}
+.byl-progressive-checkout.is-enhanced #order_review tr.woocommerce-shipping-totals td>*:not(.byl-shipping-display),.byl-progressive-checkout.is-enhanced #order_review tr.shipping td>*:not(.byl-shipping-display){position:absolute!important;width:1px!important;height:1px!important;clip-path:inset(50%);overflow:hidden;pointer-events:none}
+.byl-shipping-display{display:block;color:#69726e;font-size:12px}
+@media(min-width:950px){
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper{grid-template-columns:repeat(6,minmax(0,1fr))}
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row{grid-column:1/-1}
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>#billing_first_name_field{grid-column:1/span 3}
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>#billing_last_name_field{grid-column:4/span 3}
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>#billing_city_field{grid-column:1/span 2}
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>#billing_state_field{grid-column:3/span 2}
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>#billing_postcode_field{grid-column:5/span 2}
+}
+@media(max-width:760px){
+ .byl-summary-card:not(.is-open) .byl-summary-body{display:none}
+ .byl-summary-toggle{min-height:26px}
+ .byl-summary-promo{padding-top:12px}
+}

@@ -94,6 +94,22 @@
     const el = root.querySelector('[data-byl-review="' + target + '"]');
     if (el) el.textContent = val || 'Not provided';
   }
+  function updateShippingSummary() {
+    const cell = root.querySelector('#order_review tr.woocommerce-shipping-totals td, #order_review tr.shipping td');
+    if (cell) {
+      let display = cell.querySelector('[data-byl-shipping-display]');
+      if (!display) {
+        display = document.createElement('span');
+        display.dataset.bylShippingDisplay = '';
+        display.className = 'byl-shipping-display';
+        cell.appendChild(display);
+      }
+      display.textContent = selectedShipping() ? shippingLabel() : 'Calculated at delivery';
+    }
+    const total = root.querySelector('#order_review .order-total .woocommerce-Price-amount');
+    const compact = root.querySelector('.byl-summary-total');
+    if (total && compact) compact.textContent = total.textContent;
+  }
   function updateDetails() {
     const name = [field('billing_first_name'), field('billing_last_name')].filter(Boolean).join(' ');
     const address = [field('billing_address_1'), field('billing_address_2'), field('billing_city'), field('billing_state'), field('billing_postcode'), field('billing_country')].filter(Boolean).join(', ');
@@ -102,6 +118,7 @@
     review('contact', contact);
     review('delivery', shippingLabel());
     review('payment', paymentLabel());
+    updateShippingSummary();
     const addressSummary = root.querySelector('[data-byl-step-summary="address"]');
     const deliverySummary = root.querySelector('[data-byl-step-summary="delivery"]');
     const paymentSummary = root.querySelector('[data-byl-step-summary="payment"]');
@@ -160,7 +177,7 @@
     updateDetails();
     updateAction();
     const heading = root.querySelector('[data-byl-step="' + step + '"]');
-    if (heading) heading.scrollIntoView({block:'start',behavior:'instant'});
+    if (heading) heading.scrollIntoView({block:'start',behavior:'auto'});
   }
   next.addEventListener('click', () => {
     if (submitting) return;
@@ -201,6 +218,32 @@
   }, true);
   form.addEventListener('input', updateDetails);
   form.addEventListener('change', updateDetails);
+  const couponButton = root.querySelector('[data-byl-apply-coupon]');
+  if (couponButton) couponButton.addEventListener('click', () => {
+    const input = root.querySelector('#byl-promo-code');
+    const status = root.querySelector('[data-byl-promo-status]');
+    const code = input ? input.value.trim() : '';
+    if (!code) { status.textContent = 'Enter a promo code first.'; return; }
+    if (root.querySelector('#order_review .cart-discount')) {
+      status.textContent = 'Only one code is allowed. Remove the existing code first.';
+      return;
+    }
+    if (!window.wc_checkout_params || !wc_checkout_params.apply_coupon_nonce) {
+      status.textContent = 'Coupon service is unavailable on this checkout.';
+      return;
+    }
+    couponButton.disabled = true;
+    const url = wc_checkout_params.wc_ajax_url.replace('%%endpoint%%', 'apply_coupon');
+    $.post(url, {security: wc_checkout_params.apply_coupon_nonce, coupon_code: code})
+      .done(html => {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = typeof html === 'string' ? html : '';
+        status.textContent = wrap.textContent.trim().slice(0, 240) || 'Coupon checked.';
+        $('body').trigger('update_checkout');
+      })
+      .fail(() => { status.textContent = 'Could not apply this code. Please try again.'; })
+      .always(() => { couponButton.disabled = false; });
+  });
   $(document.body).on('updated_checkout', () => {
     mountNative();
     deliveryOptions();
@@ -213,7 +256,8 @@
     summary.classList.toggle('is-open',open);
     summaryToggle.setAttribute('aria-expanded',open?'true':'false');
   });
-  summary.classList.add('is-open');
+  summary.classList.toggle('is-open', !window.matchMedia('(max-width: 760px)').matches);
+  summaryToggle.setAttribute('aria-expanded', summary.classList.contains('is-open') ? 'true' : 'false');
   root.classList.add('is-enhanced');
   mountNative();
   setStep('address');

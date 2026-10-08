@@ -42,13 +42,18 @@ $cart = WC()->cart;
       </div>
       <aside class="byl-checkout-summary" aria-label="Order summary">
         <div class="byl-summary-card">
-          <button type="button" class="byl-summary-toggle" data-byl-summary-toggle aria-expanded="true"><strong>Order Summary</strong><span> (<?php echo esc_html($cart ? (string) $cart->get_cart_contents_count() : '0'); ?> items)</span><span class="byl-summary-chevron" aria-hidden="true">⌄</span></button>
+          <button type="button" class="byl-summary-toggle" data-byl-summary-toggle aria-expanded="true"><strong>Order Summary</strong><span> (<?php echo esc_html($cart ? (string) $cart->get_cart_contents_count() : '0'); ?> items)</span><span class="byl-summary-total"><?php echo wp_kses_post($cart ? $cart->get_total() : ""); ?></span><span class="byl-summary-chevron" aria-hidden="true">⌄</span></button>
           <div class="byl-summary-body" data-byl-summary-body>
             <div class="byl-summary-products">
               <?php if ($cart) : foreach ($cart->get_cart() as $line) :
                 $product = $line['data'] ?? null;
                 if (!$product instanceof WC_Product || !$product->exists()) { continue; }
               ?><div class="byl-summary-product"><div class="byl-summary-image"><?php echo wp_kses_post($product->get_image('woocommerce_thumbnail')); ?></div><div><strong><?php echo esc_html($product->get_name()); ?></strong><small>Qty: <?php echo esc_html((string) $line['quantity']); ?></small></div><span><?php echo wp_kses_post($cart->get_product_subtotal($product, $line['quantity'])); ?></span></div><?php endforeach; endif; ?>
+            </div>
+            <div class="byl-summary-promo">
+              <label for="byl-promo-code">Promo code</label>
+              <div class="byl-summary-promo-row"><input id="byl-promo-code" type="text" autocomplete="off" placeholder="Enter promo code"><button type="button" data-byl-apply-coupon>Apply</button></div>
+              <p data-byl-promo-status>Only one promo code can be applied per order.</p>
             </div>
             <?php do_action('woocommerce_checkout_before_order_review_heading'); ?>
             <h2 id="order_review_heading" class="screen-reader-text"><?php esc_html_e('Your order', 'woocommerce'); ?></h2>
