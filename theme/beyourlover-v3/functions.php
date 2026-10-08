@@ -156,6 +156,14 @@ add_action('wp_enqueue_scripts', static function (): void {
     }
 });
 
+// Presentation-only Woo labels on this single page; Woo still owns form submission and validation.
+add_filter('gettext', static function (string $translated, string $original, string $domain): string {
+    if ($domain !== 'woocommerce' || !is_page('track-your-order')) { return $translated; }
+    if ($original === 'Track') { return __('Track Order', 'beyourlover-v3'); }
+    if ($original === 'Order ID') { return __('Order number', 'beyourlover-v3'); }
+    return $translated;
+}, 10, 3);
+
 add_filter('body_class', static function (array $classes): array {
     $classes[] = 'byl-shell-active';
     $header = byl_v3_current_header_profile();
