@@ -25,3 +25,11 @@ add_action('wp', static function (): void {
         remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
     }
 });
+
+add_filter('woocommerce_form_field_args', static function (array $args, string $key): array {
+    if ($key === 'shipping_phone') {
+        $args['label'] = 'Shipping phone';
+        $args['description'] = 'Used only for carrier delivery and essential shipping updates.';
+    }
+    return $args;
+}, 99999, 2);
