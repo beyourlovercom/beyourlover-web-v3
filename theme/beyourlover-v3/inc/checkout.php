@@ -5,6 +5,9 @@ defined('ABSPATH') || exit;
 add_filter('woocommerce_checkout_fields', static function (array $fields): array {
     unset($fields['billing']['billing_phone']);
     unset($fields['shipping']['shipping_phone']);
+    // Personal purchases: do not collect company names at Checkout.
+    unset($fields['billing']['billing_company']);
+    unset($fields['shipping']['shipping_company']);
 
     if (isset($fields['billing']['billing_email'])) {
         $fields['billing']['billing_email']['priority'] = 1;
