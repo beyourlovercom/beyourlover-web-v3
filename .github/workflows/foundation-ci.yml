@@ -15,5 +15,7 @@ jobs:
         run: find theme platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Python syntax
         run: python -m py_compile scripts/*.py
+      - name: Cart V2 focused regression
+        run: php scripts/test_cart_v2_contract.php
       - name: Migration IDs
         run: python scripts/check_migration_ids.py
