@@ -47,6 +47,12 @@
     const l = g && document.querySelector('label[for="' + CSS.escape(g.id) + '"]');
     return l ? l.textContent.replace(/\s+/g, ' ').trim() : 'Payment not configured';
   }
+  function relabelPhone() {
+    const label = root.querySelector('#shipping_phone_field > label');
+    if (!label) return;
+    const text = Array.from(label.childNodes).find(node => node.nodeType === 3);
+    if (text) text.nodeValue = 'Shipping phone ';
+  }
   function mountNative() {
     const payment = document.getElementById('payment');
     if (payment && payment.parentElement !== paymentHost) paymentHost.appendChild(payment);
@@ -173,6 +179,7 @@
     });
     message('');
     mountNative();
+    relabelPhone();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -246,6 +253,7 @@
   });
   $(document.body).on('updated_checkout', () => {
     mountNative();
+    relabelPhone();
     deliveryOptions();
     updateDetails();
     updateAction();
