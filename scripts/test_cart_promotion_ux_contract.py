@@ -85,6 +85,13 @@ if "wp-data" not in cart_branch or "wc-blocks-data-store" not in cart_branch:
 if "'wc-blocks-data'" in cart_branch:
     raise SystemExit("S5 cart script must not use the stale exact wc-blocks-data dependency")
 
+if ".cart_totals" not in js or ".wc-proceed-to-checkout" not in js or "insertBefore(root, checkout)" not in js:
+    raise SystemExit("S5 Cart mount must support Classic Cart and place the BYL slot before checkout")
+if ".woocommerce-cart .woocommerce-cart-form .coupon" not in css:
+    raise SystemExit("Classic Cart native coupon form must be hidden in favor of the BYL slot")
+if ".woocommerce-cart #coupons_list" not in css or ".woocommerce-cart .wt_coupon_wrapper" not in css:
+    raise SystemExit("Classic Smart Coupons UI must be hidden on Cart")
+
 schema = runtime[runtime.index("public static function get_cart_presentation_schema"):runtime.index("public static function get_cart_presentation_state")]
 if "'type' => 'object'" in schema or "'properties' =>" in schema:
     raise SystemExit("Cart Store API schema must be a direct property map")

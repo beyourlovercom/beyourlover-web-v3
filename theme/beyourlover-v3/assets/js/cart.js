@@ -112,10 +112,18 @@
     }
 
     function mount() {
-        var target = document.querySelector('.wc-block-cart__totals, .wc-block-cart .wc-block-components-totals-wrapper');
+        var target = document.querySelector('.wc-block-cart__totals, .wc-block-cart .wc-block-components-totals-wrapper, .cart_totals');
         if (!target) return false;
         root = target.querySelector('.byl-cart-promotion');
-        if (!root) { root = document.createElement('section'); root.className = 'byl-cart-promotion'; root.setAttribute('aria-label', 'Free shipping promotion'); target.appendChild(root); render(state()); }
+        if (!root) {
+            root = document.createElement('section');
+            root.className = 'byl-cart-promotion';
+            root.setAttribute('aria-label', 'Free shipping promotion');
+            var checkout = target.querySelector('.wc-proceed-to-checkout');
+            if (checkout) target.insertBefore(root, checkout);
+            else target.appendChild(root);
+            render(state());
+        }
         return true;
     }
 

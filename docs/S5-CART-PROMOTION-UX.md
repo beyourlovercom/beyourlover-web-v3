@@ -1,6 +1,6 @@
 # S5 Cart Promotion UX
 
-Status: local implementation contract for the WooCommerce Cart Blocks promotion slot.
+Status: local implementation contract for the WooCommerce Cart (Block or Classic) promotion slot.
 
 S5 adds a read-only `byl-shipping-promotion` extension to the Store API `cart` response. The extension is derived from the active BYL policy, WooCommerce's matching shipping package/zone, and the displayed pre-discount merchandise subtotal. It does not write options, page content, coupons, sessions, WooCommerce settings, or order data.
 
@@ -16,6 +16,10 @@ The visible states follow C2 exactly:
 - Require-code with another code: `Replace your current code with BYL49 to unlock free shipping.`
 - Applied code: `<CODE> applied` and one `Edit` action. Edit reveals the same single input and a small `Remove` action; there is no `Add More` action.
 
-The core Cart coupon form is hidden only within the Cart Blocks UI, and only Smart Coupons' available-coupons chooser is hidden when present. The Cart Express Payment block is not hidden. Checkout remains S6 and is out of scope.
+The core Cart coupon form is hidden only within the Cart (Block or Classic) UI, and only Smart Coupons' available-coupons chooser is hidden when present. The Cart Express Payment block is not hidden. Checkout remains S6 and is out of scope.
 
 No production, page-content, WooCommerce settings, coupon, order, or deployment action is authorized by this document.
+
+
+## Dev compatibility note
+The single BYL promotion slot supports both Woo Cart Blocks and Classic Cart. On Classic Cart it mounts inside .cart_totals before the native checkout CTA, while the native Classic coupon form and Smart Coupons chooser remain hidden.

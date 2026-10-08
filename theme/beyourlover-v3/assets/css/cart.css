@@ -22,9 +22,15 @@
 
 /* BYL is the single visible Cart coupon slot. Express payment is deliberately untouched. */
 .woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon,
-.woocommerce-cart .wc-block-cart [data-block-name="woocommerce/cart-coupon-form"] { display: none !important; }
+.woocommerce-cart .wc-block-cart [data-block-name="woocommerce/cart-coupon-form"],
+.woocommerce-cart .woocommerce-cart-form .coupon { display: none !important; }
 .woocommerce-cart .wc-block-cart [data-block-name="smart-coupons/available-coupons"],
-.woocommerce-cart .wc-block-cart .smart-coupons-available-coupons { display: none !important; }
+.woocommerce-cart .wc-block-cart .smart-coupons-available-coupons,
+.woocommerce-cart [data-block-name="smart-coupons/available-coupons"],
+.woocommerce-cart .smart-coupons-available-coupons,
+.woocommerce-cart #coupons_list,
+.woocommerce-cart .wt_coupon_wrapper,
+.woocommerce-cart .wt_sc_pagination { display: none !important; }
 
 @media (min-width: 700px) {
     .woocommerce-cart .byl-cart-promotion__form { flex-direction: row; max-width: 28rem; }
