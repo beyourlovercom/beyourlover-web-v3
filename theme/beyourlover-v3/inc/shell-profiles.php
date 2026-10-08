@@ -128,8 +128,8 @@ function byl_v3_profile_nav_items(string $profile): array {
         return [
             ['label'=>'Support','url'=>home_url('/customer-help/')],
             ['label'=>'Guides & FAQ','url'=>home_url('/docs/')],
-            ['label'=>'Shipping','url'=>home_url('/shipping/')],
-            ['label'=>'Returns','url'=>home_url('/returns/')],
+            ['label'=>'Shipping','url'=>home_url('/shipping-policies/')],
+            ['label'=>'Returns','url'=>home_url('/return-policies/')],
         ];
     }
     if ($profile === 'landing') { return []; }
@@ -144,8 +144,8 @@ function byl_v3_footer_groups(string $profile): array {
     ];
     if ($profile === 'landing') {
         return [['label'=>'Trust','items'=>array_merge([
-            ['label'=>'Shipping','url'=>home_url('/shipping/')],
-            ['label'=>'Returns','url'=>home_url('/returns/')],
+            ['label'=>'Shipping','url'=>home_url('/shipping-policies/')],
+            ['label'=>'Returns','url'=>home_url('/return-policies/')],
             ['label'=>'Support','url'=>home_url('/customer-help/')],
         ], $legal)]];
     }
@@ -167,8 +167,8 @@ function byl_v3_footer_groups(string $profile): array {
                 ['label'=>'Best Sellers','url'=>home_url('/best-sellers/')],
             ]],
             ['label'=>'Shopping Help','items'=>array_merge([
-                ['label'=>'Shipping','url'=>home_url('/shipping/')],
-                ['label'=>'Returns','url'=>home_url('/returns/')],
+                ['label'=>'Shipping','url'=>home_url('/shipping-policies/')],
+                ['label'=>'Returns','url'=>home_url('/return-policies/')],
                 ['label'=>'Support','url'=>home_url('/customer-help/')],
             ], $legal)],
         ];
@@ -182,8 +182,8 @@ function byl_v3_footer_groups(string $profile): array {
     }
     return [['label'=>'BeYourLover','items'=>array_merge([
         ['label'=>'Support','url'=>home_url('/customer-help/')],
-        ['label'=>'Shipping','url'=>home_url('/shipping/')],
-        ['label'=>'Returns','url'=>home_url('/returns/')],
+        ['label'=>'Shipping','url'=>home_url('/shipping-policies/')],
+        ['label'=>'Returns','url'=>home_url('/return-policies/')],
     ], $legal)]];
 }
 
