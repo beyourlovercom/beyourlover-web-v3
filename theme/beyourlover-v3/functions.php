@@ -119,6 +119,9 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_enqueue_style('byl-v3-checkout', $uri.'/assets/css/checkout.css', ['byl-v3-motion'], $v('assets/css/checkout.css'));
         wp_enqueue_script('byl-v3-checkout', $uri.'/assets/js/checkout.js', ['jquery'], $v('assets/js/checkout.js'), true);
     }
+    if (function_exists('is_cart') && is_cart()) {
+        wp_enqueue_style('byl-v3-cart', $uri.'/assets/css/cart.css', ['byl-v3-motion'], $v('assets/css/cart.css'));
+    }
     if (is_front_page()) { wp_enqueue_style('byl-v3-homepage', $uri.'/assets/css/homepage.css', ['byl-v3-motion'], $v('assets/css/homepage.css')); }
     if (function_exists('is_shop') && (is_shop() || (function_exists('is_product_taxonomy') && is_product_taxonomy()))) { wp_enqueue_style('byl-v3-archive', $uri.'/assets/css/archive.css', ['byl-v3-motion'], $v('assets/css/archive.css')); }
     if (function_exists('is_product') && is_product()) {
