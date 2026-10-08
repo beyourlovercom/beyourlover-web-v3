@@ -1,6 +1,6 @@
 # Checkout Address Autocomplete V1 — P0 Provider Contract
 
-Status: DESIGN ONLY / NO RUNTIME ENABLEMENT
+Status: P4 DEV CONFIG ENABLED / AUTOMATED UAT PASS / OWNER MOBILE UAT PENDING — PR STILL DOCS-ONLY
 Base: main@d46137b (PR #15 merged)
 Environment: Dev-first; WWW/Production explicitly gated.
 
@@ -68,3 +68,36 @@ This is a read-only Dev and official-policy rescan. The earlier zero-provider / 
 - P5: confirm PayPal actual Sandbox gateway routing; inspect whether Stripe and WooPayments appear as duplicate card/wallet options; then test only with synthetic checkout/test orders under separate authorization.
 - P6: use actual transaction/fee/settlement evidence, not assumptions, to decide gateway economics and Airwallex necessity.
 - P7 Owner UAT; P8 WWW entirely separately approved.
+
+
+## 2026-10-08 — P4 Dev-only native WooPayments autocomplete automated UAT
+
+**Owner authorization:** use registered `WC_Payments_Address_Provider`, turn on autocomplete in Dev only, use publicly known/synthetic address data, preserve manual fallback, do not provision new Google paid keys, create orders, connect Live payments, deploy WWW or perform Production writes.
+
+**Environment & change**
+- `dev.beyourlover.com` only; WooCommerce 11.1.1, WooPayments 11.1.0.
+- **Single Dev runtime configuration change:** `wp option update woocommerce_address_autocomplete_enabled yes` (previous value `no`; post-update readback `yes`). No code, plugin, payment gateway or Production changes.
+- WooCommerce registered provider: `WC_Payments_Address_Provider` (one server-side instance); client `window.wc.addressAutocomplete` and WooCommerce `address-autocomplete.min.js` / `a8c-address-autocomplete-service.min.js` loaded in the real Checkout. Frontend provider is registered and active.
+- Rollback for Dev only (if owner requests or regression emerges): `wp option update woocommerce_address_autocomplete_enabled no`. **Do not execute on WWW.**
+
+**Real-browser automated observations**
+- Isolated temporary headless Chrome profile at 390px (not the owner's existing Chrome/profile), with a published **Dev** product added to an ephemeral browser cart to expose Checkout. No order submission, real customer data or payment action.
+- Typed publicly known `1600 Amphitheatre Parkway` into displayed `#billing_address_1`. The WooPayments/native WooCommerce UI returned **5 real address suggestions**, first being `1600 Amphitheatre Parkway, Mountain View, CA, USA`. WordPress.com provider search endpoint returned HTTP 200.
+- Selected the first `.woocommerce-address-suggestions .suggestions-list > li` candidate. `/woo/address-autocomplete/select` returned HTTP 200, autofilling these exact **Dev browser DOM** values:
+  - `billing_address_1 = 1600 Amphitheatre Pkwy`
+  - `billing_city = Mountain View`
+  - `billing_state = CA`
+  - `billing_postcode = 94043`
+  - `billing_country = US`
+  - `billing_address_2 = \"\"` (remains editable).
+- Manual fallback: intercepted and deliberately aborted a subsequent autocomplete search request. Browser field continued to accept the **fictitious** string `123 Imaginary Lane`, with address, city and apartment not disabled or readonly; one intercepted request, expected test-only network failure.
+- Triggered WooCommerce `updated_checkout`: native suggestions widget count under the billing address remained **1 → 1**, no duplicate.
+- Responsive synthetic viewports 390px, 500px and 1280px: the visible Checkout contained its address fields with document scrollWidth equal to viewport width (no global horizontal overflow).
+- Local screenshots captured only on the authorized Windows Dev device at temp paths: `%TEMP%\\byl-p4-uat-390.png`, `%TEMP%\\byl-p4-uat-500.png`, `%TEMP%\\byl-p4-uat-1280.png`. They were not deployed to WWW and are not yet a real-device M14 Owner sign-off.
+- One intermittent later repeat did not display suggestions in its short wait, while prior runs definitively returned 5 real suggestions and successful selection. Monitor search reliability in Owner UAT; do not claim a statistical success rate from these spot tests.
+
+**Gate result**
+- P4 core functional automated UAT **PASS**: real suggestions, selection/autofill, manual fallback during injected provider failure, no duplicate widget after checkout refresh, and basic responsive overflow check.
+- **Not covered / pending:** real iPhone/mobile browser Owner UAT (M14 preferred); keyboard and screen-reader testing; unsupported-country switching; full postal validation/shipping-rate persistence; provider uptime/frequency/limit/charges; performance; checkout delivery/payment/review end-to-end regression. These cannot be called PASS.
+- Dev setting remains **yes** to allow Owner UAT. Keep a manual entry fallback. A customer address query is handled by WooPayments' remote autocomplete service; no separate BYL Google API key was added.
+- The PR stays **Draft**; no code merge or WWW deploy. P5 gateway sandbox review remains separately gated by merchant-product eligibility and Live authorization.
