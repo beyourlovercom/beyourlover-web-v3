@@ -185,3 +185,18 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
   cursor:pointer;
 }
 .byl-summary-promo .byl-promo-error { margin:7px 0 0;color:var(--byl-danger);font-size:11px; }
+
+/* Keep Woo Select2 state on the same single-line row as city and ZIP. */
+.byl-progressive-checkout #billing_state_field .select2-container{width:100%!important;max-width:100%}
+.byl-progressive-checkout #billing_state_field .select2-selection--single{
+  height:45px!important;min-height:45px!important;max-height:45px!important;
+  display:flex!important;align-items:center!important;overflow:hidden;
+  padding:0 36px 0 11px!important;box-sizing:border-box;
+}
+.byl-progressive-checkout #billing_state_field .select2-selection__rendered{
+  display:block!important;width:100%;min-width:0;overflow:hidden;
+  white-space:nowrap;text-overflow:ellipsis;line-height:43px!important;padding:0!important;
+}
+.byl-progressive-checkout #billing_state_field .select2-selection__arrow{
+  height:43px!important;top:0!important;right:8px!important;
+}
