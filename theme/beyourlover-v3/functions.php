@@ -123,6 +123,9 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_enqueue_script('byl-v3-product', $uri.'/assets/js/product.js', [], $v('assets/js/product.js'), true);
         wp_script_add_data('byl-v3-product', 'strategy', 'defer');
     }
+    if (is_page('track-your-order')) {
+        wp_enqueue_style('byl-v3-track-order', $uri.'/assets/css/track-order.css', ['byl-v3-motion'], $v('assets/css/track-order.css'));
+    }
     if (function_exists('is_cart') && is_cart()) {
         wp_enqueue_style('byl-v3-cart', $uri.'/assets/css/cart.css', ['byl-v3-motion'], $v('assets/css/cart.css'));
         wp_enqueue_style('byl-v3-cart-focus', $uri.'/assets/css/cart-focus.css', ['byl-v3-cart'], $v('assets/css/cart-focus.css'));
@@ -152,6 +155,14 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_script_add_data('byl-v3-checkout', 'strategy', 'defer');
     }
 });
+
+// Presentation-only Woo labels on this single page; Woo still owns form submission and validation.
+add_filter('gettext', static function (string $translated, string $original, string $domain): string {
+    if ($domain !== 'woocommerce' || !is_page('track-your-order')) { return $translated; }
+    if ($original === 'Track') { return __('Track Order', 'beyourlover-v3'); }
+    if ($original === 'Order ID') { return __('Order number', 'beyourlover-v3'); }
+    return $translated;
+}, 10, 3);
 
 add_filter('body_class', static function (array $classes): array {
     $classes[] = 'byl-shell-active';
