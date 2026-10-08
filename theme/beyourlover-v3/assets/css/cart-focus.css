@@ -173,3 +173,10 @@ body.byl-focus-cart-shell{color:var(--byl-ink);}
 .woocommerce-cart .byl-cart-promotion__applied{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--byl-brand)}
 .woocommerce-cart .byl-cart-promotion__remove{display:inline-flex;margin:0;font-size:12px;color:var(--byl-brand);text-decoration:underline}
 @media(max-width:400px){.woocommerce-cart .byl-cart-promotion__inputs{flex-direction:column}.woocommerce-cart .byl-cart-promotion__inputs input,.woocommerce-cart .byl-cart-promotion__inputs button{width:100%}}
+
+/* Mobile Cart: isolate the recommendation rail from the document paint area.
+   Prevent hidden payment-provider metric frames from expanding the visual viewport.
+   The recommendations themselves retain their own horizontal scroll. */
+@media(max-width:600px){
+  body.byl-focus-cart-shell .byl-cart-recommendations{contain:paint}
+}
