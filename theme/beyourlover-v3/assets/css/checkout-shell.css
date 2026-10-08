@@ -1,0 +1,83 @@
+/* BYL V3 Checkout Secure Shell V1 — tokens.css is the only visual authority. */
+body.byl-secure-checkout-shell {
+  background:var(--byl-surface);
+  color:var(--byl-ink);
+  font-family:var(--byl-font);
+}
+body.byl-secure-checkout-shell :is(input,button,select,textarea) {font-family:var(--byl-font);}
+.byl-secure-header {
+  background:var(--byl-surface);
+  border-bottom:1px solid var(--byl-line);
+}
+.byl-secure-header__inner {
+  max-width:var(--byl-shell-max);
+  min-height:82px;
+  padding:12px var(--byl-gutter);
+  margin:auto;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  align-items:center;
+  column-gap:16px;
+}
+.byl-secure-brand {display:inline-flex;align-items:center;max-width:230px;min-width:0;}
+.byl-secure-brand .byl-brand-logo {display:block;max-width:100%;height:35px;width:auto;object-fit:contain;}
+.byl-secure-header__assurance {display:flex;align-items:center;justify-content:center;gap:10px;color:var(--byl-ink);white-space:nowrap;font-size:14px;font-weight:var(--byl-font-weight-semibold);}
+.byl-secure-header__assurance svg {width:19px;height:19px;color:var(--byl-brand);}
+.byl-secure-header__links {display:flex;justify-content:flex-end;align-items:center;gap:18px;}
+.byl-secure-header__links a {font-size:13px;font-weight:var(--byl-font-weight-medium);white-space:nowrap;text-decoration:none;color:var(--byl-brand);}
+.byl-secure-header__links a:hover {color:var(--byl-brand-hover);text-decoration:underline;text-underline-offset:3px;}
+.byl-secure-footer {border-top:1px solid var(--byl-line);background:var(--byl-surface-soft);}
+.byl-secure-footer__inner {max-width:var(--byl-shell-max);margin:auto;padding:25px var(--byl-gutter);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 26px;}
+.byl-secure-footer__trust {display:flex;gap:22px;flex-wrap:wrap;color:var(--byl-ink-2);font-size:12px;}
+.byl-secure-footer__trust span::before {content:'✓';color:var(--byl-brand);margin-right:7px;}
+.byl-secure-footer__legal {display:flex;flex-wrap:wrap;align-items:center;gap:14px;}
+.byl-secure-footer__legal a {font-size:12px;color:var(--byl-ink-2);text-decoration:none;}
+.byl-secure-footer__legal a:hover {color:var(--byl-brand);text-decoration:underline;}
+.byl-secure-footer small {font-size:11px;color:var(--byl-ink-3);}
+/* Existing progressive checkout retains its Woo-owned steps and validation.
+   The original checkout.css has pre-canonical green variants; visually
+   normalize them here without touching in-flight Checkout Promotion PR #15. */
+body.byl-secure-checkout-shell .byl-progressive-checkout {
+  --pc-green:var(--byl-brand);
+  --pc-border:var(--byl-line);
+  --pc-muted:var(--byl-ink-2);
+  color:var(--byl-ink);
+  font-family:var(--byl-font);
+}
+body.byl-secure-checkout-shell .byl-progressive-checkout .input-text:focus,
+body.byl-secure-checkout-shell .byl-progressive-checkout select:focus {
+  border-color:var(--byl-brand);
+  outline:2px solid var(--byl-brand-soft);
+}
+body.byl-secure-checkout-shell .byl-progressive-checkout .byl-delivery-rate.is-selected {
+  border-color:var(--byl-brand);
+  background:var(--byl-brand-soft);
+}
+body.byl-secure-checkout-shell .byl-progressive-checkout .byl-checkout-next[disabled] {
+  background:var(--byl-ink-3);
+  color:var(--byl-surface);
+}
+body.byl-secure-checkout-shell .byl-progressive-checkout .byl-summary-promo-row button {
+  background:var(--byl-brand-soft);
+  color:var(--byl-brand);
+}
+body.byl-secure-checkout-shell .byl-progressive-checkout .byl-summary-promo-row button:hover {
+  background:var(--byl-brand);
+  color:var(--byl-surface);
+}
+body.byl-secure-checkout-shell .byl-progressive-checkout .byl-summary-total {color:var(--byl-brand)!important;}
+body.byl-secure-checkout-shell .byl-progressive-checkout .woocommerce-invalid .input-text {border-color:var(--byl-danger);}
+body.byl-secure-checkout-shell .byl-progressive-checkout .byl-summary-promo .byl-promo-error {color:var(--byl-danger);}
+@media(max-width:760px){
+  .byl-secure-header__inner{grid-template-columns:auto 1fr;min-height:69px;padding:12px 20px;gap:7px 14px;}
+  .byl-secure-brand{grid-column:1;grid-row:1;max-width:150px;}
+  .byl-secure-brand .byl-brand-logo{height:28px;}
+  .byl-secure-header__assurance{grid-column:2;grid-row:1;justify-content:flex-end;font-size:12px;gap:6px;}
+  .byl-secure-header__assurance svg{width:17px;height:17px;}
+  .byl-secure-header__links{grid-column:1/-1;grid-row:2;justify-content:space-between;gap:12px;}
+  .byl-secure-header__links a{font-size:12px;}
+  .byl-secure-footer__inner{padding:22px 20px;flex-direction:column;align-items:flex-start;gap:15px;}
+  .byl-secure-footer__trust{gap:8px 18px;font-size:11px;}
+  .byl-secure-footer__legal{gap:12px;}
+}
+@media(max-width:360px){.byl-secure-header__inner{padding:10px 14px;}.byl-secure-header__assurance{font-size:11px;}}

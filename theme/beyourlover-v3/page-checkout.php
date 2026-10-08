@@ -2,7 +2,9 @@
 /** Dedicated checkout page: do not render legacy page-embedded CSS/shortcode markup. */
 declare(strict_types=1);
 defined('ABSPATH') || exit;
-get_header();
+// The completed order/thank-you endpoint keeps its established site shell.
+$byl_received = function_exists('is_order_received_page') && is_order_received_page();
+get_header($byl_received ? null : 'checkout');
 ?>
 <main id="main-content" class="byl-content byl-commerce-content">
 <?php
@@ -16,4 +18,4 @@ while (have_posts()) {
 }
 ?>
 </main>
-<?php get_footer(); ?>
+<?php get_footer($byl_received ? null : 'checkout'); ?>
