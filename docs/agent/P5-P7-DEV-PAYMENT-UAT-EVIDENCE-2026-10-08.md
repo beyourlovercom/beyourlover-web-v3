@@ -99,3 +99,13 @@ At 390px, 500px, 1280px:
 - GitHub `merge_pull_request` returned `merged=true`, merge SHA `0d55b4d72636d609082c228f495245da44d08409`; post-merge PR status `closed / merged=true`.
 - **Only GitHub main merge** was executed. No WWW deploy, Live payment, Dev gateway changes, DB migration, Woo test order, ERP business-data write, or altered Sandbox permit.
 - **Remaining critical path unchanged:** P5 Dev controlled Sandbox authenticated test session/permit still absent and earlier attempt blocked; P6 current actual fee evidence verification pending; P7 full payment/order/webhook/post-purchase Owner UAT pending; WWW independent gate not approved.
+
+
+## P5 Store API safety extension — GitHub PR #29 (2026-10-08)
+
+- **PR #29 Store API coverage:** https://github.com/beyourlovercom/beyourlover-web-v3/pull/29; exact head `8e7d66a211e1b5e7301aceaef6225dc06e7d9a11`; **Foundation CI success**.
+- Root issue: classic `woocommerce_checkout_process` safeguard is not automatically applied to WooCommerce Store API Checkout. WooCommerce documents `GET /wc/store/v1/checkout` can create a draft order; a valid payment method is not proof no draft will be created.
+- Proposed Dev-only hardening: `rest_pre_dispatch` denies Store API Checkout non-OPTIONS methods on unpermitted anonymous/incorrect sessions using the **existing** ephemeral P1.3 authorization gate. No gateway mode changes, no session creation, no persistent data mutations.
+- Offline PHP negative-path tests and Foundation CI PASS, covering Store API GET/POST and other methods, classic checkout denial, mail block, and preserving native cart/coupon/autocomplete routes.
+- **Source-only PR Draft / not merged / not deployed.** Dev REST/HPOS negative UAT still pending, privileged Sandbox test session remains blocked. Do not issue public GET /Store API checkout until protection is deployed; this GET can materialize an order draft.
+- No claim of observed unauthorized draft or production exposure; finding is a code coverage gap requiring live Dev verification before payment UAT.
