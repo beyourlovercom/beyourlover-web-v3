@@ -1,0 +1,48 @@
+/* S6: restrained progressive enhancement around the classic Woo checkout. */
+.woocommerce-checkout .byl-checkout-layout { display: block; max-width: 1180px; margin: 0 auto; }
+.woocommerce-checkout .byl-checkout-main { min-width: 0; }
+.woocommerce-checkout .byl-checkout-section { padding: 0 0 2rem; margin: 0 0 2rem; border-bottom: 1px solid rgba(24,24,27,.12); }
+.woocommerce-checkout .byl-checkout-section__heading { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.woocommerce-checkout .byl-checkout-section h2 { margin: 0 0 1rem; font-size: clamp(1.45rem, 4vw, 2rem); letter-spacing: -.03em; }
+.woocommerce-checkout .byl-checkout-section__body { min-width: 0; }
+.woocommerce-checkout .byl-checkout-section.is-collapsed { padding-bottom: 1rem; }
+.woocommerce-checkout .byl-checkout-section.is-collapsed h2 { margin-bottom: 0; font-size: 1rem; }
+.woocommerce-checkout .byl-checkout-edit { border: 0; padding: 0; background: none; color: inherit; text-decoration: underline; cursor: pointer; }
+.woocommerce-checkout .byl-checkout-section__summary { margin: 0; color: #666; font-size: .9rem; overflow-wrap: anywhere; }
+.woocommerce-checkout .byl-checkout-continue { margin-top: 1.25rem; }
+.woocommerce-checkout .byl-delivery-option { display: flex; align-items: center; gap: .75rem; padding: .9rem 0; border-bottom: 1px solid rgba(24,24,27,.08); cursor: pointer; }
+.woocommerce-checkout .byl-delivery-option input { flex: 0 0 auto; }
+.woocommerce-checkout .byl-delivery-methods { min-width: 0; }
+.woocommerce-checkout .byl-checkout-muted { color: #666; }
+.woocommerce-checkout .byl-shipping-row-hidden { display: none !important; }
+.woocommerce-checkout .byl-review-label { margin: 1.5rem 0 .5rem; font-weight: 600; }
+.woocommerce-checkout .byl-checkout-summary { min-width: 0; }
+.woocommerce-checkout .byl-checkout-summary #order_review { min-width: 0; overflow-wrap: anywhere; }
+.woocommerce-checkout .byl-checkout-promotion { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(24,24,27,.12); }
+.woocommerce-checkout .byl-checkout-promotion h3 { margin: 0 0 .35rem; font-size: 1rem; }
+.woocommerce-checkout .byl-checkout-promotion p { margin: .35rem 0; }
+.woocommerce-checkout .byl-checkout-promotion__hint { color: #666; }
+.woocommerce-checkout .byl-checkout-promotion .byl-promo-form { display: flex; flex-direction: column; gap: .5rem; width: 100%; max-width: 26rem; margin-top: .75rem; }
+.woocommerce-checkout .byl-checkout-promotion input,
+.woocommerce-checkout .byl-checkout-promotion .byl-promo-form button { min-width: 0; min-height: 44px; }
+.woocommerce-checkout .byl-checkout-promotion .byl-promo-form button { width: 100%; border-color: CanvasText; background: Canvas; color: CanvasText; }
+.woocommerce-checkout .byl-promo-edit, .woocommerce-checkout .byl-promo-remove { border: 0; padding: 0; background: none; text-decoration: underline; cursor: pointer; }
+.woocommerce-checkout .byl-promo-remove { margin-top: .5rem; }
+.woocommerce-checkout .byl-checkout-promotion__error { color: #a51d2d; }
+.woocommerce-checkout .byl-address-section .woocommerce-billing-fields > h3 { display: none; }
+.woocommerce-checkout .byl-address-section .woocommerce-billing-fields,
+.woocommerce-checkout .byl-checkout-summary #order_review { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; backdrop-filter: none !important; }
+.woocommerce-checkout .byl-address-section #billing_phone-description { display: block; margin-top: .35rem; padding: 0 !important; background: transparent !important; border: 0 !important; color: #666 !important; font-size: .875rem; line-height: 1.45; }
+.woocommerce-checkout .woocommerce-shipping-fields, .woocommerce-checkout .ship-to-different-address { display: none !important; }
+.woocommerce-checkout #commercekit-timer-wrap, .woocommerce-checkout .wt_coupon_wrapper, .woocommerce-checkout .wt_sc_pagination { display: none !important; }
+.woocommerce-checkout .woocommerce-form-coupon-toggle, .woocommerce-checkout form.checkout_coupon,
+.woocommerce-checkout [data-block-name="woocommerce/checkout-coupon-form"], .woocommerce-checkout [data-block-name="smart-coupons/available-coupons"],
+.woocommerce-checkout .smart-coupons-available-coupons, .woocommerce-checkout #coupons_list { display: none !important; }
+@media (min-width: 900px) {
+    .woocommerce-checkout .byl-checkout-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); gap: clamp(2rem, 7vw, 6rem); }
+    .woocommerce-checkout .byl-checkout-summary { position: sticky; top: 2rem; align-self: start; }
+    .woocommerce-checkout .byl-checkout-summary #order_review_heading { margin-top: 0; }
+    .woocommerce-checkout .byl-checkout-promotion .byl-promo-form { flex-direction: row; }
+    .woocommerce-checkout .byl-checkout-promotion .byl-promo-form input { flex: 1 1 auto; }
+    .woocommerce-checkout .byl-checkout-promotion .byl-promo-form button { width: auto; flex: 0 0 auto; }
+}

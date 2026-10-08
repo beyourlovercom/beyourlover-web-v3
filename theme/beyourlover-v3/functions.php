@@ -7,6 +7,7 @@ require_once get_stylesheet_directory().'/inc/homepage.php';
 require_once get_stylesheet_directory().'/inc/archive.php';
 require_once get_stylesheet_directory().'/inc/product.php';
 require_once get_stylesheet_directory().'/inc/product-modules.php';
+require_once get_stylesheet_directory().'/inc/checkout.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
@@ -120,6 +121,31 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_enqueue_style('byl-v3-product', $uri.'/assets/css/product.css', ['byl-v3-motion'], $v('assets/css/product.css'));
         wp_enqueue_script('byl-v3-product', $uri.'/assets/js/product.js', [], $v('assets/js/product.js'), true);
         wp_script_add_data('byl-v3-product', 'strategy', 'defer');
+    }
+    if (function_exists('is_cart') && is_cart()) {
+        wp_enqueue_style('byl-v3-cart', $uri.'/assets/css/cart.css', ['byl-v3-motion'], $v('assets/css/cart.css'));
+        wp_enqueue_script('byl-v3-cart', $uri.'/assets/js/cart.js', ['wp-data', 'wc-blocks-data-store'], $v('assets/js/cart.js'), true);
+        wp_localize_script('byl-v3-cart', 'BYLShippingPromotionCart', [
+            'applyUrl' => function_exists('rest_url') ? rest_url('wc/store/v1/cart/apply-coupon') : '',
+            'removeUrl' => function_exists('rest_url') ? rest_url('wc/store/v1/cart/remove-coupon') : '',
+            'nonce' => function_exists('wp_create_nonce') ? wp_create_nonce('wc_store_api') : '',
+        ]);
+        wp_script_add_data('byl-v3-cart', 'strategy', 'defer');
+    }
+    if (function_exists('is_checkout') && is_checkout() && !is_order_received_page()) {
+        wp_enqueue_style('byl-v3-checkout', $uri.'/assets/css/checkout.css', ['byl-v3-motion'], $v('assets/css/checkout.css'));
+        $checkout_dependencies = ['jquery'];
+        if (wp_script_is('wc-checkout', 'registered') || wp_script_is('wc-checkout', 'enqueued')) {
+            $checkout_dependencies[] = 'wc-checkout';
+        }
+        wp_enqueue_script('byl-v3-checkout', $uri.'/assets/js/checkout.js', $checkout_dependencies, $v('assets/js/checkout.js'), true);
+        wp_localize_script('byl-v3-checkout', 'BYLShippingPromotionCheckout', [
+            'cartUrl' => function_exists('rest_url') ? rest_url('wc/store/v1/cart') : '',
+            'applyUrl' => function_exists('rest_url') ? rest_url('wc/store/v1/cart/apply-coupon') : '',
+            'removeUrl' => function_exists('rest_url') ? rest_url('wc/store/v1/cart/remove-coupon') : '',
+            'nonce' => function_exists('wp_create_nonce') ? wp_create_nonce('wc_store_api') : '',
+        ]);
+        wp_script_add_data('byl-v3-checkout', 'strategy', 'defer');
     }
 });
 
