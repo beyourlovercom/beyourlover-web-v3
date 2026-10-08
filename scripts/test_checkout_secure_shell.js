@@ -36,4 +36,3 @@ ok(!/#00643f|#075b46|#064b3a|PingFang|background:\s*green/i.test(css),'no cross-
 ok(css.includes('@media(max-width:760px)'),'mobile shell response');
 ok(checkout.includes('byl-progressive-checkout'),'existing progressive Checkout untouched');
 console.log('PASS checkout-secure-shell-contract 鈥?dedicated shell, Woo native checkout, Poppins Burgundy, mobile');
-
