@@ -1,6 +1,6 @@
 # Checkout Address Autocomplete V1 — P0 Provider Contract
 
-Status: P4 DEV CONFIG ENABLED / AUTOMATED UAT PASS / OWNER MOBILE UAT PENDING — PR STILL DOCS-ONLY
+Status: P4 DEV CONFIG ENABLED / AUTOMATED UAT PASS / OWNER UAT PASS (user-confirmed) — PR STILL DOCS-ONLY
 Base: main@d46137b (PR #15 merged)
 Environment: Dev-first; WWW/Production explicitly gated.
 
@@ -101,3 +101,12 @@ This is a read-only Dev and official-policy rescan. The earlier zero-provider / 
 - **Not covered / pending:** real iPhone/mobile browser Owner UAT (M14 preferred); keyboard and screen-reader testing; unsupported-country switching; full postal validation/shipping-rate persistence; provider uptime/frequency/limit/charges; performance; checkout delivery/payment/review end-to-end regression. These cannot be called PASS.
 - Dev setting remains **yes** to allow Owner UAT. Keep a manual entry fallback. A customer address query is handled by WooPayments' remote autocomplete service; no separate BYL Google API key was added.
 - The PR stays **Draft**; no code merge or WWW deploy. P5 gateway sandbox review remains separately gated by merchant-product eligibility and Live authorization.
+
+
+## 2026-10-08 — P4 Owner acceptance closure
+
+- **Owner acceptance: PASS (user-confirmed)** in the ChatGPT handoff continuation, responding to the explicit request to test Dev Checkout address suggestions and city/state/postcode autofill on mobile. Treat this as user-reported Owner UAT signoff, not independently captured device/browser test logs.
+- P4 functional gate closed for Dev: native WooPayments address suggestions/autofill and manual entry fallback. Dev setting remains `woocommerce_address_autocomplete_enabled=yes`.
+- Outstanding nonblocking coverage continues as P5/P7 regression: unsupported-country behavior, keyboard/screen-reader checks, shipping update persistence, API reliability and real device screenshot evidence. No assertion that these were independently verified by the owner's PASS.
+- This signoff **does not approve** merging the Draft PR, enabling gateway Live payments, creating payment orders, merchant/product eligibility, shipping to WWW, or any Production mutation.
+- Next authorized action: P5 **read-only** gateway configuration/eligibility/duplicate-payment-choice audit; do not execute Sandbox payment orders until an explicit test-order authorization.
