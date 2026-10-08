@@ -31,3 +31,7 @@ If shipping-promotion presentation data cannot load, Woo Checkout remains the tr
 ## Dev gate
 
 Dev validation must prove the accepted Checkout V2 flow still works and that the one BYL promotion slot behaves correctly for Apply → Edit → Remove, automatic free shipping, required-code mode, representative shipping zones, mobile width, and real Dev payment availability without submitting a fabricated order.
+
+
+## Canonical BYL VI
+Checkout consumes the global V3 design tokens from assets/css/tokens.css and must not define a second local brand palette. Brand actions, active/completed steps, selected delivery states, focus, Edit links, and summary accents use --byl-brand / --byl-brand-hover / --byl-brand-soft / --byl-focus. Green is reserved for semantic success (--byl-success), not primary brand UI.

@@ -108,6 +108,21 @@ for marker in (
 if theme.count("wp_enqueue_script('byl-v3-checkout'") != 1:
     raise SystemExit("Checkout V2 script must be enqueued exactly once")
 
+
+# Canonical BYL VI gate: Checkout must consume the global V3 brand tokens.
+for forbidden in ("--pc-green", "#00643f", "#f2f8f4", "rgba(0,100,63"):
+    if forbidden in css:
+        raise SystemExit(f"Checkout VI regression: forbidden private green brand token {forbidden}")
+for required in (
+    "background:var(--byl-brand)",
+    "background:var(--byl-brand-soft)",
+    "background:var(--byl-brand-hover)",
+    "border-color:var(--byl-focus)",
+    "color:var(--byl-brand)!important",
+):
+    if required not in css:
+        raise SystemExit(f"Checkout must consume canonical BYL VI token: {required}")
+
 if "Latest main Checkout V2" not in docs or "one BYL promotion slot" not in docs:
     raise SystemExit("S6 docs must record latest-main ownership and the one-slot promotion integration")
 
