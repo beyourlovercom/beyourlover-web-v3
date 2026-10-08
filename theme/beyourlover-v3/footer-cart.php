@@ -11,7 +11,7 @@ defined('ABSPATH') || exit;
       <span><strong><?php esc_html_e('Customer support', 'beyourlover-v3'); ?></strong><small><a href="<?php echo esc_url(home_url('/customer-help/')); ?>"><?php esc_html_e('Get help', 'beyourlover-v3'); ?></a></small></span>
     </div>
     <nav class="byl-focus-legal" aria-label="<?php esc_attr_e('Policies', 'beyourlover-v3'); ?>">
-      <a href="<?php echo esc_url(home_url('/privacy-policy/')); ?>"><?php esc_html_e('Privacy', 'beyourlover-v3'); ?></a>
+      <a href="<?php echo esc_url(home_url('/privacy-policies/')); ?>"><?php esc_html_e('Privacy', 'beyourlover-v3'); ?></a>
       <a href="<?php echo esc_url(home_url('/terms-and-conditions/')); ?>"><?php esc_html_e('Terms', 'beyourlover-v3'); ?></a>
       <a href="<?php echo esc_url(home_url('/returns/')); ?>"><?php esc_html_e('Returns', 'beyourlover-v3'); ?></a>
       <a href="<?php echo esc_url(home_url('/customer-help/')); ?>"><?php esc_html_e('Support', 'beyourlover-v3'); ?></a>

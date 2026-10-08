@@ -1,22 +1,22 @@
 /* BYL V3 progressive checkout: presentation only. Woo owns transaction logic. */
 body.woocommerce-checkout #main-content.byl-commerce-content{max-width:1200px;margin:0 auto;padding:36px var(--byl-gutter) 70px}
-.byl-progressive-checkout{--pc-green:#00643f;--pc-border:#e4e7e6;--pc-muted:#757e7d;color:#151a19;font-size:14px}
+.byl-progressive-checkout{--pc-border:var(--byl-line);--pc-muted:var(--byl-ink-3);color:var(--byl-ink);font-size:14px}
 .byl-checkout-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:26px}
 .byl-checkout-heading h1{font-size:32px;line-height:1.2;letter-spacing:-.035em;font-weight:600;margin:0}
-.byl-checkout-heading>span{color:#7c8588;font-size:12px}
+.byl-checkout-heading>span{color:var(--byl-ink-3);font-size:12px}
 .byl-checkout-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,.95fr);gap:20px;align-items:start}
 .byl-checkout-stages,.byl-checkout-summary{min-width:0}
 .byl-checkout-step,.byl-summary-card{border:1px solid var(--pc-border);border-radius:13px;background:#fff;overflow:hidden;box-shadow:0 2px 9px rgba(0,0,0,.014)}
 .byl-checkout-step{margin-bottom:10px}
 .byl-step-toggle{appearance:none;border:0;background:transparent;width:100%;min-height:77px;padding:19px 21px;display:flex;gap:15px;align-items:center;text-align:left;color:inherit;cursor:pointer}
 .byl-step-number{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#ebeeee;font-weight:600;font-size:15px}
-.byl-checkout-step.is-active .byl-step-number{background:var(--pc-green);color:#fff}
-.byl-checkout-step.is-complete .byl-step-number{background:var(--pc-green);color:#fff;font-size:0}
+.byl-checkout-step.is-active .byl-step-number{background:var(--byl-brand);color:#fff}
+.byl-checkout-step.is-complete .byl-step-number{background:var(--byl-brand);color:#fff;font-size:0}
 .byl-checkout-step.is-complete .byl-step-number:before{content:'✓';font-size:18px}
 .byl-step-heading{display:flex;flex:1;flex-direction:column;gap:2px;min-width:0}
 .byl-step-heading strong{font-size:15px;font-weight:650;line-height:1.25}
 .byl-step-heading small{font-size:12px;line-height:1.4;color:var(--pc-muted);overflow-wrap:anywhere}
-.byl-step-edit{display:none;font-size:12px;color:var(--pc-green);text-decoration:underline}
+.byl-step-edit{display:none;font-size:12px;color:var(--byl-brand);text-decoration:underline}
 .byl-checkout-step.is-complete .byl-step-edit{display:block}
 .byl-step-body{padding:0 21px 22px}
 .byl-progressive-checkout.is-enhanced .byl-checkout-step:not(.is-active)>.byl-step-body{display:none}
@@ -28,19 +28,19 @@ body.woocommerce-checkout #main-content.byl-commerce-content{max-width:1200px;ma
 .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row-first{grid-column:1}
 .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row-last{grid-column:2}
 .byl-progressive-checkout .form-row label{display:block;font-weight:500;font-size:12px;margin:0 0 6px}
-.byl-progressive-checkout .form-row label .required{color:#b82e3f}
-.byl-progressive-checkout .input-text,.byl-progressive-checkout select,.byl-progressive-checkout .select2-selection{font:inherit!important;display:block;min-height:45px;width:100%;border:1px solid #d8dddf;border-radius:8px;background:#fff;padding:10px 11px;box-shadow:none;color:#151a19;max-width:100%}
+.byl-progressive-checkout .form-row label .required{color:var(--byl-danger)}
+.byl-progressive-checkout .input-text,.byl-progressive-checkout select,.byl-progressive-checkout .select2-selection{font:inherit!important;display:block;min-height:45px;width:100%;border:1px solid var(--byl-line);border-radius:8px;background:#fff;padding:10px 11px;box-shadow:none;color:var(--byl-ink);max-width:100%}
 .byl-progressive-checkout .select2-selection{height:auto!important;display:flex;align-items:center}
 .byl-progressive-checkout .select2-selection__rendered{padding-left:0!important}
 .byl-progressive-checkout .select2-selection__arrow{top:9px!important}
 .byl-progressive-checkout textarea.input-text{min-height:76px}
-.byl-progressive-checkout .input-text:focus,.byl-progressive-checkout select:focus{outline:2px solid rgba(0,100,63,.22);border-color:var(--pc-green)}
-.byl-progressive-checkout .woocommerce-invalid .input-text{border-color:#be2e35}
+.byl-progressive-checkout .input-text:focus,.byl-progressive-checkout select:focus{outline:2px solid var(--byl-brand-soft);border-color:var(--byl-focus)}
+.byl-progressive-checkout .woocommerce-invalid .input-text{border-color:var(--byl-danger)}
 .byl-delivery-options{display:grid;gap:9px}
-.byl-delivery-rate{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid #d7dedd;border-radius:9px;width:100%;text-align:left;background:#fff;cursor:pointer;font:inherit;color:inherit}
-.byl-delivery-rate.is-selected{border-color:var(--pc-green);background:#f2f8f4}
-.byl-delivery-radio{flex:0 0 19px;height:19px;width:19px;border-radius:50%;border:2px solid #bdc5c6}
-.is-selected>.byl-delivery-radio{border:6px solid var(--pc-green)}
+.byl-delivery-rate{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--byl-line);border-radius:9px;width:100%;text-align:left;background:#fff;cursor:pointer;font:inherit;color:inherit}
+.byl-delivery-rate.is-selected{border-color:var(--byl-brand);background:var(--byl-brand-soft)}
+.byl-delivery-radio{flex:0 0 19px;height:19px;width:19px;border-radius:50%;border:2px solid var(--byl-ink-3)}
+.is-selected>.byl-delivery-radio{border:6px solid var(--byl-brand)}
 .byl-delivery-label{flex:1;min-width:0;font-size:13px}
 .byl-delivery-label strong{display:block;font-weight:600}
 .byl-delivery-label small{display:block;color:var(--pc-muted);margin-top:3px}
@@ -49,36 +49,37 @@ body.woocommerce-checkout #main-content.byl-commerce-content{max-width:1200px;ma
 .byl-progressive-checkout .woocommerce-checkout-payment{background:transparent!important;border:0!important;padding:0!important}
 .byl-progressive-checkout .wc_payment_methods{padding:0!important;margin:0!important;border:0!important;background:transparent!important}
 .byl-progressive-checkout .wc_payment_methods>li{border:1px solid var(--pc-border);border-radius:9px;padding:14px;margin:0 0 8px;list-style:none}
-.byl-progressive-checkout .payment_box{background:#f6f8f7!important;color:#1b2825!important}
+.byl-progressive-checkout .payment_box{background:var(--byl-surface-soft)!important;color:var(--byl-ink)!important}
 .byl-progressive-checkout.is-enhanced .place-order #place_order{display:none!important}
 .byl-progressive-checkout.is-enhanced .woocommerce-terms-and-conditions-wrapper{display:none}
 .byl-progressive-checkout.is-enhanced [data-byl-terms-host] .woocommerce-terms-and-conditions-wrapper{display:block}
 .byl-review-details{margin:0 0 18px}
 .byl-review-details>div{display:grid;grid-template-columns:125px minmax(0,1fr) auto;gap:10px;padding:17px 0;border-bottom:1px solid var(--pc-border);align-items:start}
 .byl-review-details dt{font-weight:600}
-.byl-review-details dd{margin:0;color:#656f72;white-space:pre-line;overflow-wrap:anywhere}
-.byl-review-details button{background:none;border:0;color:var(--pc-green);text-decoration:underline;cursor:pointer}
+.byl-review-details dd{margin:0;color:var(--byl-ink-2);white-space:pre-line;overflow-wrap:anywhere}
+.byl-review-details button{background:none;border:0;color:var(--byl-brand);text-decoration:underline;cursor:pointer}
 .byl-checkout-action-bar{margin-top:13px}
-.byl-checkout-next{width:100%;display:flex;justify-content:center;align-items:center;gap:13px;background:var(--pc-green);border:0;border-radius:9px;min-height:50px;padding:12px 20px;color:white;font:600 14px var(--byl-font);cursor:pointer}
-.byl-checkout-next[disabled]{background:#8ca99b;cursor:not-allowed}
-.byl-checkout-error{color:#ab2d37;font-size:12px;margin:0 0 9px}
+.byl-checkout-next{width:100%;display:flex;justify-content:center;align-items:center;gap:13px;background:var(--byl-brand);border:0;border-radius:9px;min-height:50px;padding:12px 20px;color:white;font:600 14px var(--byl-font);cursor:pointer}
+.byl-checkout-next:hover:not([disabled]){background:var(--byl-brand-hover)}
+.byl-checkout-next[disabled]{background:var(--byl-line);color:var(--byl-ink-3);cursor:not-allowed}
+.byl-checkout-error{color:var(--byl-danger);font-size:12px;margin:0 0 9px}
 .byl-checkout-summary{position:sticky;top:76px}
 .byl-summary-card{padding:20px}
-.byl-summary-toggle{display:flex;align-items:center;gap:5px;width:100%;padding:0;border:0;background:transparent;text-align:left;color:#151a19;cursor:pointer}
+.byl-summary-toggle{display:flex;align-items:center;gap:5px;width:100%;padding:0;border:0;background:transparent;text-align:left;color:var(--byl-ink);cursor:pointer}
 .byl-summary-toggle strong{font-size:16px}
 .byl-summary-toggle>span{color:var(--pc-muted);font-size:12px}
 .byl-summary-chevron{margin-left:auto}
 .byl-summary-body{padding-top:17px}
 .byl-summary-products{padding-bottom:15px;border-bottom:1px solid var(--pc-border)}
 .byl-summary-product{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:start;gap:10px}
-.byl-summary-product .byl-summary-image{height:62px;width:62px;border-radius:9px;background:#f6f7f6;overflow:hidden}
+.byl-summary-product .byl-summary-image{height:62px;width:62px;border-radius:9px;background:var(--byl-surface-soft);overflow:hidden}
 .byl-summary-product img{height:100%;width:100%;object-fit:cover}
 .byl-summary-product strong{display:block;font-size:12px;line-height:1.45}
 .byl-summary-product small{display:block;color:var(--pc-muted);font-size:11px}
 .byl-summary-product>span{font-size:12px;white-space:nowrap;font-weight:600}
 .byl-summary-card .woocommerce-checkout-review-order-table{width:100%;border:0;margin:0!important;box-shadow:none!important;border-collapse:collapse}
 .byl-summary-card .woocommerce-checkout-review-order-table thead,.byl-summary-card .woocommerce-checkout-review-order-table tbody{display:none}
-.byl-summary-card .woocommerce-checkout-review-order-table tfoot tr{border-bottom:1px solid #e6e9e8}
+.byl-summary-card .woocommerce-checkout-review-order-table tfoot tr{border-bottom:1px solid var(--byl-line)}
 .byl-summary-card .woocommerce-checkout-review-order-table th,.byl-summary-card .woocommerce-checkout-review-order-table td{padding:11px 0!important;font-size:12px!important;background:none!important;border:0!important}
 .byl-summary-card .woocommerce-checkout-review-order-table th{text-align:left}
 .byl-summary-card .woocommerce-checkout-review-order-table td{text-align:right}
@@ -104,7 +105,7 @@ body.woocommerce-checkout #main-content.byl-commerce-content{max-width:1200px;ma
  .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper{grid-template-columns:1fr 1fr;gap:13px 10px}
  .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row:not(.form-row-first):not(.form-row-last){grid-column:1/-1}
  .byl-progressive-checkout .form-row label{font-size:12px}
- .byl-checkout-action-bar{position:fixed;left:0;right:0;bottom:0;z-index:300;padding:10px 20px calc(10px + env(safe-area-inset-bottom));margin:0;background:rgba(255,255,255,.97);border-top:1px solid #e5e8e7;box-shadow:0 -7px 20px rgba(0,0,0,.06);backdrop-filter:blur(14px)}
+ .byl-checkout-action-bar{position:fixed;left:0;right:0;bottom:0;z-index:300;padding:10px 20px calc(10px + env(safe-area-inset-bottom));margin:0;background:rgba(255,255,255,.97);border-top:1px solid var(--byl-line);box-shadow:0 -7px 20px rgba(0,0,0,.06);backdrop-filter:blur(14px)}
  .byl-checkout-next{min-height:50px;font-size:15px}
  .byl-review-details>div{grid-template-columns:90px minmax(0,1fr) auto;font-size:12px}
 }
@@ -117,17 +118,17 @@ body.woocommerce-checkout .woocommerce-form-coupon-toggle{display:none!important
 .byl-summary-promo{padding:15px 0;border-bottom:1px solid var(--pc-border)}
 .byl-summary-promo>label{display:block;font-weight:600;font-size:12px;margin-bottom:8px}
 .byl-summary-promo-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
-.byl-summary-promo-row input{height:39px!important;min-height:39px!important;width:100%;min-width:0;border:1px solid #d8dddf!important;border-radius:8px!important;padding:8px 10px!important;background:#fff;font-size:12px!important}
-.byl-summary-promo-row button{height:39px;padding:0 13px;border:0;border-radius:8px;background:#edf1ef;color:#1b2723;font-weight:600;font-size:12px;cursor:pointer}
+.byl-summary-promo-row input{height:39px!important;min-height:39px!important;width:100%;min-width:0;border:1px solid var(--byl-line)!important;border-radius:8px!important;padding:8px 10px!important;background:#fff;font-size:12px!important}
+.byl-summary-promo-row button{height:39px;padding:0 13px;border:0;border-radius:8px;background:var(--byl-brand-soft);color:var(--byl-brand);font-weight:600;font-size:12px;cursor:pointer}
 .byl-summary-promo-row button:disabled{opacity:.5;cursor:wait}
 .byl-summary-promo p{margin:7px 0 0;color:var(--pc-muted);font-size:11px}
-.byl-summary-total{margin-left:auto;font-weight:700!important;font-size:13px!important;color:var(--pc-green)!important}
+.byl-summary-total{margin-left:auto;font-weight:700!important;font-size:13px!important;color:var(--byl-brand)!important}
 .byl-summary-chevron{margin-left:5px}
 .byl-progressive-checkout #order_review table.shop_table{border:0!important;box-shadow:none!important;border-radius:0!important;background:transparent!important}
-.byl-progressive-checkout #order_review table.shop_table tfoot tr,.byl-progressive-checkout #order_review table.shop_table tfoot td,.byl-progressive-checkout #order_review table.shop_table tfoot th{background:transparent!important;border-color:#e8ebe9!important}
+.byl-progressive-checkout #order_review table.shop_table tfoot tr,.byl-progressive-checkout #order_review table.shop_table tfoot td,.byl-progressive-checkout #order_review table.shop_table tfoot th{background:transparent!important;border-color:var(--byl-line)!important}
 .byl-progressive-checkout #order_review tr.woocommerce-shipping-totals td,.byl-progressive-checkout #order_review tr.shipping td{position:relative;padding:10px 0!important;height:auto!important}
 .byl-progressive-checkout.is-enhanced #order_review tr.woocommerce-shipping-totals td>*:not(.byl-shipping-display),.byl-progressive-checkout.is-enhanced #order_review tr.shipping td>*:not(.byl-shipping-display){position:absolute!important;width:1px!important;height:1px!important;clip-path:inset(50%);overflow:hidden;pointer-events:none}
-.byl-shipping-display{display:block;color:#69726e;font-size:12px}
+.byl-shipping-display{display:block;color:var(--byl-ink-2);font-size:12px}
 @media(min-width:950px){
  .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper{grid-template-columns:repeat(6,minmax(0,1fr))}
  .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row{grid-column:1/-1}
@@ -154,10 +155,15 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
 
 .byl-progressive-checkout #shipping_phone-description {
   display:block!important;
-  margin-top:5px;
-  color:var(--pc-muted);
-  font-size:11px;
-  line-height:1.45;
+  margin-top:8px;
+  color:var(--byl-ink-2)!important;
+  font-size:13px!important;
+  line-height:1.6;
+  opacity:1!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0!important;
 }
 
 .byl-summary-promo[hidden] { display:none!important; }
@@ -165,17 +171,45 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
 .byl-summary-promo .byl-promo-message,
 .byl-summary-promo .byl-promo-hint,
 .byl-summary-promo .byl-promo-applied { margin:6px 0 0;color:var(--pc-muted);font-size:11px; }
-.byl-summary-promo .byl-promo-applied strong { color:#151a19; }
+.byl-summary-promo .byl-promo-applied strong { color:var(--byl-ink); }
 .byl-summary-promo .byl-promo-edit,
 .byl-summary-promo .byl-promo-remove {
   border:0;
   padding:0;
   margin-top:7px;
   background:transparent;
-  color:#1b2723;
+  color:var(--byl-brand);
   font:inherit;
   font-size:11px;
   text-decoration:underline;
   cursor:pointer;
 }
-.byl-summary-promo .byl-promo-error { margin:7px 0 0;color:#ab2d37;font-size:11px; }
+.byl-summary-promo .byl-promo-error { margin:7px 0 0;color:var(--byl-danger);font-size:11px; }
+
+/* Keep Woo Select2 state on the same single-line row as city and ZIP. */
+.byl-progressive-checkout #billing_state_field .select2-container{width:100%!important;max-width:100%}
+.byl-progressive-checkout #billing_state_field .select2-selection--single{
+  height:45px!important;min-height:45px!important;max-height:45px!important;
+  display:flex!important;align-items:center!important;overflow:hidden;
+  padding:0 36px 0 11px!important;box-sizing:border-box;
+}
+.byl-progressive-checkout #billing_state_field .select2-selection__rendered{
+  display:block!important;width:100%;min-width:0;overflow:hidden;
+  white-space:nowrap;text-overflow:ellipsis;line-height:43px!important;padding:0!important;
+}
+.byl-progressive-checkout #billing_state_field .select2-selection__arrow{
+  height:43px!important;top:0!important;right:8px!important;
+}
+
+
+/* Review: compact, subordinate legal copy; never pre-consent to optional outreach. */
+.byl-progressive-checkout [data-byl-terms-host]{
+  color:var(--byl-ink-3);font-size:12px;line-height:1.55;
+}
+.byl-progressive-checkout [data-byl-terms-host] .woocommerce-privacy-policy-text p{
+  margin:0 0 9px;color:var(--byl-ink-3);font-size:12px;line-height:1.55;
+}
+.byl-progressive-checkout [data-byl-terms-host] .cr-customer-consent{
+  margin:0;color:var(--byl-ink-3);font-size:12px;line-height:1.55;
+}
+.byl-progressive-checkout [data-byl-terms-host] a{color:var(--byl-ink-2)}

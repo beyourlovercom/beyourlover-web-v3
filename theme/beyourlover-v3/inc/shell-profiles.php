@@ -138,7 +138,7 @@ function byl_v3_profile_nav_items(string $profile): array {
 
 function byl_v3_footer_groups(string $profile): array {
     $legal = [
-        ['label'=>'Privacy','url'=>home_url('/privacy-policy/')],
+        ['label'=>'Privacy','url'=>home_url('/privacy-policies/')],
         ['label'=>'Terms','url'=>home_url('/terms-and-conditions/')],
         ['label'=>'Accessibility','url'=>home_url('/accessibility/')],
     ];

@@ -64,6 +64,19 @@
     if (payment && payment.parentElement !== paymentHost) paymentHost.appendChild(payment);
     const terms = document.querySelector('.woocommerce-terms-and-conditions-wrapper');
     if (terms && terms.parentElement !== termsHost) termsHost.appendChild(terms);
+    // Woo fragments can reinsert the same terms block on updated_checkout.
+    const blocks = Array.from(termsHost.querySelectorAll('.woocommerce-terms-and-conditions-wrapper'));
+    blocks.slice(1).forEach(block => block.remove());
+    const privacy = termsHost.querySelector('.woocommerce-privacy-policy-text p');
+    if (privacy && !privacy.dataset.bylCompact) {
+      const link = privacy.querySelector('a');
+      if (link) {
+        privacy.replaceChildren(document.createTextNode('See our '), link, document.createTextNode(' for how we use your data.'));
+      }
+      privacy.dataset.bylCompact = '1';
+    }
+    const reviewInvite = termsHost.querySelector('.cr-customer-consent .woocommerce-terms-and-conditions-checkbox-text');
+    if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation with gift card rewards.';
     const notes = document.querySelector('.woocommerce-additional-fields');
     if (notes && notes.parentElement !== notesHost) notesHost.appendChild(notes);
   }
@@ -136,7 +149,7 @@
     const paymentSummary = root.querySelector('[data-byl-step-summary="payment"]');
     if (addressSummary && name && address) addressSummary.textContent = name + ' · ' + address;
     if (deliverySummary && selectedShipping()) deliverySummary.textContent = shippingLabel();
-    if (paymentSummary && selectedGateway()) paymentSummary.textContent = paymentLabel();
+    if (paymentSummary) paymentSummary.textContent = paymentLabel();
   }
   function validateAddress() {
     let firstInvalid = null;
@@ -163,9 +176,9 @@
     arrow.textContent = '→';
     arrow.setAttribute('aria-hidden','true');
     next.appendChild(arrow);
-    if (active === 'review' && !paymentConfigured()) {
+    if ((active === 'payment' || active === 'review') && !paymentConfigured()) {
       next.disabled = true;
-      message('Payment is not configured on Dev yet. Order submission is disabled.');
+      message('No payment method is available. Please try again later.');
     } else {
       next.disabled = false;
     }
@@ -198,6 +211,11 @@
     if (active === 'address' && !validateAddress()) return;
     if (active === 'delivery' && !selectedShipping()) {
       message('Please select an available delivery method.');
+      return;
+    }
+    // Never mark Payment complete unless Woo has an eligible selected gateway.
+    if (active === 'payment' && !paymentConfigured()) {
+      message('Select an available payment method to continue.');
       return;
     }
     if (active === 'review') {
