@@ -3,7 +3,6 @@
 
     var config = window.BYLShippingPromotionCart || {};
     var root = null;
-    var editing = false;
     var busy = false;
 
     function store() {
@@ -55,13 +54,11 @@
             var progress = data.threshold > 0 ? Math.min(100, Math.max(0, (data.subtotal / data.threshold) * 100)) : 0;
             html += '<div class="byl-cart-promotion__meter" role="progressbar" aria-label="Progress toward free shipping" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + progress.toFixed(0) + '"><span style="width:' + progress.toFixed(2) + '%"></span></div>';
         }
-        if (applied && !editing) {
-            html += '<p class="byl-cart-promotion__applied"><span>' + escapeHtml(data.applied_code) + ' applied</span> <button type="button" class="byl-cart-promotion__edit">Edit</button></p>';
-        } else {
-            html += '<form class="byl-cart-promotion__form"><label class="screen-reader-text" for="byl-promotion-code">Promo code</label><input id="byl-promotion-code" name="code" type="text" autocomplete="off" placeholder="Promo code" required><button type="submit"' + (busy ? ' disabled' : '') + '>Apply</button></form>';
-            if (applied) html += '<button type="button" class="byl-cart-promotion__remove">Remove</button>';
-        }
+        // One predictable Coupon Code entry point, regardless of free-shipping or applied-code state.
+        html += '<form class="byl-cart-promotion__form"><label for="byl-promotion-code">Promo / Coupon Code</label><div class="byl-cart-promotion__inputs"><input id="byl-promotion-code" name="code" type="text" autocomplete="off" placeholder="Enter coupon code" required><button type="submit"' + (busy ? ' disabled' : '') + '>Apply</button></div></form>';
+        if (applied) html += '<p class="byl-cart-promotion__applied">' + escapeHtml(data.applied_code) + ' applied <button type="button" class="byl-cart-promotion__remove">Remove</button></p>';
         root.innerHTML = html + '<p class="byl-cart-promotion__error" role="alert" hidden></p>';
+        document.body.classList.add('byl-cart-coupon-enhanced');
         bind(data);
     }
 
@@ -71,15 +68,18 @@
     }
 
     function bind(data) {
-        var edit = root.querySelector('.byl-cart-promotion__edit');
-        if (edit) edit.addEventListener('click', function () { editing = true; render(data); });
         var remove = root.querySelector('.byl-cart-promotion__remove');
         if (remove) remove.addEventListener('click', function () { mutate(config.removeUrl, {code: data.applied_code}, 'remove'); });
         var form = root.querySelector('.byl-cart-promotion__form');
         if (form) form.addEventListener('submit', function (event) {
             event.preventDefault();
             var input = form.querySelector('input');
-            mutate(config.applyUrl, {code: input ? input.value.trim() : ''}, 'apply');
+            var proposed = input ? input.value.trim() : '';
+            if (data.has_code && data.applied_code) {
+                showError('Remove the current coupon before applying a different code.');
+                return;
+            }
+            if (proposed) mutate(config.applyUrl, {code: proposed}, 'apply');
         });
     }
 
@@ -101,7 +101,6 @@
             .then(function (result) {
                 busy = false;
                 if (!result.ok) throw new Error((result.json && (result.json.message || result.json.code)) || 'Unable to update the promo code.');
-                editing = false;
                 var descriptor = store();
                 var dispatcher = window.wp && wp.data && descriptor ? wp.data.dispatch(descriptor) : null;
                 if (dispatcher && typeof dispatcher.receiveCart === 'function') dispatcher.receiveCart(result.json);
@@ -112,10 +111,18 @@
     }
 
     function mount() {
-        var target = document.querySelector('.wc-block-cart__totals, .wc-block-cart .wc-block-components-totals-wrapper');
+        var target = document.querySelector('.wc-block-cart__totals, .wc-block-cart .wc-block-components-totals-wrapper, .cart_totals');
         if (!target) return false;
         root = target.querySelector('.byl-cart-promotion');
-        if (!root) { root = document.createElement('section'); root.className = 'byl-cart-promotion'; root.setAttribute('aria-label', 'Free shipping promotion'); target.appendChild(root); render(state()); }
+        if (!root) {
+            root = document.createElement('section');
+            root.className = 'byl-cart-promotion';
+            root.setAttribute('aria-label', 'Free shipping promotion');
+            var checkout = target.querySelector('.wc-proceed-to-checkout');
+            if (checkout) target.insertBefore(root, checkout);
+            else target.appendChild(root);
+            render(state());
+        }
         return true;
     }
 
