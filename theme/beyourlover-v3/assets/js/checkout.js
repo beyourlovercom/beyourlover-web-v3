@@ -163,9 +163,9 @@
     arrow.textContent = '→';
     arrow.setAttribute('aria-hidden','true');
     next.appendChild(arrow);
-    if (active === 'review' && !paymentConfigured()) {
+    if ((active === 'payment' || active === 'review') && !paymentConfigured()) {
       next.disabled = true;
-      message('Payment is not configured on Dev yet. Order submission is disabled.');
+      message('No payment method is available for this order yet. Please try again later.');
     } else {
       next.disabled = false;
     }
@@ -198,6 +198,10 @@
     if (active === 'address' && !validateAddress()) return;
     if (active === 'delivery' && !selectedShipping()) {
       message('Please select an available delivery method.');
+      return;
+    }
+    if (active === 'payment' && !paymentConfigured()) {
+      message('Select an available payment method before continuing.');
       return;
     }
     if (active === 'review') {
