@@ -19,5 +19,7 @@ jobs:
         run: php scripts/test_cart_v2_contract.php
       - name: Cart coupon UI and native fallback
         run: node scripts/test_cart_coupon_ui.js
+      - name: Cart V3 canonical brand tokens
+        run: node scripts/test_cart_vi_tokens.js
       - name: Migration IDs
         run: python scripts/check_migration_ids.py
