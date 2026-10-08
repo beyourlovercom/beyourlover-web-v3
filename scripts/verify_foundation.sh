@@ -2,6 +2,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 find theme platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+php -l dev/mu-plugins/byl-dev-safety.php
+php scripts/test_dev_sandbox_safety.php
 python3 -m py_compile scripts/*.py
 python3 scripts/check_migration_ids.py
 python3 scripts/test_shipping_promotion_contract.py
