@@ -15,6 +15,12 @@ jobs:
         run: find theme platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Python syntax
         run: python -m py_compile scripts/*.py
+      - name: Cart V2 focused regression
+        run: php scripts/test_cart_v2_contract.php
+      - name: Cart coupon UI and native fallback
+        run: node scripts/test_cart_coupon_ui.js
+      - name: Cart V3 canonical brand tokens
+        run: node scripts/test_cart_vi_tokens.js
       - name: Migration IDs
         run: python scripts/check_migration_ids.py
       - name: Shipping promotion contract

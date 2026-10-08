@@ -14,8 +14,8 @@ if "byl-cart-promotion__form" not in mobile_css or "flex-direction: column" not 
     raise SystemExit("Mobile promotion form must stack as a full-width column")
 if not re.search(r"\.woocommerce-cart \.byl-cart-promotion__form input,\s*\.woocommerce-cart \.byl-cart-promotion__form button \{[^}]*min-height:\s*[^;]+;", mobile_css, re.S):
     raise SystemExit("Mobile promotion controls need a comfortable min-height")
-if ".byl-cart-promotion__form button { border: 1px solid CanvasText; background: CanvasText; color: Canvas;" not in mobile_css:
-    raise SystemExit("Mobile Apply button must retain a clear neutral primary affordance")
+if ".byl-cart-promotion__form button { border: 1px solid var(--byl-brand); background: var(--byl-brand); color: var(--byl-surface);" not in mobile_css:
+    raise SystemExit("Mobile Apply button must retain the canonical BYL brand primary affordance")
 desktop_css = css.split("@media (min-width: 700px)", 1)[1]
 if "flex-direction: row" not in desktop_css or "max-width: 28rem" not in desktop_css:
     raise SystemExit("Desktop promotion form must remain a horizontal 28rem row")
@@ -64,16 +64,18 @@ for marker in (
     "Free shipping unlocked",
     "Free shipping available",
     "Replace your current code with ",
-    "class=\"byl-cart-promotion__edit\"",
     "class=\"byl-cart-promotion__remove\"",
     "receiveCart",
     "applyUrl",
     "removeUrl",
     "mutate(config.removeUrl, {code: data.applied_code}, 'remove')",
-    "mutate(config.applyUrl, {code: input ? input.value.trim() : ''}, 'apply')",
 ):
     if marker not in js:
         raise SystemExit(f"Missing Cart UI marker: {marker}")
+if "mutate(config.applyUrl, {code: proposed}, 'apply')" not in js:
+    raise SystemExit("Cart apply flow must use the native Store API")
+if "document.body.classList.add('byl-cart-coupon-enhanced')" not in js:
+    raise SystemExit("Cart enhancement must gate hiding the native coupon")
 if "Add More" in js or "Add More" in css:
     raise SystemExit("S5 must not render Add More")
 if ".express" in css.lower() or "express-payment" in css.lower() or "express-payment" in js.lower():
@@ -87,8 +89,8 @@ if "'wc-blocks-data'" in cart_branch:
 
 if ".cart_totals" not in js or ".wc-proceed-to-checkout" not in js or "insertBefore(root, checkout)" not in js:
     raise SystemExit("S5 Cart mount must support Classic Cart and place the BYL slot before checkout")
-if ".woocommerce-cart .woocommerce-cart-form .coupon" not in css:
-    raise SystemExit("Classic Cart native coupon form must be hidden in favor of the BYL slot")
+if ".woocommerce-cart.byl-cart-coupon-enhanced .woocommerce-cart-form .coupon" not in css:
+    raise SystemExit("Classic Cart native coupon must only hide after the BYL slot is functional")
 if ".woocommerce-cart #coupons_list" not in css or ".woocommerce-cart .wt_coupon_wrapper" not in css:
     raise SystemExit("Classic Smart Coupons UI must be hidden on Cart")
 

@@ -1,9 +1,9 @@
-/* S5 owns one compact promotion slot on the Cart Blocks page. */
+/* Andy Commerce Cart promotion slot 鈥?BYL V3 canonical tokens. */
 .woocommerce-cart .byl-cart-promotion {
     margin: 1rem 0;
     padding: 1rem 0;
-    border-top: 1px solid rgba(24, 24, 27, .12);
-    border-bottom: 1px solid rgba(24, 24, 27, .12);
+    border-top: 1px solid var(--byl-line);
+    border-bottom: 1px solid var(--byl-line);
 }
 .woocommerce-cart .byl-cart-promotion__heading { margin: 0 0 .35rem; font-weight: 600; }
 .woocommerce-cart .byl-cart-promotion__message { margin: 0; }
@@ -12,18 +12,19 @@
 .woocommerce-cart .byl-cart-promotion__form input,
 .woocommerce-cart .byl-cart-promotion__form button { box-sizing: border-box; width: 100%; min-height: 2.75rem; }
 .woocommerce-cart .byl-cart-promotion__form input { min-width: 0; }
-.woocommerce-cart .byl-cart-promotion__form button { border: 1px solid CanvasText; background: CanvasText; color: Canvas; font-weight: 600; cursor: pointer; }
-.woocommerce-cart .byl-cart-promotion__meter { height: .25rem; margin-top: .75rem; overflow: hidden; background: rgba(24, 24, 27, .12); border-radius: 99px; }
-.woocommerce-cart .byl-cart-promotion__meter span { display: block; height: 100%; background: currentColor; border-radius: inherit; }
-.woocommerce-cart .byl-cart-promotion__error { margin: .5rem 0 0; color: #a51d2d; }
+.woocommerce-cart .byl-cart-promotion__form button { border: 1px solid var(--byl-brand); background: var(--byl-brand); color: var(--byl-surface); font-weight: 600; cursor: pointer; }
+.woocommerce-cart .byl-cart-promotion__meter { height: .25rem; margin-top: .75rem; overflow: hidden; background: var(--byl-line); border-radius: var(--byl-radius-pill); }
+.woocommerce-cart .byl-cart-promotion__meter span { display: block; height: 100%; background: var(--byl-brand); border-radius: inherit; }
+.woocommerce-cart .byl-cart-promotion__error { margin: .5rem 0 0; color: var(--byl-danger); }
 .woocommerce-cart .byl-cart-promotion__edit,
 .woocommerce-cart .byl-cart-promotion__remove { margin-top: .5rem; padding: 0; border: 0; background: transparent; text-decoration: underline; cursor: pointer; }
 .woocommerce-cart .byl-cart-promotion__remove { margin-left: .75rem; }
 
 /* BYL is the single visible Cart coupon slot. Express payment is deliberately untouched. */
 .woocommerce-cart .wc-block-cart .wc-block-components-totals-coupon,
-.woocommerce-cart .wc-block-cart [data-block-name="woocommerce/cart-coupon-form"],
-.woocommerce-cart .woocommerce-cart-form .coupon { display: none !important; }
+.woocommerce-cart .wc-block-cart [data-block-name="woocommerce/cart-coupon-form"] { display: none !important; }
+/* Hide native Woo coupon only while a live, working single-code promotion UI is present. */
+.woocommerce-cart.byl-cart-coupon-enhanced .woocommerce-cart-form .coupon { display: none !important; }
 .woocommerce-cart .wc-block-cart [data-block-name="smart-coupons/available-coupons"],
 .woocommerce-cart .wc-block-cart .smart-coupons-available-coupons,
 .woocommerce-cart [data-block-name="smart-coupons/available-coupons"],
