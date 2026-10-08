@@ -110,3 +110,16 @@ This is a read-only Dev and official-policy rescan. The earlier zero-provider / 
 - Outstanding nonblocking coverage continues as P5/P7 regression: unsupported-country behavior, keyboard/screen-reader checks, shipping update persistence, API reliability and real device screenshot evidence. No assertion that these were independently verified by the owner's PASS.
 - This signoff **does not approve** merging the Draft PR, enabling gateway Live payments, creating payment orders, merchant/product eligibility, shipping to WWW, or any Production mutation.
 - Next authorized action: P5 **read-only** gateway configuration/eligibility/duplicate-payment-choice audit; do not execute Sandbox payment orders until an explicit test-order authorization.
+
+
+## 2026-10-08 — P5 initial read-only gateway audit (post-P4)
+
+**Scope:** only inspect configured WC gateways and test/sandbox options on Dev; do not transact, enable/disable gateways, print credentials, or write Production.
+
+- Read-only WP-CLI `WC()->payment_gateways()->payment_gateways()` and selected scalar `wp option` fields on `dev.beyourlover.com`.
+- WooPayments gateway `woocommerce_payments: enabled=yes`; plugin option `woocommerce_woocommerce_payments_settings.test_mode=yes`.
+- WooPayments configured sub-gateways `woocommerce_payments_klarna=yes`, `woocommerce_payments_apple_pay=yes`, `woocommerce_payments_google_pay=yes`, `woocommerce_payments_amazon_pay=yes`; Aff﻿irm, Afterpay/Clearpay, Alipay also report `yes`. **Config flag is not the same as real checkout visibility, merchant method eligibility, account approval or successful authorization.** Review merchant product/industry eligibility first.
+- Independent Stripe gateway `stripe: enabled=no`; `woocommerce_stripe_settings.enabled=no` with `testmode=yes` retained. Other Stripe method gateways (including Klarna, Link, Amazon Pay and wallet-related entries) report `enabled=no`. Historical earlier readout indicated Stripe enabled; the *later read-only gateway audit* is authoritative for this timestamp only.
+- PayPal PPCP gateways `ppcp=no`, `ppcp_card=no`, `ppcp_googlepay=no`, `ppcp_applepay=no`. `woocommerce_ppcp_api_settings.environment=sandbox`. Sandbox configuration/connection success and PayPal account merchant status **not verified**; do not treat installed plugin or saved option names as authenticated.
+- Current configured gateways therefore do **not** show simultaneous enabled Stripe/PayPal card/wallet choices alongside WooPayments. Actual payment-step browser visibility, buyer-country filtering, duplicate button presentation, compliance and merchant eligibility require targeted P5 UAT.
+- **No Sandbox payment/order was made.** Next P5 stage requires separate explicit authorization for synthetic-address, non-production test transactions and appropriate sandbox account validation. Live mode, WWW and Production remain prohibited without specific approval.
