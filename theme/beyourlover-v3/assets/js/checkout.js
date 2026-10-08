@@ -64,6 +64,19 @@
     if (payment && payment.parentElement !== paymentHost) paymentHost.appendChild(payment);
     const terms = document.querySelector('.woocommerce-terms-and-conditions-wrapper');
     if (terms && terms.parentElement !== termsHost) termsHost.appendChild(terms);
+    // Woo fragments can reinsert the same terms block on updated_checkout.
+    const blocks = Array.from(termsHost.querySelectorAll('.woocommerce-terms-and-conditions-wrapper'));
+    blocks.slice(1).forEach(block => block.remove());
+    const privacy = termsHost.querySelector('.woocommerce-privacy-policy-text p');
+    if (privacy && !privacy.dataset.bylCompact) {
+      const link = privacy.querySelector('a');
+      if (link) {
+        privacy.replaceChildren(document.createTextNode('See our '), link, document.createTextNode(' for how we use your data.'));
+      }
+      privacy.dataset.bylCompact = '1';
+    }
+    const reviewInvite = termsHost.querySelector('.cr-customer-consent .woocommerce-terms-and-conditions-checkbox-text');
+    if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation from CusRev.';
     const notes = document.querySelector('.woocommerce-additional-fields');
     if (notes && notes.parentElement !== notesHost) notesHost.appendChild(notes);
   }

@@ -200,3 +200,16 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
 .byl-progressive-checkout #billing_state_field .select2-selection__arrow{
   height:43px!important;top:0!important;right:8px!important;
 }
+
+
+/* Review: compact, subordinate legal copy; never pre-consent to optional outreach. */
+.byl-progressive-checkout [data-byl-terms-host]{
+  color:var(--byl-ink-3);font-size:12px;line-height:1.55;
+}
+.byl-progressive-checkout [data-byl-terms-host] .woocommerce-privacy-policy-text p{
+  margin:0 0 9px;color:var(--byl-ink-3);font-size:12px;line-height:1.55;
+}
+.byl-progressive-checkout [data-byl-terms-host] .cr-customer-consent{
+  margin:0;color:var(--byl-ink-3);font-size:12px;line-height:1.55;
+}
+.byl-progressive-checkout [data-byl-terms-host] a{color:var(--byl-ink-2)}
