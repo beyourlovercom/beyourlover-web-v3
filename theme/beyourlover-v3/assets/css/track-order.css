@@ -37,6 +37,8 @@
   width:100%;margin:0;padding:0;border:0;background:transparent;box-shadow:none;
 }
 .byl-track-query form.track_order > p{margin:0;min-width:0}
+/* Woo's stock instruction repeats the already visible hero explanation; remove only that introductory paragraph. */
+.byl-track-query form.track_order > p:first-child:not(.form-row){display:none}
 .byl-track-query form.track_order > p:not(.form-row){grid-column:1/-1}
 .byl-track-query form.track_order .form-row{
   width:auto!important;float:none!important;clear:none!important;padding:0!important;display:block;min-width:0
