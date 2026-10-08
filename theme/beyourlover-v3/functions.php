@@ -137,6 +137,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     }
     if (function_exists('is_checkout') && is_checkout() && !is_order_received_page()) {
         wp_enqueue_style('byl-v3-checkout', $uri.'/assets/css/checkout.css', ['byl-v3-motion'], $v('assets/css/checkout.css'));
+        wp_enqueue_style('byl-v3-checkout-shell', $uri.'/assets/css/checkout-shell.css', ['byl-v3-checkout'], $v('assets/css/checkout-shell.css'));
         $checkout_dependencies = ['jquery'];
         if (wp_script_is('wc-checkout', 'registered') || wp_script_is('wc-checkout', 'enqueued')) {
             $checkout_dependencies[] = 'wc-checkout';

@@ -21,6 +21,8 @@ jobs:
         run: node scripts/test_cart_coupon_ui.js
       - name: Cart V3 canonical brand tokens
         run: node scripts/test_cart_vi_tokens.js
+      - name: Checkout Secure Shell V1 contract
+        run: node scripts/test_checkout_secure_shell.js
       - name: Migration IDs
         run: python scripts/check_migration_ids.py
       - name: Shipping promotion contract
