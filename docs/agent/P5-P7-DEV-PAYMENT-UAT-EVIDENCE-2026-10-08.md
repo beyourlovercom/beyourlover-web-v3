@@ -79,3 +79,14 @@ At 390px, 500px, 1280px:
 - P6 ERP economics **implemented and merged**; current transactional metrics and release gate **PENDING**.
 - P7 Checkout **non-payment integration smoke PASS**; full payment/post-purchase UAT **PENDING**.
 - WWW Production payment and deployments **NOT AUTHORIZED**.
+
+
+## Follow-up read-only checkpoint — 2026-10-08
+
+- Remote Dev verification: `siteurl=https://dev.beyourlover.com`; WooPayments `test_mode=yes`; native BYL Dev Safety MU plugin present.
+- The narrowly scoped private `p13-sandbox-gate.json` file was confirmed **absent** at its canonical path. Thus the normal public session remains blocked. No file was created, no session token handled and no payment attempted. Earlier privileged authenticated session creation had been blocked by execution safety checks; do not bypass these checks.
+- The Dev WooCommerce HPOS setting reads `yes`. Old `wp post list --post_type=shop_order` count was zero but **is not valid proof of no HPOS orders**; do not infer order inventory from the legacy posts count. Order verification remains pending an HPOS-aware read-only method.
+- GitHub Foundation CI on PR #26 exact head `868afece503e004e82620653ce888af2184604f4`: **success**. PR #26 currently **ready for review, mergeable, not merged**; Owner UAT recorded PASS. No merge performed in this checkpoint.
+- GitHub Foundation CI on PR #28 `64c9046f98dff0009957f89c15926680c14e76ae`: **success**; Draft remains open.
+- ERP PR #423 (Payment Reliability Closure V1) also **merged**, composed from prior read-only Payment Health + Gateway Economics, expressly no Production deploy, write, payment routing change or P1.9 schema migration. It does not update the historical fee evidence to current live runtime data.
+- **Next supported gate:** independently authorized, safely provisioned synthetic-customer test session within the established MU limits, plus verified isolation from ERP fulfillment/email, before any transactional UAT. If not available, keep P5 transaction and full P7 marked blocked; work on doc/contract verification only.
