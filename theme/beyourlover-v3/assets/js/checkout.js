@@ -149,7 +149,7 @@
     const paymentSummary = root.querySelector('[data-byl-step-summary="payment"]');
     if (addressSummary && name && address) addressSummary.textContent = name + ' · ' + address;
     if (deliverySummary && selectedShipping()) deliverySummary.textContent = shippingLabel();
-    if (paymentSummary && selectedGateway()) paymentSummary.textContent = paymentLabel();
+    if (paymentSummary) paymentSummary.textContent = paymentLabel();
   }
   function validateAddress() {
     let firstInvalid = null;
@@ -176,9 +176,9 @@
     arrow.textContent = '→';
     arrow.setAttribute('aria-hidden','true');
     next.appendChild(arrow);
-    if (active === 'review' && !paymentConfigured()) {
+    if ((active === 'payment' || active === 'review') && !paymentConfigured()) {
       next.disabled = true;
-      message('Payment is not configured on Dev yet. Order submission is disabled.');
+      message('No payment method is available. Please try again later.');
     } else {
       next.disabled = false;
     }
@@ -211,6 +211,11 @@
     if (active === 'address' && !validateAddress()) return;
     if (active === 'delivery' && !selectedShipping()) {
       message('Please select an available delivery method.');
+      return;
+    }
+    // Never mark Payment complete unless Woo has an eligible selected gateway.
+    if (active === 'payment' && !paymentConfigured()) {
+      message('Select an available payment method to continue.');
       return;
     }
     if (active === 'review') {

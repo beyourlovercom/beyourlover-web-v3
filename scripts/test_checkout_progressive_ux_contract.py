@@ -27,7 +27,7 @@ for marker in (
     "function deliveryOptions()",
     "function paymentConfigured()",
     "nativeButton.click()",
-    "Payment is not configured on Dev yet. Order submission is disabled.",
+    "No payment method is available. Please try again later.",
 ):
     if marker not in js:
         raise SystemExit(f"Missing accepted Checkout V2 behavior marker: {marker}")
@@ -122,6 +122,12 @@ for required in (
 ):
     if required not in css:
         raise SystemExit(f"Checkout must consume canonical BYL VI token: {required}")
+
+# Payment cannot be marked complete when Woo requires payment but offers no gateway.
+if "if ((active === 'payment' || active === 'review') && !paymentConfigured())" not in js:
+    raise SystemExit("Payment step CTA must stay disabled without an eligible gateway")
+if "if (active === 'payment' && !paymentConfigured())" not in js:
+    raise SystemExit("Payment to Review transition must fail closed when no gateway exists")
 
 if "Latest main Checkout V2" not in docs or "one BYL promotion slot" not in docs:
     raise SystemExit("S6 docs must record latest-main ownership and the one-slot promotion integration")
