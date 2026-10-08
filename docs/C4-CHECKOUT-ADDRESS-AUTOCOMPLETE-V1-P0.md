@@ -40,3 +40,31 @@ Environment: Dev-first; WWW/Production explicitly gated.
 
 ## Current status
 P0 provider audit PASS; provider registration 0; design specification ready. P1 connector engineering BLOCKED on approved provider/credentials/budget, Dev setting remains no. No WWW changes.
+
+
+## 2026-10-08 — P1/P2/P3 rescan (supersedes earlier Dev snapshot)
+
+This is a read-only Dev and official-policy rescan. The earlier zero-provider / no-payment-plugin observation above was accurate **before** the latest plugin installation; do not use it as current state.
+
+### Dev read-only evidence
+- GitHub: PR #15 merged; PR #18 remains a Draft, documentation-only proposal.
+- Dev: WooCommerce 11.1.1; WooPayments 11.1.0 active; WooCommerce Stripe Gateway 11.0.1 active; `pymntpl-paypal-woocommerce` 2.0.27 active; Airwallex not installed.
+- WooPayments gateway `enabled=yes`, `test_mode=yes`; independent Stripe gateway `enabled=yes`, `testmode=yes`. This is **not** evidence of account approval or successful payments. Test-only configured gateways need browser review for duplicate cards/wallets.
+- PayPal plugin registers `ppcp` and related wallet gateways; PayPal account connection, gateway eligibility and sandbox routing are **not verified**. Do not infer these from plugin activation or legacy `woocommerce_paypal_settings` values.
+- Store configuration: USD, default location US:CA. This does **not** establish the legal merchant entity country or Klarna approval.
+- Native WooCommerce `AddressProviderController::get_providers()` now returns **one** provider: `WC_Payments_Address_Provider`; `woocommerce_address_autocomplete_enabled=no` remains unchanged.
+- No payment transaction, checkout order, external paid Places API key, Dev option write, Production change or migration was performed in this rescan.
+
+### Official documentation / provisional decision
+- WooPayments Klarna varies by merchant country and account eligibility and does **not** support cross-border BNPL: customer billing country must match merchant account country and the national currency. Source: https://woocommerce.com/document/woopayments/payment-methods/buy-now-pay-later/
+- U.S. WooPayments published Klarna base fee (indicative **only if U.S. merchant**): 5.99% + $0.30; $15 dispute fee. Actual BYL merchant location/contract is unverified. Source: https://woocommerce.com/document/woopayments/fees/
+- Airwallex supports merchant regions including US, UK, EEA, HK and shopper countries across US/EU/UK; Airwallex Klarna currently documents settlement eight business days after capture, manual-capture deadline 28 days, refund/dispute eligibility up to 180 days. Merchant-specific fees are not verified. Sources: https://www.airwallex.com/docs/payments/payment-methods/global/klarna ; https://www.airwallex.com/docs/payments/online-payments/plugins/woocommerce
+- WooPayments address autocomplete requires WooCommerce 10.3+ and WooPayments enabled in checkout. Native WooPayments provider is available; standalone Google Places key/integration should **not** be developed yet. Source: https://woocommerce.com/document/woopayments/settings-guide/
+- **Merchant-category eligibility is a blocker, not a footnote:** adult-oriented goods/services may be prohibited or restricted by the processors. The merchant must seek accurate written confirmation for its actual merchandise, legal entity and destination markets before any Live connection. Sources: https://woocommerce.com/document/woopayments/our-policies/prohibited-and-restricted-products/ ; https://stripe.com/legal/restricted-businesses ; https://help.airwallex.com/hc/en-gb/articles/4410623274905-Unsupported-Industries ; https://www.paypal.com/us/cshelp/article/paypal%E5%AF%B9%E6%80%A7%E5%8F%96%E5%90%91%E5%95%86%E5%93%81%E5%92%8C%E6%9C%8D%E5%8A%A1%E7%9A%84%E4%BA%A4%E6%98%93%E5%88%B6%E5%AE%9A%E4%BA%86%E4%BB%80%E4%B9%88-help384?locale.x=zh_US
+
+### Decisions and remaining gates
+- **WooPayments KEEP (Dev Test only); Stripe TEMP KEEP (Dev Test only); PayPal KEEP pending Sandbox/connection verification; Airwallex DEFER**. No Live payments or unverified Klarna eligibility.
+- **Address Autocomplete P4 blocked on explicit Dev opt-in**, review of address-data handling, then synthetic-address-only browser UAT; option remains `no` until approval. Use existing WooPayments provider first; no new paid Google API or duplicate widget.
+- P5: confirm PayPal actual Sandbox gateway routing; inspect whether Stripe and WooPayments appear as duplicate card/wallet options; then test only with synthetic checkout/test orders under separate authorization.
+- P6: use actual transaction/fee/settlement evidence, not assumptions, to decide gateway economics and Airwallex necessity.
+- P7 Owner UAT; P8 WWW entirely separately approved.
