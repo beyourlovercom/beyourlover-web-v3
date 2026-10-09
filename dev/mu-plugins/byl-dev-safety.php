@@ -33,6 +33,7 @@ function byl_dev_p13_checkout_gate(): array {
     if ($expires <= time() || $expires > time() + 3600) { return $result; }
     $user_id = get_current_user_id();
     if (!$user_id || $user_id !== (int) $config['customer_id']) { return $result; }
+    if (!byl_dev_p13_is_synthetic_customer($user_id)) { return $result; }
     $cookie = $_COOKIE['byl_p13_sandbox'] ?? '';
     if (!is_string($cookie) || strlen($cookie) < 40 || strlen($cookie) > 256 ||
         !hash_equals((string) $config['cookie_hash'], hash('sha256', $cookie))) {
@@ -128,3 +129,219 @@ add_filter('wp_get_attachment_url', static function ($url, $attachment_id) {
     }
     return $url;
 }, 50, 2);
+
+
+/**
+ * P1.3 G2: human-authorized, browser-bound Sandbox activation.
+ *
+ * This extends the EXISTING Dev Safety MU plugin, and never operates on www.
+ * Approval only queues a permit (no cookie_hash => checkout remains closed).
+ * The real logged-in synthetic customer must POST a nonce-protected activation
+ * form on My Account to receive the Secure/HttpOnly/host-only cookie. Neither
+ * user credentials nor cookie values are exposed to admin or tool output.
+ */
+function byl_dev_p13_runtime_ready(): bool {
+    return wp_get_environment_type() === 'staging'
+        && home_url() === 'https://dev.beyourlover.com'
+        && is_ssl();
+}
+
+function byl_dev_p13_is_synthetic_customer(int $id): bool {
+    if ($id < 1) { return false; }
+    $user = get_userdata($id);
+    if (!$user || strtolower((string) $user->user_email) !== 'byl-p13@example.invalid') {
+        return false;
+    }
+    $roles = (array) $user->roles;
+    return in_array('customer', $roles, true)
+        && !array_intersect($roles, ['administrator', 'shop_manager', 'editor']);
+}
+
+function byl_dev_p13_synthetic_customer() {
+    $user = get_user_by('email', 'byl-p13@example.invalid');
+    return $user && byl_dev_p13_is_synthetic_customer((int) $user->ID) ? $user : null;
+}
+
+function byl_dev_p13_permit_path(): string {
+    return '/home/u247343654/byl-v3-staging/p13-sandbox-gate.json';
+}
+
+function byl_dev_p13_read_permit(): array {
+    $path = byl_dev_p13_permit_path();
+    if (!is_file($path) || !is_readable($path)) { return []; }
+    $raw = file_get_contents($path);
+    $value = is_string($raw) ? json_decode($raw, true) : null;
+    return is_array($value) ? $value : [];
+}
+
+/**
+ * Serialized updates with atomic 0600 file replacement. A rejected callback
+ * returns false; null revokes by unlinking under the same lock. This file is
+ * deliberately outside webroot. No cookie plaintext is ever stored here.
+ */
+function byl_dev_p13_change_permit(callable $decide): bool {
+    if (!byl_dev_p13_runtime_ready()) { return false; }
+    $path = byl_dev_p13_permit_path();
+    $dir = dirname($path);
+    if (!is_dir($dir) || !is_writable($dir)) { return false; }
+    $lock = fopen($dir . '/p13-sandbox-gate.lock', 'c');
+    if (!$lock) { return false; }
+    chmod($dir . '/p13-sandbox-gate.lock', 0600);
+    try {
+        if (!flock($lock, LOCK_EX)) { return false; }
+        $next = $decide(byl_dev_p13_read_permit());
+        if ($next === false) { return false; }
+        if ($next === null) { return !is_file($path) || unlink($path); }
+        if (!is_array($next)) { return false; }
+        $json = wp_json_encode($next, JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) { return false; }
+        $tmp = tempnam($dir, 'p13-grant-');
+        if (!$tmp) { return false; }
+        chmod($tmp, 0600);
+        if (file_put_contents($tmp, $json, LOCK_EX) === false) {
+            unlink($tmp);
+            return false;
+        }
+        if (!rename($tmp, $path)) {
+            unlink($tmp);
+            return false;
+        }
+        return true;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+}
+
+function byl_dev_p13_is_live_permit(array $permit): bool {
+    return !empty($permit['enabled'])
+        && isset($permit['expires_at'], $permit['customer_id'], $permit['gateway'])
+        && (int) $permit['expires_at'] > time()
+        && (int) $permit['expires_at'] <= time() + 3600
+        && $permit['gateway'] === 'woocommerce_payments'
+        && byl_dev_p13_is_synthetic_customer((int) $permit['customer_id']);
+}
+
+function byl_dev_p13_admin_guard(string $nonce): void {
+    if (!byl_dev_p13_runtime_ready() || !current_user_can('manage_options')) {
+        wp_die('Sandbox approval is restricted to the Dev administrator.', '', ['response' => 403]);
+    }
+    check_admin_referer($nonce);
+}
+
+add_action('admin_menu', static function (): void {
+    if (!byl_dev_p13_runtime_ready()) { return; }
+    add_management_page('BYL Sandbox UAT', 'BYL Sandbox UAT', 'manage_options', 'byl-p13-sandbox', 'byl_dev_p13_admin_page');
+});
+
+function byl_dev_p13_admin_page(): void {
+    if (!byl_dev_p13_runtime_ready() || !current_user_can('manage_options')) { return; }
+    $permit = byl_dev_p13_read_permit();
+    $live = byl_dev_p13_is_live_permit($permit);
+    $state = !$live ? 'Closed' : (empty($permit['cookie_hash']) ? 'Awaiting tester activation' : 'Tester activated');
+    echo '<div class="wrap"><h1>BYL Dev Sandbox UAT</h1>';
+    echo '<p>Dev-only, WooPayments Test Mode, one synthetic customer, 30-minute maximum. No Live payment.</p>';
+    echo '<p><strong>Gate status: ' . esc_html($state) . '</strong></p>';
+    if (!$live) {
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        echo '<input type="hidden" name="action" value="byl_p13_approve">';
+        wp_nonce_field('byl_p13_approve');
+        echo '<button type="submit" class="button button-primary">Approve 30-minute test window</button></form>';
+    } else {
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        echo '<input type="hidden" name="action" value="byl_p13_revoke">';
+        wp_nonce_field('byl_p13_revoke');
+        echo '<button type="submit" class="button">Revoke authorization immediately</button></form>';
+    }
+    echo '</div>';
+}
+
+add_action('admin_post_byl_p13_approve', static function (): void {
+    byl_dev_p13_admin_guard('byl_p13_approve');
+    $user = byl_dev_p13_synthetic_customer();
+    $settings = (array) get_option('woocommerce_woocommerce_payments_settings', []);
+    if (!$user || !function_exists('wc_get_orders')
+        || ($settings['enabled'] ?? '') !== 'yes' || ($settings['test_mode'] ?? '') !== 'yes'
+        || count(wc_get_orders(['customer_id' => $user->ID, 'limit' => 6, 'return' => 'ids'])) >= 6) {
+        wp_die('Sandbox preflight failed; no grant issued.', '', ['response' => 403]);
+    }
+    $ok = byl_dev_p13_change_permit(static function (array $current) use ($user): array|bool {
+        if (byl_dev_p13_is_live_permit($current)) { return false; }
+        // No cookie_hash: approval alone NEVER enables checkout.
+        return [
+            'enabled' => true,
+            'expires_at' => time() + 1800,
+            'customer_id' => (int) $user->ID,
+            'gateway' => 'woocommerce_payments',
+            'approved_by' => get_current_user_id(),
+        ];
+    });
+    if (!$ok) { wp_die('Sandbox grant was not written; gate remains closed.', '', ['response' => 403]); }
+    wp_safe_redirect(admin_url('tools.php?page=byl-p13-sandbox'));
+    exit;
+});
+
+add_action('admin_post_byl_p13_revoke', static function (): void {
+    byl_dev_p13_admin_guard('byl_p13_revoke');
+    if (!byl_dev_p13_change_permit(static fn (array $current) => null)) {
+        wp_die('Could not revoke sandbox authorization.', '', ['response' => 500]);
+    }
+    wp_safe_redirect(admin_url('tools.php?page=byl-p13-sandbox'));
+    exit;
+});
+
+// Render only inside the normal, logged-in WooCommerce My Account dashboard.
+add_action('woocommerce_account_dashboard', static function (): void {
+    if (!byl_dev_p13_runtime_ready()
+        || !byl_dev_p13_is_synthetic_customer(get_current_user_id())) { return; }
+    $permit = byl_dev_p13_read_permit();
+    echo '<section class="byl-p13-sandbox"><h3>Sandbox Payment Test</h3>';
+    if (!byl_dev_p13_is_live_permit($permit)
+        || (int) $permit['customer_id'] !== get_current_user_id()) {
+        echo '<p>Awaiting Dev administrator approval. No payment methods are enabled.</p>';
+    } elseif (!empty($permit['cookie_hash'])) {
+        echo '<p>Approval activated. Use Checkout for the approved WooPayments Test Mode scenario.</p>';
+    } else {
+        echo '<p>An administrator approved a short-lived sandbox test. Activate it in this browser only.</p>';
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        echo '<input type="hidden" name="action" value="byl_p13_activate">';
+        wp_nonce_field('byl_p13_activate');
+        echo '<button type="submit">Activate Sandbox Test</button></form>';
+    }
+    echo '</section>';
+});
+
+add_action('admin_post_byl_p13_activate', static function (): void {
+    if (!byl_dev_p13_runtime_ready()
+        || !byl_dev_p13_is_synthetic_customer(get_current_user_id())) {
+        wp_die('Only the logged-in synthetic customer may activate.', '', ['response' => 403]);
+    }
+    check_admin_referer('byl_p13_activate');
+    try {
+        $secret = bin2hex(random_bytes(32));
+    } catch (Throwable $e) {
+        wp_die('Secure random generator unavailable; gate remains closed.', '', ['response' => 500]);
+    }
+    $ok = byl_dev_p13_change_permit(static function (array $permit) use ($secret): array|bool {
+        if (!byl_dev_p13_is_live_permit($permit)
+            || (int) $permit['customer_id'] !== get_current_user_id()
+            || !empty($permit['cookie_hash'])) { return false; }
+        $permit['cookie_hash'] = hash('sha256', $secret);
+        return $permit;
+    });
+    if (!$ok) { wp_die('Approval unavailable, expired or already activated.', '', ['response' => 403]); }
+    $expires = (int) byl_dev_p13_read_permit()['expires_at'];
+    if (!setcookie('byl_p13_sandbox', $secret, [
+        'expires' => $expires,
+        'path' => '/',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ])) {
+        // Never leave an active server-side grant without a browser cookie.
+        byl_dev_p13_change_permit(static fn (array $permit) => null);
+        wp_die('Browser cookie could not be established; authorization revoked.', '', ['response' => 500]);
+    }
+    wp_safe_redirect(home_url('/my-account/'));
+    exit;
+});
