@@ -40,3 +40,51 @@ function byl_v3_ty_is_paid_success($order): bool {
         && $order->is_paid()
         && $order->has_status(['processing', 'completed']);
 }
+
+/**
+ * WooPayments and other gateways may provide HTML (logo <img> + masked card)
+ * as a payment title in browser contexts. Render plain text, never raw HTML,
+ * and never escape HTML tags into a visible order-information paragraph.
+ */
+function byl_v3_ty_payment_label(string $title): string {
+    $decoded = html_entity_decode($title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = trim((string) preg_replace('/\s+/u', ' ', wp_strip_all_tags($decoded)));
+    $has_markup = str_contains($decoded, '<');
+
+    // A plain Woo title, such as "Visa credit card", must remain unchanged.
+    if (!$has_markup) {
+        return $text !== '' ? $text : 'Pending confirmation';
+    }
+
+    $brand = '';
+    if (preg_match('~<img\b[^>]*\bsrc\s*=\s*["\x27]([^"\x27]+)~i', $decoded, $src_match)) {
+        $path = (string) parse_url($src_match[1], PHP_URL_PATH);
+        $file = strtolower((string) pathinfo($path, PATHINFO_FILENAME));
+        $brands = [
+            'visa' => 'Visa',
+            'mastercard' => 'Mastercard',
+            'master-card' => 'Mastercard',
+            'amex' => 'American Express',
+            'americanexpress' => 'American Express',
+            'discover' => 'Discover',
+            'jcb' => 'JCB',
+            'maestro' => 'Maestro',
+            'unionpay' => 'UnionPay',
+        ];
+        $brand = $brands[$file] ?? '';
+    }
+    if ($brand === '' && preg_match('~<img\b[^>]*\balt\s*=\s*["\x27]([^"\x27]*)~i', $decoded, $alt_match)) {
+        $brand = trim(wp_strip_all_tags($alt_match[1]));
+    }
+    if ($brand === '') { $brand = 'Card'; }
+
+    // Avoid showing the gateway's logo URL, SVG markup or HTML tag text.
+    // Only the brand and the already-masked last four digits are needed.
+    if (preg_match('/(?:^|\D)(\d{4})\s*$/u', $text, $digits)) {
+        return $brand.' •••• '.$digits[1];
+    }
+    if ($text !== '' && stripos($text, $brand) !== 0) {
+        return $brand.' '.$text;
+    }
+    return $text !== '' ? $text : $brand;
+}
