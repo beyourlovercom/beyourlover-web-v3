@@ -78,6 +78,21 @@ foreach ($cases as $case => [$allow, $topic, $arg, $expected]) {
     $passed++;
     echo 'PASS '.$case.PHP_EOL;
 }
+// G5-06: repeated/out-of-order Woo native order webhooks must never escape
+// for the isolated synthetic user. This is NOT WCPay provider-event deduping.
+foreach ([
+    ['order.updated', 721], ['order.created', 721], ['order.deleted', 721],
+    ['order.created', 722], ['order.updated', 723],
+] as [$topic, $orderId]) {
+    for ($repeat = 0; $repeat < 3; $repeat++) {
+        if ($guard(true, new P7Webhook($topic), $orderId) !== false) {
+            throw new RuntimeException('FAIL g5_replay_'.str_replace('.', '_', $topic).'_'.$orderId.'_'.$repeat);
+        }
+        $passed++;
+    }
+}
+echo "PASS g5_synthetic_order_replay_outbound_blocked (15 events)\n";
+
 $direct = $guard(true, new P7Webhook('order.updated'), $GLOBALS['p7_orders'][721]);
 if ($direct !== false) { throw new RuntimeException('FAIL direct_order_object'); }
 $passed++; echo "PASS direct_order_object\n";
