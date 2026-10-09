@@ -87,6 +87,24 @@ add_filter('woocommerce_webhook_should_deliver', static function ($allow, $webho
 // No external outgoing email, even from an authorized test order.
 add_filter('pre_wp_mail', static function () { return false; }, 99);
 
+// P5: Store API Checkout is a distinct order-creation/payment path from classic Woo.
+// The G2 test permit is classic-checkout only. Even a valid tester grant must
+// never authorize Store API Checkout until that surface has equivalent gates.
+// OPTIONS only advertises route metadata; never create/payment process here.
+add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
+    if ($result !== null || !($request instanceof WP_REST_Request)) { return $result; }
+    if (wp_get_environment_type() !== 'staging' || home_url() !== 'https://dev.beyourlover.com') {
+        return $result;
+    }
+    $route = $request->get_route();
+    if (!preg_match('#^/wc/store(?:/v1)?/checkout(?:/[0-9]+)?/?$#', $route)) { return $result; }
+    if ($request->get_method() === 'OPTIONS') { return $result; }
+    return new WP_Error(
+        'byl_dev_sandbox_checkout_closed',
+        'Store API Checkout is disabled on the development environment.',
+        ['status' => 403]
+    );
+}, 99, 3);
 // Ordinary visitors see no payment methods. Tester sees exactly one eligible rail.
 add_filter('woocommerce_available_payment_gateways', static function (array $gateways): array {
     $context = byl_dev_p13_checkout_gate();
