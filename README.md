@@ -15,7 +15,7 @@ Greenfield foundation for the BeYourLover V3 rebuild.
 
 ## Layout
 - `theme/beyourlover-v3/` — presentation only.
-- `platform/byl-platform/` — first-party platform utilities and migration runner.
+- `platform/byl-platform/` — **frozen transitional source only**, pending verified Dev retirement into Andy Commerce. No new features here.
 - `docs/` — environment, release, cache/WAF and migration contracts.
 - `scripts/` — release and smoke tooling.
 - `.github/workflows/` — foundation CI.
