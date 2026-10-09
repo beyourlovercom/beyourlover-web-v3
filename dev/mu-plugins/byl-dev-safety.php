@@ -61,7 +61,9 @@ function byl_dev_p13_checkout_gate(): array {
 // but never emit the isolated Dev Sandbox order via Woo's outbound webhook path.
 // This filter runs in WC_Webhook::process() BEFORE remote HTTP delivery.
 add_filter('woocommerce_webhook_should_deliver', static function ($allow, $webhook, $arg): bool {
-    if (!byl_dev_p13_runtime_ready() || !is_object($webhook) || !method_exists($webhook, 'get_topic')) {
+    // CLI/WP-Cron dispatch may have no HTTPS request context: match the configured site, not is_ssl().
+    if (wp_get_environment_type() !== 'staging' || home_url() !== 'https://dev.beyourlover.com'
+        || !is_object($webhook) || !method_exists($webhook, 'get_topic')) {
         return (bool) $allow;
     }
     // An order ID must not be interpreted as a product/customer webhook.
