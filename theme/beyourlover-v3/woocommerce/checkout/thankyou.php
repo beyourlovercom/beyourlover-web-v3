@@ -55,7 +55,7 @@ $money = static fn($amount) => wc_price($amount, ['currency' => $currency]);
 
     <?php if ($eta): ?>
         <section class="byl-ty-delivery" aria-labelledby="byl-ty-delivery-heading">
-            <span class="byl-ty-delivery-icon" aria-hidden="true">↗</span>
+            <span class="byl-ty-delivery-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5.5h12v11.5h-12zM14.5 9.5h3.5l3.5 3.4V17h-7"/><circle cx="7" cy="18" r="1.6"/><circle cx="18" cy="18" r="1.6"/></svg></span>
             <div>
                 <h2 id="byl-ty-delivery-heading">Estimated delivery</h2>
                 <?php if ($eta['range']): ?>
