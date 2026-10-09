@@ -352,6 +352,9 @@
     }
   }
   function setStep(step) {
+    // Never re-enable the checkout CTA by navigating to another step
+    // while native WooPayments / 3DS authentication is in progress.
+    if (submitting) return;
     const index = steps.indexOf(step);
     if (index < 0 || index > furthest) return;
     active = step;
@@ -414,6 +417,13 @@
       e.preventDefault();
       e.stopImmediatePropagation();
       message('Complete all checkout steps before placing your order.');
+      return;
+    }
+    // Enter-key / native form submissions must display the same pending
+    // state as the BYL CTA. Do not intercept Woo's authoritative submit flow.
+    if (!submitting) {
+      submitting = true;
+      updateAction();
     }
   }, true);
 
