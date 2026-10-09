@@ -30,7 +30,7 @@ Special routes:
 | Rich Page | content with at least 20px gutters, media constrained | max 1120px |
 | Standard Post | 350px article text / 20px gutters | optional hero max 1120px, text max 760px |
 
-**Two-edge shell contract (Owner correction):** At 1440px, the Page outer frame must start at x=56px and finish at x=1384px, matching BOTH Header and Footer content boundaries. The visible frame is 1328px wide; legal text stays a centered 760px inner reading column. At 390px, the border disappears and text runs between x=20px and x=370px. Do NOT implement only left alignment of a 760px article; the right outer frame must stay aligned too.
+**Shared-shell, no-frame contract (Owner revision):** The Page uses the existing Header/Footer outer container width (`--byl-shell-max`) and gutters (`--byl-gutter`) for both boundaries, but **does not render any visible outer card, border, rounded corner, background panel, shadow or extra panel padding**. This is a structural layout container only. Terms text is a centered 760px reading column at 1440px, starting x=340px and ending x=1100px; the global shell's invisible content boundaries are x=56px / x=1384px. At 390px, text and title start x=20px and end x=370px. Never left-align just a 760px text column or stretch individual paragraphs full width to satisfy the outer-shell requirement.
 
 All text/page margins use the existing BYL VI typography and colors. Scoped CSS only:
 `assets/css/page-simple.css`, `assets/css/page-default.css`, `assets/css/post-single.css`.
