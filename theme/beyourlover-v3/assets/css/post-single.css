@@ -159,3 +159,115 @@
   .byl-post-single__navigation { grid-template-columns: 1fr; }
   .byl-post-single__nav-item { padding: 18px; }
 }
+
+/* WWW article TOC parity: Summary inside content, floating INDEX to the
+ * left of the reading column at desktop widths with adequate spare space.
+ * Scope exclusively to single WordPress Posts. Never a site-wide sidebar. */
+.byl-post-single__content h2 {
+  color: var(--byl-brand, #9b3749);
+  scroll-margin-top: 105px;
+}
+.byl-post-toc--inline {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 30px 0 28px;
+  padding: 20px 22px;
+  border: 1px solid var(--byl-line, #e7e2e4);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.byl-post-toc__inline-label {
+  margin: 0 0 10px !important;
+  color: var(--byl-ink, #161316);
+  font-weight: 600;
+  font-size: 16px;
+}
+.byl-post-toc__inline-list,
+.byl-post-toc__floating-list {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+.byl-post-toc__inline-list > li {
+  position: relative;
+  margin: 0 !important;
+  padding: 6px 0 6px 23px;
+  line-height: 1.6;
+}
+.byl-post-toc__inline-list > li::before {
+  content: '▷';
+  position: absolute;
+  left: 0;
+  color: var(--byl-brand, #9b3749);
+}
+.byl-post-toc__inline-list a {
+  color: var(--byl-ink, #161316) !important;
+  font-size: 14px;
+  text-decoration: none !important;
+  overflow-wrap: anywhere;
+}
+.byl-post-toc__inline-list a:is(:hover, :focus-visible) {
+  color: var(--byl-brand, #9b3749) !important;
+  text-decoration: underline !important;
+}
+.byl-post-toc--floating {
+  display: none;
+}
+.byl-post-toc--floating[hidden] {
+  display: none !important;
+}
+@media (min-width: 1280px) {
+  .byl-post-toc--floating:not([hidden]) {
+    position: fixed;
+    z-index: 12;
+    top: 100px;
+    left: max(20px, calc((100vw - 1120px) / 2));
+    display: block;
+    width: 170px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #fff;
+    scrollbar-width: thin;
+  }
+  .byl-post-toc__rail-label {
+    margin: 0 0 8px;
+    padding: 0 5px 9px;
+    border-bottom: 1px solid var(--byl-line, #e7e2e4);
+    color: var(--byl-brand, #9b3749);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+  .byl-post-toc__floating-list li {
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--byl-line, #e7e2e4);
+    line-height: 1.65;
+  }
+  .byl-post-toc__floating-list li:last-child { border-bottom: 0; }
+  .byl-post-toc__floating-list a {
+    display: block;
+    padding: 8px 4px;
+    color: var(--byl-ink, #161316);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.65;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .byl-post-toc__floating-list a:is(:hover, :focus-visible, .is-current) {
+    color: var(--byl-brand, #9b3749);
+  }
+}
+@media (max-width: 640px) {
+  .byl-post-toc--inline {
+    margin-block: 26px 25px;
+    padding: 17px 18px;
+  }
+  .byl-post-toc__inline-list a { font-size: 14px; }
+}
