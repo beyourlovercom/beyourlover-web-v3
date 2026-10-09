@@ -1,0 +1,42 @@
+/* BYL V3 default rich WordPress Page. Scoped: does not affect Commerce. */
+.byl-default-page {
+  --byl-default-gutter: clamp(20px,4vw,56px);
+  padding-block: clamp(32px,4.5vw,64px) clamp(64px,7vw,100px);
+  padding-inline: max(var(--byl-default-gutter),env(safe-area-inset-left,0px))
+    max(var(--byl-default-gutter),env(safe-area-inset-right,0px));
+  color: var(--byl-ink,#161316);
+}
+.byl-default-page__container {
+  width: 100%;
+  max-width: 1120px;
+  min-width: 0;
+  margin-inline: auto;
+}
+.byl-default-page__article,
+.byl-default-page__content {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.byl-default-page__content :where(img,video,iframe,figure,table,pre) {
+  max-width: 100%;
+}
+.byl-default-page__content :where(h1,h2,h3,h4,h5,h6) {
+  color: var(--byl-ink,#161316);
+  line-height: 1.3;
+}
+.byl-default-page__content :where(p,li) { line-height: 1.7; }
+.byl-default-page__content a {
+  color: var(--byl-brand,#9b3749);
+  overflow-wrap: anywhere;
+}
+.byl-default-page__content :where(.alignwide,.alignfull) {
+  max-width: 100%;
+  margin-inline: 0;
+}
+.byl-default-page__content :where(table,pre) { overflow-x: auto; }
+@media(max-width:640px) {
+  .byl-default-page {
+    --byl-default-gutter:20px;
+    padding-block:36px 64px;
+  }
+}
