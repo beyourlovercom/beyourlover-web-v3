@@ -42,6 +42,8 @@ jobs:
         run: python -m py_compile scripts/*.py
       - name: Cart V2 focused regression
         run: php scripts/test_cart_v2_contract.php
+      - name: Cart native Woo shipping-zone parity regression
+        run: php scripts/test_cart_promotion_native_authority.php
       - name: Cart coupon UI and native fallback
         run: node scripts/test_cart_coupon_ui.js
       - name: Cart V3 canonical brand tokens
