@@ -38,6 +38,11 @@ $byl_blocks_are_text_only = static function (array $blocks) use (&$byl_blocks_ar
     foreach ($blocks as $block) {
         if (!is_array($block)) { return false; }
         $type = $block['blockName'] ?? null;
+        $attrs = is_array($block['attrs'] ?? null) ? $block['attrs'] : [];
+        if (in_array(($attrs['align'] ?? ''), ['wide', 'full'], true)
+            || (($attrs['layout']['type'] ?? '') === 'flex')) {
+            return false; // Explicit wide/full layout and flex grids stay rich.
+        }
         if ($type === null) {
             // Classic HTML remains eligible only if it is straightforward
             // text, not a shortcode, embedded widget, script or media region.
