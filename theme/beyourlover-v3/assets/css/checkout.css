@@ -87,6 +87,8 @@ body.woocommerce-checkout #main-content.byl-commerce-content{max-width:1200px;ma
 .byl-summary-trust{text-align:center;padding-top:14px;color:var(--pc-muted);font-size:11px}
 .byl-progressive-checkout.is-enhanced [data-byl-payment-host]>.woocommerce-checkout-payment{display:block}
 .byl-progressive-checkout.is-enhanced .byl-checkout-step:not(.is-active) [data-byl-payment-host]>.woocommerce-checkout-payment{display:none}
+/* Order Summary toggle must hide its body at all viewport widths when aria-expanded=false. */
+.byl-progressive-checkout.is-enhanced .byl-summary-card:not(.is-open) .byl-summary-body{display:none}
 @media(max-width:760px){
  body.woocommerce-checkout #main-content.byl-commerce-content{padding:16px 20px calc(112px + env(safe-area-inset-bottom))!important}
  .byl-checkout-heading{margin-bottom:14px}
@@ -98,7 +100,6 @@ body.woocommerce-checkout #main-content.byl-commerce-content{max-width:1200px;ma
  .byl-summary-card{padding:15px}
  .byl-summary-toggle strong{font-size:14px}
  .byl-summary-card .byl-summary-body{padding-top:12px}
- .byl-progressive-checkout.is-enhanced .byl-summary-card:not(.is-open) .byl-summary-body{display:none}
  .byl-step-toggle{padding:16px;min-height:68px;gap:11px}
  .byl-step-number{width:32px;height:32px;flex-basis:32px}
  .byl-step-body{padding:0 16px 16px}
