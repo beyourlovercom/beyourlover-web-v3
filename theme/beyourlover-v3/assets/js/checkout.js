@@ -79,8 +79,8 @@
     // Consolidate only the visible legal sentence; never synthesize consent or links.
     const nativeTerms = termsHost.querySelector('.woocommerce-terms-and-conditions-wrapper');
     if (nativeTerms) {
-      const legalText = nativeTerms.querySelector('#terms_field .woocommerce-terms-and-conditions-checkbox-text');
-      const termsLink = legalText && legalText.querySelector('a.woocommerce-terms-and-conditions-link');
+      const termsLink = nativeTerms.querySelector('a.woocommerce-terms-and-conditions-link');
+      const legalText = termsLink && termsLink.closest('.woocommerce-terms-and-conditions-checkbox-text');
       const privacyBlock = nativeTerms.querySelector('.woocommerce-privacy-policy-text');
       const privacyLink = privacyBlock && privacyBlock.querySelector('a[href]');
       if (legalText && termsLink && privacyLink && !legalText.classList.contains('byl-legal-inline')) {
