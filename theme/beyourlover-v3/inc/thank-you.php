@@ -56,6 +56,11 @@ function byl_v3_ty_payment_label(string $title): string {
         return $text !== '' ? $text : 'Pending confirmation';
     }
 
+    // Markup-only labels (for example <span>PayPal</span>) are not cards.
+    if (!preg_match('/<img\b/i', $decoded)) {
+        return $text !== '' ? $text : 'Pending confirmation';
+    }
+
     $brand = '';
     if (preg_match('~<img\b[^>]*\bsrc\s*=\s*["\x27]([^"\x27]+)~i', $decoded, $src_match)) {
         $path = (string) parse_url($src_match[1], PHP_URL_PATH);
