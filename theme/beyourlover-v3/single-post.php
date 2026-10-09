@@ -17,6 +17,15 @@ add_action('wp_enqueue_scripts', static function (): void {
         ['byl-v3-motion'],
         is_file($path) ? (string) filemtime($path) : (string) wp_get_theme()->get('Version')
     );
+    $toc_relative = '/assets/js/post-toc.js';
+    $toc_path = get_stylesheet_directory().$toc_relative;
+    wp_enqueue_script(
+        'byl-v3-post-toc',
+        get_stylesheet_directory_uri().$toc_relative,
+        [],
+        is_file($toc_path) ? (string) filemtime($toc_path) : (string) wp_get_theme()->get('Version'),
+        true
+    );
 }, 20);
 
 get_header();
@@ -46,6 +55,12 @@ get_header();
           <?php the_post_thumbnail('full', ['class' => 'byl-post-single__hero-image', 'loading' => 'eager']); ?>
         </figure>
       <?php endif; ?>
+
+      <?php /* Enhanced progressively by post-toc.js; never alters saved post body. */ ?>
+      <nav class="byl-post-toc--floating" id="byl-post-floating-toc" aria-label="<?php esc_attr_e('Article index', 'beyourlover-v3'); ?>" hidden>
+        <p class="byl-post-toc__rail-label"><?php esc_html_e('Index', 'beyourlover-v3'); ?></p>
+        <ol class="byl-post-toc__floating-list"></ol>
+      </nav>
 
       <article <?php post_class('byl-post-single__article'); ?>>
         <header class="byl-post-single__header">
