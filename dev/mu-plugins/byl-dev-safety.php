@@ -154,7 +154,10 @@ function byl_dev_p13_is_synthetic_customer(int $id): bool {
     }
     $roles = (array) $user->roles;
     return in_array('customer', $roles, true)
-        && !array_intersect($roles, ['administrator', 'shop_manager', 'editor']);
+        && !array_intersect($roles, ['administrator', 'shop_manager', 'editor'])
+        // Custom roles or capabilities must never turn a privileged user into a tester.
+        && !user_can($user, 'manage_options')
+        && !user_can($user, 'manage_woocommerce');
 }
 
 function byl_dev_p13_synthetic_customer() {
