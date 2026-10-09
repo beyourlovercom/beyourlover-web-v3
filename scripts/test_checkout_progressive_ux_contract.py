@@ -209,8 +209,11 @@ for marker in (
 ):
     if marker not in js:
         raise SystemExit(f"G3 Dev consent-default experiment contract missing: {marker}")
-if "input.checked = true" in js or 'terms.checked = true' in js:
-    raise SystemExit("No unconditional checkbox recheck on fragment updates")
+# Shipping-rate selection legitimately checks a different input. Only prohibit
+# an unconditional Terms/review-consent assignment in the new sync helper.
+consent_region = js.split('function syncConsentCheckboxes() {', 1)[1].split("termsHost.addEventListener('change'", 1)[0]
+if "input.checked = true" in consent_region or "terms.checked = true" in js:
+    raise SystemExit("Consent sync must preserve explicit user opt-outs")
 if "window.location.hostname === 'www.beyourlover.com'" in js:
     raise SystemExit("Precheck may not be enabled for WWW")
 
