@@ -34,6 +34,10 @@ jobs:
           php -l tools/dev/tests/p71-thank-you-estimate-smoke.php
       - name: P7.1 delivery estimate holiday regression
         run: php tools/dev/tests/p71-thank-you-estimate-smoke.php
+      - name: P7.1 payment title safe text regression
+        run: |
+          php -l tools/dev/tests/p71-payment-title-smoke.php
+          php tools/dev/tests/p71-payment-title-smoke.php
       - name: Python syntax
         run: python -m py_compile scripts/*.py
       - name: Cart V2 focused regression
