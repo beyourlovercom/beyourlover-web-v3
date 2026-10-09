@@ -49,7 +49,7 @@ $money = static fn($amount) => wc_price($amount, ['currency' => $currency]);
         <div><span>Order number</span><strong>#<?php echo esc_html($order->get_order_number()); ?></strong></div>
         <div><span>Date</span><strong><?php echo esc_html($order->get_date_created() ? wp_date('M j, Y', $order->get_date_created()->getTimestamp()) : '—'); ?></strong></div>
         <div><span>Total</span><strong><?php echo wp_kses_post($money($order->get_total())); ?></strong></div>
-        <div><span>Payment</span><strong><?php echo esc_html($order->get_payment_method_title() ?: 'Pending confirmation'); ?></strong></div>
+        <div><span>Payment</span><strong><?php echo esc_html(byl_v3_ty_payment_label((string) $order->get_payment_method_title())); ?></strong></div>
         <div><span>Status</span><strong class="byl-ty-status <?php echo $paid ? 'is-paid' : ($failed ? 'is-failed' : 'is-pending'); ?>"><?php echo esc_html($status); ?></strong></div>
     </div>
 
