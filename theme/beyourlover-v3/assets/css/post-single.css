@@ -219,13 +219,16 @@
   display: none !important;
 }
 @media (min-width: 1280px) {
+  /* WWW measured reading region: 660px, x390..1050 at 1440px.
+   * Preserve the 1120px feature image while narrowing long-form prose. */
+  .byl-post-single__article { max-width: 660px; }
   .byl-post-toc--floating:not([hidden]) {
     position: fixed;
     z-index: 12;
     top: 100px;
     left: max(20px, calc((100vw - 1120px) / 2));
     display: block;
-    width: 170px;
+    width: 187px;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
     overflow-x: hidden;
