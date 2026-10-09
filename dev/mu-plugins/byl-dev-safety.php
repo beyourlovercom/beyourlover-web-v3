@@ -69,6 +69,26 @@ add_filter('woocommerce_available_payment_gateways', static function (array $gat
 
 add_filter('woocommerce_allow_tracking', '__return_false', 99);
 
+// Store API Checkout is a separate order-creation/payment path from classic
+// checkout. Its checkout/{order_id} route can also process an existing order.
+// The existing synthetic email, six-order cap and audit marker are implemented
+// ONLY for classic Checkout. Never open Store API using that classic permit.
+// Until Store API has independently verified equivalent safeguards, deny its
+// Checkout routes even when a classic-only sandbox test permit is valid.
+add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
+    if ($result !== null || !($request instanceof WP_REST_Request)) { return $result; }
+    $route = $request->get_route();
+    if (!preg_match('#^/wc/store(?:/v1)?/checkout(?:/[0-9]+)?/?$#', $route)) { return $result; }
+    // OPTIONS advertises endpoint metadata and has no order-creation effect.
+    if ($request->get_method() === 'OPTIONS') { return $result; }
+    return new WP_Error(
+        'byl_dev_sandbox_checkout_closed',
+        'Store API Checkout is disabled on the development environment.',
+        ['status' => 403]
+    );
+}, 99, 3);
+
+
 // Stop all checkout orders, except a narrowly scoped synthetic customer.
 // Limit the number of test orders; do not weaken server-side Woo validations.
 add_action('woocommerce_checkout_process', static function (): void {
