@@ -25,6 +25,15 @@ jobs:
         run: php -l tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
       - name: P7 outbound Dev Sandbox Webhook security smoke
         run: php tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
+      - name: P7.1 Thank You PHP syntax
+        run: |
+          php -l theme/beyourlover-v3/functions.php
+          php -l theme/beyourlover-v3/inc/thank-you.php
+          php -l theme/beyourlover-v3/inc/thank-you-estimate.php
+          php -l theme/beyourlover-v3/woocommerce/checkout/thankyou.php
+          php -l tools/dev/tests/p71-thank-you-estimate-smoke.php
+      - name: P7.1 delivery estimate holiday regression
+        run: php tools/dev/tests/p71-thank-you-estimate-smoke.php
       - name: Python syntax
         run: python -m py_compile scripts/*.py
       - name: Cart V2 focused regression
