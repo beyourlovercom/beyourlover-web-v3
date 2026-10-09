@@ -165,7 +165,7 @@ for marker in (
 if ".byl-privacy-merged{display:none!important}" not in css:
     raise SystemExit("G3 duplicate Privacy paragraph must be visually hidden after link transfer")
 if "terms.checked = true" in js or "#terms_field input" in js or "privacy-polices/" in js:
-    raise SystemExit("G3 must never precheck Terms or hardcode privacy URLs")
+    raise SystemExit("G3 must not hardcode a policy URL or use unconditional consent mutation")
 
 
 # PR40 review: both configured links open the SAME inline legal panel, no new tabs.
@@ -194,5 +194,24 @@ for marker in (
 ):
     if marker not in css:
         raise SystemExit(f"PR40 unified consent visual contract missing: {marker}")
+
+# Dev-only Owner-requested default checks: user may uncheck either box, and
+# Woo updated_checkout must not silently restore a declined selection.
+# NOT a valid production opt-in for UK/EU or other affirmative-consent regimes.
+for marker in (
+    "window.location.hostname === 'dev.beyourlover.com'",
+    'const consentChoice = new Map()',
+    'if (!consentChoice.has(input.name)) consentChoice.set(input.name, true)',
+    'input.checked = consentChoice.get(input.name)',
+    "termsHost.addEventListener('change', event =>",
+    'consentChoice.set(event.target.name, event.target.checked)',
+    'syncConsentCheckboxes();',
+):
+    if marker not in js:
+        raise SystemExit(f"G3 Dev consent-default experiment contract missing: {marker}")
+if "input.checked = true" in js or 'terms.checked = true' in js:
+    raise SystemExit("No unconditional checkbox recheck on fragment updates")
+if "window.location.hostname === 'www.beyourlover.com'" in js:
+    raise SystemExit("Precheck may not be enabled for WWW")
 
 print("Checkout progressive UX contract check PASS")
