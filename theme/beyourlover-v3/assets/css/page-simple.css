@@ -1,0 +1,107 @@
+/*
+ * BYL Simple Page — opt-in text-first Page template only.
+ * No global selectors, Checkout rules, page-content rewrites, or new palette.
+ * The outer boundary aligns with BOTH global shell edges (Header and Footer).
+ * The nested 760px reading column keeps long paragraphs comfortable.
+ * No visible card, panel, border or outer decorative frame at any width.
+ */
+.byl-simple-page {
+  --byl-page-reading-max: var(--byl-reading-max, 760px);
+  width: 100%;
+  padding-block: clamp(36px, 5vw, 72px) clamp(64px, 7vw, 104px);
+  padding-inline: 0;
+  color: var(--byl-ink, #161316);
+}
+.byl-simple-page__container {
+  width: min(100%, var(--byl-shell-max, 1440px));
+  max-width: var(--byl-shell-max, 1440px);
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: var(--byl-gutter, 20px);
+}
+.byl-simple-page__article {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.byl-simple-page__heading,
+.byl-simple-page__content {
+  width: 100%;
+  max-width: var(--byl-page-reading-max);
+  min-width: 0;
+  margin-inline: auto;
+  overflow-wrap: break-word;
+}
+.byl-simple-page__heading {
+  margin-block: 0 clamp(26px, 3vw, 40px);
+}
+.byl-simple-page__title {
+  margin: 0;
+  color: var(--byl-ink, #161316);
+  font-family: var(--byl-font, inherit);
+  font-weight: 600;
+  font-size: clamp(30px, 3.25vw, 42px);
+  line-height: 1.18;
+  letter-spacing: -.035em;
+}
+.byl-simple-page__content {
+  font-size: 16px;
+  line-height: 1.8;
+}
+.byl-simple-page__content :where(p, ul, ol, blockquote) {
+  margin-block: 0 1.35em;
+}
+.byl-simple-page__content :where(h2, h3, h4, h5, h6) {
+  margin-block: 1.85em .65em;
+  color: var(--byl-ink, #161316);
+  font-weight: 600;
+  line-height: 1.38;
+  letter-spacing: -.025em;
+}
+.byl-simple-page__content h2 { font-size: clamp(21px, 2.15vw, 26px); }
+.byl-simple-page__content h3 { font-size: clamp(18px, 1.8vw, 21px); }
+.byl-simple-page__content :where(h4, h5, h6) { font-size: 17px; }
+.byl-simple-page__content :where(ul, ol) {
+  padding-inline-start: 1.45em;
+}
+.byl-simple-page__content li + li { margin-block-start: .42em; }
+.byl-simple-page__content :where(hr, .wp-block-separator) {
+  height: 0;
+  margin-block: 30px;
+  border: 0;
+  border-top: 1px solid var(--byl-line, #e7e2e4);
+}
+.byl-simple-page__content a {
+  color: var(--byl-brand, #9b3749);
+  overflow-wrap: anywhere;
+  text-underline-offset: .16em;
+}
+.byl-simple-page__content :where(img, video, iframe, pre, .wp-block-image, .alignwide, .alignfull) {
+  max-width: 100%;
+}
+.byl-simple-page__content :where(pre, table) {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.byl-simple-page__content :where(.alignwide, .alignfull) {
+  width: 100%;
+  margin-inline: 0;
+}
+.byl-simple-page__content > :last-child { margin-block-end: 0; }
+
+@media (max-width: 640px) {
+  .byl-simple-page {
+    padding-block: 36px 64px;
+  }
+  .byl-simple-page__container {
+    padding-inline: max(20px, env(safe-area-inset-left, 0px))
+      max(20px, env(safe-area-inset-right, 0px));
+  }
+  .byl-simple-page__heading { margin-bottom: 26px; }
+  .byl-simple-page__content { line-height: 1.75; }
+  .byl-simple-page__content :where(hr, .wp-block-separator) { margin-block: 26px; }
+}
