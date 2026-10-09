@@ -1,31 +1,44 @@
 /*
  * BYL Simple Page — opt-in text-first Page template only.
  * No global selectors, Checkout rules, page-content rewrites, or new palette.
- * The outer 760px reading measure, horizontal gutters and vertical spacing
- * are the contract. Keep these margins consistent across future simple Pages.
+ * The outer boundary aligns with BOTH global shell edges (Header and Footer).
+ * The nested 760px reading column keeps long paragraphs comfortable.
+ * On mobile the frame becomes invisible and retains 20px content gutters.
  */
 .byl-simple-page {
   --byl-page-reading-max: var(--byl-reading-max, 760px);
-  --byl-page-gutter: clamp(20px, 4vw, 56px);
   width: 100%;
   padding-block: clamp(36px, 5vw, 72px) clamp(64px, 7vw, 104px);
-  padding-inline: max(var(--byl-page-gutter), env(safe-area-inset-left, 0px))
-    max(var(--byl-page-gutter), env(safe-area-inset-right, 0px));
+  padding-inline: 0;
   color: var(--byl-ink, #161316);
 }
 .byl-simple-page__container {
+  width: min(100%, var(--byl-shell-max, 1440px));
+  max-width: var(--byl-shell-max, 1440px);
+  min-width: 0;
+  margin-inline: auto;
+  padding-inline: var(--byl-gutter, 20px);
+}
+.byl-simple-page__article {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(28px, 5vw, 72px);
+  border: 1px solid var(--byl-line, #e7e2e4);
+  border-radius: 20px;
+  background: var(--byl-surface, #ffffff);
+}
+.byl-simple-page__heading,
+.byl-simple-page__content {
   width: 100%;
   max-width: var(--byl-page-reading-max);
   min-width: 0;
   margin-inline: auto;
-}
-.byl-simple-page__article,
-.byl-simple-page__content {
-  min-width: 0;
   overflow-wrap: break-word;
 }
 .byl-simple-page__heading {
-  margin: 0 0 clamp(26px, 3vw, 40px);
+  margin-block: 0 clamp(26px, 3vw, 40px);
 }
 .byl-simple-page__title {
   margin: 0;
@@ -83,8 +96,16 @@
 
 @media (max-width: 640px) {
   .byl-simple-page {
-    --byl-page-gutter: 20px;
     padding-block: 36px 64px;
+  }
+  .byl-simple-page__container {
+    padding-inline: max(20px, env(safe-area-inset-left, 0px))
+      max(20px, env(safe-area-inset-right, 0px));
+  }
+  .byl-simple-page__article {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
   }
   .byl-simple-page__heading { margin-bottom: 26px; }
   .byl-simple-page__content { line-height: 1.75; }
