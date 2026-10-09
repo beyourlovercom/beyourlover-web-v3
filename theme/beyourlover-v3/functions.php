@@ -8,6 +8,8 @@ require_once get_stylesheet_directory().'/inc/archive.php';
 require_once get_stylesheet_directory().'/inc/product.php';
 require_once get_stylesheet_directory().'/inc/product-modules.php';
 require_once get_stylesheet_directory().'/inc/checkout.php';
+// Isolated P7.1 order-received template, without modifying G3 payment JS.
+require_once get_stylesheet_directory().'/inc/thank-you.php';
 require_once get_stylesheet_directory().'/inc/cart-experience.php';
 
 add_action('after_setup_theme', static function (): void {

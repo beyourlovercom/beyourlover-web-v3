@@ -1,0 +1,96 @@
+/* P7.1 Thank You — BYL canonical tokens, never YBY colours. */
+body.woocommerce-order-received .byl-commerce-content{max-width:none;padding:0}
+body.woocommerce-order-received .byl-commerce-content>.woocommerce{width:100%}
+.byl-ty{--ty-burgundy:var(--byl-brand,#9b3749);--ty-wine-dark:var(--byl-brand-hover,#7f2d3c);--ty-rose:var(--byl-brand-soft,#f7ecef);--ty-ink:var(--byl-ink,#161316);--ty-subtle:var(--byl-ink-2,#655e62);--ty-line:var(--byl-line,#e7e2e4);max-width:1200px;margin:0 auto;padding:52px clamp(20px,4vw,54px) 78px;color:var(--ty-ink);font-family:var(--byl-font,'Poppins',Arial,sans-serif)}
+.byl-ty *{box-sizing:border-box}
+.byl-ty h1,.byl-ty h2,.byl-ty h3,.byl-ty p{margin:0}
+.byl-ty h2{font-size:20px;font-weight:600;letter-spacing:-.035em}
+.byl-ty-hero{text-align:center;margin:0 auto 30px}
+.byl-ty-check{display:grid;place-items:center;margin:0 auto 16px;width:64px;height:64px;border-radius:50%;background:var(--ty-rose);color:var(--ty-burgundy);font-size:38px;font-weight:500}
+.byl-ty-hero h1{font-size:clamp(27px,3vw,40px);line-height:1.18;letter-spacing:-.045em;font-weight:600;color:var(--ty-ink)}
+.byl-ty-hero p{font-size:15px;color:var(--ty-subtle);margin-top:12px}
+.byl-ty-facts{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--ty-line);border-radius:13px;padding:24px 9px;margin:0 auto 16px;background:#fff}
+.byl-ty-facts>div{padding:0 18px;min-width:0;border-right:1px solid var(--ty-line)}
+.byl-ty-facts>div:last-child{border:0}
+.byl-ty-facts>div>span{display:block;color:var(--ty-subtle);font-size:12px;margin-bottom:8px}
+.byl-ty-facts strong{display:block;color:var(--ty-ink);font-size:15px;font-weight:600;line-height:1.45;overflow-wrap:anywhere}
+.byl-ty .byl-ty-status{display:inline-block;width:auto;padding:4px 9px;border-radius:7px;background:var(--ty-rose);color:var(--ty-burgundy);font-size:12px}
+.byl-ty .byl-ty-status.is-failed{background:#fff1f2;color:#ad2544}
+.byl-ty .byl-ty-status.is-pending{background:#f4f1f3;color:var(--ty-subtle)}
+.byl-ty-delivery{display:flex;align-items:center;gap:20px;background:linear-gradient(110deg,#fdf4f6,#f9edf1);border-radius:12px;padding:23px 30px;margin:0 0 16px}
+.byl-ty-delivery-icon{display:grid;place-items:center;flex:0 0 54px;height:54px;border-radius:50%;background:#f6dfe6;color:var(--ty-burgundy);font-size:30px;line-height:1}
+.byl-ty-delivery h2{font-size:13px;font-weight:600;margin-bottom:5px}
+.byl-ty-delivery-date{display:block;font-size:clamp(19px,2vw,27px);line-height:1.3;letter-spacing:-.025em}
+.byl-ty-delivery p{margin-top:6px;color:var(--ty-subtle);font-size:12px;line-height:1.5}
+.byl-ty-delivery .byl-ty-delivery-small{font-size:11px}
+.byl-ty-actions{display:flex;justify-content:center;align-items:center;gap:12px;margin:0 auto 38px}
+.byl-ty-button{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;min-width:190px;padding:12px 24px;border:1px solid var(--ty-burgundy);border-radius:7px;font-size:13px;font-weight:600;text-decoration:none!important;transition:background .15s ease,transform .15s ease}
+.byl-ty-button:focus-visible{outline:2px solid var(--ty-burgundy);outline-offset:3px}
+.byl-ty-button:hover{transform:translateY(-1px)}
+.byl-ty .byl-ty-primary{background:var(--ty-burgundy);color:#fff}
+.byl-ty .byl-ty-primary:hover{background:var(--ty-wine-dark);color:#fff}
+.byl-ty .byl-ty-secondary{background:#fff;color:var(--ty-burgundy)}
+.byl-ty .byl-ty-secondary:hover{background:var(--ty-rose);color:var(--ty-burgundy)}
+.byl-ty-progress{margin:0 0 40px}
+.byl-ty-progress>h2{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.byl-ty-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;padding:0;list-style:none;gap:0}
+.byl-ty-steps li{list-style:none!important;position:relative;text-align:center;padding:0 14px;min-width:0}
+.byl-ty-steps li:not(:last-child):after{content:"";position:absolute;top:13px;left:calc(50% + 27px);width:calc(100% - 54px);border-top:1px solid #ded8db}
+.byl-ty-steps li:first-child:after{border-color:var(--ty-burgundy)}
+.byl-ty-step-number{display:flex;align-items:center;justify-content:center;width:27px;height:27px;margin:0 auto 8px;border-radius:50%;background:#e6e3e5;color:#40383d;font-size:13px;font-weight:600}
+.byl-ty-steps li.is-current .byl-ty-step-number{background:var(--ty-burgundy);color:#fff}
+.byl-ty-steps strong{display:block;font-size:13px;color:var(--ty-ink);font-weight:600}
+.byl-ty-steps p{font-size:12px;line-height:1.5;color:var(--ty-subtle);margin:5px auto 0;max-width:225px}
+.byl-ty-products{border-top:1px solid var(--ty-line);padding-top:20px;margin-bottom:32px}
+.byl-ty-products h2{margin-bottom:16px}
+.byl-ty-items{border:1px solid var(--ty-line);border-radius:11px;overflow:hidden}
+.byl-ty-item{display:grid;grid-template-columns:68px minmax(0,1fr) minmax(145px,auto);align-items:center;gap:18px;padding:12px 18px;border-bottom:1px solid var(--ty-line)}
+.byl-ty-item:last-child{border-bottom:0}
+.byl-ty-item-photo{width:68px;height:68px;display:grid;place-items:center;border-radius:8px;background:#f9f6f7;overflow:hidden;color:var(--ty-subtle)}
+.byl-ty-item-photo img{width:100%;height:100%;object-fit:contain}
+.byl-ty-item-name strong,.byl-ty-item-price strong{display:block;font-size:13px;color:var(--ty-ink);font-weight:600;line-height:1.35}
+.byl-ty-item-name small,.byl-ty-item-price>span{display:block;font-size:12px;color:var(--ty-subtle);margin-top:5px}
+.byl-ty-item-price{text-align:right}
+.byl-ty-totals{max-width:315px;margin:16px 0 0 auto}
+.byl-ty-totals>div{display:flex;justify-content:space-between;gap:18px;margin:8px 0;font-size:13px;color:var(--ty-subtle)}
+.byl-ty-totals .byl-ty-grand-total{font-size:17px;padding-top:12px;margin-top:12px;border-top:1px solid var(--ty-line);color:var(--ty-ink)}
+.byl-ty-addresses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:22px}
+.byl-ty-addresses section{border:1px solid var(--ty-line);border-radius:10px;padding:19px 22px;background:#fdfbfc}
+.byl-ty-addresses h2{font-size:14px;margin:0 0 13px}
+.byl-ty-addresses address{font-size:13px;color:var(--ty-subtle);font-style:normal;line-height:1.75}
+.byl-ty-help{display:grid;grid-template-columns:1.25fr repeat(3,1fr);align-items:center;gap:20px;border-radius:10px;background:#faf5f7;padding:20px 24px}
+.byl-ty-help h2{font-size:14px}
+.byl-ty-help p{font-size:12px;color:var(--ty-subtle);margin-top:4px}
+.byl-ty-help a{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:600;font-size:12px;color:var(--ty-burgundy);text-decoration:none}
+.byl-ty-help a:hover{text-decoration:underline}
+@media(max-width:780px){
+ .byl-ty{padding:30px 20px 60px}
+ .byl-ty-hero{margin-bottom:22px}
+ .byl-ty-check{width:54px;height:54px;font-size:32px;margin-bottom:13px}
+ .byl-ty-hero p{font-size:13px}
+ .byl-ty-facts{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px;padding:20px 12px}
+ .byl-ty-facts>div{border-right:0!important;padding:0 10px}
+ .byl-ty-facts>div:nth-child(2n){border-left:1px solid var(--ty-line)}
+ .byl-ty-delivery{padding:18px;gap:12px}
+ .byl-ty-delivery-icon{flex-basis:42px;height:42px;font-size:24px}
+ .byl-ty-actions{flex-direction:column;gap:8px;margin:18px 0 26px}
+ .byl-ty-button{width:100%;min-width:0}
+ .byl-ty-steps{display:flex;flex-direction:column;gap:20px;padding:0 3px 0 8px}
+ .byl-ty-steps li{text-align:left;padding:0 0 0 48px;min-height:35px}
+ .byl-ty-step-number{position:absolute;left:0;top:0;margin:0}
+ .byl-ty-steps li:not(:last-child):after{left:13px;top:31px;bottom:-18px;width:0;border-top:0;border-left:1px solid var(--ty-line)}
+ .byl-ty-steps li:first-child:after{border-color:var(--ty-burgundy)}
+ .byl-ty-steps p{max-width:none;margin:4px 0 0}
+ .byl-ty-item{grid-template-columns:60px minmax(0,1fr) auto;gap:10px;padding:11px}
+ .byl-ty-item-photo{width:60px;height:60px}
+ .byl-ty-item-price>span{display:none}
+ .byl-ty-totals{max-width:100%}
+ .byl-ty-addresses{grid-template-columns:1fr;gap:10px}
+ .byl-ty-help{grid-template-columns:1fr;gap:14px}
+ .byl-ty-help a{border-top:1px solid var(--ty-line);padding-top:12px}
+}
+@media(max-width:360px){.byl-ty-facts strong{font-size:13px}.byl-ty-item-price strong{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.byl-ty-button{transition:none}.byl-ty-button:hover{transform:none}}
+
+/* Woo money consists of nested spans; do not let generic UI-label rules break currency signs or hide item totals. */
+.byl-ty .woocommerce-Price-amount,.byl-ty .woocommerce-Price-amount bdi{white-space:nowrap;display:inline}
