@@ -152,8 +152,8 @@ if "Latest main Checkout V2" not in docs or "one BYL promotion slot" not in docs
 # G3 Review: render Woo's original required checkbox with BOTH configured links in
 # one sentence. Move only native terms content below consent controls. Never check it.
 for marker in (
-    "nativeTerms.querySelector('#terms_field .woocommerce-terms-and-conditions-checkbox-text')",
-    "legalText.querySelector('a.woocommerce-terms-and-conditions-link')",
+    "nativeTerms.querySelector('a.woocommerce-terms-and-conditions-link')",
+    "termsLink.closest('.woocommerce-terms-and-conditions-checkbox-text')",
     "privacyBlock.querySelector('a[href]')",
     "document.createTextNode(' and have read the ')",
     "legalText.classList.add('byl-legal-inline')",
