@@ -322,15 +322,18 @@ add_action('admin_post_byl_p13_activate', static function (): void {
     } catch (Throwable $e) {
         wp_die('Secure random generator unavailable; gate remains closed.', '', ['response' => 500]);
     }
-    $ok = byl_dev_p13_change_permit(static function (array $permit) use ($secret): array|bool {
+    $expires = 0;
+    $ok = byl_dev_p13_change_permit(static function (array $permit) use ($secret, &$expires): array|bool {
         if (!byl_dev_p13_is_live_permit($permit)
             || (int) $permit['customer_id'] !== get_current_user_id()
             || !empty($permit['cookie_hash'])) { return false; }
+        $expires = (int) $permit['expires_at'];
         $permit['cookie_hash'] = hash('sha256', $secret);
         return $permit;
     });
-    if (!$ok) { wp_die('Approval unavailable, expired or already activated.', '', ['response' => 403]); }
-    $expires = (int) byl_dev_p13_read_permit()['expires_at'];
+    if (!$ok || $expires <= time()) {
+        wp_die('Approval unavailable, expired or already activated.', '', ['response' => 403]);
+    }
     if (!setcookie('byl_p13_sandbox', $secret, [
         'expires' => $expires,
         'path' => '/',
