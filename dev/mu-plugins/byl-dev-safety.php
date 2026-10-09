@@ -57,6 +57,33 @@ function byl_dev_p13_checkout_gate(): array {
     return $result;
 }
 
+// P7: keep AfterShip / Automizely Woo webhooks for real orders intact,
+// but never emit the isolated Dev Sandbox order via Woo's outbound webhook path.
+// This filter runs in WC_Webhook::process() BEFORE remote HTTP delivery.
+add_filter('woocommerce_webhook_should_deliver', static function ($allow, $webhook, $arg): bool {
+    // CLI/WP-Cron dispatch may have no HTTPS request context: match the configured site, not is_ssl().
+    if (wp_get_environment_type() !== 'staging' || home_url() !== 'https://dev.beyourlover.com'
+        || !is_object($webhook) || !method_exists($webhook, 'get_topic')) {
+        return (bool) $allow;
+    }
+    // An order ID must not be interpreted as a product/customer webhook.
+    $topic = (string) $webhook->get_topic();
+    if (!str_starts_with($topic, 'order.')) {
+        return (bool) $allow;
+    }
+    $order = $arg instanceof WC_Order ? $arg : (
+        is_numeric($arg) && (int) $arg > 0 && function_exists('wc_get_order') ? wc_get_order((int) $arg) : null
+    );
+    if (!$order instanceof WC_Order) {
+        return (bool) $allow;
+    }
+    if ($order->get_meta('_byl_dev_sandbox_p13', true) === 'yes'
+        || strtolower(trim((string) $order->get_billing_email())) === 'byl-p13@example.invalid') {
+        return false;
+    }
+    return (bool) $allow;
+}, PHP_INT_MAX, 3);
+
 // No external outgoing email, even from an authorized test order.
 add_filter('pre_wp_mail', static function () { return false; }, 99);
 
