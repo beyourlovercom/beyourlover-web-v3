@@ -11,7 +11,7 @@ $cases=[
     ['<div class="wc-payment-gateway-method-logo-wrapper wc-payment-card-logo"><img alt="Card" src="https://dev.beyourlover.com/wp-content/plugins/woocommerce-payments/assets/images/cards/visa.svg"> •••• 4242</div>','Visa •••• 4242','WooPayments Visa HTML logo'],
     ['<div><img alt="Card" src="https://dev.beyourlover.com/assets/cards/mastercard.svg"> •••• 5454</div>','Mastercard •••• 5454','Mastercard card logo'],
     ['<div><img alt="Card" src="/cards/amex.svg"> •••• 1005</div>','American Express •••• 1005','Amex card logo'],
-    ['<span>PayPal</span>','Card PayPal','unrecognized markup no leak'],
+    ['<span>PayPal</span>','PayPal','unrecognized markup no leak'],
     ['<div><img alt="Card" src="/cards/visa.svg" onerror="alert(1)"> •••• 4242</div>','Visa •••• 4242','malicious image attributes ignored'],
     ['&lt;div&gt;&lt;img alt="Card" src="/cards/visa.svg"&gt; •••• 4242&lt;/div&gt;','Visa •••• 4242','encoded HTML normalized'],
 ];
