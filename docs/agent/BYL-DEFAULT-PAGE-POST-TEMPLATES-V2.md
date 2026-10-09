@@ -23,7 +23,7 @@ WordPress honors specific `page-{slug}.php` and explicit installed page template
 
 Actual Dev public REST sample (50 published Pages checked read-only, 2026-10-09) shows old custom template assignments, including `template-canvas.php`, `template-fullwidth.php`, `elementor-fullwidth.php`, `Template-custom-default-page.php`, and `template-custom-default-page.php`. Those historical assets may not exist in the new V3 theme; WordPress otherwise falls back to `page.php`. Applying a generic content-width rule to all those pages would silently change complex commercial landing pages. This V2 first checks `get_page_template_slug()`; nonempty non-default historical assignments always retain the current `index.php` renderer.
 
-**Privacy Policies** currently retains an imported page template assignment and therefore is NOT globally changed by this PR. Its independent migration to the now-proven Terms Simple Page should be handled as a narrowly scoped new `page-privacy-policies.php` canary after Owner visual assessment.
+**Privacy Policies** (post #7271) was rechecked against the actual live Dev REST API: its template value is **empty**, meaning it is legitimately on the WordPress **Default** template. Accordingly, the default `page.php` automatically applies the already-approved no-frame `BYL Simple Page` reading layout on Dev. No Page metadata, content, slug, URL or database fields were modified. It needs its own visual Owner UAT, but it is NOT an imported custom-template exception. Earlier preflight notes assuming it had a legacy assignment were incorrect.
 
 ## Offline tests and real-content preview
 
@@ -36,3 +36,11 @@ Actual Dev public REST sample (50 published Pages checked read-only, 2026-10-09)
 ## Guardrails / rollback
 
 Deploy nothing until successor PR exact head CI PASS and scoped Dev safety gate confirmed. Default `page.php`, `single-post.php` and CSS do affect multiple non-commerce routes; use file-before hash/backup, fail-if-exists staging and atomic installs on Dev only; rollback by removing only files added by this PR when they exactly match staged bytes. No WordPress database changes, new posts, transactions, messages, WWW deployment, AfterShip or ERP effects.
+
+## Actual Dev-only V2 canary results (read-only browser, no business effects)
+
+- Guarded 4-file Dev installation after exact GitHub SHA / PHP lint / host+G2 / target-absent checks succeeded. Rollback script: `/home/u247343654/byl-v3-backups/pr47-default-v2-35d2d806-20261009/rollback.sh`.
+- Live browser rendered Terms, Privacy, Disclaimer, a rich Default Page, historical canvas Landing, Blog homepage and two normal Posts at 390px and 1440px (18 checks). All HTTP 200. 16 test expectations passed; the only two failed expectations were the incorrect assumption that Privacy had a legacy non-default template, now corrected by direct Dev REST `template:""` evidence.
+- Real Privacy V2: semantic H1, reading width 350px mobile / 760px desktop, no outer frame or horizontal overflow. Legal body unchanged; no stale localdev support email.
+- Real Post V2: wide 1120px optional desktop feature image, readable 760px article and 350px mobile article, exactly one H1, no overflow; 2 samples PASS.
+- Pre-existing unrelated issues observed: one legacy canvas landing has mobile docWidth 479px at viewport 390px (not a default-template change); Random Gift Policies text still contains stale `support@localdev.beyourlover.com` (not changed by template work). Track independently; do not rewrite Page text under this code PR.
