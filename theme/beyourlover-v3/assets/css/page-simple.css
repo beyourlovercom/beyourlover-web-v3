@@ -3,7 +3,7 @@
  * No global selectors, Checkout rules, page-content rewrites, or new palette.
  * The outer boundary aligns with BOTH global shell edges (Header and Footer).
  * The nested 760px reading column keeps long paragraphs comfortable.
- * On mobile the frame becomes invisible and retains 20px content gutters.
+ * No visible card, panel, border or outer decorative frame at any width.
  */
 .byl-simple-page {
   --byl-page-reading-max: var(--byl-reading-max, 760px);
@@ -21,13 +21,12 @@
 }
 .byl-simple-page__article {
   width: 100%;
-  max-width: none;
   min-width: 0;
   margin: 0;
-  padding: clamp(28px, 5vw, 72px);
-  border: 1px solid var(--byl-line, #e7e2e4);
-  border-radius: 20px;
-  background: var(--byl-surface, #ffffff);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 .byl-simple-page__heading,
 .byl-simple-page__content {
@@ -101,11 +100,6 @@
   .byl-simple-page__container {
     padding-inline: max(20px, env(safe-area-inset-left, 0px))
       max(20px, env(safe-area-inset-right, 0px));
-  }
-  .byl-simple-page__article {
-    padding: 0;
-    border: 0;
-    border-radius: 0;
   }
   .byl-simple-page__heading { margin-bottom: 26px; }
   .byl-simple-page__content { line-height: 1.75; }
