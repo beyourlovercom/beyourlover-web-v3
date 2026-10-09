@@ -148,4 +148,73 @@ if "if (active === 'payment' && !paymentConfigured())" not in js:
 if "Latest main Checkout V2" not in docs or "one BYL promotion slot" not in docs:
     raise SystemExit("S6 docs must record latest-main ownership and the one-slot promotion integration")
 
+
+# G3 Review: render Woo's original required checkbox with BOTH configured links in
+# one sentence. Move only native terms content below consent controls. Never check it.
+for marker in (
+    "nativeTerms.querySelector('a.woocommerce-terms-and-conditions-link')",
+    "termsLink.closest('.woocommerce-terms-and-conditions-checkbox-text')",
+    "privacyBlock.querySelector('a[href]')",
+    "document.createTextNode(' and have read the ')",
+    "legalText.classList.add('byl-legal-inline')",
+    "privacyBlock.classList.add('byl-privacy-merged')",
+    "nativeTerms.appendChild(expandedTerms)",
+):
+    if marker not in js:
+        raise SystemExit(f"G3 native Review legal consent contract missing: {marker}")
+if ".byl-privacy-merged{display:none!important}" not in css:
+    raise SystemExit("G3 duplicate Privacy paragraph must be visually hidden after link transfer")
+if "terms.checked = true" in js or "#terms_field input" in js or "privacy-polices/" in js:
+    raise SystemExit("G3 must not hardcode a policy URL or use unconditional consent mutation")
+
+
+# PR40 review: both configured links open the SAME inline legal panel, no new tabs.
+for marker in (
+    "wireLegalAccordion()",
+    "termsLink.removeAttribute('target')",
+    "privacyLink.removeAttribute('target')",
+    "termsLink.dataset.bylPolicyToggle = 'terms'",
+    "privacyLink.dataset.bylPolicyToggle = 'privacy'",
+    "event.preventDefault()",
+    "event.stopPropagation()",
+    "fetchPrivacyPolicy(toggle)",
+    "endpoint.searchParams.set('slug', slug)",
+    "privacyBody.replaceChildren(safePolicyFragment(markup))",
+    "expandedTerms.append(termsBody, privacyBody)",
+):
+    if marker not in js:
+        raise SystemExit(f"PR40 shared inline legal accordion contract missing: {marker}")
+if "location.assign(" in js or "window.open(" in js:
+    raise SystemExit("PR40 may not navigate Privacy/Terms to new windows")
+for marker in (
+    "label.woocommerce-form__label-for-checkbox",
+    "font:400 14px/1.55 var(--byl-font)!important",
+    "accent-color:var(--byl-brand)",
+    "[data-byl-policy-privacy][hidden]",
+):
+    if marker not in css:
+        raise SystemExit(f"PR40 unified consent visual contract missing: {marker}")
+
+# Dev-only Owner-requested default checks: user may uncheck either box, and
+# Woo updated_checkout must not silently restore a declined selection.
+# NOT a valid production opt-in for UK/EU or other affirmative-consent regimes.
+for marker in (
+    "window.location.hostname === 'dev.beyourlover.com'",
+    'const consentChoice = new Map()',
+    'if (!consentChoice.has(input.name)) consentChoice.set(input.name, true)',
+    'input.checked = consentChoice.get(input.name)',
+    "termsHost.addEventListener('change', event =>",
+    'consentChoice.set(event.target.name, event.target.checked)',
+    'syncConsentCheckboxes();',
+):
+    if marker not in js:
+        raise SystemExit(f"G3 Dev consent-default experiment contract missing: {marker}")
+# Shipping-rate selection legitimately checks a different input. Only prohibit
+# an unconditional Terms/review-consent assignment in the new sync helper.
+consent_region = js.split('function syncConsentCheckboxes() {', 1)[1].split("termsHost.addEventListener('change'", 1)[0]
+if "input.checked = true" in consent_region or "terms.checked = true" in js:
+    raise SystemExit("Consent sync must preserve explicit user opt-outs")
+if "window.location.hostname === 'www.beyourlover.com'" in js:
+    raise SystemExit("Precheck may not be enabled for WWW")
+
 print("Checkout progressive UX contract check PASS")

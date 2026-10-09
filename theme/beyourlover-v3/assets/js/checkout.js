@@ -12,6 +12,21 @@
   let submitting = false;
   const notesHost = root.querySelector('[data-byl-notes-host]');
   const termsHost = root.querySelector('[data-byl-terms-host]');
+  // Dev-only UX experiment. Do not treat pre-selected checkboxes as valid
+  // marketing/privacy consent or propagate this behavior to Production.
+  const devPrecheck = window.location.hostname === 'dev.beyourlover.com';
+  const consentSelector = 'input[type="checkbox"][name="cr_customer_consent"], input[type="checkbox"][name="terms"]';
+  const consentChoice = new Map();
+  function syncConsentCheckboxes() {
+    if (!devPrecheck) return;
+    termsHost.querySelectorAll(consentSelector).forEach(input => {
+      if (!consentChoice.has(input.name)) consentChoice.set(input.name, true);
+      input.checked = consentChoice.get(input.name);
+    });
+  }
+  termsHost.addEventListener('change', event => {
+    if (event.target.matches(consentSelector)) consentChoice.set(event.target.name, event.target.checked);
+  });
   const paymentHost = root.querySelector('[data-byl-payment-host]');
   const deliveryHost = root.querySelector('[data-byl-delivery-options]');
   const summary = root.querySelector('.byl-summary-card');
@@ -59,6 +74,95 @@
     const description = root.querySelector('#shipping_phone-description');
     if (description) description.setAttribute('aria-hidden', 'false');
   }
+  // One inline accordion for both legal documents. Terms remain Woo-owned;
+  // Privacy is loaded read-only from the published WordPress Privacy page.
+  let privacyPolicyPromise = null;
+  function safePolicyFragment(markup) {
+    const parsed = new DOMParser().parseFromString(markup, 'text/html');
+    const allowed = new Set(['P','H2','H3','H4','STRONG','EM','B','I','UL','OL','LI','A','BR','HR','BLOCKQUOTE']);
+    const ignored = new Set(['SCRIPT','STYLE','IFRAME','OBJECT','FORM','INPUT','BUTTON','SVG','NOSCRIPT']);
+    function copyNode(source) {
+      if (source.nodeType === Node.TEXT_NODE) return document.createTextNode(source.textContent);
+      if (source.nodeType !== Node.ELEMENT_NODE || ignored.has(source.tagName)) return null;
+      const output = allowed.has(source.tagName) ? document.createElement(source.tagName.toLowerCase()) : document.createDocumentFragment();
+      if (source.tagName === 'A' && source.hasAttribute('href')) {
+        try {
+          const url = new URL(source.getAttribute('href'), location.origin);
+          if (['https:', 'http:', 'mailto:'].includes(url.protocol)) {
+            output.setAttribute('href', url.href);
+            output.setAttribute('rel', 'noopener noreferrer');
+          }
+        } catch (_) { /* Invalid source link stays plain text. */ }
+      }
+      source.childNodes.forEach(child => { const safe = copyNode(child); if (safe) output.appendChild(safe); });
+      return output;
+    }
+    const result = document.createDocumentFragment();
+    parsed.body.childNodes.forEach(child => { const safe = copyNode(child); if (safe) result.appendChild(safe); });
+    return result;
+  }
+  async function fetchPrivacyPolicy(link) {
+    if (privacyPolicyPromise) return privacyPolicyPromise;
+    privacyPolicyPromise = (async () => {
+      const configured = new URL(link.href, location.href);
+      if (configured.origin !== location.origin) throw new Error('Privacy Policy is not on this site.');
+      const slug = configured.pathname.split('/').filter(Boolean).pop();
+      if (!slug) throw new Error('Privacy Policy page is not configured.');
+      const endpoint = new URL('/wp-json/wp/v2/pages', location.origin);
+      endpoint.searchParams.set('slug', slug);
+      endpoint.searchParams.set('_fields', 'id,link,content');
+      const response = await fetch(endpoint.href, {credentials:'same-origin', headers:{Accept:'application/json'}});
+      if (!response.ok) throw new Error('Privacy Policy is temporarily unavailable.');
+      const pages = await response.json();
+      const page = Array.isArray(pages) && pages.find(item => {
+        try { return new URL(item.link).pathname.replace(/\/$/, '') === configured.pathname.replace(/\/$/, ''); }
+        catch (_) { return false; }
+      });
+      const html = page && page.content && page.content.rendered;
+      if (typeof html !== 'string' || !html.trim() || html.length > 150000) throw new Error('Privacy Policy content is unavailable.');
+      return html;
+    })().catch(err => { privacyPolicyPromise = null; throw err; });
+    return privacyPolicyPromise;
+  }
+  function wireLegalAccordion() {
+    if (termsHost.dataset.bylLegalWired === '1') return;
+    termsHost.dataset.bylLegalWired = '1';
+    termsHost.addEventListener('click', event => {
+      const toggle = event.target.closest('a[data-byl-policy-toggle]');
+      if (!toggle || !termsHost.contains(toggle)) return;
+      event.preventDefault();
+      event.stopPropagation(); // Do not invoke Woo's separate Terms-only click handler.
+      const wrapper = toggle.closest('.woocommerce-terms-and-conditions-wrapper');
+      const panel = wrapper && wrapper.querySelector('.woocommerce-terms-and-conditions');
+      const termsBody = panel && panel.querySelector('[data-byl-policy-terms]');
+      const privacyBody = panel && panel.querySelector('[data-byl-policy-privacy]');
+      if (!panel || !termsBody || !privacyBody) return;
+      const kind = toggle.dataset.bylPolicyToggle;
+      const open = $(panel).css('display') !== 'none';
+      const same = panel.dataset.bylPolicyShowing === kind;
+      const toggles = wrapper.querySelectorAll('a[data-byl-policy-toggle]');
+      if (same && open) {
+        $(panel).stop(true, true).slideUp(160);
+        toggles.forEach(link => link.setAttribute('aria-expanded', 'false'));
+        return;
+      }
+      panel.dataset.bylPolicyShowing = kind;
+      termsBody.hidden = kind !== 'terms';
+      privacyBody.hidden = kind !== 'privacy';
+      toggles.forEach(link => link.setAttribute('aria-expanded', String(link.dataset.bylPolicyToggle === kind)));
+      $(panel).stop(true, true).slideDown(160);
+      if (kind === 'privacy' && !privacyBody.dataset.bylLoaded) {
+        privacyBody.textContent = 'Loading Privacy Policy…';
+        fetchPrivacyPolicy(toggle).then(markup => {
+          if (!privacyBody.isConnected) return;
+          privacyBody.replaceChildren(safePolicyFragment(markup));
+          privacyBody.dataset.bylLoaded = '1';
+        }).catch(() => {
+          if (privacyBody.isConnected) privacyBody.textContent = 'Privacy Policy could not load. Select Privacy Policy again to retry.';
+        });
+      }
+    });
+  }
   function mountNative() {
     const payment = document.getElementById('payment');
     if (payment && payment.parentElement !== paymentHost) paymentHost.appendChild(payment);
@@ -75,6 +179,60 @@
       }
       privacy.dataset.bylCompact = '1';
     }
+    // Keep the native Woo required checkbox, terms toggle and configured privacy URL.
+    // Consolidate only the visible legal sentence; never synthesize consent or links.
+    const nativeTerms = termsHost.querySelector('.woocommerce-terms-and-conditions-wrapper');
+    if (nativeTerms) {
+      const termsLink = nativeTerms.querySelector('a.woocommerce-terms-and-conditions-link');
+      const legalText = termsLink && termsLink.closest('.woocommerce-terms-and-conditions-checkbox-text');
+      const privacyBlock = nativeTerms.querySelector('.woocommerce-privacy-policy-text');
+      const privacyLink = privacyBlock && privacyBlock.querySelector('a[href]');
+      if (legalText && termsLink && privacyLink && !legalText.classList.contains('byl-legal-inline')) {
+        termsLink.textContent = 'Terms and Conditions';
+        privacyLink.textContent = 'Privacy Policy';
+        legalText.replaceChildren(
+          document.createTextNode('I have read and agree to the '),
+          termsLink,
+          document.createTextNode(' and have read the '),
+          privacyLink,
+          document.createTextNode('.')
+        );
+        legalText.classList.add('byl-legal-inline');
+        privacyBlock.classList.add('byl-privacy-merged');
+      }
+      if (legalText && termsLink && privacyLink) {
+        termsLink.removeAttribute('target');
+        privacyLink.removeAttribute('target');
+        termsLink.dataset.bylPolicyToggle = 'terms';
+        privacyLink.dataset.bylPolicyToggle = 'privacy';
+      }
+      // The expanded legal text belongs AFTER the required and optional checkboxes.
+      // Moving the existing node preserves Woo's native expand/collapse behavior.
+      const expandedTerms = nativeTerms.querySelector('.woocommerce-terms-and-conditions');
+      if (expandedTerms && expandedTerms.parentElement === nativeTerms && expandedTerms !== nativeTerms.lastElementChild) {
+        nativeTerms.appendChild(expandedTerms);
+      }
+      if (expandedTerms && !expandedTerms.querySelector('[data-byl-policy-terms]')) {
+        const termsBody = document.createElement('div');
+        termsBody.dataset.bylPolicyTerms = '';
+        while (expandedTerms.firstChild) termsBody.appendChild(expandedTerms.firstChild);
+        const privacyBody = document.createElement('div');
+        privacyBody.dataset.bylPolicyPrivacy = '';
+        privacyBody.hidden = true;
+        expandedTerms.append(termsBody, privacyBody);
+        expandedTerms.dataset.bylPolicyShowing = 'terms';
+        expandedTerms.id = expandedTerms.id || 'byl-checkout-legal-panel';
+      }
+      if (expandedTerms && termsLink && privacyLink) {
+        [termsLink, privacyLink].forEach(link => {
+          link.setAttribute('aria-controls', expandedTerms.id);
+          link.setAttribute('aria-expanded', 'false');
+        });
+      }
+    }
+    wireLegalAccordion();
+    // Mount/re-mount must preserve a customer's deliberate opt-out.
+    syncConsentCheckboxes();
     const reviewInvite = termsHost.querySelector('.cr-customer-consent .woocommerce-terms-and-conditions-checkbox-text');
     if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation with gift card rewards.';
     const notes = document.querySelector('.woocommerce-additional-fields');

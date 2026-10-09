@@ -214,3 +214,43 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
   margin:0;color:var(--byl-ink-3);font-size:12px;line-height:1.55;
 }
 .byl-progressive-checkout [data-byl-terms-host] a{color:var(--byl-ink-2)}
+
+/* G3 Review: one native Terms + Privacy consent line, before expanded legal text. */
+.byl-progressive-checkout [data-byl-terms-host] .byl-privacy-merged{display:none!important}
+.byl-progressive-checkout [data-byl-terms-host] .byl-legal-inline{color:var(--byl-ink-2)}
+.byl-progressive-checkout [data-byl-terms-host] .woocommerce-terms-and-conditions-checkbox-text{overflow-wrap:anywhere;line-height:1.6}
+.byl-progressive-checkout [data-byl-terms-host] .woocommerce-terms-and-conditions-wrapper>.woocommerce-terms-and-conditions{max-width:100%;margin:8px 0 0!important;overflow-wrap:anywhere}
+
+/* G3 Review: identical optional and required consent rows; one policy accordion. */
+.byl-progressive-checkout [data-byl-terms-host] .woocommerce-terms-and-conditions-wrapper>.cr-customer-consent,
+.byl-progressive-checkout [data-byl-terms-host] .woocommerce-terms-and-conditions-wrapper>.form-row.validate-required{
+  margin:0 0 11px!important;padding:0!important;background:transparent!important;border:0!important;
+}
+.byl-progressive-checkout [data-byl-terms-host] label.woocommerce-form__label-for-checkbox{
+  display:flex!important;align-items:flex-start!important;gap:10px!important;
+  margin:0!important;padding:0!important;min-height:22px;
+  font:400 14px/1.55 var(--byl-font)!important;color:var(--byl-ink-2)!important;
+}
+.byl-progressive-checkout [data-byl-terms-host] label.woocommerce-form__label-for-checkbox>input[type=checkbox]{
+  flex:0 0 18px!important;width:18px!important;height:18px!important;
+  margin:2px 0 0!important;padding:0!important;accent-color:var(--byl-brand);
+}
+.byl-progressive-checkout [data-byl-terms-host] label.woocommerce-form__label-for-checkbox>.woocommerce-terms-and-conditions-checkbox-text{
+  font:400 14px/1.55 var(--byl-font)!important;color:var(--byl-ink-2)!important;
+  letter-spacing:normal!important;overflow-wrap:anywhere;
+}
+.byl-progressive-checkout [data-byl-terms-host] label.woocommerce-form__label-for-checkbox a[data-byl-policy-toggle]{
+  font:inherit!important;font-weight:500!important;color:inherit!important;
+  text-decoration:underline;text-underline-offset:2px;cursor:pointer;
+}
+.byl-progressive-checkout [data-byl-terms-host] label.woocommerce-form__label-for-checkbox>.required{
+  margin:0 0 0 -7px!important;font:inherit!important;white-space:nowrap;
+}
+.byl-progressive-checkout [data-byl-terms-host] [data-byl-policy-terms][hidden],
+.byl-progressive-checkout [data-byl-terms-host] [data-byl-policy-privacy][hidden]{display:none!important}
+.byl-progressive-checkout [data-byl-terms-host] #byl-checkout-legal-panel{
+  max-height:240px!important;overflow:auto!important;
+}
+.byl-progressive-checkout [data-byl-terms-host] #byl-checkout-legal-panel :is(p,li,h2,h3,h4){
+  overflow-wrap:anywhere;
+}
