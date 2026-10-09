@@ -148,4 +148,23 @@ if "if (active === 'payment' && !paymentConfigured())" not in js:
 if "Latest main Checkout V2" not in docs or "one BYL promotion slot" not in docs:
     raise SystemExit("S6 docs must record latest-main ownership and the one-slot promotion integration")
 
+
+# G3 Review: render Woo's original required checkbox with BOTH configured links in
+# one sentence. Move only native terms content below consent controls. Never check it.
+for marker in (
+    "nativeTerms.querySelector('#terms_field .woocommerce-terms-and-conditions-checkbox-text')",
+    "legalText.querySelector('a.woocommerce-terms-and-conditions-link')",
+    "privacyBlock.querySelector('a[href]')",
+    "document.createTextNode(' and have read the ')",
+    "legalText.classList.add('byl-legal-inline')",
+    "privacyBlock.classList.add('byl-privacy-merged')",
+    "nativeTerms.appendChild(expandedTerms)",
+):
+    if marker not in js:
+        raise SystemExit(f"G3 native Review legal consent contract missing: {marker}")
+if ".byl-privacy-merged{display:none!important}" not in css:
+    raise SystemExit("G3 duplicate Privacy paragraph must be visually hidden after link transfer")
+if "terms.checked = true" in js or "#terms_field input" in js or "privacy-polices/" in js:
+    raise SystemExit("G3 must never precheck Terms or hardcode privacy URLs")
+
 print("Checkout progressive UX contract check PASS")
