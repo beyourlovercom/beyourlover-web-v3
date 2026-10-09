@@ -126,12 +126,18 @@ function byl_v3_cart_native_promotion_state(): array {
     $threshold = $policy::get_persisted_zone_effective_threshold($zone_id);
     if (null === $threshold) { return []; }
 
+    // Read the same zone catalog Woo already exposes. Do not directly
+    // instantiate/rehydrate zone shipping methods a second time here:
+    // it can fail under CLI and some plugin-managed method contexts.
+    $zones = WC_Shipping_Zones::get_zones();
+    $zone_info = (array) ($zones[$zone_id] ?? []);
     $free_supported = false;
-    if (method_exists($zone, 'get_shipping_methods')) {
-        foreach ((array) $zone->get_shipping_methods(true) as $method) {
-            $id = is_object($method) && method_exists($method, 'get_method_id')
-                ? $method->get_method_id() : (is_object($method) ? ($method->id ?? '') : '');
-            if ('free_shipping' === $id) { $free_supported = true; break; }
+    foreach ((array) ($zone_info['shipping_methods'] ?? []) as $method) {
+        $id = is_object($method) && method_exists($method, 'get_method_id')
+            ? $method->get_method_id() : (is_object($method) ? ($method->id ?? '') : '');
+        if ('free_shipping' === $id && 'no' !== (string) ($method->enabled ?? 'yes')) {
+            $free_supported = true;
+            break;
         }
     }
 
@@ -153,6 +159,10 @@ function byl_v3_cart_native_promotion_state(): array {
         $free_available = true;
         if ((string) $rate_key === $selected) { $selected_free = true; }
     }
+
+    // Rest-of-world and dynamically configured zones may not be in the
+    // standard catalog, but an actual zero-cost Woo rate is definitive.
+    if ($free_available) { $free_supported = true; }
 
     $decimals = function_exists('wc_get_price_decimals') ? (int) wc_get_price_decimals() : 2;
     $threshold = round((float) $threshold, $decimals);

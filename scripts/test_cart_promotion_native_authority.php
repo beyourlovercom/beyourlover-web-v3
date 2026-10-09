@@ -25,6 +25,7 @@ class FakeZone {
 class WC_Shipping_Zones {
     public static $zone;
     public static function get_zone_matching_package($pkg){return self::$zone;}
+    public static function get_zones(){return [self::$zone->get_id()=>['shipping_methods'=>self::$zone->get_shipping_methods(true)]];}
 }
 class Andy_Commerce_Shipping_Promotion_Policy {
     public static function get_persisted_settings(){return ['free_shipping_code'=>'BYL49','mode'=>'automatic'];}
@@ -65,6 +66,8 @@ WC()->session->chosen=['free_shipping:9'];
 $a=byl_v3_cart_native_promotion_state();
 tassert($a['state']==='automatic_unlocked' && $a['unlocked'],'free selected and zero cost');
 WC_Shipping_Zones::$zone=new FakeZone(0,false);
+WC()->shipping()->rates=['flat_rate:3'=>new FakeRate('flat_rate',0)];
+WC()->session->chosen=['flat_rate:3'];
 WC()->cart->subtotal=59;
 $a=byl_v3_cart_native_promotion_state();
 tassert($a['state']==='shipping_unavailable','zone without free method must not promise free');

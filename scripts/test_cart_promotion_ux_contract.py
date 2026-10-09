@@ -83,6 +83,7 @@ for marker in (
     "woocommerce_cart_totals_before_order_total",
     "byl_v3_cart_native_promotion_state",
     "WC_Shipping_Zones::get_zone_matching_package",
+    "WC_Shipping_Zones::get_zones",
     "get_shipping_packages()",
     "chosen_shipping_methods",
     "get_persisted_zone_effective_threshold",

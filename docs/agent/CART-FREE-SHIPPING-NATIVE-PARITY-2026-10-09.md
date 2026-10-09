@@ -43,3 +43,14 @@ It showed a different zone's "unlocked" state than the actual $10 Woo rate.
 5. Verify classic coupon input and single-code fallback, Checkout unchanged,
    desktop and mobile narrow viewport; Dev Store API Checkout remains 403.
 No Place Order, synthetic orders, outbound communication, migrations, or WWW deploy.
+
+## Additional runtime hardening
+
+During Dev read-only WP CLI check, directly calling
+`WC_Shipping_Zone::get_shipping_methods(true)` failed after the zone/threshold
+checks, while `WC_Shipping_Zones::get_zones()` completed and returned the
+correct enabled free/flat methods. The three theme files were immediately
+restored from the verified predeploy archive. Updated native context reads
+free-service support from Woo's normal zone catalog (and can recognize an
+actual zero-cost free rate) without directly rehydrating zone methods.
+No shipping settings or orders were modified.
