@@ -74,8 +74,9 @@
       const firstTop = headings[0].getBoundingClientRect().top + window.scrollY;
       const readingEnd = content.getBoundingClientRect().bottom + window.scrollY;
       const scroll = window.scrollY;
-      const allow = scroll > Math.max(450, firstTop - window.innerHeight * 0.85)
-        && scroll + 140 < readingEnd;
+      // WWW reveals the INDEX after the lead/hero has scrolled away,
+      // well before the first H2 reaches the top of the viewport.
+      const allow = scroll > 650 && scroll + 140 < readingEnd;
       floating.hidden = !allow;
       if (!allow) return;
 
