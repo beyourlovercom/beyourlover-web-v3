@@ -167,4 +167,32 @@ if ".byl-privacy-merged{display:none!important}" not in css:
 if "terms.checked = true" in js or "#terms_field input" in js or "privacy-polices/" in js:
     raise SystemExit("G3 must never precheck Terms or hardcode privacy URLs")
 
+
+# PR40 review: both configured links open the SAME inline legal panel, no new tabs.
+for marker in (
+    "wireLegalAccordion()",
+    "termsLink.removeAttribute('target')",
+    "privacyLink.removeAttribute('target')",
+    "termsLink.dataset.bylPolicyToggle = 'terms'",
+    "privacyLink.dataset.bylPolicyToggle = 'privacy'",
+    "event.preventDefault()",
+    "event.stopPropagation()",
+    "fetchPrivacyPolicy(toggle)",
+    "endpoint.searchParams.set('slug', slug)",
+    "privacyBody.replaceChildren(safePolicyFragment(markup))",
+    "expandedTerms.append(termsBody, privacyBody)",
+):
+    if marker not in js:
+        raise SystemExit(f"PR40 shared inline legal accordion contract missing: {marker}")
+if "location.assign(" in js or "window.open(" in js:
+    raise SystemExit("PR40 may not navigate Privacy/Terms to new windows")
+for marker in (
+    "label.woocommerce-form__label-for-checkbox",
+    "font:400 14px/1.55 var(--byl-font)!important",
+    "accent-color:var(--byl-brand)",
+    "[data-byl-policy-privacy][hidden]",
+):
+    if marker not in css:
+        raise SystemExit(f"PR40 unified consent visual contract missing: {marker}")
+
 print("Checkout progressive UX contract check PASS")
