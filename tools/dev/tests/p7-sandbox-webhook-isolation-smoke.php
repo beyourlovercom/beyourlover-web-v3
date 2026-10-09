@@ -16,7 +16,7 @@ function add_filter($name, $callback, $priority = 10, $args = 1): void {
     $GLOBALS['p7_filters'][$name][$priority][] = $callback;
 }
 function add_action($name, $callback, $priority = 10, $args = 1): void {}
-function wp_get_environment_type(): string { return 'staging'; }
+function wp_get_environment_type(): string { return $GLOBALS['p7_state']['environment'] ?? 'staging'; }
 function home_url($path = ''): string { return $GLOBALS['p7_state']['site'].$path; }
 function is_ssl(): bool { return $GLOBALS['p7_state']['https']; }
 
@@ -85,7 +85,10 @@ $GLOBALS['p7_state']['site'] = 'https://www.beyourlover.com';
 if ($guard(true, new P7Webhook('order.created'), 721) !== true) { throw new RuntimeException('FAIL production_unmodified'); }
 $passed++; echo "PASS production_unmodified\n";
 $GLOBALS['p7_state'] = ['site' => 'https://dev.beyourlover.com', 'https' => false];
-if ($guard(true, new P7Webhook('order.created'), 721) !== true) { throw new RuntimeException('FAIL http_unmodified'); }
-$passed++; echo "PASS http_unmodified\n";
+if ($guard(true, new P7Webhook('order.created'), 721) !== false) { throw new RuntimeException('FAIL cron_without_ssl_must_block'); }
+$passed++; echo "PASS cron_without_ssl_must_block\n";
+$GLOBALS['p7_state'] = ['site' => 'https://dev.beyourlover.com', 'https' => true, 'environment' => 'production'];
+if ($guard(true, new P7Webhook('order.created'), 721) !== true) { throw new RuntimeException('FAIL non_staging_unmodified'); }
+$passed++; echo "PASS non_staging_unmodified\n";
 
 echo 'P7_WOO_WEBHOOK_ISOLATION=PASS '.$passed.' offline cases'.PHP_EOL;
