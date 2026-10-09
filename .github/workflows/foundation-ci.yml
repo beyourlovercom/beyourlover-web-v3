@@ -25,6 +25,10 @@ jobs:
         run: php -l tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
       - name: P7 outbound Dev Sandbox Webhook security smoke
         run: php tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
+      - name: G5 AfterShip/Automizely Dev-only outbound safety syntax
+        run: php -l tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
+      - name: G5 provider outbound isolation no-network regression
+        run: php tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
       - name: P7.1 Thank You PHP syntax
         run: |
           php -l theme/beyourlover-v3/functions.php
