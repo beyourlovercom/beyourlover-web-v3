@@ -125,6 +125,20 @@ for required in (
     if required not in css:
         raise SystemExit(f"Checkout must consume canonical BYL VI token: {required}")
 
+# Summary is collapsed by CSS at ANY viewport when JS sets aria-expanded=false.
+# Mobile starts collapsed while desktop starts expanded, but toggling must be real
+# at either width (not just an ARIA update with a still-visible desktop body).
+summary_closed_rule = ".byl-progressive-checkout.is-enhanced .byl-summary-card:not(.is-open) .byl-summary-body{display:none}"
+if css.count(summary_closed_rule) != 1 or css.index(summary_closed_rule) > css.index("@media(max-width:760px){"):
+    raise SystemExit("Order Summary collapsed-body CSS must be a single all-viewport rule")
+for marker in (
+    "summaryToggle.addEventListener('click'",
+    "summaryToggle.setAttribute('aria-expanded',open?'true':'false')",
+    "summary.classList.toggle('is-open', !window.matchMedia('(max-width: 760px)').matches)",
+):
+    if marker not in js:
+        raise SystemExit(f"Order Summary toggle/ARIA contract missing: {marker}")
+
 # Payment cannot be marked complete when Woo requires payment but offers no gateway.
 if "if ((active === 'payment' || active === 'review') && !paymentConfigured())" not in js:
     raise SystemExit("Payment step CTA must stay disabled without an eligible gateway")
