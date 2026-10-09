@@ -75,6 +75,34 @@
       }
       privacy.dataset.bylCompact = '1';
     }
+    // Keep the native Woo required checkbox, terms toggle and configured privacy URL.
+    // Consolidate only the visible legal sentence; never synthesize consent or links.
+    const nativeTerms = termsHost.querySelector('.woocommerce-terms-and-conditions-wrapper');
+    if (nativeTerms) {
+      const legalText = nativeTerms.querySelector('#terms_field .woocommerce-terms-and-conditions-checkbox-text');
+      const termsLink = legalText && legalText.querySelector('a.woocommerce-terms-and-conditions-link');
+      const privacyBlock = nativeTerms.querySelector('.woocommerce-privacy-policy-text');
+      const privacyLink = privacyBlock && privacyBlock.querySelector('a[href]');
+      if (legalText && termsLink && privacyLink && !legalText.classList.contains('byl-legal-inline')) {
+        termsLink.textContent = 'Terms and Conditions';
+        privacyLink.textContent = 'Privacy Policy';
+        legalText.replaceChildren(
+          document.createTextNode('I have read and agree to the '),
+          termsLink,
+          document.createTextNode(' and have read the '),
+          privacyLink,
+          document.createTextNode('.')
+        );
+        legalText.classList.add('byl-legal-inline');
+        privacyBlock.classList.add('byl-privacy-merged');
+      }
+      // The expanded legal text belongs AFTER the required and optional checkboxes.
+      // Moving the existing node preserves Woo's native expand/collapse behavior.
+      const expandedTerms = nativeTerms.querySelector('.woocommerce-terms-and-conditions');
+      if (expandedTerms && expandedTerms.parentElement === nativeTerms && expandedTerms !== nativeTerms.lastElementChild) {
+        nativeTerms.appendChild(expandedTerms);
+      }
+    }
     const reviewInvite = termsHost.querySelector('.cr-customer-consent .woocommerce-terms-and-conditions-checkbox-text');
     if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation with gift card rewards.';
     const notes = document.querySelector('.woocommerce-additional-fields');
