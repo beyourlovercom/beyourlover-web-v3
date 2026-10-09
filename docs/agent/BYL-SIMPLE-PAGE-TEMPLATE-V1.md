@@ -30,6 +30,8 @@ Special routes:
 | Rich Page | content with at least 20px gutters, media constrained | max 1120px |
 | Standard Post | 350px article text / 20px gutters | optional hero max 1120px, text max 760px |
 
+**Two-edge shell contract (Owner correction):** At 1440px, the Page outer frame must start at x=56px and finish at x=1384px, matching BOTH Header and Footer content boundaries. The visible frame is 1328px wide; legal text stays a centered 760px inner reading column. At 390px, the border disappears and text runs between x=20px and x=370px. Do NOT implement only left alignment of a 760px article; the right outer frame must stay aligned too.
+
 All text/page margins use the existing BYL VI typography and colors. Scoped CSS only:
 `assets/css/page-simple.css`, `assets/css/page-default.css`, `assets/css/post-single.css`.
 
