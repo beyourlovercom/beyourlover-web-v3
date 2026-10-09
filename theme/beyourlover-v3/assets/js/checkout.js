@@ -12,6 +12,21 @@
   let submitting = false;
   const notesHost = root.querySelector('[data-byl-notes-host]');
   const termsHost = root.querySelector('[data-byl-terms-host]');
+  // Dev-only UX experiment. Do not treat pre-selected checkboxes as valid
+  // marketing/privacy consent or propagate this behavior to Production.
+  const devPrecheck = window.location.hostname === 'dev.beyourlover.com';
+  const consentSelector = 'input[type="checkbox"][name="cr_customer_consent"], input[type="checkbox"][name="terms"]';
+  const consentChoice = new Map();
+  function syncConsentCheckboxes() {
+    if (!devPrecheck) return;
+    termsHost.querySelectorAll(consentSelector).forEach(input => {
+      if (!consentChoice.has(input.name)) consentChoice.set(input.name, true);
+      input.checked = consentChoice.get(input.name);
+    });
+  }
+  termsHost.addEventListener('change', event => {
+    if (event.target.matches(consentSelector)) consentChoice.set(event.target.name, event.target.checked);
+  });
   const paymentHost = root.querySelector('[data-byl-payment-host]');
   const deliveryHost = root.querySelector('[data-byl-delivery-options]');
   const summary = root.querySelector('.byl-summary-card');
@@ -216,6 +231,8 @@
       }
     }
     wireLegalAccordion();
+    // Mount/re-mount must preserve a customer's deliberate opt-out.
+    syncConsentCheckboxes();
     const reviewInvite = termsHost.querySelector('.cr-customer-consent .woocommerce-terms-and-conditions-checkbox-text');
     if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation with gift card rewards.';
     const notes = document.querySelector('.woocommerce-additional-fields');
