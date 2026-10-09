@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 $scenarios = [
     'closed', 'pending', 'valid', 'wrong_cookie', 'wrong_user',
-    'admin_user', 'live_gateway', 'expired', 'wrong_gateway', 'wrong_site',
+    'admin_user', 'custom_privileged_user', 'live_gateway', 'expired', 'wrong_gateway', 'wrong_site',
     'not_https', 'admin_flow', 'deny_admin_approve', 'deny_guest_activate',
     'deny_bad_nonce',
 ];
@@ -42,7 +42,8 @@ $GLOBALS['testState'] = [
     'site' => $scenario === 'wrong_site' ? 'https://www.beyourlover.com' : 'https://dev.beyourlover.com',
     'https' => $scenario !== 'not_https',
     'user' => in_array($scenario, ['admin_user', 'admin_flow', 'deny_bad_nonce'], true) ? 19
-        : ($scenario === 'wrong_user' || $scenario === 'deny_guest_activate' ? 18 : 17),
+        : ($scenario === 'custom_privileged_user' ? 20
+        : ($scenario === 'wrong_user' || $scenario === 'deny_guest_activate' ? 18 : 17)),
     'testmode' => $scenario !== 'live_gateway',
     'nonce' => $scenario !== 'deny_bad_nonce',
 ];
@@ -63,6 +64,7 @@ function get_userdata($id) {
         17 => (object) ['ID' => 17, 'user_email' => 'byl-p13@example.invalid', 'roles' => ['customer']],
         18 => (object) ['ID' => 18, 'user_email' => 'other@example.invalid', 'roles' => ['customer']],
         19 => (object) ['ID' => 19, 'user_email' => 'byl-p13@example.invalid', 'roles' => ['administrator']],
+        20 => (object) ['ID' => 20, 'user_email' => 'byl-p13@example.invalid', 'roles' => ['customer', 'custom_role']],
         default => null,
     };
 }
@@ -78,6 +80,10 @@ function get_option($key, $default = []) {
 function wc_get_orders(array $args): array { return []; }
 function wp_json_encode($value, $flags = 0): string|false { return json_encode($value, $flags); }
 function current_user_can($cap): bool { return $GLOBALS['testState']['user'] === 19; }
+function user_can($user, $cap): bool {
+    return in_array((int) $user->ID, [19, 20], true)
+        && in_array((string) $cap, ['manage_options', 'manage_woocommerce'], true);
+}
 function check_admin_referer($action): void {
     if (!$GLOBALS['testState']['nonce']) { throw new G2Denied('CSRF_DENIED'); }
 }
@@ -139,6 +145,7 @@ if ($scenario === 'admin_flow') {
         $fixture = $pending;
         if ($scenario === 'expired') { $fixture['expires_at'] = time() - 10; }
         if ($scenario === 'wrong_gateway') { $fixture['gateway'] = 'ppcp'; }
+        if ($scenario === 'custom_privileged_user') { $fixture['customer_id'] = 20; }
         if ($scenario !== 'pending' && $scenario !== 'deny_guest_activate') {
             $fixture['cookie_hash'] = hash('sha256', $cookie);
         }
