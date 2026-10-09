@@ -19,6 +19,10 @@ function between(start, end) {
 }
 const action = between('  function updateAction() {', '  function setStep(');
 const click = between("  next.addEventListener('click', () => {", "  root.addEventListener('click', e => {");
+const step = between('  function setStep(step) {', "  next.addEventListener('click', () => {");
+const formSubmit = between("  form.addEventListener('submit', e => {", "  function promotionMessage(");
+assert(step.includes('if (submitting) return;'), 'Cannot switch Checkout step while payment is pending');
+assert(formSubmit.includes('if (!submitting) {'), 'Native Enter form submit must synchronize busy state');
 const error = between("  $(document.body).on('checkout_error',", '  if (summaryToggle)');
 assert(!/setTimeout\s*\(\s*\(\s*\)\s*=>\s*\{\s*submitting\s*=\s*false/.test(click),
   'No timer may unlock an unconfirmed 3DS / payment submission');
@@ -40,6 +44,8 @@ function fixture({gateway = true, nativePresent = true} = {}) {
     setAttribute(name, value) { attrs.set(name, value); },
     removeAttribute(name) { attrs.delete(name); },
   };
+  const formCallbacks = new Map();
+  const form = {addEventListener(name, callback) {formCallbacks.set(name, callback);}};
   const nativeButton = {click() { counters.native++; }};
   const document = {
     body: {},
@@ -48,8 +54,8 @@ function fixture({gateway = true, nativePresent = true} = {}) {
     createElement() { return {textContent: '', setAttribute() {}}; },
   };
   const context = vm.createContext({
-    next, document,
-    root: {dataset: {needsPayment: '1'}},
+    next, document, form,
+    root: {dataset: {needsPayment: '1'},querySelectorAll() {return [];},querySelector() {return null;}},
     steps: ['address', 'delivery', 'payment', 'review'],
     window: {setTimeout() {counters.timers++; throw Error('Unexpected timeout unlock');}},
     $() { return {on(name, callback) {events.set(name, callback);}}; },
@@ -61,7 +67,7 @@ function fixture({gateway = true, nativePresent = true} = {}) {
   });
   vm.runInContext(
     "let submitting = false; let active = 'review'; let furthest = 3;\n" +
-      action + click + error +
+      action + step + click + formSubmit + error +
       "\nthis.inspect = () => ({submitting, active});\n",
     context,
     {filename: 'isolated-G5-actual-checkout-handler.js', timeout: 1000},
@@ -71,6 +77,8 @@ function fixture({gateway = true, nativePresent = true} = {}) {
   context.updateAction();
   return {
     click: callbacks.get('click'), fail: events.get('checkout_error'),
+    submit: formCallbacks.get('submit'),
+    editStep: context.setStep,
     updatedCheckout: context.updateAction,
     state: context.inspect, counters, next, attrs,
   };
@@ -123,6 +131,29 @@ scenario('G5-08 missing native Woo submit button fails closed', () => {
   const f = fixture({nativePresent: false});
   f.click(); f.click();
   verify(f.counters.native === 0 && !f.state().submitting, 'no synthetic submit fallback');
+});
+
+scenario('G5-05 stage navigation cannot unlock pending payment', () => {
+  const f = fixture();
+  f.click();
+  f.editStep('payment');
+  verify(f.state().active === 'review', 'step-edit cannot escape a pending Review payment');
+  verify(f.next.disabled && f.attrs.get('aria-busy') === 'true',
+    'native pending state stays disabled after edit attempts');
+  f.fail();
+  verify(!f.state().submitting, 'Woo explicit error returns UI to editable state');
+});
+
+scenario('G5-04 Enter/native form path shares BYL pending lock', () => {
+  const f = fixture();
+  const evt={preventDefault() {throw Error('unexpected submit interception');},
+    stopImmediatePropagation() {throw Error('unexpected Woo handler interception');}};
+  f.submit(evt);
+  verify(f.state().submitting && f.next.disabled, 'native form submit gets busy state');
+  f.click();
+  verify(f.counters.native === 0, 'BYL CTA cannot issue a second native click after Enter');
+  f.fail();
+  verify(!f.state().submitting && !f.next.disabled, 'Woo error unlocks Enter submission');
 });
 
 console.log('G5_OFFLINE_SUBMISSION_GUARD=PASS ' + cases + ' scenarios; zero requests / orders / charges');
