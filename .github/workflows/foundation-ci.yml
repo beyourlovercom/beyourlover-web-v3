@@ -25,6 +25,12 @@ jobs:
         run: php -l tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
       - name: P7 outbound Dev Sandbox Webhook security smoke
         run: php tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
+      - name: G5 isolated staging preparation lock no-network tests
+        run: |
+          php -l tools/g5-isolated/byl-g5-isolated-preparation-lock.php
+          php -l scripts/test_g5_isolated_preparation_lock.php
+          php scripts/test_g5_isolated_preparation_lock.php
+          php tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
       - name: P7.1 Thank You PHP syntax
         run: |
           php -l theme/beyourlover-v3/functions.php
@@ -58,5 +64,7 @@ jobs:
         run: python scripts/test_checkout_shipping_promotion_docs.py
       - name: Cart promotion UX contract
         run: python scripts/test_cart_promotion_ux_contract.py
+      - name: G5 abnormal payment submit-lock offline regression
+        run: node scripts/test_g5_submission_lock.js
       - name: Checkout progressive UX contract
         run: python scripts/test_checkout_progressive_ux_contract.py
