@@ -17,6 +17,7 @@ assert.match(functions,/inc\/cart-drawer\.php/);
 assert.match(php,/giftEnabled' => false/);
 assert.match(php,/wc_get_checkout_url\(\)/);
 assert.match(php,/wp_footer/);
+assert.match(php,/\}, 5\);\s*$/,'Drawer markup must be inserted before wp_print_footer_scripts at wp_footer priority 20');
 assert.match(php,/role="dialog" aria-modal="true"/);
 assert.match(php,/data-drawer-recommendations/);
 assert.match(php,/data-drawer-mobile-recs/);

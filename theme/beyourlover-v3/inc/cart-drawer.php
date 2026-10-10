@@ -112,4 +112,4 @@ add_action('wp_footer', static function (): void {
       </section>
     </div>
     <?php
-}, 99);
+}, 5);
