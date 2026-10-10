@@ -28,7 +28,7 @@ An additional `inc/free-shipping-v2-policy.php` (shipping-ui) is included *after
 
 The Theme entrypoint additionally registers after_setup_theme support, after_switch_theme legacy menu mapping, wp_enqueue_scripts, request (priority 8), redirect_canonical, permalink_manager_filter_redirect (priority 20), page_link, gettext, and body_class. Do not promote any visual code into payment authority.
 
-## Current asset inventory (T2.2 baseline; not yet extracted)
+## Current asset inventory (T2.2 code extracted verbatim)
 Global sequence: style.css → tokens.css → components.css → component-library.css → shell.css → motion.css; shell.js deferred. Route-specific conditional loading:
 - front_page: homepage.css
 - shop/product taxonomy: archive.css
@@ -45,13 +45,13 @@ All asset versions use the existing filemtime fallback to Theme Version; change 
 Entrypoint replaces only the ordered nine require_once statements with one `inc/theme-os-bootstrap.php` require. The loader uses the exact same nine statements and preserves the position before all subsequent global hooks. The tenth policy include stays in place. Validate manifest owner registration, order contract, PHP lint and preexisting offline regression in Foundation CI. Rollback is to revert this isolated T2 branch commit(s), never change the live Dev Theme without backup, exact SHA, independent Owner approval and M390/PC1440 UAT.
 
 ## T2.2–T2.7 gates
-1. T2.2: extract asset registration only after tracing source-sensitive legacy tests; preserve all handles, route predicates, version, dependency order, localized payload and WP hook priority; no user-visible changes
+1. T2.2: DONE — same existing wp_enqueue_scripts callback moved byte-for-byte to inc/theme-os-assets.php, included at its original functions.php position; six existing source-sensitive legacy tests retargeted with unchanged semantic assertions
 2. T2.3: audit Woo native adapter for duplicated inventory/total/checkout logic. Any business-logic move is a separate PR outside behavior-preserving refactor
-3. T2.4: extend source and negative module tests; run full Foundation CI and deterministic package checks
+3. T2.4: DONE at code/CI level — nine-route isolated PHP fixture verifies handles, dependency order, localized coupon endpoints, nonce, no Cart/Checkout bleed, and conditional wc-checkout fallback; existing Foundation CI and deterministic ZIP tests remain in place
 4. T2.5: isolated WP + Woo functional rehearsal with no mail/payment/outbound/data writes, comparing M390/PC1440 Cart/Checkout/Postpurchase
 5. T2.6: separately approved Dev-only exact-hash backup and runtime Owner UAT; do not disturb G5 permit or 3DS test
 6. T2.7: exact-head review + Owner Final PASS then separate merge authorization, no production deployment
 
 **Known conflicts:** Cart Drawer draft PR #63 adds new Cart assets and must register their owner after T1 merge; Cart CSS PR #61 and G3/G5 branches are independent. Avoid their functions.php/CI edits being silently overwritten.
 
-Status: T2.0 read-only audit completed, T2.1 source staged, CI pending. T2.2–T2.7 not yet accepted.
+Status as of 2026-10-10: T2.0–T2.4 code-level audit, loader/asset extraction and Foundation CI PASS; see separate T2 Woo-native audit. Independent exact-source comparison confirms the original nine-require block and 4,946-character asset callback are preserved verbatim. T2.5 actual isolated WP/Woo M390/PC1440 rehearsal is not yet completed, and T2.6 requires a distinct Dev-only exact-hash backup/permit gate and Owner UAT. No Dev/WWW install or payment test took place.
