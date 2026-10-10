@@ -12,6 +12,8 @@ The manifest at theme/beyourlover-v3/theme-os.json is the one registry of Theme 
 
 Cart, Checkout and postpurchase are protected Woo-adjacent UI modules. Changes to shared modules cause dependent-module regression gates. The registry is a **CI contract only**, not a runtime loader; Theme functions.php, page URLs and Woo hook order are unchanged by this initial implementation.
 
+**T2 stacked development (PR #69, not merged):** A separate static Theme-internal `inc/theme-os-bootstrap.php` preserves the original nine eager `require_once` calls in order. `inc/theme-os-assets.php` preserves the existing `wp_enqueue_scripts` callback byte-for-byte at the former registration point; the manifest remains a CI ownership registry and is **not** dynamically interpreted at runtime. The tenth free-shipping policy include, Woo hooks, Cart/Checkout localization and route guards retain their original order. Evidence and incomplete runtime gates are tracked in `THEME-OS-T2-RUNTIME-AUDIT.md` and `THEME-OS-T2-WOO-NATIVE-AUDIT.md`. The Theme remains 0.1.0; nothing is deployed.
+
 Future modules must reuse Woo APIs, use narrow stable UI interfaces, handle missing/network/expired-Nonce states, and keep page-specific JS/CSS out of global bundles. Do not duplicate CommerceKit or Woo fragments. Free Gift remains OFF until server-side Andy Commerce entitlement, stock and checkout verification are approved.
 
 ## SemVer and releases
