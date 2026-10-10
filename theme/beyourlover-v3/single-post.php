@@ -1,0 +1,95 @@
+<?php
+/**
+ * BYL V3 — canonical default for individual WordPress blog Posts only.
+ *
+ * Single Post precedence: single-post.php; does not affect Woo products,
+ * Pages, dedicated Blog home, Cart, Checkout, or custom post types.
+ */
+declare(strict_types=1);
+defined('ABSPATH') || exit;
+
+add_action('wp_enqueue_scripts', static function (): void {
+    $relative = '/assets/css/post-single.css';
+    $path = get_stylesheet_directory().$relative;
+    wp_enqueue_style(
+        'byl-v3-post-single',
+        get_stylesheet_directory_uri().$relative,
+        ['byl-v3-motion'],
+        is_file($path) ? (string) filemtime($path) : (string) wp_get_theme()->get('Version')
+    );
+}, 20);
+
+get_header();
+?>
+<main id="main-content" class="byl-post-single" data-byl-post-template="default">
+  <?php while (have_posts()) : the_post(); ?>
+    <?php
+    $byl_categories = get_the_category();
+    $byl_first_category = is_array($byl_categories) && $byl_categories
+        ? $byl_categories[0] : null;
+    $byl_previous = get_previous_post();
+    $byl_next = get_next_post();
+    ?>
+    <div class="byl-post-single__frame">
+      <nav class="byl-post-single__breadcrumb" aria-label="<?php esc_attr_e('Breadcrumb', 'beyourlover-v3'); ?>">
+        <a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'beyourlover-v3'); ?></a>
+        <span aria-hidden="true">/</span>
+        <a href="<?php echo esc_url(home_url('/blog/')); ?>"><?php esc_html_e('Blog', 'beyourlover-v3'); ?></a>
+        <?php if ($byl_first_category instanceof WP_Term): ?>
+          <span aria-hidden="true">/</span>
+          <a href="<?php echo esc_url(get_category_link((int) $byl_first_category->term_id)); ?>"><?php echo esc_html($byl_first_category->name); ?></a>
+        <?php endif; ?>
+      </nav>
+
+      <?php if (has_post_thumbnail()) : ?>
+        <figure class="byl-post-single__hero">
+          <?php the_post_thumbnail('full', ['class' => 'byl-post-single__hero-image', 'loading' => 'eager']); ?>
+        </figure>
+      <?php endif; ?>
+
+      <article <?php post_class('byl-post-single__article'); ?>>
+        <header class="byl-post-single__header">
+          <h1 class="byl-post-single__title"><?php echo esc_html(get_the_title()); ?></h1>
+          <div class="byl-post-single__meta">
+            <time datetime="<?php echo esc_attr(get_the_date('c')); ?>"><?php echo esc_html(get_the_date()); ?></time>
+            <?php if ($byl_first_category instanceof WP_Term): ?>
+              <span aria-hidden="true">·</span>
+              <a href="<?php echo esc_url(get_category_link((int) $byl_first_category->term_id)); ?>"><?php echo esc_html($byl_first_category->name); ?></a>
+            <?php endif; ?>
+          </div>
+        </header>
+
+        <div class="byl-post-single__content">
+          <?php the_content(); ?>
+          <?php wp_link_pages(['before' => '<nav class="byl-post-single__pagination" aria-label="' . esc_attr__('Article pages', 'beyourlover-v3') . '">', 'after' => '</nav>']); ?>
+        </div>
+
+        <?php $byl_tags = get_the_tag_list('', ', '); ?>
+        <?php if (is_string($byl_tags) && $byl_tags !== '') : ?>
+          <footer class="byl-post-single__tags" aria-label="<?php esc_attr_e('Tags', 'beyourlover-v3'); ?>">
+            <span><?php esc_html_e('Tags:', 'beyourlover-v3'); ?></span>
+            <?php echo wp_kses_post($byl_tags); ?>
+          </footer>
+        <?php endif; ?>
+
+        <?php if ($byl_previous instanceof WP_Post || $byl_next instanceof WP_Post) : ?>
+          <nav class="byl-post-single__navigation" aria-label="<?php esc_attr_e('More articles', 'beyourlover-v3'); ?>">
+            <?php if ($byl_previous instanceof WP_Post) : ?>
+              <a class="byl-post-single__nav-item" href="<?php echo esc_url(get_permalink($byl_previous)); ?>">
+                <span><?php esc_html_e('Previous article', 'beyourlover-v3'); ?></span>
+                <strong><?php echo esc_html(get_the_title($byl_previous)); ?></strong>
+              </a>
+            <?php endif; ?>
+            <?php if ($byl_next instanceof WP_Post) : ?>
+              <a class="byl-post-single__nav-item" href="<?php echo esc_url(get_permalink($byl_next)); ?>">
+                <span><?php esc_html_e('Next article', 'beyourlover-v3'); ?></span>
+                <strong><?php echo esc_html(get_the_title($byl_next)); ?></strong>
+              </a>
+            <?php endif; ?>
+          </nav>
+        <?php endif; ?>
+      </article>
+    </div>
+  <?php endwhile; ?>
+</main>
+<?php get_footer();
