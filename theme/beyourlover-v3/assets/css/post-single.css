@@ -274,3 +274,114 @@
   }
   .byl-post-toc__inline-list a { font-size: 14px; }
 }
+
+/* WWW Blog's actual right column: newsletter, Woo products and recent posts.
+ * Desktop-only 250px rail beside the 660px article with a 30px gap.
+ * All product/post details come from current WordPress/Woo records. */
+.byl-post-single__body { position: relative; min-width: 0; }
+.byl-blog-sidebar { display: none; }
+@media (min-width: 1280px) {
+  .byl-blog-sidebar {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: calc(50% + 360px);
+    width: 250px;
+    max-width: 250px;
+    min-width: 0;
+    color: var(--byl-ink, #161316);
+    font-family: var(--byl-font, inherit);
+    overflow-wrap: anywhere;
+  }
+  .byl-blog-sidebar__module { margin: 0 0 38px; }
+  .byl-blog-sidebar__module > h2 {
+    margin: 0 0 19px;
+    font-size: 20px;
+    line-height: 1.4;
+    letter-spacing: -.02em;
+    color: var(--byl-ink, #161316);
+    font-weight: 600;
+  }
+  .byl-blog-sidebar__newsletter {
+    padding: 22px 19px 24px;
+    border-radius: 12px;
+    background: #faf8f9;
+    border: 1px solid var(--byl-line, #e7e2e4);
+  }
+  .byl-blog-sidebar__newsletter > h2 { font-size: 18px; margin-bottom: 8px; }
+  .byl-blog-sidebar__newsletter p {
+    margin: 0 0 16px;
+    color: var(--byl-ink-2, #655e62);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .byl-blog-sidebar__subscribe {
+    display: flex;
+    min-height: 39px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    background: var(--byl-brand, #9b3749);
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-decoration: none !important;
+  }
+  .byl-blog-sidebar__subscribe:is(:hover, :focus-visible) {
+    filter: brightness(.90);
+  }
+  .byl-blog-sidebar__items {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+  .byl-blog-sidebar__item {
+    display: flex;
+    gap: 11px;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--byl-line, #e7e2e4);
+    align-items: flex-start;
+  }
+  .byl-blog-sidebar__item:first-child { padding-top: 0; }
+  .byl-blog-sidebar__item:last-child { border-bottom: 0; }
+  .byl-blog-sidebar__image {
+    display: block;
+    flex: 0 0 72px;
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f6f5f6;
+  }
+  .byl-blog-sidebar__image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin: 0;
+  }
+  .byl-blog-sidebar__item-body { flex: 1; min-width: 0; }
+  .byl-blog-sidebar__item-name {
+    color: var(--byl-ink, #161316) !important;
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    text-decoration: none !important;
+  }
+  .byl-blog-sidebar__item-name:is(:hover, :focus-visible) {
+    color: var(--byl-brand, #9b3749) !important;
+  }
+  .byl-blog-sidebar__price {
+    margin-top: 5px;
+    color: var(--byl-brand, #9b3749);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .byl-blog-sidebar__price del { font-weight: 400; color: #777; }
+  .byl-blog-sidebar__price ins { text-decoration: none; }
+}
