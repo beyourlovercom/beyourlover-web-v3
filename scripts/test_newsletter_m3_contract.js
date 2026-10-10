@@ -12,6 +12,8 @@ check(page.includes("shortcode_exists('yby_subscribe')"),'Core shortcode registr
 check(page.includes("class_exists('YBY_Newsletter_REST_Controller')"),'Old inert Core must fail closed');
 check((page.match(/do_shortcode\('\[yby_subscribe\]'\)/g)||[]).length===1,'Core must be rendered exactly once');
 check(page.includes('Newsletter sign-up is not available yet.'),'Explicit unavailable fallback required');
+check(page.includes("esc_html_e('The BeYourLover Edit'"), 'Newsletter eyebrow uses exact BeYourLover brand case');
+check(!page.includes("'THE BYL EDIT'"), 'No abbreviated user-facing brand eyebrow');
 check(page.includes('YBY_Newsletter_REST_Controller::enabled()'),'Core API gate must remain closed until authorized');
 check(page.includes('YBY_Newsletter_REST_Controller::outbound_enabled()'),'Outbound gate must remain closed until authorized');
 check(page.includes("$byl_newsletter_privacy !== ''"),'Missing privacy URL blocks signup');
