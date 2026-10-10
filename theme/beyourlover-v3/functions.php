@@ -1,16 +1,7 @@
 <?php
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
-require_once get_stylesheet_directory().'/inc/components.php';
-require_once get_stylesheet_directory().'/inc/shell-profiles.php';
-require_once get_stylesheet_directory().'/inc/homepage.php';
-require_once get_stylesheet_directory().'/inc/archive.php';
-require_once get_stylesheet_directory().'/inc/product.php';
-require_once get_stylesheet_directory().'/inc/product-modules.php';
-require_once get_stylesheet_directory().'/inc/checkout.php';
-// Isolated P7.1 order-received template, without modifying G3 payment JS.
-require_once get_stylesheet_directory().'/inc/thank-you.php';
-require_once get_stylesheet_directory().'/inc/cart-experience.php';
+require_once get_stylesheet_directory().'/inc/theme-os-bootstrap.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
