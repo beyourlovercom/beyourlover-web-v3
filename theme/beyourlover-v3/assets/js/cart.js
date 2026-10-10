@@ -10,7 +10,20 @@
         return blocks && blocks.cartStore;
     }
 
+    // Classic Cart uses Woo shipping packages and the customer's session.
+    // Blocks Store API cart state is independent and may still have an old zone.
+    function nativeCart() {
+        return document.querySelector('.byl-cart-runtime .cart_totals, .cart_totals');
+    }
+
     function state() {
+        var classic = nativeCart();
+        if (classic) {
+            var embedded = classic.querySelector('[data-byl-native-promotion]');
+            if (!embedded) return null; // Keep native Woo coupon; never infer from stale Blocks.
+            try { return JSON.parse(embedded.getAttribute('data-byl-native-promotion')); }
+            catch (error) { return null; }
+        }
         var descriptor = store();
         if (!window.wp || !wp.data || !descriptor) return null;
         var selected = wp.data.select(descriptor);
@@ -30,6 +43,14 @@
         } catch (error) { return '$' + Number(value || 0).toFixed(2); }
     }
 
+    // Whole-dollar thresholds should read "$69", not "$69.00".
+    // Keep fractional thresholds accurate if a future zone needs cents.
+    function thresholdCurrency(value) {
+        var numeric = Number(value || 0);
+        if (!Number.isFinite(numeric)) return currency(0);
+        return Number.isInteger(numeric) ? currency(numeric).replace(/\.00$/, '') : currency(numeric);
+    }
+
     function escapeHtml(value) {
         return String(value || '').replace(/[&<>'"]/g, function (character) {
             return {'&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;'}[character];
@@ -38,17 +59,29 @@
 
     function messageFor(data) {
         if (data.state === 'below_threshold') return 'Add ' + currency(data.remaining) + ' more for free shipping';
-        if (data.state === 'automatic_unlocked' || data.state === 'require_code_unlocked') return 'Free shipping unlocked';
+        if (data.state === 'automatic_unlocked' || data.state === 'require_code_unlocked') return "🎉 Congrats! You've unlocked free shipping.";
+        if (data.state === 'free_shipping_available') return "🎉 Congrats! You've unlocked free shipping.";
+        if (data.state === 'shipping_unavailable') return 'Free shipping is not available for this shipping address.';
         if (data.state === 'require_code_available') return 'Free shipping available';
         if (data.state === 'require_code_other') return 'Replace your current code with ' + escapeHtml(data.policy_code) + ' to unlock free shipping.';
         return '';
     }
 
     function render(data) {
-        if (!root || !data || !data.active) return;
+        if (!root || !data || !data.active) {
+            if (root) root.innerHTML = '';
+            document.body.classList.remove('byl-cart-coupon-enhanced');
+            return;
+        }
         var applied = data.has_code && data.applied_code;
-        var html = '<p class="byl-cart-promotion__heading">Free shipping</p>';
-        html += '<p class="byl-cart-promotion__message" aria-live="polite">' + messageFor(data) + '</p>';
+        var html = '';
+        if (data.state !== 'shipping_unavailable' && data.threshold > 0) {
+            html += '<p class="byl-cart-promotion__threshold">Free shipping on orders over ' + thresholdCurrency(data.threshold) + '</p>';
+        }
+        var celebrated = ['automatic_unlocked', 'require_code_unlocked', 'free_shipping_available'].indexOf(data.state) !== -1;
+        html += '<p class="byl-cart-promotion__message' + (celebrated ? ' byl-cart-promotion__message--celebrate' : '') + '" aria-live="polite">' + messageFor(data) + '</p>';
+        if (data.state === 'free_shipping_available') html += '<p class="byl-cart-promotion__delivery-note">Select Free Shipping under Shipping above to apply it to your order.</p>';
+        if (data.state === 'automatic_unlocked' || data.state === 'require_code_unlocked') html += '<p class="byl-cart-promotion__delivery-note">Free shipping applied to your order.</p>';
         if (data.state === 'require_code_available') html += '<p class="byl-cart-promotion__hint">Use code ' + escapeHtml(data.policy_code) + '</p>';
         if (data.state === 'below_threshold') {
             var progress = data.threshold > 0 ? Math.min(100, Math.max(0, (data.subtotal / data.threshold) * 100)) : 0;
@@ -103,7 +136,10 @@
                 if (!result.ok) throw new Error((result.json && (result.json.message || result.json.code)) || 'Unable to update the promo code.');
                 var descriptor = store();
                 var dispatcher = window.wp && wp.data && descriptor ? wp.data.dispatch(descriptor) : null;
-                if (dispatcher && typeof dispatcher.receiveCart === 'function') dispatcher.receiveCart(result.json);
+                // Classic Woo totals and its embedded shipping context must
+                // be refreshed by Woo, not a separate Blocks cart snapshot.
+                if (nativeCart()) window.location.reload();
+                else if (dispatcher && typeof dispatcher.receiveCart === 'function') dispatcher.receiveCart(result.json);
                 else window.location.reload();
                 return action;
             })
@@ -130,7 +166,16 @@
         var observer = new MutationObserver(function () { if (!root || !document.body.contains(root)) mount(); });
         observer.observe(document.body, {childList: true, subtree: true});
         mount();
-        if (window.wp && wp.data && typeof wp.data.subscribe === 'function') wp.data.subscribe(function () { var data = state(); if (data) { mount(); render(data); } });
+        if (window.wp && wp.data && typeof wp.data.subscribe === 'function') wp.data.subscribe(function () {
+            if (nativeCart()) return; // Classic Woo HTML owns state.
+            var data = state(); if (data) { mount(); render(data); }
+        });
+        // Woo updates classic cart totals after a shipping-address change.
+        if (window.jQuery && typeof window.jQuery === 'function') {
+            window.jQuery(document.body).on('updated_cart_totals updated_wc_div updated_shipping_method', function () {
+                mount(); render(state());
+            });
+        }
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

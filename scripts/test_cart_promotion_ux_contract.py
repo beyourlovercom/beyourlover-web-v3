@@ -61,7 +61,12 @@ if "cart.js" in product_branch or "cart.css" in product_branch:
 
 for marker in (
     "extensions['byl-shipping-promotion']",
-    "Free shipping unlocked",
+    "Free shipping applied",
+    "Free shipping on orders over ",
+    "thresholdCurrency(data.threshold)",
+    "Add ",
+    "data-byl-native-promotion",
+    "nativeCart()",
     "Free shipping available",
     "Replace your current code with ",
     "class=\"byl-cart-promotion__remove\"",
@@ -72,6 +77,28 @@ for marker in (
 ):
     if marker not in js:
         raise SystemExit(f"Missing Cart UI marker: {marker}")
+# Native Woo shipping-zone totals are authoritative on the shortcode Cart.
+# Blocks Store API may be stale after a classic address/zone update.
+native_php = (ROOT / "theme/beyourlover-v3/inc/cart-experience.php").read_text(encoding="utf-8")
+for marker in (
+    "woocommerce_cart_totals_before_order_total",
+    "byl_v3_cart_native_promotion_state",
+    "WC_Shipping_Zones::get_zone_matching_package",
+    "WC_Shipping_Zones::get_zones",
+    "get_shipping_packages()",
+    "chosen_shipping_methods",
+    "get_persisted_zone_effective_threshold",
+    "free_shipping_available",
+    "shipping_unavailable",
+    "wp_json_encode($state)",
+):
+    if marker not in native_php:
+        raise SystemExit(f"Missing Woo native Cart authority: {marker}")
+if "if (classic)" not in js or "if (!embedded) return null" not in js:
+    raise SystemExit("Classic Cart must fail closed to native Woo when shipping context is absent")
+if "if (nativeCart()) window.location.reload();" not in js:
+    raise SystemExit("Classic coupon mutation must refresh Woo's actual cart totals")
+
 if "mutate(config.applyUrl, {code: proposed}, 'apply')" not in js:
     raise SystemExit("Cart apply flow must use the native Store API")
 if "document.body.classList.add('byl-cart-coupon-enhanced')" not in js:

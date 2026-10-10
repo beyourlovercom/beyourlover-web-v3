@@ -5,15 +5,15 @@
     border-top: 1px solid var(--byl-line);
     border-bottom: 1px solid var(--byl-line);
 }
-.woocommerce-cart .byl-cart-promotion__heading { margin: 0 0 .35rem; font-weight: 600; }
 .woocommerce-cart .byl-cart-promotion__message { margin: 0; }
+.woocommerce-cart .byl-cart-promotion__threshold { margin: 0 0 .25rem; font-weight: 600; }
 .woocommerce-cart .byl-cart-promotion__hint { margin: .35rem 0 0; font-size: .9em; }
 .woocommerce-cart .byl-cart-promotion__form { display: flex; flex-direction: column; gap: .5rem; width: 100%; margin-top: .75rem; }
 .woocommerce-cart .byl-cart-promotion__form input,
 .woocommerce-cart .byl-cart-promotion__form button { box-sizing: border-box; width: 100%; min-height: 2.75rem; }
 .woocommerce-cart .byl-cart-promotion__form input { min-width: 0; }
 .woocommerce-cart .byl-cart-promotion__form button { border: 1px solid var(--byl-brand); background: var(--byl-brand); color: var(--byl-surface); font-weight: 600; cursor: pointer; }
-.woocommerce-cart .byl-cart-promotion__meter { height: .25rem; margin-top: .75rem; overflow: hidden; background: var(--byl-line); border-radius: var(--byl-radius-pill); }
+.woocommerce-cart .byl-cart-promotion__meter { height: .25rem; margin-top: .4rem; overflow: hidden; background: var(--byl-line); border-radius: var(--byl-radius-pill); }
 .woocommerce-cart .byl-cart-promotion__meter span { display: block; height: 100%; background: var(--byl-brand); border-radius: inherit; }
 .woocommerce-cart .byl-cart-promotion__error { margin: .5rem 0 0; color: var(--byl-danger); }
 .woocommerce-cart .byl-cart-promotion__edit,
@@ -38,3 +38,7 @@
     .woocommerce-cart .byl-cart-promotion__form input { flex: 1 1 auto; width: auto; }
     .woocommerce-cart .byl-cart-promotion__form button { width: auto; }
 }
+
+/* Free shipping success state — distinct eligibility and application. */
+.woocommerce-cart .byl-cart-promotion__message--celebrate { color: #496e5c; font-weight: 700; }
+.woocommerce-cart .byl-cart-promotion__delivery-note { margin: .25rem 0 .5rem; font-size: .86rem; line-height: 1.6; }
