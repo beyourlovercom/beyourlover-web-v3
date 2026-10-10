@@ -41,6 +41,11 @@ function the_content(): void { echo '<p>OFFLINE_FIXTURE_CONTENT</p>'; }
 function home_url($path = ''): string { return 'https://offline.invalid'.$path; }
 function has_post_thumbnail(): bool { return $GLOBALS['byl_fixture']['thumbnail']; }
 function the_post_thumbnail($size, $attr): void { echo '<img src="fixture.png" alt="fixture">'; }
+function get_the_ID(): int { return 39899; }
+function get_posts($args = []): array {
+    // Offline fixture: no DB, no network or WordPress bootstrap.
+    return [];
+}
 function get_the_category(): array { return [new WP_Term(1,'NEWS')]; }
 function get_category_link($id): string { return '/category/news/'; }
 function get_previous_post() { return null; }

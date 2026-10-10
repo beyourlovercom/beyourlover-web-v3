@@ -17,6 +17,15 @@ add_action('wp_enqueue_scripts', static function (): void {
         ['byl-v3-motion'],
         is_file($path) ? (string) filemtime($path) : (string) wp_get_theme()->get('Version')
     );
+    $toc_relative = '/assets/js/post-toc.js';
+    $toc_path = get_stylesheet_directory().$toc_relative;
+    wp_enqueue_script(
+        'byl-v3-post-toc',
+        get_stylesheet_directory_uri().$toc_relative,
+        [],
+        is_file($toc_path) ? (string) filemtime($toc_path) : (string) wp_get_theme()->get('Version'),
+        true
+    );
 }, 20);
 
 get_header();
@@ -47,6 +56,13 @@ get_header();
         </figure>
       <?php endif; ?>
 
+      <?php /* Enhanced progressively by post-toc.js; never alters saved post body. */ ?>
+      <nav class="byl-post-toc--floating" id="byl-post-floating-toc" aria-label="<?php esc_attr_e('Article index', 'beyourlover-v3'); ?>" hidden>
+        <p class="byl-post-toc__rail-label"><?php esc_html_e('Index', 'beyourlover-v3'); ?></p>
+        <ol class="byl-post-toc__floating-list"></ol>
+      </nav>
+
+      <div class="byl-post-single__body">
       <article <?php post_class('byl-post-single__article'); ?>>
         <header class="byl-post-single__header">
           <h1 class="byl-post-single__title"><?php echo esc_html(get_the_title()); ?></h1>
@@ -72,23 +88,11 @@ get_header();
           </footer>
         <?php endif; ?>
 
-        <?php if ($byl_previous instanceof WP_Post || $byl_next instanceof WP_Post) : ?>
-          <nav class="byl-post-single__navigation" aria-label="<?php esc_attr_e('More articles', 'beyourlover-v3'); ?>">
-            <?php if ($byl_previous instanceof WP_Post) : ?>
-              <a class="byl-post-single__nav-item" href="<?php echo esc_url(get_permalink($byl_previous)); ?>">
-                <span><?php esc_html_e('Previous article', 'beyourlover-v3'); ?></span>
-                <strong><?php echo esc_html(get_the_title($byl_previous)); ?></strong>
-              </a>
-            <?php endif; ?>
-            <?php if ($byl_next instanceof WP_Post) : ?>
-              <a class="byl-post-single__nav-item" href="<?php echo esc_url(get_permalink($byl_next)); ?>">
-                <span><?php esc_html_e('Next article', 'beyourlover-v3'); ?></span>
-                <strong><?php echo esc_html(get_the_title($byl_next)); ?></strong>
-              </a>
-            <?php endif; ?>
-          </nav>
-        <?php endif; ?>
+        <?php /* WWW endmatter: editorial bio, prior/next and related Posts. */ ?>
+        <?php require get_stylesheet_directory().'/blog-endmatter.php'; ?>
       </article>
+      <?php require get_stylesheet_directory().'/blog-sidebar.php'; ?>
+      </div>
     </div>
   <?php endwhile; ?>
 </main>
