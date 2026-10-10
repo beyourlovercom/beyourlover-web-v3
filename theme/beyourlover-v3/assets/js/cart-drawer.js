@@ -38,8 +38,21 @@
     try { return new Intl.NumberFormat('en-US', {style:'currency',currency:code}).format(amount); }
     catch (_) { return code + ' ' + amount.toFixed(2); }
   };
+  const decodeWooText = value => String(value ?? '').replace(
+    /&(#x[0-9a-f]+|#[0-9]+|amp|lt|gt|quot|apos);/gi,
+    (full,raw) => {
+      const entity=raw.toLowerCase();
+      if(entity[0]==='#') {
+        const code=entity[1]==='x' ? parseInt(entity.slice(2),16) : parseInt(entity.slice(1),10);
+        return Number.isInteger(code) && code>=32 && code<=0x10ffff
+          ? String.fromCodePoint(code) : full;
+      }
+      return {amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"}[entity] ?? full;
+    }
+  );
   const setFeedback = (message, error=false) => {
-    elements.feedback.textContent = message;
+    // Woo returns entity-encoded errors; textContent guarantees safe display.
+    elements.feedback.textContent = decodeWooText(message);
     elements.feedback.classList.toggle('is-error', error);
   };
   const safeHref = value => {
