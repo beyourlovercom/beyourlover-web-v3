@@ -44,6 +44,8 @@ jobs:
         run: node --check theme/beyourlover-v3/assets/js/post-toc.js && node scripts/test_blog_toc_contract.js
       - name: Blog product-card legacy Woo shortcode offline regression
         run: php -l theme/beyourlover-v3/inc/blog-product-card.php && php -l tools/dev/tests/blog-product-card-offline-smoke.php && php tools/dev/tests/blog-product-card-offline-smoke.php
+      - name: Newsletter M3 offline theme and Core contract
+        run: php -l theme/beyourlover-v3/page-newsletter.php && node --check scripts/test_newsletter_m3_contract.js && node scripts/test_newsletter_m3_contract.js
       - name: Python syntax
         run: python -m py_compile scripts/*.py
       - name: Cart V2 focused regression
