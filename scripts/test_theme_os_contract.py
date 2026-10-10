@@ -91,7 +91,7 @@ class TestThemeOS(unittest.TestCase):
         self.assertEqual(entry.count("require_once get_stylesheet_directory().'/inc/theme-os-bootstrap.php';"), 1)
         self.assertLess(entry.index("inc/theme-os-bootstrap.php"), entry.index("add_action('after_setup_theme'"))
         self.assertLess(entry.index("add_action('wp_enqueue_scripts'"), entry.index("inc/free-shipping-v2-policy.php"))
-        paths = re.findall(r"require_once get_stylesheet_directory\\(\\)\\.'/((?:inc/)[^']+\\.php)';", loader)
+        paths = re.findall(r"require_once get_stylesheet_directory\(\)\.'/((?:inc/)[^']+\.php)';", loader)
         expected = [
             "inc/components.php", "inc/shell-profiles.php", "inc/homepage.php",
             "inc/archive.php", "inc/product.php", "inc/product-modules.php",
