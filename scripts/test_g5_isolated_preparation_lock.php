@@ -10,7 +10,7 @@ function add_action($name, $callback, $priority = 10, $args = 1) {
     $GLOBALS['hooks'][$name][] = $callback;
 }
 function wp_get_environment_type() { return 'staging'; }
-function home_url() { return 'https://g5-uat.beyourlover.com'; }
+function home_url() { return $GLOBALS['g5_home'] ?? 'http://g5-uat.beyourlover.com'; }
 function wc_add_notice($text,$type) { $GLOBALS['g5_notice'] = [$text,$type]; }
 class WP_REST_Request {
     function __construct(private string $route){}
@@ -52,4 +52,10 @@ $prior=new WP_Error('earlier_denied','prior');
 test($http($prior, [], 'https://api.stripe.com/')===$prior,'prior network rejection preserved');
 test(isset($GLOBALS['hooks']['parse_request']),'AfterShip legacy ingress registered');
 test(isset($GLOBALS['hooks']['wp_robots']),'robots noindex registered');
+// Canonical hostname and environment gate are part of fail-closed safety.
+$source = file_get_contents(dirname(__DIR__) . '/tools/g5-isolated/byl-g5-isolated-preparation-lock.php');
+test(str_contains($source, "'http://g5-uat.beyourlover.com'")
+    && str_contains($source, "'https://g5-uat.beyourlover.com'"),
+    'lock covers Hostinger HTTP transition and eventual HTTPS canonical URL');
+
 echo "G5_ISOLATED_PREPARATION_LOCK_PASS=$pass checks, zero requests, zero orders".PHP_EOL;
