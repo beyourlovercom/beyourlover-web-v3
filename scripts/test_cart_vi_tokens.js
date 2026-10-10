@@ -26,6 +26,11 @@ assert(!/#[0-9a-f]{3,8}(?![a-z0-9])/i.test(focus), 'Cart Focus CSS must not hard
 assert(!/\bgreen\b|PingFang|#075[a-f0-9]{3}|#064b3a/i.test(focus), 'legacy green/other-brand VI not allowed');
 assert(focus.includes('body.byl-focus-cart-shell .byl-cart-recommendations{contain:paint}'), 'Mobile Cart rail must not expand the page viewport');
 assert(focus.includes('overflow-x:auto;scroll-snap-type:x mandatory'), 'Mobile recommendations keep independent horizontal scrolling');
+assert(
+  /\.byl-cart-runtime\s+\.woocommerce-cart-form\s+table\.shop_table\s+tbody\s+tr\.cart_item\s*>\s*td\s*\{\s*background:\s*transparent\s*!important\s*;\s*\}/.test(focus),
+  'WooCommerce alternating-row cell backgrounds must not create gray rectangles in mobile Cart'
+);
+
 assert(cart.includes('background: var(--byl-brand)'), 'Legacy cart coupon component must inherit BYL brand');
 assert(!/CanvasText|#a51d2d/.test(cart), 'generic system or legacy danger tokens not allowed');
 const fn = fs.readFileSync(path.join(theme,'functions.php'),'utf8');
