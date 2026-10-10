@@ -4,10 +4,10 @@
 
 ## 0. Exact baseline and release boundary
 
-- Website main (last read-only audit): `16d1cec21840aeee3036d95d57cdf5f1d7eba54a`; recheck before any release.
-- G5 source: PR #48 HEAD `656daca53fbb48ea0b77bf6bd3f060fb7c1c68f1` (Draft/unmerged), PR #56 HEAD `ddb873341cecf4acc5416a618b2546027de15bc2` (Draft/unmerged). **Independent exact-head Owner merge approvals required**, including new CI.
-- Newsletter security: PR #68 Draft (HEAD changes with this document; use its CURRENT head), Issue #67. Website Newsletter: PR #62 Draft, Owner visual PASS; it must NOT merge or deploy via this safety PR.
-- Installed Dev safety MU SHA256 `8766416cba7e3651ec4f7656fcad9705da832d30adedfb08238e646776f8f137` equals PR #56 G5 file; NOT main. Preserve its AfterShip/Automizely egress + ingress quarantine, Woo orders/customers REST protection, and 11 synthetic-test-order limit.
+- Website main (last exact-head audit after G5 Closure): `d4ea6bae459fb57d5ad37f9ac2292dff081ed6aa`; recheck before any release.
+- G5 Closure **complete**: PR #48 authorized main-only merge `779c4d8b9167ab695f36c7e1b1fb363ead9b4e65`, then PR #56 authorized main-only merge `d4ea6bae459fb57d5ad37f9ac2292dff081ed6aa`. No Dev/WWW deployment occurred as part of either merge.
+- Newsletter security: PR #68 Draft, reconciled onto G5-merged main with Newsletter-owned changes only (HEAD changes with this document; use its CURRENT head), Issue #67. Owner Code UAT approved the prior exact-code design; independent final PR merge authorization remains required. Website Newsletter: PR #62 Draft, Owner visual PASS; it must NOT merge or deploy via this safety PR.
+- Installed Dev safety MU SHA256 `8766416cba7e3651ec4f7656fcad9705da832d30adedfb08238e646776f8f137` was read-only verified before G5 #56 main Closure and matches the newly merged G5 main safety source. Revalidate installed hash immediately before any later authorized Dev change. Preserve its AfterShip/Automizely egress + ingress quarantine, Woo orders/customers REST protection, and 11 synthetic-test-order limit.
 - Last read-only Dev checks: `staging`, site `https://dev.beyourlover.com`, G2 permit ABSENT; Newsletter API OFF, outbound OFF, one-use mail permit ABSENT, Newsletter table 0 rows, exact private full DB backup SHA256 + gzip integrity PASS. All email safety remains default OFF.
 - Core Newsletter main `6eea6cc6a616b5e07ed204d0530618f0f522176f`: site-wide JS for safe email token landing, deliberately requires human button click to POST confirm; never automatically confirm a scanner GET. Owner mailbox remains privately designated and is **not listed in GitHub**.
 
@@ -34,8 +34,8 @@ All passing code-only tests are **offline**, not a real mail delivery, confirmat
 
 ## 3. Required separate authorization sequence after Code UAT
 
-1. G5 owner independently approves main-only closure of PR #48 then PR #56, specifying refreshed exact heads and CI, with no Dev/WWW deploy. If main has drifted, reconcile first. A general `next step` does not authorize merging.
-2. Rebase/reconcile Newsletter one-mail delta to the actual new main so the PR shows ONLY Newsletter-owned code, tests and docs. Re-run all original G5 and Newsletter tests and GitHub CI. Preserve G5 installed source and rollback identity.
+1. **COMPLETE:** G5 owner separately approved the main-only Closure of PR #48 then PR #56. Actual verified merge SHAs are shown in Section 0; no Dev/WWW deployment.
+2. **CODE-ONLY COMPLETE:** PR #68 was reconciled onto the new G5-merged main. The GitHub comparison reports only Newsletter-owned PHP, CI, two Newsletter documents and one Newsletter test. Exact-head Foundation CI and all security regressions must be rechecked again if this document or head changes; preserve installed G5 source and rollback identity.
 3. Owner separately approves the final Newsletter PR merge and **Dev-only exact-file safety deploy** with verified private backup and rollback, no global public API enablement, no new plugin, no G5 changes.
 4. Only after independent signed approval and no earlier execution safety refusal, use a supported approved operator test facility to provision a 0600 five-minute one-use grant. Allow **at most one** genuine Newsletter double-opt-in confirmation email to the privately owner-designated mailbox. Never disclose the email address, raw message, token or credentials in GitHub.
 5. Verify WordPress transport acceptance is distinct from mailbox receipt. If delivery is uncertain, do NOT retry under same grant. Only the Owner deliberately clicks **Confirm my subscription** on the linked Dev landing page; confirm token action must be POST rather than auto-confirming GET.
@@ -49,4 +49,4 @@ No active Dev runtime change is needed to perform Section 2 **code UAT**. The ac
 
 ## 5. Roadmap
 
-M3.0–M3.7 Newsletter page/contract/isolated DB PASS → Issue #67 code candidate and offline regression PASS → **Owner Code UAT** → G5 #48/#56 authorized GitHub Closure → Newsletter refreshed exact-head CI/closure → independently authorized Dev safety installation → one real confirmation mailbox UAT → Core↔ERP E2E → final Website owner/release closure.
+M3.0–M3.7 Newsletter page/contract/isolated DB PASS → Issue #67 code security and Owner Code UAT PASS → G5 #48/#56 main Closure PASS → Newsletter reconciled exact-head CI PASS → **independent Newsletter #68 merge authorization gate** → independently authorized Dev safety installation → one real confirmation mailbox UAT → Core↔ERP E2E → final Website owner/release closure.
