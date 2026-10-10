@@ -7,7 +7,7 @@
 declare(strict_types=1);
 
 $cases = [
-    'no_permit', 'approved_once', 'already_consumed', 'expired',
+    'no_permit', 'approved_once', 'already_consumed', 'expired', 'missing_backup_file', 'tampered_backup', 'wrong_backup_path',
     'future', 'long_lifetime', 'wrong_site', 'wrong_environment',
     'not_cli', 'prior_denial', 'unapproved', 'missing_backup_hash',
     'wrong_recipient', 'extra_to', 'headers_cc', 'headers_bcc',
@@ -30,8 +30,13 @@ if ($argvCount === 1) {
     if (!is_string($source) || !str_contains($source, '/home/u247343654/byl-v3-staging')) {
         throw new RuntimeException('Missing expected Dev safety source anchor');
     }
-    file_put_contents($shared.'/safety.php', str_replace('/home/u247343654/byl-v3-staging', $shared, $source));
+    $source = str_replace('/home/u247343654/byl-v3-staging', $shared, $source);
+    $source = str_replace('/home/u247343654/backups', $shared, $source);
+    file_put_contents($shared.'/safety.php', $source);
+    mkdir($shared.'/newsletter-m37-dev-pretest-20261010T081209Z-ABC123', 0700);
+    file_put_contents($shared.'/newsletter-m37-dev-pretest-20261010T081209Z-ABC123/dev-pretest.sql.gz', str_repeat('B', 2048));
     $ticket = newsletter_test_ticket();
+    $ticket['backup_path'] = $shared.'/newsletter-m37-dev-pretest-20261010T081209Z-ABC123/dev-pretest.sql.gz';
     file_put_contents($shared.'/newsletter-one-mail-permit.json', json_encode($ticket));
     chmod($shared.'/newsletter-one-mail-permit.json', 0600);
     $processes = [];
@@ -57,6 +62,8 @@ if ($argvCount === 1) {
     }
     $final=json_decode((string)file_get_contents($shared.'/newsletter-one-mail-permit.json'), true);
     if (($final['state']??null)!=='consumed') { throw new RuntimeException('Race ticket not consumed'); }
+    foreach (glob($shared.'/newsletter-m37-dev-pretest-20261010T081209Z-ABC123/*') ?: [] as $file) { unlink($file); }
+    rmdir($shared.'/newsletter-m37-dev-pretest-20261010T081209Z-ABC123');
     foreach (glob($shared.'/*') ?: [] as $file) { unlink($file); }
     rmdir($shared);
     echo "NEWSLETTER_ONE_MAIL_SAFETY=PASS ".count($cases)." negative/positive cases + cross-process race\n";
@@ -71,7 +78,8 @@ function newsletter_test_ticket(): array {
         'approved_by_owner'=>true,
         'max_messages'=>1,
         'ticket_id'=>str_repeat('a',32),
-        'backup_sha256'=>str_repeat('b',64),
+        'backup_sha256'=>hash('sha256', str_repeat('B', 2048)),
+        'backup_path'=>'/home/u247343654/backups/newsletter-m37-dev-pretest-20261010T081209Z-ABC123/dev-pretest.sql.gz',
         'recipient_sha256'=>hash('sha256','owner@example.test'),
         'issued_at'=>time()-10,
         'expires_at'=>time()+180,
@@ -104,13 +112,17 @@ if (!$race) {
     if (!is_string($source) || !str_contains($source, '/home/u247343654/byl-v3-staging')) {
         throw new RuntimeException('Source mismatch');
     }
-    file_put_contents($tmp.'/safety.php', str_replace('/home/u247343654/byl-v3-staging', $tmp, $source));
+    $source = str_replace('/home/u247343654/byl-v3-staging', $tmp, $source);
+    $source = str_replace('/home/u247343654/backups', $tmp, $source);
+    file_put_contents($tmp.'/safety.php', $source);
 }
 $GLOBALS['filters'] = [];
 function add_filter($name, $cb, $priority=10, $accepted=1): void {
     $GLOBALS['filters'][$name][] = ['callback'=>$cb,'priority'=>$priority,'accepted'=>$accepted];
 }
-function add_action(...$args): void {}
+function add_action($name, $callback, $priority=10, $accepted=1): void {
+    $GLOBALS['filters'][$name][] = ['callback'=>$callback,'priority'=>$priority,'accepted'=>$accepted];
+}
 function wp_get_environment_type(): string {
     return $GLOBALS['testCase'] === 'wrong_environment' ? 'production' : 'staging';
 }
@@ -140,9 +152,16 @@ if ($race) {
 }
 $permit=newsletter_test_ticket();
 $mail=newsletter_test_mail();
+$backupDir=$tmp.'/newsletter-m37-dev-pretest-20261010T081209Z-ABC123';
+mkdir($backupDir, 0700);
+file_put_contents($backupDir.'/dev-pretest.sql.gz', str_repeat('B',2048));
+$permit['backup_path']=$backupDir.'/dev-pretest.sql.gz';
 $allow=$scenario==='approved_once';
 switch ($scenario) {
     case 'expired': $permit['expires_at']=time()-1;break;
+    case 'missing_backup_file': unlink($backupDir.'/dev-pretest.sql.gz');break;
+    case 'tampered_backup':file_put_contents($backupDir.'/dev-pretest.sql.gz','MODIFIED'.str_repeat('B',2048));break;
+    case 'wrong_backup_path':$permit['backup_path']=$tmp.'/elsewhere.sql.gz';break;
     case 'future': $permit['issued_at']=time()+1;break;
     case 'long_lifetime': $permit['expires_at']=$permit['issued_at']+301;break;
     case 'wrong_site_ticket': $permit['site']='https://www.beyourlover.com';break;
@@ -193,6 +212,8 @@ if ($allow) {
         throw new RuntimeException('Denied request consumed ticket: '.$scenario);
     }
 }
+foreach (glob($backupDir.'/*') ?: [] as $file) { unlink($file); }
+rmdir($backupDir);
 foreach (glob($tmp.'/*') ?: [] as $file) { unlink($file); }
 rmdir($tmp);
 echo "PASS ".$scenario.PHP_EOL;
