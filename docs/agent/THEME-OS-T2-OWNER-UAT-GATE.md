@@ -32,4 +32,4 @@ Capture real 390 CSS px and 1440 CSS px browser screenshots, console errors, net
 ## Exit criteria
 All applicable functional tests PASS, verified files and hashes unchanged outside scope, G2/G5 undisturbed and Owner visual UAT PASS. Any changed Woo hooks, asset dependencies, Cart/Checkout behavior or safety controls is FAIL and triggers scoped code rollback. T2 PR main merge and WWW cutover always require separate approvals.
 
-**Present status: UAT checklist READY, T2.5 isolated full WordPress+Woo browser rehearsal and T2.6 Dev Owner UAT NOT PERFORMED.**
+**Present status 2026-10-10:** T2.5 isolated real WordPress 7.1.3 / WooCommerce 11.2.1 / PHP 8.3.33 technical rehearsal **PASS** (80/80 M390 + PC1440 browser checks, 12/12 additional native Cart/Coupon/Order Received checks, 14 local screenshots, zero synthetic orders, no outbound). Evidence: `THEME-OS-T2-ISOLATED-WP-WOO-EVIDENCE.md`. T2.6 **Dev installed stack preflight + code-only deployment + Owner UAT NOT PERFORMED**; G5/P13 safety state unverified and independent Owner Dev deployment authorization still required. PR #69 remains Draft; WWW unchanged.
