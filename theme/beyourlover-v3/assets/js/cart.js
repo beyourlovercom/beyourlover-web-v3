@@ -59,8 +59,8 @@
 
     function messageFor(data) {
         if (data.state === 'below_threshold') return 'Add ' + currency(data.remaining) + ' more for free shipping';
-        if (data.state === 'automatic_unlocked' || data.state === 'require_code_unlocked') return 'Free shipping applied';
-        if (data.state === 'free_shipping_available') return 'Free shipping is available — select it under Shipping above.';
+        if (data.state === 'automatic_unlocked' || data.state === 'require_code_unlocked') return "🎉 Congrats! You've unlocked free shipping.";
+        if (data.state === 'free_shipping_available') return "🎉 Congrats! You've unlocked free shipping.";
         if (data.state === 'shipping_unavailable') return 'Free shipping is not available for this shipping address.';
         if (data.state === 'require_code_available') return 'Free shipping available';
         if (data.state === 'require_code_other') return 'Replace your current code with ' + escapeHtml(data.policy_code) + ' to unlock free shipping.';
@@ -78,7 +78,10 @@
         if (data.state !== 'shipping_unavailable' && data.threshold > 0) {
             html += '<p class="byl-cart-promotion__threshold">Free shipping on orders over ' + thresholdCurrency(data.threshold) + '</p>';
         }
-        html += '<p class="byl-cart-promotion__message" aria-live="polite">' + messageFor(data) + '</p>';
+        var celebrated = ['automatic_unlocked', 'require_code_unlocked', 'free_shipping_available'].indexOf(data.state) !== -1;
+        html += '<p class="byl-cart-promotion__message' + (celebrated ? ' byl-cart-promotion__message--celebrate' : '') + '" aria-live="polite">' + messageFor(data) + '</p>';
+        if (data.state === 'free_shipping_available') html += '<p class="byl-cart-promotion__delivery-note">Select Free Shipping under Shipping above to apply it to your order.</p>';
+        if (data.state === 'automatic_unlocked' || data.state === 'require_code_unlocked') html += '<p class="byl-cart-promotion__delivery-note">Free shipping applied to your order.</p>';
         if (data.state === 'require_code_available') html += '<p class="byl-cart-promotion__hint">Use code ' + escapeHtml(data.policy_code) + '</p>';
         if (data.state === 'below_threshold') {
             var progress = data.threshold > 0 ? Math.min(100, Math.max(0, (data.subtotal / data.threshold) * 100)) : 0;

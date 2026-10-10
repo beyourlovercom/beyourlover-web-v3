@@ -65,3 +65,15 @@ The free-shipping promotion card must omit the redundant standalone
 Use "over" as the Owner-approved customer-facing copy; eligibility calculation
 remains WooCommerce's unchanged effective zone rule (minimum $69). Fractional
 future thresholds retain cents to avoid silently misrepresenting the amount.
+
+## Final Owner-approved success messaging (2026-10-09)
+The cart uses the same Free Shipping V2 victory line as /free-shipping/:
+`🎉 Congrats! You've unlocked free shipping.`.
+**Eligible but paid service selected:** show celebration **and**
+`Select Free Shipping under Shipping above to apply it to your order.`.
+**Free delivery selected:** show celebration **and**
+`Free shipping applied to your order.`.
+Do not celebrate under threshold, when a required code has not been applied,
+or when no actual free rate is available. Preserve $69 threshold,
+$10.00 remaining, native Woo shipping authority, and anti-stale Blocks guard.
+The payment G2 gate remains closed.

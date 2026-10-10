@@ -38,3 +38,7 @@
     .woocommerce-cart .byl-cart-promotion__form input { flex: 1 1 auto; width: auto; }
     .woocommerce-cart .byl-cart-promotion__form button { width: auto; }
 }
+
+/* Free shipping success state — distinct eligibility and application. */
+.woocommerce-cart .byl-cart-promotion__message--celebrate { color: #496e5c; font-weight: 700; }
+.woocommerce-cart .byl-cart-promotion__delivery-note { margin: .25rem 0 .5rem; font-size: .86rem; line-height: 1.6; }
