@@ -158,7 +158,10 @@ function byl_dev_newsletter_mail_consume_once(array $mail): bool {
             !is_string($ticket['backup_sha256'] ?? null) ||
             !preg_match('/^[a-f0-9]{64}$/D', $ticket['backup_sha256']) ||
             !is_string($ticket['recipient_sha256'] ?? null) ||
-            !preg_match('/^[a-f0-9]{64}$/D', $ticket['recipient_sha256'])) {
+            !preg_match('/^[a-f0-9]{64}$/D', $ticket['recipient_sha256']) ||
+            !is_string($ticket['backup_path'] ?? null) ||
+            !preg_match('~^/home/u247343654/backups/newsletter-m37-dev-pretest-[0-9]{8}T[0-9]{6}Z-[A-Za-z0-9]{6}/dev-pretest\\.sql\\.gz$~D',
+                $ticket['backup_path'])) {
             return false;
         }
         $issued = $ticket['issued_at'] ?? null;
@@ -167,6 +170,13 @@ function byl_dev_newsletter_mail_consume_once(array $mail): bool {
             $issued > time() || $issued < time() - 300 ||
             $expires <= time() || $expires > $issued + 300 ||
             !byl_dev_newsletter_mail_match($mail, $ticket['recipient_sha256'])) {
+            return false;
+        }
+        // Check the previously verified pre-test backup again before any send.
+        $backup = $ticket['backup_path'];
+        if (is_link($backup) || !is_file($backup) || !is_readable($backup) ||
+            realpath($backup) !== $backup || filesize($backup) < 1024 ||
+            !hash_equals($ticket['backup_sha256'], (string) hash_file('sha256', $backup))) {
             return false;
         }
         // Consume BEFORE attempting transport. A failed or uncertain delivery
@@ -184,6 +194,7 @@ function byl_dev_newsletter_mail_consume_once(array $mail): bool {
             return false;
         }
         $attempted = true;
+        $GLOBALS['byl_dev_newsletter_canary_armed'] = $ticket['recipient_sha256'];
         return true;
     } finally {
         flock($lock, LOCK_UN);
@@ -200,6 +211,29 @@ add_filter('pre_wp_mail', static function ($pre, $mail) {
     return null; // allow exactly this native wp_mail attempt, not a synthetic success
 }, PHP_INT_MAX, 2);
 
+// Defence in depth: later mailer hooks must not add any recipients.
+add_action('phpmailer_init', static function ($mailer): void {
+    $hash = $GLOBALS['byl_dev_newsletter_canary_armed'] ?? null;
+    if (!is_string($hash)) { return; }
+    if (!is_object($mailer) || !method_exists($mailer, 'getToAddresses') ||
+        !method_exists($mailer, 'getCcAddresses') ||
+        !method_exists($mailer, 'getBccAddresses') ||
+        !method_exists($mailer, 'getReplyToAddresses') ||
+        !method_exists($mailer, 'getAttachments')) {
+        throw new RuntimeException('Newsletter Canary transport verification unavailable.');
+    }
+    $to = $mailer->getToAddresses();
+    if (!is_array($to) || count($to) !== 1 || !is_array($to[0]) ||
+        !is_string($to[0][0] ?? null) ||
+        !hash_equals($hash, hash('sha256', strtolower(trim($to[0][0])))) ||
+        ($mailer->Subject ?? null) !== 'Confirm your newsletter subscription' ||
+        count($mailer->getCcAddresses()) !== 0 ||
+        count($mailer->getBccAddresses()) !== 0 ||
+        count($mailer->getReplyToAddresses()) !== 0 ||
+        count($mailer->getAttachments()) !== 0) {
+        throw new RuntimeException('Newsletter Canary transport recipients mismatch.');
+    }
+}, PHP_INT_MAX);
 
 // P5: Store API Checkout is a distinct order-creation/payment path from classic Woo.
 // The G2 test permit is classic-checkout only. Even a valid tester grant must
