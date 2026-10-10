@@ -25,6 +25,9 @@ check(js.includes('desktop.matches') && css.includes('min-width: 1280px'), 'Desk
 check(css.includes('max-width: 660px') && css.includes('width: 187px'), 'WWW measured reading/rail dimensions');
 check(css.includes('.byl-post-toc--floating[hidden]') && css.includes('display: none !important'), 'Hidden-state CSS fail-closed');
 check(!/\.wp-site-blocks|woocommerce_available_payment_gateways|place_order/i.test(js), 'No global/Page/payment mutation code');
+check(js.includes('const bannerCleared = !hero || hero.getBoundingClientRect().bottom <= 0'), 'Floating INDEX waits until the rendered featured banner completely leaves viewport');
+check(js.includes('scroll > 650 && bannerCleared'), 'Dynamic banner clearance is mandatory to show the desktop INDEX');
+check(js.includes("heroImage.addEventListener('load', requestUpdate"), 'Delayed featured-image loading triggers visibility recalculation');
 check(js.includes('readingProgress < 0.9'), 'Floating index retires at 90% of article body');
 check(js.includes('contentRect.height') && js.includes('contentStart'), 'Reading progress measured against article body');
 check(php.includes("get_stylesheet_directory().'/blog-sidebar.php'"), 'Post only includes dedicated sidebar');
