@@ -62,6 +62,7 @@ get_header();
         <ol class="byl-post-toc__floating-list"></ol>
       </nav>
 
+      <div class="byl-post-single__body">
       <article <?php post_class('byl-post-single__article'); ?>>
         <header class="byl-post-single__header">
           <h1 class="byl-post-single__title"><?php echo esc_html(get_the_title()); ?></h1>
@@ -104,6 +105,8 @@ get_header();
           </nav>
         <?php endif; ?>
       </article>
+      <?php require get_stylesheet_directory().'/blog-sidebar.php'; ?>
+      </div>
     </div>
   <?php endwhile; ?>
 </main>
