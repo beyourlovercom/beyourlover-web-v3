@@ -108,6 +108,16 @@ class TestThemeOS(unittest.TestCase):
         for route in ("is_front_page()", "is_shop()", "is_product()", "is_cart()", "is_checkout()", "is_order_received_page()"):
             self.assertIn(route, assets)
 
+    def test_route_scoped_wordpress_asset_parity(self):
+        """Execute isolated PHP callback fixtures without WordPress or any network."""
+        import subprocess
+        p = subprocess.run(
+            ["php", str(theme_os.ROOT / "scripts/test_theme_os_route_assets.php")],
+            cwd=theme_os.ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("PASS Theme OS T2.4", p.stdout)
+
     def test_reproducible_and_sha_verified(self):
         with TemporaryDirectory() as a, TemporaryDirectory() as b:
             x, xr = theme_os.build(Path(a), allow_dirty=True)
