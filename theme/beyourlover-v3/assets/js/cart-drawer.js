@@ -228,6 +228,11 @@
     const field=elements.couponForm.querySelector('input[name="coupon_code"]');
     const code=(field?.value||'').trim();
     if(!code) {setFeedback('Enter a coupon code first.',true);return;}
+    const coupons = Array.isArray(state?.coupons) ? state.coupons : [];
+    if(coupons.length) {
+      setFeedback('Only one promo code can be used at a time. Remove the applied code first.',true);
+      return;
+    }
     update('apply-coupon',{code}).then(applied=>{
       // Failed/expired/invalid coupons must remain editable for a retry.
       if(applied && field) field.value='';
