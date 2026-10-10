@@ -88,22 +88,8 @@ get_header();
           </footer>
         <?php endif; ?>
 
-        <?php if ($byl_previous instanceof WP_Post || $byl_next instanceof WP_Post) : ?>
-          <nav class="byl-post-single__navigation" aria-label="<?php esc_attr_e('More articles', 'beyourlover-v3'); ?>">
-            <?php if ($byl_previous instanceof WP_Post) : ?>
-              <a class="byl-post-single__nav-item" href="<?php echo esc_url(get_permalink($byl_previous)); ?>">
-                <span><?php esc_html_e('Previous article', 'beyourlover-v3'); ?></span>
-                <strong><?php echo esc_html(get_the_title($byl_previous)); ?></strong>
-              </a>
-            <?php endif; ?>
-            <?php if ($byl_next instanceof WP_Post) : ?>
-              <a class="byl-post-single__nav-item" href="<?php echo esc_url(get_permalink($byl_next)); ?>">
-                <span><?php esc_html_e('Next article', 'beyourlover-v3'); ?></span>
-                <strong><?php echo esc_html(get_the_title($byl_next)); ?></strong>
-              </a>
-            <?php endif; ?>
-          </nav>
-        <?php endif; ?>
+        <?php /* WWW endmatter: editorial bio, prior/next and related Posts. */ ?>
+        <?php require get_stylesheet_directory().'/blog-endmatter.php'; ?>
       </article>
       <?php require get_stylesheet_directory().'/blog-sidebar.php'; ?>
       </div>
