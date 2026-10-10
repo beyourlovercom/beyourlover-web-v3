@@ -97,7 +97,7 @@ async function main() {
     const body=init.body?JSON.parse(init.body):{};
     calls.push({endpoint,method,body});
     if(method==='POST'&&endpoint==='apply-coupon'){
-      if(body.code==='BAD')return {ok:false,headers:{get(){return null;}},json:async()=>({message:'Coupon is invalid'})};
+      if(body.code==='BAD')return {ok:false,headers:{get(){return null;}},json:async()=>({message:'Coupon &quot;BAD&quot; is invalid'})};
       server=makeCart(server.items[0]?.quantity||0,[body.code]);
     }else if(method==='POST'&&endpoint==='update-item'){
       if(failNextUpdate){failNextUpdate=false;return {ok:false,headers:{get(){return null;}},json:async()=>({message:'Quantity rejected by Woo'})};}
@@ -118,8 +118,10 @@ async function main() {
   // Invalid coupon stays in form. A subsequent successful request still works.
   input.value='BAD';
   events['coupon.submit']({preventDefault(){}});
-  await waitFor(()=>el['[data-drawer-feedback]'].textContent==='Coupon is invalid');
+  await waitFor(()=>el['[data-drawer-feedback]'].textContent==='Coupon "BAD" is invalid');
   assert.equal(input.value,'BAD','failed coupon not silently cleared');
+  assert.ok(!el['[data-drawer-feedback]'].textContent.includes('&quot;'),
+    'WordPress/Woo entity-encoded feedback should be rendered naturally without HTML markup');
   input.value='GOOD';
   events['coupon.submit']({preventDefault(){}});
   await waitFor(()=>el['[data-drawer-active-coupons]'].innerHTML.includes('GOOD'));
