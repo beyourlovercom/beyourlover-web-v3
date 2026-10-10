@@ -36,8 +36,9 @@ check(!/\b(?:body|html|button|input)\s*\{/.test(css),'No global selectors');
 const cp = require('node:child_process');
 const harness = 'tools/dev/tests/newsletter-m3-render-harness.php';
 function render(mode) { return cp.execFileSync('php',[harness, mode], { encoding:'utf8' }); }
-const off = render('off'), on = render('on'), noPolicy = render('policy_missing');
+const off = render('off'), on = render('on'), noPolicy = render('policy_missing'), noCore = render('missing_core');
 check(!off.includes('data-yby-subscribe-contract'),'OFF state must not expose a submit form');
+check(!noCore.includes('data-yby-subscribe-contract'),'Missing Core must not expose a form');
 check(off.includes('Newsletter sign-up is not available yet.'),'OFF state explicitly discloses closed signup');
 check((on.match(/data-yby-subscribe-contract/g)||[]).length === 1,'ON state delegates exactly one Core form');
 check(on.includes('name="marketing_consent"') && !/name="marketing_consent"[^>]*checked/.test(on),'Core consent defaults unchecked');
