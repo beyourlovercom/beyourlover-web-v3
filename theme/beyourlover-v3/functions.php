@@ -125,6 +125,11 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_enqueue_script('byl-v3-product', $uri.'/assets/js/product.js', [], $v('assets/js/product.js'), true);
         wp_script_add_data('byl-v3-product', 'strategy', 'defer');
     }
+    if (is_page('free-shipping') || is_page('free-shipping-guide')) {
+        wp_enqueue_style('byl-v3-free-shipping', $uri.'/assets/css/free-shipping.css', ['byl-v3-motion'], $v('assets/css/free-shipping.css'));
+        wp_enqueue_script('byl-v3-free-shipping-v2', $uri.'/assets/js/free-shipping-v2.js', [], $v('assets/js/free-shipping-v2.js'), true);
+        wp_script_add_data('byl-v3-free-shipping-v2', 'strategy', 'defer');
+    }
     if (is_page('track-your-order')) {
         wp_enqueue_style('byl-v3-track-order', $uri.'/assets/css/track-order.css', ['byl-v3-motion'], $v('assets/css/track-order.css'));
     }
@@ -157,6 +162,42 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_script_add_data('byl-v3-checkout', 'strategy', 'defer');
     }
 });
+
+require_once get_stylesheet_directory().'/inc/free-shipping-v2-policy.php';
+
+/**
+ * Free Shipping page URL compatibility.
+ *
+ * A preexisting Dev SVG media attachment uses the slug `free-shipping`.
+ * Never alter/delete the attachment or bypass WordPress slug uniqueness.
+ * The official Page is stored as `free-shipping-guide`, while its single
+ * public address stays /free-shipping/ via an exact-path read-only router.
+ */
+function byl_v3_is_free_shipping_route(): bool {
+    $path = wp_parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+    return is_string($path) && (untrailingslashit($path) ?: '/') === '/free-shipping';
+}
+add_filter('request', static function (array $vars): array {
+    if (!byl_v3_is_free_shipping_route()) { return $vars; }
+    $page = get_page_by_path('free-shipping-guide', OBJECT, 'page');
+    if (!$page instanceof WP_Post || $page->post_status !== 'publish') { return $vars; }
+    return ['page_id' => (int)$page->ID];
+}, 8);
+add_filter('redirect_canonical', static function ($redirect) {
+    return byl_v3_is_free_shipping_route() ? false : $redirect;
+});
+// Permalink Manager Pro owns an additional redirect path outside WordPress
+// redirect_canonical. Preserve the public /free-shipping/ URL only; all other
+// plugin redirects are untouched.
+add_filter('permalink_manager_filter_redirect', static function ($url) {
+    return byl_v3_is_free_shipping_route() ? null : $url;
+}, 20, 1);
+add_filter('page_link', static function (string $link, int $post_id): string {
+    if (get_post_field('post_name', $post_id) === 'free-shipping-guide') {
+        return home_url('/free-shipping/');
+    }
+    return $link;
+}, 10, 2);
 
 // Presentation-only Woo labels on this single page; Woo still owns form submission and validation.
 add_filter('gettext', static function (string $translated, string $original, string $domain): string {

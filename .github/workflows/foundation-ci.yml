@@ -38,12 +38,18 @@ jobs:
         run: |
           php -l tools/dev/tests/p71-payment-title-smoke.php
           php tools/dev/tests/p71-payment-title-smoke.php
+      - name: Default Page/Post template offline regression
+        run: php -l tools/dev/tests/page-post-defaults-offline-smoke.php && php tools/dev/tests/page-post-defaults-offline-smoke.php
+      - name: Blog TOC offline source and script syntax regression
+        run: node --check theme/beyourlover-v3/assets/js/post-toc.js && node scripts/test_blog_toc_contract.js
       - name: Python syntax
         run: python -m py_compile scripts/*.py
       - name: Cart V2 focused regression
         run: php scripts/test_cart_v2_contract.php
       - name: Cart native Woo shipping-zone parity regression
         run: php scripts/test_cart_promotion_native_authority.php
+      - name: Free Shipping landing page contract
+        run: php scripts/test_free_shipping_page.php
       - name: Cart coupon UI and native fallback
         run: node scripts/test_cart_coupon_ui.js
       - name: Cart V3 canonical brand tokens
