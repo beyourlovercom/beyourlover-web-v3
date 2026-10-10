@@ -125,6 +125,13 @@ async function main() {
   await waitFor(()=>el['[data-drawer-active-coupons]'].innerHTML.includes('GOOD'));
   assert.equal(input.value,'','accepted coupon cleared');
   assert.equal(server.coupons[0].code,'GOOD');
+  const beforeSecondCoupon=calls.filter(c=>c.endpoint==='apply-coupon').length;
+  input.value='SECOND';
+  events['coupon.submit']({preventDefault(){}});
+  assert.match(el['[data-drawer-feedback]'].textContent,/Only one promo code/);
+  assert.equal(calls.filter(c=>c.endpoint==='apply-coupon').length,beforeSecondCoupon,
+    'second coupon must not reach Woo API while first one is applied');
+  assert.equal(input.value,'SECOND','unapplied second promo stays editable');
 
   // API rejects first optimistic quantity change -> restore Woo response.
   const label=domElement(),row={dataset:{drawerKey:'line-one'},querySelector:()=>label};
