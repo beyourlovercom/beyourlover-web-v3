@@ -1,6 +1,6 @@
 <?php
 /**
- * BYL V3 Newsletter presentation only. Andy Core owns the form, consent and API.
+ * BeYourLover V3 Newsletter presentation only. Andy Core owns the form, consent and API.
  * No stored post_content is echoed: the historical newsletter Page embeds an
  * obsolete WPForms placeholder and must not produce two forms.
  */
@@ -47,7 +47,7 @@ get_header();
   <div class="byl-newsletter__wrap">
     <div class="byl-newsletter__breadcrumb"><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'beyourlover-v3'); ?></a><span aria-hidden="true">/</span><span><?php esc_html_e('Newsletter', 'beyourlover-v3'); ?></span></div>
     <section class="byl-newsletter__hero" aria-labelledby="byl-newsletter-heading">
-      <p class="byl-newsletter__eyebrow"><?php esc_html_e('THE BYL EDIT', 'beyourlover-v3'); ?></p>
+      <p class="byl-newsletter__eyebrow"><?php esc_html_e('The BeYourLover Edit', 'beyourlover-v3'); ?></p>
       <h1 id="byl-newsletter-heading"><?php esc_html_e('Stay in the loop.', 'beyourlover-v3'); ?></h1>
       <p class="byl-newsletter__lede"><?php esc_html_e('Discover new arrivals, helpful guides and updates from BeYourLover. Choose whether you want to receive our emails.', 'beyourlover-v3'); ?></p>
       <div class="byl-newsletter__panel" aria-labelledby="byl-newsletter-form-heading">
