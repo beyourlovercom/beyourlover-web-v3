@@ -9,10 +9,12 @@ declare(strict_types=1);
 $cases = [
     'no_permit', 'approved_once', 'already_consumed', 'expired', 'missing_backup_file', 'tampered_backup', 'wrong_backup_path',
     'future', 'long_lifetime', 'wrong_site', 'wrong_environment',
+    'permit_wrong_permissions', 'symlink_permit', 'backup_symlink', 'tiny_backup',
     'not_cli', 'prior_denial', 'unapproved', 'missing_backup_hash',
     'wrong_recipient', 'extra_to', 'headers_cc', 'headers_bcc',
     'wrong_subject', 'wrong_body', 'bad_token', 'same_token',
     'extra_field', 'wrong_purpose', 'wrong_ticket', 'wrong_mode',
+    'headers_replyto', 'mail_attachments', 'mail_embeds', 'prior_true',
     'max_two', 'old_ticket', 'wrong_site_ticket',
 ];
 $argvCount = count($argv);
@@ -170,6 +172,11 @@ switch ($scenario) {
     case 'missing_backup_file': unlink($backupDir.'/dev-pretest.sql.gz');break;
     case 'tampered_backup':file_put_contents($backupDir.'/dev-pretest.sql.gz','MODIFIED'.str_repeat('B',2048));break;
     case 'wrong_backup_path':$permit['backup_path']=$tmp.'/elsewhere.sql.gz';break;
+    case 'backup_symlink':
+        rename($backupDir.'/dev-pretest.sql.gz',$tmp.'/original-backup');
+        symlink($tmp.'/original-backup',$backupDir.'/dev-pretest.sql.gz');
+        break;
+    case 'tiny_backup':file_put_contents($backupDir.'/dev-pretest.sql.gz','short');break;
     case 'future': $permit['issued_at']=time()+1;break;
     case 'long_lifetime': $permit['expires_at']=$permit['issued_at']+301;break;
     case 'wrong_site_ticket': $permit['site']='https://www.beyourlover.com';break;
@@ -179,6 +186,9 @@ switch ($scenario) {
     case 'extra_to': $mail['to']=['owner@example.test','other@example.test'];break;
     case 'headers_cc': $mail['headers']=['Cc: other@example.test'];break;
     case 'headers_bcc': $mail['headers']=['Bcc: other@example.test'];break;
+    case 'headers_replyto':$mail['headers']=['Reply-To: other@example.test'];break;
+    case 'mail_attachments':$mail['attachments']=['invoice.pdf'];break;
+    case 'mail_embeds':$mail['embeds']=['inline.gif'];break;
     case 'wrong_subject': $mail['subject']='Your receipt';break;
     case 'wrong_body': $mail['message']='payment/marketing payload';break;
     case 'bad_token': $mail['message']=newsletter_test_message('invalid',str_repeat('d',64));break;
@@ -195,6 +205,9 @@ switch ($scenario) {
     case 'wrong_site':break;
     case 'wrong_environment':break;
     case 'prior_denial':break;
+    case 'prior_true':break;
+    case 'permit_wrong_permissions':break;
+    case 'symlink_permit':break;
     case 'approved_once':break;
     default:throw new RuntimeException('Unexpected test case');
 }
@@ -202,8 +215,13 @@ $path=$tmp.'/newsletter-one-mail-permit.json';
 if ($scenario !== 'no_permit') {
     file_put_contents($path,json_encode($permit));
     chmod($path,0600);
+    if ($scenario === 'permit_wrong_permissions') { chmod($path, 0644); }
+    if ($scenario === 'symlink_permit') {
+        rename($path,$tmp.'/permit-target.json');
+        symlink($tmp.'/permit-target.json',$path);
+    }
 }
-$pre = $scenario==='prior_denial' ? false : null;
+$pre = $scenario==='prior_denial' ? false : ($scenario==='prior_true' ? true : null);
 $actual=$fn($pre,$mail);
 $final=$terminal($actual,$mail);
 if ($allow !== ($final===null)) {
