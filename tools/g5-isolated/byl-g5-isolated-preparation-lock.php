@@ -51,7 +51,26 @@ add_action('parse_request', static function (): void {
 add_filter('woocommerce_webhook_should_deliver', static fn () => false, PHP_INT_MAX, 3);
 add_filter('pre_wp_mail', static fn () => false, PHP_INT_MAX);
 add_filter('pre_http_request', static function ($pre, $args, $url) {
-    return $pre !== false ? $pre : new WP_Error(
+    if ($pre !== false) { return $pre; }
+    // A one-hour, explicitly authorized connect-only window can permit the
+    // WordPress.com OAuth backend. It never permits Stripe/charges or orders.
+    // Default DENY when constants are absent, invalid, or expired.
+    $connecting = defined('BYL_G5_TEST_ACCOUNT_CONNECT_ONLY')
+        && BYL_G5_TEST_ACCOUNT_CONNECT_ONLY === true
+        && defined('BYL_G5_TEST_ACCOUNT_CONNECT_UNTIL')
+        && is_int(BYL_G5_TEST_ACCOUNT_CONNECT_UNTIL)
+        && BYL_G5_TEST_ACCOUNT_CONNECT_UNTIL > time()
+        && BYL_G5_TEST_ACCOUNT_CONNECT_UNTIL <= time() + 3600;
+    if ($connecting && is_string($url)) {
+        $scheme = wp_parse_url($url, PHP_URL_SCHEME);
+        $host = wp_parse_url($url, PHP_URL_HOST);
+        if ($scheme === 'https' && in_array(strtolower((string) $host), [
+            'public-api.wordpress.com', 'wordpress.com', 'api.wordpress.com',
+        ], true)) {
+            return false; // Allow normal WP HTTP transport for Test Account OAuth only.
+        }
+    }
+    return new WP_Error(
         'byl_g5_isolated_network_closed',
         'G5 preparation: outgoing HTTP is disabled.'
     );
