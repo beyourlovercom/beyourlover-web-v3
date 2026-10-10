@@ -5,8 +5,14 @@
  */
 defined('ABSPATH') || exit;
 
+// Hostinger starts a new site on HTTP until its dedicated TLS/DNS is ready.
+// Never allow a scheme switch to silently disable the preparation lock.
+// Still require an exact isolated hostname and staging; no WWW/Dev coverage.
 if (wp_get_environment_type() !== 'staging'
-    || home_url() !== 'https://g5-uat.beyourlover.com') {
+    || !in_array(home_url(), [
+        'http://g5-uat.beyourlover.com',
+        'https://g5-uat.beyourlover.com',
+    ], true)) {
     return;
 }
 
