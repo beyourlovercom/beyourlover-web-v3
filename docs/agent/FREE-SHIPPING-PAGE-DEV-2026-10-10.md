@@ -43,3 +43,12 @@ authorized Dev WordPress page create.
 Desktop and 390px mobile page display, FAQ accordion, guest/empty cart,
 known Iowa Zone 5 cart $59 / threshold $69, qualifying $69 and choice status.
 Owner PASS required before GitHub merge or future WWW cutover.
+
+## Permalink Manager Pro canonical constraint
+Dev also runs Permalink Manager Pro 2.5.1.2, which issues an independent 301
+from the desired URL to the internal `/free-shipping-guide/` slug even when
+WordPress canonical redirect is disabled. Its supported
+`permalink_manager_filter_redirect` is now scoped to the exact
+`/free-shipping/` request; it cancels only that redirect, preserving every
+other Permalink Manager behavior. Dev Owner UAT must verify direct HTTP 200
+and no redirect for the public URL; must not edit the pre-existing SVG attachment.

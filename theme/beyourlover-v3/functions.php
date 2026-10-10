@@ -182,6 +182,12 @@ add_filter('request', static function (array $vars): array {
 add_filter('redirect_canonical', static function ($redirect) {
     return byl_v3_is_free_shipping_route() ? false : $redirect;
 });
+// Permalink Manager Pro owns an additional redirect path outside WordPress
+// redirect_canonical. Preserve the public /free-shipping/ URL only; all other
+// plugin redirects are untouched.
+add_filter('permalink_manager_filter_redirect', static function ($url) {
+    return byl_v3_is_free_shipping_route() ? null : $url;
+}, 20, 1);
 add_filter('page_link', static function (string $link, int $post_id): string {
     if (get_post_field('post_name', $post_id) === 'free-shipping-guide') {
         return home_url('/free-shipping/');

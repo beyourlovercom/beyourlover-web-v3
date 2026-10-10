@@ -92,5 +92,6 @@ $route = file_get_contents(__DIR__.'/../theme/beyourlover-v3/functions.php');
 check(str_contains($route, "get_page_by_path('free-shipping-guide'"), 'page router has exact internal slug');
 check(str_contains($route, "is_page('free-shipping-guide')"), 'new page enqueues the approved CSS');
 check(str_contains($route, "byl_v3_is_free_shipping_route()"), 'route is exact-path scoped');
+check(str_contains($route, "permalink_manager_filter_redirect"), 'do not allow Permalink Manager to redirect the public Page');
 check(is_file(__DIR__.'/../theme/beyourlover-v3/page-free-shipping-guide.php'), 'internal slug has proper template alias');
 echo "PASS /free-shipping/ — empty, $59/$69, >=69, selected/unavailable, no-cache\n";
