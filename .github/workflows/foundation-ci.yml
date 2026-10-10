@@ -50,6 +50,8 @@ jobs:
         run: php scripts/test_cart_v2_contract.php
       - name: Cart final quantity and fragment regression
         run: node scripts/test_cart_quantity_refresh_c1c4.js
+      - name: Cart Drawer D3 preview contract
+        run: node scripts/test_cart_drawer_d3_preview.js
       - name: Cart to Checkout native handoff contract
         run: node scripts/test_cart_checkout_handoff_c1c4.js
       - name: Cart native Woo shipping-zone parity regression
