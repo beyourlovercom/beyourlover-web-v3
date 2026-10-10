@@ -203,6 +203,39 @@ if ($allow !== ($actual===null)) {
     throw new RuntimeException('Wrong mail decision '.$scenario);
 }
 if ($allow) {
+    $mailerHooks=$GLOBALS['filters']['phpmailer_init'] ?? [];
+    if (count($mailerHooks)!==1) { throw new RuntimeException('Missing secondary mailer guard'); }
+    $mailerGuard=$mailerHooks[0]['callback'];
+    $makeMailer=static function(array $to, array $cc=[], array $bcc=[], string $subject='Confirm your newsletter subscription'): object {
+        return new class($to,$cc,$bcc,$subject) {
+            public string $Subject;
+            private array $to;
+            private array $cc;
+            private array $bcc;
+            public function __construct(array $to,array $cc,array $bcc,string $subject){
+                $this->to=$to;$this->cc=$cc;$this->bcc=$bcc;$this->Subject=$subject;
+            }
+            public function getToAddresses():array{return $this->to;}
+            public function getCcAddresses():array{return $this->cc;}
+            public function getBccAddresses():array{return $this->bcc;}
+            public function getReplyToAddresses():array{return [];}
+            public function getAttachments():array{return [];}
+        };
+    };
+    $mailerGuard($makeMailer([['owner@example.test','']]));
+    foreach ([
+        $makeMailer([['owner@example.test',''], ['attacker@example.test','']]),
+        $makeMailer([['owner@example.test','']], [['attacker@example.test','']]),
+        $makeMailer([['owner@example.test','']], [], [['attacker@example.test','']]),
+        $makeMailer([['owner@example.test','']], [], [], 'Your order receipt'),
+    ] as $badMailer) {
+        try {
+            $mailerGuard($badMailer);
+            throw new RuntimeException('Transport guard failed to reject modified PHPMailer');
+        } catch (RuntimeException $e) {
+            if ($e->getMessage()==='Transport guard failed to reject modified PHPMailer') { throw $e; }
+        }
+    }
     if ($fn(null,$mail)!==false) { throw new RuntimeException('Second send allowed'); }
     $saved=json_decode((string)file_get_contents($path),true);
     if (($saved['state']??null)!=='consumed' || !is_int($saved['consumed_at']??null)) {
