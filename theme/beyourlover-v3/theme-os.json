@@ -1,0 +1,196 @@
+{
+  "schema": 1,
+  "theme": "beyourlover-v3",
+  "theme_version": "0.1.0",
+  "version_policy": "semver",
+  "runtime_mode": "existing-hooks-unchanged",
+  "release_policy": "github-exact-head-owner-gated",
+  "business_logic_owners": {
+    "theme": "presentation-and-interaction-only",
+    "andy-core": "generic-wordpress-foundation",
+    "andy-commerce": "B2C-promotion-shipping-gift-policy",
+    "woocommerce": "authoritative-cart-totals-stock-checkout-payment-orders",
+    "byl-erp": "fulfillment-payment-logistics-accounting"
+  },
+  "modules": {
+    "foundation": {
+      "depends_on": [],
+      "kind": "foundation",
+      "files": [
+        "style.css",
+        "theme.json",
+        "functions.php",
+        "index.php",
+        "inc/components.php",
+        "template-component-library.php",
+        "assets/css/tokens.css",
+        "assets/css/components.css",
+        "assets/css/component-library.css",
+        "assets/css/motion.css",
+        "assets/css/preview.css",
+        "assets/fonts/poppins-400.woff2",
+        "assets/fonts/poppins-500.woff2",
+        "assets/fonts/poppins-600.woff2",
+        "assets/fonts/poppins-700.woff2"
+      ]
+    },
+    "shell": {
+      "depends_on": [
+        "foundation"
+      ],
+      "kind": "presentation",
+      "files": [
+        "header.php",
+        "footer.php",
+        "inc/shell-profiles.php",
+        "assets/css/shell.css",
+        "assets/js/shell.js"
+      ]
+    },
+    "homepage": {
+      "depends_on": [
+        "foundation",
+        "shell"
+      ],
+      "kind": "presentation",
+      "files": [
+        "front-page.php",
+        "inc/homepage.php",
+        "assets/css/homepage.css"
+      ]
+    },
+    "catalog": {
+      "depends_on": [
+        "foundation",
+        "shell"
+      ],
+      "kind": "presentation",
+      "files": [
+        "inc/archive.php",
+        "woocommerce/archive-product.php",
+        "assets/css/archive.css"
+      ]
+    },
+    "product": {
+      "depends_on": [
+        "foundation",
+        "shell",
+        "catalog"
+      ],
+      "kind": "commerce-ui",
+      "files": [
+        "inc/product.php",
+        "inc/product-modules.php",
+        "woocommerce/single-product.php",
+        "assets/js/product.js",
+        "assets/css/product.css"
+      ]
+    },
+    "shipping-ui": {
+      "depends_on": [
+        "foundation",
+        "shell"
+      ],
+      "kind": "commerce-ui",
+      "files": [
+        "inc/free-shipping-v2-policy.php",
+        "page-free-shipping-guide.php",
+        "page-free-shipping.php",
+        "assets/css/free-shipping.css",
+        "assets/js/free-shipping-v2.js"
+      ]
+    },
+    "cart": {
+      "depends_on": [
+        "foundation",
+        "shell",
+        "shipping-ui"
+      ],
+      "kind": "commerce-ui",
+      "files": [
+        "page-cart.php",
+        "header-cart.php",
+        "footer-cart.php",
+        "inc/cart-experience.php",
+        "assets/css/cart.css",
+        "assets/css/cart-focus.css",
+        "assets/js/cart-experience.js",
+        "assets/js/cart.js"
+      ]
+    },
+    "checkout": {
+      "depends_on": [
+        "foundation",
+        "shell",
+        "cart",
+        "shipping-ui"
+      ],
+      "kind": "protected-commerce-ui",
+      "files": [
+        "page-checkout.php",
+        "header-checkout.php",
+        "footer-checkout.php",
+        "inc/checkout.php",
+        "woocommerce/checkout/form-checkout.php",
+        "assets/css/checkout.css",
+        "assets/css/checkout-shell.css",
+        "assets/js/checkout.js"
+      ]
+    },
+    "postpurchase": {
+      "depends_on": [
+        "foundation",
+        "shell",
+        "checkout"
+      ],
+      "kind": "protected-commerce-ui",
+      "files": [
+        "inc/thank-you.php",
+        "inc/thank-you-estimate.php",
+        "woocommerce/checkout/thankyou.php",
+        "assets/css/thank-you.css"
+      ]
+    },
+    "editorial": {
+      "depends_on": [
+        "foundation",
+        "shell"
+      ],
+      "kind": "presentation",
+      "files": [
+        "single-post.php",
+        "blog-endmatter.php",
+        "blog-sidebar.php",
+        "inc/blog-product-card.php",
+        "assets/css/post-single.css",
+        "assets/js/post-toc.js"
+      ]
+    },
+    "pages": {
+      "depends_on": [
+        "foundation",
+        "shell"
+      ],
+      "kind": "presentation",
+      "files": [
+        "page.php",
+        "template-simple-page.php",
+        "assets/css/page-default.css",
+        "assets/css/page-simple.css",
+        "page-terms-and-conditions.php"
+      ]
+    },
+    "support": {
+      "depends_on": [
+        "foundation",
+        "shell",
+        "pages"
+      ],
+      "kind": "presentation",
+      "files": [
+        "page-track-your-order.php",
+        "assets/css/track-order.css"
+      ]
+    }
+  }
+}

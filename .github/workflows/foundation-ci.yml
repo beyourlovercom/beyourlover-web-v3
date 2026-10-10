@@ -21,10 +21,6 @@ jobs:
         run: php -l dev/mu-plugins/byl-dev-safety.php && php -l tools/dev/tests/newsletter-one-mail-safety-smoke.php
       - name: Newsletter single-message fail-closed, negative and race smoke
         run: php tools/dev/tests/newsletter-one-mail-safety-smoke.php
-      - name: Combined G5 provider quarantine PHP syntax
-        run: php -l tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
-      - name: Combined G5 inbound outbound no-network regression
-        run: php tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
       - name: P5 Store API Checkout fail-closed PHP syntax
         run: php -l tools/dev/tests/p5-store-api-checkout-deny-smoke.php
       - name: P5 Store API Checkout fail-closed security smoke
@@ -33,6 +29,10 @@ jobs:
         run: php -l tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
       - name: P7 outbound Dev Sandbox Webhook security smoke
         run: php tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
+      - name: G5 AfterShip/Automizely Dev-only outbound safety syntax
+        run: php -l tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
+      - name: G5 provider outbound isolation no-network regression
+        run: php tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
       - name: P7.1 Thank You PHP syntax
         run: |
           php -l theme/beyourlover-v3/functions.php
@@ -54,6 +54,21 @@ jobs:
         run: php -l theme/beyourlover-v3/inc/blog-product-card.php && php -l tools/dev/tests/blog-product-card-offline-smoke.php && php tools/dev/tests/blog-product-card-offline-smoke.php
       - name: Python syntax
         run: python -m py_compile scripts/*.py
+      - name: Theme OS V1 module, SemVer and dependency validation
+        run: python3 scripts/theme_os.py validate
+      - name: Theme OS V1 fail-closed contracts
+        run: python3 -m unittest discover -s scripts -p test_theme_os_contract.py -v
+      - name: Theme OS V1 reproducible ZIP (CI evidence, no deploy)
+        run: |
+          mkdir -p "$RUNNER_TEMP/byl-os-a" "$RUNNER_TEMP/byl-os-b"
+          python3 scripts/theme_os.py build --out-dir "$RUNNER_TEMP/byl-os-a"
+          python3 scripts/theme_os.py build --out-dir "$RUNNER_TEMP/byl-os-b"
+          A=$(find "$RUNNER_TEMP/byl-os-a" -maxdepth 1 -name '*.zip' -print -quit)
+          B=$(find "$RUNNER_TEMP/byl-os-b" -maxdepth 1 -name '*.zip' -print -quit)
+          test -n "$A" && test -n "$B"
+          test "$(sha256sum "$A" | cut -d' ' -f1)" = "$(sha256sum "$B" | cut -d' ' -f1)"
+          python3 scripts/theme_os.py verify --zip "$A" --receipt "${A%.zip}.receipt.json"
+          echo "Theme ZIP reproducibility verified; no release or deployment."
       - name: Cart V2 focused regression
         run: php scripts/test_cart_v2_contract.php
       - name: Cart final quantity and fragment regression
