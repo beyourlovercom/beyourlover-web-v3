@@ -110,6 +110,67 @@ add_filter('pre_http_request', static function ($pre, $args, $url) {
     return $pre;
 }, PHP_INT_MAX, 3);
 
+/**
+ * G5 Dev-only inbound Provider quarantine.
+ *
+ * AfterShip exposes /aftership-api/vN/orders AND query-var alias routes;
+ * outbound HTTP filtering never stops an authenticated Provider from
+ * pulling /wc/v3/orders with its existing read_write Woo API key.
+ *
+ * Deliberately restrict only Dev order/customer API surfaces, not wp-admin
+ * pages or internal PHP WC_Order reads. This may interrupt external Dev
+ * API clients and should be kept until G5 closes, then reviewed for rollback.
+ * Does not revoke/delete credentials or affect WWW.
+ */
+function byl_dev_g5_aftership_inbound_path(string $uri, array $queryVars = [], array $query = []): bool {
+    $path = wp_parse_url($uri, PHP_URL_PATH);
+    if (is_string($path) && preg_match('#(?:^|/)aftership-api(?:/|$)#i', $path)) {
+        return true;
+    }
+    // Rewrite-free equivalent: /?aftership-api-route=/orders
+    // or legacy /?aftership-api=...
+    foreach (['aftership-api-route', 'aftership-api'] as $name) {
+        if (array_key_exists($name, $queryVars) || array_key_exists($name, $query)) {
+            return true;
+        }
+    }
+    return false;
+}
+add_action('parse_request', static function ($wp): void {
+    if (wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com') {
+        return;
+    }
+    $uri = (string) ($_SERVER['REQUEST_URI'] ?? '');
+    $vars = is_object($wp) && isset($wp->query_vars) && is_array($wp->query_vars)
+        ? $wp->query_vars : [];
+    if (!byl_dev_g5_aftership_inbound_path($uri, $vars, $_GET)) {
+        return;
+    }
+    status_header(403);
+    nocache_headers();
+    exit;
+}, -999, 1);
+
+// Prevent a previously connected AfterShip/Woo consumer_key from polling
+// the native Woo REST Orders and Customers collections or mutating records.
+// Store API Cart and WooPayments internal server-side processing remain intact.
+add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
+    if ($result !== null || !($request instanceof WP_REST_Request)
+        || wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com') {
+        return $result;
+    }
+    if (!preg_match('#^/wc/(?:v1|v2|v3)/(?:orders|customers)(?:/|$)#', $request->get_route())) {
+        return $result;
+    }
+    return new WP_Error(
+        'byl_dev_g5_provider_inbound_quarantine',
+        'Woo Orders/Customers REST API is quarantined on Dev for G5 payment UAT.',
+        ['status' => 403]
+    );
+}, 98, 3);
+
 // No external outgoing email, even from an authorized test order.
 add_filter('pre_wp_mail', static function () { return false; }, 99);
 
