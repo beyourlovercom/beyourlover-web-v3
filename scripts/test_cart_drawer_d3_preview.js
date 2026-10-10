@@ -46,12 +46,14 @@ assert.match(js,/mutationQueue = operation\.catch\(\(\)=>\{\}\)/, 'failed reques
 assert.match(js,/return operation\.then\(\(\)=>true,\(\)=>false\)/, 'mutation success must reach caller');
 assert.match(js,/if\(applied && field\) field\.value=''/, 'failed coupon must stay in editable field');
 assert.match(js,/if \(state\) render\(state\)/, 'rejected Woo mutation must restore authoritative quantity UI');
+assert.match(js,/const safeHref = value =>/, 'prevent non-HTTP product href injection');
+assert.match(js,/Network updates are serialized/, 'discard stale Woo actions during in-flight requests');
 assert.match(php,/gift offers are not active/);
 assert.doesNotMatch(js,/\/checkout\/order-received|place_order|wc_store_api_checkout|process_payment/i);
 assert.doesNotMatch(php,/wc_create_order|wp_insert_post|add_option|update_option|update_post_meta|register_activation_hook/i);
 assert.match(css,/@media\(max-width:900px\)/);
 assert.match(css,/\.byl-drawer__aside\{display:none\}/);
 assert.match(css,/width:100vw/);
-assert.match(css,/--byl-drawer-brand:#96314d/);
+assert.match(css,/--byl-drawer-brand:var\(--byl-brand,#9b3749\)/, 'canonical brand token shared with Theme VI');
 assert.match(css,/overscroll-behavior:contain/);
 console.log('PASS D3 Dev-only opt-in Drawer preview: Woo Cart authority, no gift launch, mobile/fullscreen, no checkout mutation');
