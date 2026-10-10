@@ -88,4 +88,9 @@ check(str_contains($none,"Free shipping isn't available for this delivery zone")
 check(!str_contains($none,"🎉 Congrats! You've unlocked free shipping."),'no false promise');
 check(!empty($GLOBALS['nocache_called']),'cart-dependent HTML must prevent caching');
 check(str_contains($below,'Frequently asked questions') && str_contains($below,'Good to know'),'copy sections');
+$route = file_get_contents(__DIR__.'/../theme/beyourlover-v3/functions.php');
+check(str_contains($route, "get_page_by_path('free-shipping-guide'"), 'page router has exact internal slug');
+check(str_contains($route, "is_page('free-shipping-guide')"), 'new page enqueues the approved CSS');
+check(str_contains($route, "byl_v3_is_free_shipping_route()"), 'route is exact-path scoped');
+check(is_file(__DIR__.'/../theme/beyourlover-v3/page-free-shipping-guide.php'), 'internal slug has proper template alias');
 echo "PASS /free-shipping/ — empty, $59/$69, >=69, selected/unavailable, no-cache\n";

@@ -4,8 +4,15 @@
 Theme-owned slug-specific template `theme/beyourlover-v3/page-free-shipping.php`
 with stylesheet `assets/css/free-shipping.css` enqueued only on this Page.
 Use existing global header/footer; do not add a third business plugin.
-Real Dev WP Page has slug `free-shipping`, title `Free Shipping`, empty body,
-and the slug-native template. Never overwrite another Page on Production.
+A preexisting independent SVG media attachment (Dev WP ID 9900) occupies
+`/free-shipping/`. This media item is preserved untouched. Create the
+real Dev WP Page with internal slug `free-shipping-guide`, title `Free Shipping`,
+empty body. An exact-path request filter resolves the public URL
+`/free-shipping/` to the Page; `page_link` supplies the preferred public
+permalink and `redirect_canonical` avoids redirecting it back to an
+internal slug. `page-free-shipping-guide.php` includes the approved template.
+Do not rename/delete/mutate media metadata or alter other routes.
+Never overwrite another Page on Production.
 
 ## Design
 Replicates approved activity-style hero, gift-art SVG, progress panel,
