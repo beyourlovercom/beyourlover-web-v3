@@ -12,7 +12,8 @@ if (!in_array($byl_test_mode, ['off', 'on', 'policy_missing', 'missing_core'], t
     exit(2);
 }
 class WP_Post { public string $post_status = 'publish'; }
-if ($byl_test_mode !== 'missing_core') {\nclass YBY_Newsletter_REST_Controller {
+if ($byl_test_mode !== 'missing_core') {
+class YBY_Newsletter_REST_Controller {
     public static function enabled(): bool {
         global $byl_test_mode;
         return $byl_test_mode !== 'off';
