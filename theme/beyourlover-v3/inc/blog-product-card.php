@@ -12,7 +12,7 @@ defined('ABSPATH') || exit;
 /** Repair imported smart quotes inside ONLY the legacy product_card marker. */
 function byl_v3_normalize_blog_product_card(string $content): string {
     return (string) preg_replace(
-        '~\[product_card\s+id\s*=\s*[\x{201C}\x{201D}\x{201E}](\d{1,10})[\x{201C}\x{201D}\x{201E}]\s*\]~u',
+        '~\[product_card\s+id\s*=\s*[\x{201C}\x{201D}\x{201E}\x{2033}](\d{1,10})[\x{201C}\x{201D}\x{201E}\x{2033}]\s*\]~u',
         '[product_card id="$1"]',
         $content
     );
