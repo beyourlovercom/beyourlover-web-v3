@@ -146,10 +146,16 @@ if ($scenario === 'wrong_environment') {
     echo "PASS wrong_environment (no staging filters loaded)".PHP_EOL;
     exit(0);
 }
-if (count($mailHookEntries)!==1) { throw new RuntimeException('Expected exact fail-closed mail filter'); }
+if (count($mailHookEntries)!==2) { throw new RuntimeException('Expected both fail-closed mail filters'); }
+usort($mailHookEntries,static fn($a,$b)=>$a['priority']<=>$b['priority']);
+if ($mailHookEntries[0]['priority'] !== 99 || $mailHookEntries[1]['priority'] !== PHP_INT_MAX) {
+    throw new RuntimeException('Lost priority 99 / terminal default-deny contract');
+}
 $fn=$mailHookEntries[0]['callback'];
+$terminal=$mailHookEntries[1]['callback'];
 if ($race) {
-    echo $fn(null,newsletter_test_mail())===null ? 'RACE_GRANTED' : 'RACE_DENIED';
+    $mail=newsletter_test_mail();
+    echo $terminal($fn(null,$mail),$mail)===null ? 'RACE_GRANTED' : 'RACE_DENIED';
     exit(0);
 }
 $permit=newsletter_test_ticket();
@@ -199,8 +205,16 @@ if ($scenario !== 'no_permit') {
 }
 $pre = $scenario==='prior_denial' ? false : null;
 $actual=$fn($pre,$mail);
-if ($allow !== ($actual===null)) {
+$final=$terminal($actual,$mail);
+if ($allow !== ($final===null)) {
     throw new RuntimeException('Wrong mail decision '.$scenario);
+}
+if ($allow) {
+    $mutated=$mail;
+    $mutated['to']='attacker@example.test';
+    if ($terminal(null,$mutated)!==false || $terminal(true,$mail)!==false) {
+        throw new RuntimeException('Terminal email safety guard failed');
+    }
 }
 if ($allow) {
     $mailerHooks=$GLOBALS['filters']['phpmailer_init'] ?? [];
@@ -236,7 +250,7 @@ if ($allow) {
             if ($e->getMessage()==='Transport guard failed to reject modified PHPMailer') { throw $e; }
         }
     }
-    if ($fn(null,$mail)!==false) { throw new RuntimeException('Second send allowed'); }
+    if ($terminal($fn(null,$mail),$mail)!==false) { throw new RuntimeException('Second send allowed'); }
     $saved=json_decode((string)file_get_contents($path),true);
     if (($saved['state']??null)!=='consumed' || !is_int($saved['consumed_at']??null)) {
         throw new RuntimeException('One-use ticket not consumed');
