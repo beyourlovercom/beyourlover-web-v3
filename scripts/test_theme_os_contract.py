@@ -18,7 +18,7 @@ class TestThemeOS(unittest.TestCase):
     def test_registry_positive(self):
         r = theme_os.validate(self.manifest)
         self.assertEqual(r["module_count"], 12)
-        self.assertEqual(r["file_count"], 72)
+        self.assertEqual(r["file_count"], 75)
         self.assertEqual(r["version"], "0.1.0")
         self.assertLess(r["module_order"].index("cart"), r["module_order"].index("checkout"))
         self.assertEqual(r["owner_map"]["woocommerce/checkout/form-checkout.php"], "checkout")
@@ -96,6 +96,7 @@ class TestThemeOS(unittest.TestCase):
             "inc/components.php", "inc/shell-profiles.php", "inc/homepage.php",
             "inc/archive.php", "inc/product.php", "inc/product-modules.php",
             "inc/checkout.php", "inc/thank-you.php", "inc/cart-experience.php",
+            "inc/cart-drawer.php",
         ]
         self.assertEqual(paths, expected)
         self.assertEqual(loader.count("require_once get_stylesheet_directory()"), len(expected))
@@ -125,10 +126,10 @@ class TestThemeOS(unittest.TestCase):
             self.assertEqual(hashlib.sha256(x.read_bytes()).hexdigest(),
                              hashlib.sha256(y.read_bytes()).hexdigest())
             receipt = json.loads(xr.read_text(encoding="utf8"))
-            self.assertEqual(len(receipt["file_sha256"]), 72)
+            self.assertEqual(len(receipt["file_sha256"]), 75)
             self.assertEqual(receipt["owner_uat"], "NOT_GRANTED")
             result = theme_os.verify(x, xr)
-            self.assertEqual(result["files"], 72)
+            self.assertEqual(result["files"], 75)
             payload = json.loads(yr.read_text(encoding="utf8"))
             payload["zip_sha256"] = "0" * 64
             yr.write_text(json.dumps(payload) + "\n", encoding="utf8")

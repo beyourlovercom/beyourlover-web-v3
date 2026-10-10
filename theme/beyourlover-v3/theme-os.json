@@ -117,7 +117,10 @@
         "assets/css/cart.css",
         "assets/css/cart-focus.css",
         "assets/js/cart-experience.js",
-        "assets/js/cart.js"
+        "assets/js/cart.js",
+        "inc/cart-drawer.php",
+        "assets/css/cart-drawer.css",
+        "assets/js/cart-drawer.js"
       ]
     },
     "checkout": {
