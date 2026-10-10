@@ -43,6 +43,14 @@
         } catch (error) { return '$' + Number(value || 0).toFixed(2); }
     }
 
+    // Whole-dollar thresholds should read "$69", not "$69.00".
+    // Keep fractional thresholds accurate if a future zone needs cents.
+    function thresholdCurrency(value) {
+        var numeric = Number(value || 0);
+        if (!Number.isFinite(numeric)) return currency(0);
+        return Number.isInteger(numeric) ? currency(numeric).replace(/\.00$/, '') : currency(numeric);
+    }
+
     function escapeHtml(value) {
         return String(value || '').replace(/[&<>'"]/g, function (character) {
             return {'&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;'}[character];
@@ -66,9 +74,9 @@
             return;
         }
         var applied = data.has_code && data.applied_code;
-        var html = '<p class="byl-cart-promotion__heading">Free shipping</p>';
+        var html = '';
         if (data.state !== 'shipping_unavailable' && data.threshold > 0) {
-            html += '<p class="byl-cart-promotion__threshold">Free shipping on orders of ' + currency(data.threshold) + '</p>';
+            html += '<p class="byl-cart-promotion__threshold">Free shipping on orders over ' + thresholdCurrency(data.threshold) + '</p>';
         }
         html += '<p class="byl-cart-promotion__message" aria-live="polite">' + messageFor(data) + '</p>';
         if (data.state === 'require_code_available') html += '<p class="byl-cart-promotion__hint">Use code ' + escapeHtml(data.policy_code) + '</p>';

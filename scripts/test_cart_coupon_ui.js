@@ -62,10 +62,18 @@ const iowa = run({
   active:true,state:'below_threshold',threshold:69,subtotal:59,remaining:10,
   has_code:false,applied_code:'',zone_id:5,
 }, {active:true,state:'automatic_unlocked',threshold:0,remaining:0});
-assert(iowa.markup.includes('Free shipping on orders of $69.00'), 'Iowa native Woo zone threshold $69');
+assert(iowa.markup.includes('Free shipping on orders over $69</p>'), 'Iowa native Woo whole-dollar threshold with over');
+assert(!iowa.markup.includes('byl-cart-promotion__heading'), 'remove ambiguous redundant Free shipping heading');
+assert(!iowa.markup.includes('Free shipping on orders of '), 'no obsolete of copy');
+assert(!iowa.markup.includes('Free shipping on orders over $69.00'), 'omit .00 on whole-dollar threshold');
 assert(iowa.markup.includes('Add $10.00 more for free shipping'), 'Iowa native Woo $59/$69 difference');
 assert(!iowa.markup.includes('Free shipping applied'), 'stale Blocks unlocked must not override native $10 flat');
 assert(iowa.markup.includes('role="progressbar"'), 'under-threshold progress bar');
+assert(iowa.markup.indexOf('byl-cart-promotion__threshold') < iowa.markup.indexOf('byl-cart-promotion__message'), 'threshold before remaining');
+assert(iowa.markup.indexOf('byl-cart-promotion__message') < iowa.markup.indexOf('byl-cart-promotion__meter'), 'meter immediately follows remaining');
+assert(iowa.markup.indexOf('byl-cart-promotion__meter') < iowa.markup.indexOf('byl-cart-promotion__form'), 'coupon entry follows the meter');
+const fractionalZone = run({active:true,state:'below_threshold',threshold:69.5,subtotal:59,remaining:10.5});
+assert(fractionalZone.markup.includes('Free shipping on orders over $69.50'), 'preserve fractional zone thresholds without rounding misleadingly');
 const availablePaid = run({active:true,state:'free_shipping_available',threshold:69,subtotal:79,remaining:0});
 assert(availablePaid.markup.includes('select it under Shipping'), 'paid selection cannot claim free shipping applied');
 const noFreeRate = run({active:true,state:'shipping_unavailable',threshold:0});

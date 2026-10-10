@@ -54,3 +54,14 @@ restored from the verified predeploy archive. Updated native context reads
 free-service support from Woo's normal zone catalog (and can recognize an
 actual zero-cost free rate) without directly rehydrating zone methods.
 No shipping settings or orders were modified.
+
+## Owner copy/layout UAT correction (2026-10-10)
+The free-shipping promotion card must omit the redundant standalone
+"Free shipping" heading. On Iowa Zone 5 at $59, render exactly:
+- `Free shipping on orders over $69` (whole-dollar threshold, no decimals)
+- `Add $10.00 more for free shipping`
+- Progress bar immediately below the remaining amount, then the coupon form.
+
+Use "over" as the Owner-approved customer-facing copy; eligibility calculation
+remains WooCommerce's unchanged effective zone rule (minimum $69). Fractional
+future thresholds retain cents to avoid silently misrepresenting the amount.
