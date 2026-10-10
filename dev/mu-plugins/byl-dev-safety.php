@@ -9,6 +9,10 @@
 defined('ABSPATH') || exit;
 if (wp_get_environment_type() !== 'staging') { return; }
 
+// Owner-approved Dev-only G5 lifetime cap: previous 6 + 5 = 11.
+// The same bound applies to both checkout and normal admin approval.
+const BYL_DEV_P13_MAX_SYNTHETIC_ORDERS = 11;
+
 /**
  * Permission for one synthetic test customer + one sandbox gateway only.
  * The gate config is outside the webroot and is absent/expired by default.
@@ -214,10 +218,10 @@ add_action('woocommerce_checkout_process', static function (): void {
         }
         $existing = wc_get_orders([
             'customer_id' => $context['customer_id'],
-            'limit' => 6,
+            'limit' => BYL_DEV_P13_MAX_SYNTHETIC_ORDERS,
             'return' => 'ids',
         ]);
-        if (count($existing) >= 6) {
+        if (count($existing) >= BYL_DEV_P13_MAX_SYNTHETIC_ORDERS) {
             wc_add_notice('Sandbox order limit reached. No additional orders allowed.', 'error');
         }
         return;
@@ -397,7 +401,7 @@ add_action('admin_post_byl_p13_approve', static function (): void {
     $settings = (array) get_option('woocommerce_woocommerce_payments_settings', []);
     if (!$user || !function_exists('wc_get_orders')
         || ($settings['enabled'] ?? '') !== 'yes' || ($settings['test_mode'] ?? '') !== 'yes'
-        || count(wc_get_orders(['customer_id' => $user->ID, 'limit' => 6, 'return' => 'ids'])) >= 6) {
+        || count(wc_get_orders(['customer_id' => $user->ID, 'limit' => BYL_DEV_P13_MAX_SYNTHETIC_ORDERS, 'return' => 'ids'])) >= BYL_DEV_P13_MAX_SYNTHETIC_ORDERS) {
         wp_die('Sandbox preflight failed; no grant issued.', '', ['response' => 403]);
     }
     $ok = byl_dev_p13_change_permit(static function (array $current) use ($user): array|bool {
