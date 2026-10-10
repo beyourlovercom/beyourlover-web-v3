@@ -25,6 +25,9 @@ function get_stylesheet_directory_uri(): string { return 'https://offline.invali
 function add_action($hook, $callback, $priority = 10): void {
     // Tests inspect actual template output, not enqueues or network.
 }
+function add_filter($hook, $callback, $priority = 10): void {}
+function add_shortcode($tag, $callback): void {}
+
 function get_header(): void { echo 'BYL_HEADER'; }
 function get_footer(): void { echo 'BYL_FOOTER'; }
 function have_posts(): bool { return $GLOBALS['byl_fixture']['cursor']++ === 0; }
