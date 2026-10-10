@@ -37,6 +37,12 @@
     elements.feedback.textContent = message;
     elements.feedback.classList.toggle('is-error', error);
   };
+  const safeHref = value => {
+    try {
+      const uri = new URL(String(value), window.location.href);
+      return ['https:','http:'].includes(uri.protocol) ? uri.href : String(config.cartUrl);
+    } catch (_) { return String(config.cartUrl); }
+  };
   const safeImage = url => {
     try { const uri = new URL(String(url), window.location.href); return ['https:','http:'].includes(uri.protocol) ? uri.href : ''; }
     catch (_) { return ''; }
@@ -57,9 +63,9 @@
     const lineTotal = item.totals?.line_total ?? item.prices?.price;
     const sale = Number(item.prices?.regular_price) > Number(item.prices?.price);
     return '<article class="byl-drawer__item" data-drawer-key="' + key + '">' +
-      '<a class="byl-drawer__product-image" href="' + escape(item.permalink || config.cartUrl) + '">' + img + '</a>' +
+      '<a class="byl-drawer__product-image" href="' + escape(safeHref(item.permalink || config.cartUrl)) + '">' + img + '</a>' +
       '<div class="byl-drawer__item-info"><div class="byl-drawer__item-top"><a href="' +
-      escape(item.permalink || config.cartUrl) + '">' + escape(item.name) + '</a>' +
+      escape(safeHref(item.permalink || config.cartUrl)) + '">' + escape(item.name) + '</a>' +
       (soldOut ? '<span class="byl-drawer__qty-locked">' + quantity + '</span>' :
        '<div class="byl-drawer__quantity" role="group" aria-label="Quantity for ' + escape(item.name) + '">' +
        '<button type="button" data-drawer-qty="-1" aria-label="Decrease quantity"'+(Number.isFinite(min) && quantity<=min?' disabled':'')+'>−</button>' +
@@ -180,6 +186,9 @@
   });
   root.addEventListener('click',event=>{
     if (event.target.closest('[data-drawer-close]')) {close();return;}
+    // Network updates are serialized. Never accept an event based on the
+    // previous Woo cart snapshot while an update is still in flight.
+    if (loading) return;
     const remove=event.target.closest('[data-drawer-remove]');
     if(remove && state){
       const row=remove.closest('[data-drawer-key]');
@@ -214,6 +223,7 @@
   });
   elements.couponForm.addEventListener('submit',event=>{
     event.preventDefault();
+    if (loading) return;
     const field=elements.couponForm.querySelector('input[name="coupon_code"]');
     const code=(field?.value||'').trim();
     if(!code) {setFeedback('Enter a coupon code first.',true);return;}
