@@ -33,6 +33,7 @@ Stop and ask the Owner before:
 
 ## Read context only when relevant
 - [Architecture and module ownership](docs/agent/ARCHITECTURE.md) — cross-module or plugin/theme changes
+- [BYL Theme OS V1](docs/agent/THEME-OS-V1.md) — Theme module ownership, SemVer, ZIP receipts, upgrade and rollback
 - [Dev environment and integration](docs/agent/DEV-ENV.md) — local/Dev work, deployments, branch handoff
 - [Cart, Checkout, payment contracts](docs/agent/COMMERCE.md) — commerce/customer-funnel work
 - [Testing and Owner UAT](docs/agent/TESTING.md) — test selection, browser evidence, closure criteria
