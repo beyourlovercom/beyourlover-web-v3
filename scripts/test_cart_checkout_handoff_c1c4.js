@@ -1,0 +1,30 @@
+'use strict';
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+function read(file){return fs.readFileSync(path.join(__dirname,'../theme/beyourlover-v3',file),'utf8');}
+const cart = read('page-cart.php');
+const checkout = read('page-checkout.php');
+const nativeCart = read('inc/cart-experience.php');
+const quantity = read('assets/js/cart-experience.js');
+const promotion = read('assets/js/cart.js');
+const checkoutJs = read('assets/js/checkout.js');
+const functionSrc = read('functions.php');
+assert(cart.includes("do_shortcode('[woocommerce_cart]')"), 'Cart delegates prices, quantities and coupon to Woo shortcode');
+assert(checkout.includes("do_shortcode('[woocommerce_checkout]')"), 'Checkout owns native Woo checkout runtime');
+assert(cart.includes("get_header('cart')")&&checkout.includes("'checkout'"), 'different focused shells are preserved');
+assert(nativeCart.includes('get_shipping_packages()') && nativeCart.includes('get_zone_matching_package'), 'Cart promotion uses actual Woo destination');
+assert(nativeCart.includes('get_persisted_zone_effective_threshold'), 'Cart free-shipping threshold uses Andy Commerce');
+assert(nativeCart.includes('chosen_shipping_methods') && nativeCart.includes('get_packages()'), 'Cart applied status requires actual selected free shipping rate');
+assert(promotion.includes('if (nativeCart()) window.location.reload();'), 'classic coupon changes refresh native Woo totals');
+assert(promotion.includes('if (!embedded) return null;'), 'classic Cart cannot use stale Blocks snapshot');
+assert(promotion.includes("🎉 Congrats! You've unlocked free shipping."), 'Cart matches Free Shipping Page celebration');
+assert(quantity.includes('form.requestSubmit(submit)') && !quantity.includes('fetch('), 'quantity actions are native Woo, not custom cart writes');
+assert(quantity.includes('updated_wc_div updated_cart_totals'), 'quantity controls survive classic Woo fragment replacement');
+assert(!/wp_create_order|wc_create_order|process_payment|update_post_meta|WC_Order/.test(quantity), 'quantity presentation cannot create orders');
+assert(!/wp_create_order|wc_create_order|process_payment/.test(nativeCart), 'Cart promotion cannot create orders');
+assert(functionSrc.includes("if (function_exists('is_cart') && is_cart())"), 'Cart assets are scoped to Cart');
+assert(!checkoutJs.includes('window.BYLShippingPromotionCart'), 'Cart-only coupon controller does not take over Checkout');
+// No fake checkout or shipping totals are computed by our quantity handler.
+assert(!/calculate_totals\s*\(|set_total\s*\(|get_total\s*\(|set_shipping_total\s*\(/.test(quantity), 'stepper never calculates a payment or shipping total');
+console.log('PASS Cart->Checkout C3 native ownership: Woo shortcode, shipping/coupon session authority, no order mutations');
