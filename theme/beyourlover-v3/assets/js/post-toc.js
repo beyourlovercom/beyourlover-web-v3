@@ -71,7 +71,11 @@
         floating.hidden = true;
         return;
       }
-      const firstTop = headings[0].getBoundingClientRect().top + window.scrollY;
+      const hero = document.querySelector('.byl-post-single__hero');
+      // Never overlay the featured banner with the left INDEX. Unlike a
+      // fixed pixel threshold, this adapts to the actual rendered hero height
+      // (responsive images, aspect ratios and slow image loading).
+      const bannerCleared = !hero || hero.getBoundingClientRect().bottom <= 0;
       const contentRect = content.getBoundingClientRect();
       const readingEnd = contentRect.bottom + window.scrollY;
       const contentStart = contentRect.top + window.scrollY;
@@ -81,8 +85,8 @@
       const readingPosition = scroll + 140;
       const readingProgress = Math.max(0, (readingPosition - contentStart) /
         Math.max(1, contentRect.height));
-      const allow = scroll > 650 && readingProgress < 0.9 &&
-        readingPosition < readingEnd;
+      const allow = scroll > 650 && bannerCleared &&
+        readingProgress < 0.9 && readingPosition < readingEnd;
       floating.hidden = !allow;
       if (!allow) return;
 
@@ -107,6 +111,11 @@
     }
     window.addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate, { passive: true });
+    const heroImage = document.querySelector('.byl-post-single__hero-image');
+    if (heroImage && !heroImage.complete) {
+      heroImage.addEventListener('load', requestUpdate, { once: true });
+      heroImage.addEventListener('error', requestUpdate, { once: true });
+    }
     window.addEventListener('hashchange', requestUpdate);
     if (desktop.addEventListener) desktop.addEventListener('change', requestUpdate);
     else desktop.addListener(requestUpdate);
