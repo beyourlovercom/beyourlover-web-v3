@@ -72,11 +72,17 @@
         return;
       }
       const firstTop = headings[0].getBoundingClientRect().top + window.scrollY;
-      const readingEnd = content.getBoundingClientRect().bottom + window.scrollY;
+      const contentRect = content.getBoundingClientRect();
+      const readingEnd = contentRect.bottom + window.scrollY;
+      const contentStart = contentRect.top + window.scrollY;
       const scroll = window.scrollY;
-      // WWW reveals the INDEX after the lead/hero has scrolled away,
-      // well before the first H2 reaches the top of the viewport.
-      const allow = scroll > 650 && scroll + 140 < readingEnd;
+      // Measure actual reading position against the Post body, not the
+      // page/footer length. Retire the rail at the 90% reading mark.
+      const readingPosition = scroll + 140;
+      const readingProgress = Math.max(0, (readingPosition - contentStart) /
+        Math.max(1, contentRect.height));
+      const allow = scroll > 650 && readingProgress < 0.9 &&
+        readingPosition < readingEnd;
       floating.hidden = !allow;
       if (!allow) return;
 
