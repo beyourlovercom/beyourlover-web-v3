@@ -1,0 +1,33 @@
+/* Newsletter M3: source-level isolation checks. No WordPress, email or DB calls. */
+'use strict';
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const page = fs.readFileSync('theme/beyourlover-v3/page-newsletter.php','utf8');
+const css = fs.readFileSync('theme/beyourlover-v3/assets/css/newsletter.css','utf8');
+const sidebar = fs.readFileSync('theme/beyourlover-v3/blog-sidebar.php','utf8');
+const base = fs.readFileSync('theme/beyourlover-v3/page.php','utf8');
+let n=0;
+function check(ok,msg){assert.ok(ok,msg);n++;}
+check(page.includes("shortcode_exists('yby_subscribe')"),'Core shortcode registration must be checked');
+check(page.includes("class_exists('YBY_Newsletter_REST_Controller')"),'Old inert Core must fail closed');
+check((page.match(/do_shortcode\('\[yby_subscribe\]'\)/g)||[]).length===1,'Core must be rendered exactly once');
+check(page.includes('Newsletter sign-up is not available yet.'),'Explicit unavailable fallback required');
+check(!page.includes('the_content('),'Legacy WPForms placeholder must not render');
+check(!/\[wpforms|wpforms_display|<form\b/i.test(page),'No parallel form allowed');
+check(!/wp_insert_post|\$wpdb|wp_mail|register_rest_route|YBY_NEWSLETTER_API_ENABLED/.test(page),'Theme must not own Core business logic or force API activation');
+check(page.includes('get_page_template_slug'),'Preserve custom template selected in WordPress');
+check(page.includes("'/index.php'"),'Legacy Page fallback preserved');
+check(page.includes("get_page_by_path('privacy-polices'"),'Privacy URL resolved from an actual published page');
+check(page.includes("get_privacy_policy_url"),'WordPress policy fallback retained');
+check(page.includes('unsubscribe'),'Visible unsubscribe guidance');
+check(page.includes('Only confirming your address completes the subscription'),'Pending is not subscribed');
+check(sidebar.includes("home_url('/newsletter/')"),'Blog CTA unchanged');
+check(sidebar.includes('New Arrivals') && sidebar.includes('Recent Posts'),'Existing Blog sidebar intact');
+check(base.includes('$byl_has_legacy_template'),'Default Page legacy gate intact');
+check(css.includes('.byl-newsletter__core input[type=checkbox]'),'Opt-in checkbox presented by Core, styled locally');
+check(css.includes(':focus-visible'),'Keyboard focus cue');
+check(css.includes('min-height:48px'),'Accessible touch target');
+check(css.includes('@media(max-width:767px)'),'Mobile responsive rules');
+check(css.includes('minmax(0,1fr)'),'Prevent flex/grid overflow');
+check(!/\b(?:body|html|button|input)\s*\{/.test(css),'No global selectors');
+console.log('NEWSLETTER_M3_OFFLINE_CONTRACT=PASS '+n+' assertions');
