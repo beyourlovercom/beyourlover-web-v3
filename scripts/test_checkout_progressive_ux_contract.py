@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-theme = (ROOT / "theme/beyourlover-v3/functions.php").read_text(encoding="utf-8")
+theme = (ROOT / "theme/beyourlover-v3/inc/theme-os-assets.php").read_text(encoding="utf-8")
 php = (ROOT / "theme/beyourlover-v3/inc/checkout.php").read_text(encoding="utf-8")
 js = (ROOT / "theme/beyourlover-v3/assets/js/checkout.js").read_text(encoding="utf-8")
 css = (ROOT / "theme/beyourlover-v3/assets/css/checkout.css").read_text(encoding="utf-8")
