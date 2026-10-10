@@ -1,5 +1,5 @@
 /* BYL Cart Drawer V2 D3.1 — Dev-only opt-in preview, scoped styles. */
-:root{--byl-drawer-brand:#96314d;--byl-drawer-ink:#171417;--byl-drawer-line:#e8e0e4;--byl-drawer-soft:#faf7f9}
+:root{--byl-drawer-brand:var(--byl-brand,#9b3749);--byl-drawer-ink:#171417;--byl-drawer-line:#e8e0e4;--byl-drawer-soft:#faf7f9}
 html.byl-drawer-open{overflow:hidden}
 .byl-drawer[hidden],.byl-drawer [hidden]{display:none!important}
 .byl-drawer{position:fixed;inset:0;z-index:99995;font-family:inherit;color:var(--byl-drawer-ink)}
