@@ -142,8 +142,11 @@
       render(result);
       setFeedback('');
     }catch(error){
+      // A failed Woo mutation must not leave optimistic quantity text onscreen.
+      // The previously accepted Woo response remains our only displayed truth.
+      if (state) render(state);
+      else elements.empty.hidden = false;
       setFeedback(error.message || 'Could not update your cart. Please try again.',true);
-      if(!state) elements.empty.hidden = false;
       throw error;
     } finally {
       loading=false;
@@ -151,8 +154,11 @@
     }
   }
   const update = (endpoint,data) => {
-    mutationQueue = mutationQueue.then(()=>request(endpoint,data)).catch(()=>{});
-    return mutationQueue;
+    // Preserve the success/failure result for callers (especially coupon UI).
+    // Keep the serial queue alive after an API error so a retry can proceed.
+    const operation = mutationQueue.then(()=>request(endpoint,data));
+    mutationQueue = operation.catch(()=>{});
+    return operation.then(()=>true,()=>false);
   };
   function open() {
     if(!root.hidden) return;
@@ -211,7 +217,10 @@
     const field=elements.couponForm.querySelector('input[name="coupon_code"]');
     const code=(field?.value||'').trim();
     if(!code) {setFeedback('Enter a coupon code first.',true);return;}
-    update('apply-coupon',{code}).then(()=>{if(field) field.value='';});
+    update('apply-coupon',{code}).then(applied=>{
+      // Failed/expired/invalid coupons must remain editable for a retry.
+      if(applied && field) field.value='';
+    });
   });
   document.addEventListener('keydown',event=>{
     if(root.hidden) return;
