@@ -26,6 +26,7 @@ if ($argvCount === 1) {
     $root = dirname(__DIR__, 3);
     $shared = sys_get_temp_dir().'/newsletter-mail-race-'.bin2hex(random_bytes(6));
     if (!mkdir($shared, 0700)) { throw new RuntimeException('Race directory unavailable'); }
+    $shared=realpath($shared);
     $source = file_get_contents($root.'/dev/mu-plugins/byl-dev-safety.php');
     if (!is_string($source) || !str_contains($source, '/home/u247343654/byl-v3-staging')) {
         throw new RuntimeException('Missing expected Dev safety source anchor');
@@ -107,6 +108,7 @@ $root = dirname(__DIR__,3);
 $tmp = $race ? ($argv[2] ?? '') :
     sys_get_temp_dir().'/newsletter-one-mail-security-'.bin2hex(random_bytes(6));
 if (!$race && !mkdir($tmp, 0700)) { throw new RuntimeException('Fixture mkdir fail'); }
+$tmp=realpath($tmp);
 if (!$race) {
     $source = file_get_contents($root.'/dev/mu-plugins/byl-dev-safety.php');
     if (!is_string($source) || !str_contains($source, '/home/u247343654/byl-v3-staging')) {
