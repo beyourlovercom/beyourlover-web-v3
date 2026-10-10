@@ -8,6 +8,9 @@
 declare(strict_types=1);
 defined('ABSPATH') || exit;
 
+// Blog-only shortcode compatibility; never loads on Cart/Checkout or Pages.
+require_once get_stylesheet_directory().'/inc/blog-product-card.php';
+
 add_action('wp_enqueue_scripts', static function (): void {
     $relative = '/assets/css/post-single.css';
     $path = get_stylesheet_directory().$relative;
