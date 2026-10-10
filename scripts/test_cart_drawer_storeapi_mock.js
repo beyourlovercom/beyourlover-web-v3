@@ -111,6 +111,7 @@ async function main() {
   await waitFor(()=>window.BYL_Cart_Drawer_Preview && el['[data-drawer-items]'].innerHTML.includes('Safe Product'));
   assert.equal(root.hidden,false,'explicit preview must open the Drawer');
   assert.ok(!el['[data-drawer-items]'].innerHTML.includes('href="javascript:'),'unsafe Woo product permalink scheme must be rejected');
+  assert.ok(!el['[data-drawer-items]'].innerHTML.includes('<img '),'empty Woo thumbnail must not trigger homepage image requests');
   assert.ok(el['[data-drawer-items]'].innerHTML.includes('https://dev.example.invalid/cart/'),'unsafe href falls back to cart URL');
   assert.equal(el['[data-drawer-footer-total]'].textContent,'$59.99','display Woo-authoritative minor-unit totals');
 
