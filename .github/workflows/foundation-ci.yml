@@ -30,6 +30,8 @@ jobs:
           php -l tools/g5-isolated/byl-g5-isolated-preparation-lock.php
           php -l scripts/test_g5_isolated_preparation_lock.php
           php scripts/test_g5_isolated_preparation_lock.php
+          php -l scripts/test_g5_wcpay_connect_only.php
+          php scripts/test_g5_wcpay_connect_only.php
           php tools/dev/tests/g5-aftership-dev-outbound-isolation-smoke.php
       - name: P7.1 Thank You PHP syntax
         run: |
