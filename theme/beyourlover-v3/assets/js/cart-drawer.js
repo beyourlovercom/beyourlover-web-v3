@@ -44,6 +44,7 @@
     } catch (_) { return String(config.cartUrl); }
   };
   const safeImage = url => {
+    if (!url || !String(url).trim()) return '';
     try { const uri = new URL(String(url), window.location.href); return ['https:','http:'].includes(uri.protocol) ? uri.href : ''; }
     catch (_) { return ''; }
   };
