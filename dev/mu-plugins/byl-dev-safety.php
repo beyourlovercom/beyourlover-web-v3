@@ -84,6 +84,32 @@ add_filter('woocommerce_webhook_should_deliver', static function ($allow, $webho
     return (bool) $allow;
 }, PHP_INT_MAX, 3);
 
+// G5: Dev-only outbound isolation for AfterShip / Automizely HTTP API hosts.
+// Native Woo order webhook isolation above is necessary but not sufficient:
+// third-party plugins can also call WP HTTP directly (including in WP-Cron).
+// This filter is network-preemptive; it never initiates an external request.
+// Provider-side jobs already running outside Dev WordPress are NOT covered.
+add_filter('pre_http_request', static function ($pre, $args, $url) {
+    if ($pre !== false || wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com' || !is_string($url)) {
+        return $pre;
+    }
+    $host = wp_parse_url($url, PHP_URL_HOST);
+    if (!is_string($host) || $host === '') { return $pre; }
+    $host = strtolower(rtrim($host, '.'));
+    foreach (['automizely.com', 'aftership.com'] as $providerDomain) {
+        // Dot boundary forbids hosts like api.aftership.com.evil.example.
+        if ($host === $providerDomain || str_ends_with($host, '.' . $providerDomain)) {
+            return new WP_Error(
+                'byl_dev_aftership_outbound_closed',
+                'AfterShip/Automizely external HTTP requests are disabled on Dev.'
+            );
+        }
+    }
+    // Critical: WooPayments/Stripe APIs and every unrelated host untouched.
+    return $pre;
+}, PHP_INT_MAX, 3);
+
 // No external outgoing email, even from an authorized test order.
 add_filter('pre_wp_mail', static function () { return false; }, 99);
 
