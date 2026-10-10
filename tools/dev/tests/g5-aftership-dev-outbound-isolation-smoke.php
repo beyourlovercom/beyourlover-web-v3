@@ -12,16 +12,22 @@ $GLOBALS['g5_env'] = ['site' => 'https://dev.beyourlover.com', 'environment' => 
 function add_filter($name, $callback, $priority = 10, $args = 1): void {
     $GLOBALS['g5_hooks'][$name][$priority][] = ['callback' => $callback, 'args' => $args];
 }
-function add_action($name, $callback, $priority = 10, $args = 1): void {}
+function add_action($name, $callback, $priority = 10, $args = 1): void { add_filter($name, $callback, $priority, $args); }
 function wp_get_environment_type(): string { return $GLOBALS['g5_env']['environment']; }
 function home_url($path = ''): string { return $GLOBALS['g5_env']['site'] . $path; }
 function wp_parse_url($url, $component = -1) { return parse_url($url, $component); }
 class WP_Error {
-    public function __construct(private string $code, private string $message = '') {}
+    public function __construct(private string $code, private string $message = '', private array $data = []) {}
     public function get_error_code(): string { return $this->code; }
     public function get_error_message(): string { return $this->message; }
+    public function get_error_data(): array { return $this->data; }
 }
 
+class WP_REST_Request {
+    public function __construct(private string $route, private string $method = 'GET') {}
+    public function get_route(): string { return $this->route; }
+    public function get_method(): string { return $this->method; }
+}
 require dirname(__DIR__, 3) . '/dev/mu-plugins/byl-dev-safety.php';
 $hooks = $GLOBALS['g5_hooks']['pre_http_request'] ?? [];
 if (count($hooks[PHP_INT_MAX] ?? []) !== 1
@@ -94,4 +100,56 @@ expect(isset($GLOBALS['g5_hooks']['rest_pre_dispatch'][99]),
     'existing Dev Store API Checkout fail-closed hook remains registered');
 expect(isset($GLOBALS['g5_hooks']['woocommerce_available_payment_gateways'][99]),
     'existing Dev payment-gateway guard remains registered');
+// G5 inbound: plugin rewrite routes, direct aliases, and exact REST route boundaries.
+expect(isset($GLOBALS['g5_hooks']['parse_request'][-999]), 'early AfterShip ingress guard registered');
+expect(isset($GLOBALS['g5_hooks']['rest_pre_dispatch'][98]), 'native order/customer ingress guard registered');
+foreach ([
+    ['/aftership-api/v3/orders', [], []],
+    ['/aftership-api/v4/orders/20', [], []],
+    ['/aftership-api/v5/orders', [], []],
+    ['/wp-json/?aftership-api-route=/orders', [], ['aftership-api-route'=>'/orders']],
+    ['/', ['aftership-api-route'=>'/orders'], []],
+    ['/', [], ['aftership-api'=>'callback']],
+    ['/shop/aftership-api/v4/orders', [], []],
+] as $i => [$uri, $qvars, $q]) {
+    expect(byl_dev_g5_aftership_inbound_path($uri, $qvars, $q) === true,
+        'blocks incoming AfterShip endpoint or alias ' . $i);
+}
+foreach ([
+    '/', '/checkout/', '/cart/', '/wp-json/wc/store/v1/cart',
+    '/aftership-api.evil.example/', '/some/aftership-api-typo',
+] as $i => $uri) {
+    expect(byl_dev_g5_aftership_inbound_path($uri, [], []) === false,
+        'preserves unrelated site request ' . $i);
+}
+$inbound = $GLOBALS['g5_hooks']['rest_pre_dispatch'][98][0]['callback'];
+foreach ([
+    '/wc/v1/orders', '/wc/v2/orders/20', '/wc/v3/orders/20/refunds',
+    '/wc/v3/orders/batch', '/wc/v3/customers', '/wc/v3/customers/22',
+] as $i => $route) {
+    $r = $inbound(null, null, new WP_REST_Request($route));
+    expect($r instanceof WP_Error
+        && $r->get_error_code() === 'byl_dev_g5_provider_inbound_quarantine'
+        && ($r->get_error_data()['status'] ?? null) === 403,
+        'native Woo API order/customer access denied ' . $i);
+}
+foreach ([
+    '/wc/store/v1/cart', '/wc/store/v1/products', '/wc/v3/products',
+    '/wc-analytics/reports/orders', '/wp/v2/pages',
+] as $i => $route) {
+    expect($inbound(null, null, new WP_REST_Request($route)) === null,
+        'non-target Woo/WP REST route preserved ' . $i);
+}
+$GLOBALS['g5_env']['site'] = 'https://www.beyourlover.com';
+expect($inbound(null, null, new WP_REST_Request('/wc/v3/orders')) === null,
+    'WWW native Woo Orders REST unaffected');
+$GLOBALS['g5_env']['site'] = 'https://dev.beyourlover.com';
+$GLOBALS['g5_env']['environment'] = 'production';
+expect($inbound(null, null, new WP_REST_Request('/wc/v3/orders')) === null,
+    'production environment native Woo Orders REST unaffected');
+$GLOBALS['g5_env']['environment'] = 'staging';
+$upstream = new WP_Error('prior_rest_denial');
+expect($inbound($upstream, null, new WP_REST_Request('/wc/v3/orders')) === $upstream,
+    'preserve earlier REST denial');
 echo 'G5_AFTERSHIP_DEV_OUTBOUND_ISOLATION=PASS ' . $checks . ' offline checks; no HTTP / order / charge' . PHP_EOL;
+echo 'G5_DEV_PROVIDER_BIDIRECTIONAL_QUARANTINE=PASS; no provider requests or order writes' . PHP_EOL;

@@ -9,6 +9,10 @@
 defined('ABSPATH') || exit;
 if (wp_get_environment_type() !== 'staging') { return; }
 
+// Owner-approved Dev-only G5 lifetime cap: previous 6 + 5 = 11.
+// The same bound applies to both checkout and normal admin approval.
+const BYL_DEV_P13_MAX_SYNTHETIC_ORDERS = 11;
+
 /**
  * Permission for one synthetic test customer + one sandbox gateway only.
  * The gate config is outside the webroot and is absent/expired by default.
@@ -110,6 +114,67 @@ add_filter('pre_http_request', static function ($pre, $args, $url) {
     return $pre;
 }, PHP_INT_MAX, 3);
 
+/**
+ * G5 Dev-only inbound Provider quarantine.
+ *
+ * AfterShip exposes /aftership-api/vN/orders AND query-var alias routes;
+ * outbound HTTP filtering never stops an authenticated Provider from
+ * pulling /wc/v3/orders with its existing read_write Woo API key.
+ *
+ * Deliberately restrict only Dev order/customer API surfaces, not wp-admin
+ * pages or internal PHP WC_Order reads. This may interrupt external Dev
+ * API clients and should be kept until G5 closes, then reviewed for rollback.
+ * Does not revoke/delete credentials or affect WWW.
+ */
+function byl_dev_g5_aftership_inbound_path(string $uri, array $queryVars = [], array $query = []): bool {
+    $path = wp_parse_url($uri, PHP_URL_PATH);
+    if (is_string($path) && preg_match('#(?:^|/)aftership-api(?:/|$)#i', $path)) {
+        return true;
+    }
+    // Rewrite-free equivalent: /?aftership-api-route=/orders
+    // or legacy /?aftership-api=...
+    foreach (['aftership-api-route', 'aftership-api'] as $name) {
+        if (array_key_exists($name, $queryVars) || array_key_exists($name, $query)) {
+            return true;
+        }
+    }
+    return false;
+}
+add_action('parse_request', static function ($wp): void {
+    if (wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com') {
+        return;
+    }
+    $uri = (string) ($_SERVER['REQUEST_URI'] ?? '');
+    $vars = is_object($wp) && isset($wp->query_vars) && is_array($wp->query_vars)
+        ? $wp->query_vars : [];
+    if (!byl_dev_g5_aftership_inbound_path($uri, $vars, $_GET)) {
+        return;
+    }
+    status_header(403);
+    nocache_headers();
+    exit;
+}, -999, 1);
+
+// Prevent a previously connected AfterShip/Woo consumer_key from polling
+// the native Woo REST Orders and Customers collections or mutating records.
+// Store API Cart and WooPayments internal server-side processing remain intact.
+add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
+    if ($result !== null || !($request instanceof WP_REST_Request)
+        || wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com') {
+        return $result;
+    }
+    if (!preg_match('#^/wc/(?:v1|v2|v3)/(?:orders|customers)(?:/|$)#', $request->get_route())) {
+        return $result;
+    }
+    return new WP_Error(
+        'byl_dev_g5_provider_inbound_quarantine',
+        'Woo Orders/Customers REST API is quarantined on Dev for G5 payment UAT.',
+        ['status' => 403]
+    );
+}, 98, 3);
+
 // No external outgoing email, even from an authorized test order.
 add_filter('pre_wp_mail', static function () { return false; }, 99);
 
@@ -153,10 +218,10 @@ add_action('woocommerce_checkout_process', static function (): void {
         }
         $existing = wc_get_orders([
             'customer_id' => $context['customer_id'],
-            'limit' => 6,
+            'limit' => BYL_DEV_P13_MAX_SYNTHETIC_ORDERS,
             'return' => 'ids',
         ]);
-        if (count($existing) >= 6) {
+        if (count($existing) >= BYL_DEV_P13_MAX_SYNTHETIC_ORDERS) {
             wc_add_notice('Sandbox order limit reached. No additional orders allowed.', 'error');
         }
         return;
@@ -336,7 +401,7 @@ add_action('admin_post_byl_p13_approve', static function (): void {
     $settings = (array) get_option('woocommerce_woocommerce_payments_settings', []);
     if (!$user || !function_exists('wc_get_orders')
         || ($settings['enabled'] ?? '') !== 'yes' || ($settings['test_mode'] ?? '') !== 'yes'
-        || count(wc_get_orders(['customer_id' => $user->ID, 'limit' => 6, 'return' => 'ids'])) >= 6) {
+        || count(wc_get_orders(['customer_id' => $user->ID, 'limit' => BYL_DEV_P13_MAX_SYNTHETIC_ORDERS, 'return' => 'ids'])) >= BYL_DEV_P13_MAX_SYNTHETIC_ORDERS) {
         wp_die('Sandbox preflight failed; no grant issued.', '', ['response' => 403]);
     }
     $ok = byl_dev_p13_change_permit(static function (array $current) use ($user): array|bool {
