@@ -39,6 +39,8 @@ assert.match(js,/add-item/);
 assert.match(js,/apply-coupon/);
 assert.match(js,/remove-coupon/);
 assert.match(js,/pendingQuantity\.get\(item\.key\)/);
+assert.match(js,/document\.addEventListener\('keydown'/, 'Esc closes an open Drawer even after removing focused item');
+assert.match(js,/if\(root\.hidden\) return;/, 'Global keydown must not run when Drawer closed');
 assert.match(js,/mutationQueue = mutationQueue\.then/);
 assert.match(php,/gift offers are not active/);
 assert.doesNotMatch(js,/\/checkout\/order-received|place_order|wc_store_api_checkout|process_payment/i);

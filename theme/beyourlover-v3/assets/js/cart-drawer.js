@@ -213,7 +213,8 @@
     if(!code) {setFeedback('Enter a coupon code first.',true);return;}
     update('apply-coupon',{code}).then(()=>{if(field) field.value='';});
   });
-  root.addEventListener('keydown',event=>{
+  document.addEventListener('keydown',event=>{
+    if(root.hidden) return;
     if(event.key==='Escape'){event.preventDefault();close();return;}
     if(event.key!=='Tab')return;
     const tabbables=[...root.querySelectorAll('a[href],button:not([disabled]),input:not([disabled])')]
