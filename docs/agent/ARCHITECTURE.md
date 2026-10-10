@@ -21,3 +21,7 @@ Build a coherent new B2C site on Dev, not a sequence of patches on legacy WWW. E
 
 ## Scope by workstream
 Cart and Checkout can be independently developed/UATed while sharing Andy Commerce policy contracts. Payment Gateway Integration and Post-purchase Experience are separate gates; neither is declared done by finishing Checkout layout.
+
+## BYL Theme OS V1
+
+Owner-approved standalone BYL Theme version and upgrade lifecycle without Shoptimizer, CommerceKit or an additional Child Theme. The module ownership, SemVer, CI and rollout rules are in [THEME-OS-V1.md](THEME-OS-V1.md). Phase 1 keeps Theme bootstrap and all Woo Cart/Checkout hooks unchanged.
