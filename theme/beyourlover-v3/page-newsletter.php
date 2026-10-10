@@ -25,10 +25,16 @@ wp_enqueue_style(
 );
 
 // Only the M1 Core controller is a valid integration, not the old inert shortcode.
-$byl_newsletter_core_available = class_exists('YBY_Newsletter_REST_Controller')
-    && shortcode_exists('yby_subscribe');
+// The legacy shortcode is not a working signup; never show a submit button
+// while Core API or outbound email remains OFF.
+$byl_newsletter_core_ready = class_exists('YBY_Newsletter_REST_Controller')
+    && shortcode_exists('yby_subscribe')
+    && is_callable(['YBY_Newsletter_REST_Controller', 'enabled'])
+    && is_callable(['YBY_Newsletter_REST_Controller', 'outbound_enabled'])
+    && YBY_Newsletter_REST_Controller::enabled()
+    && YBY_Newsletter_REST_Controller::outbound_enabled();
 $byl_newsletter_privacy = '';
-$byl_newsletter_policy_page = get_page_by_path('privacy-polices', OBJECT, 'page');
+$byl_newsletter_policy_page = get_page_by_path('privacy-policies', OBJECT, 'page');
 if ($byl_newsletter_policy_page instanceof WP_Post && $byl_newsletter_policy_page->post_status === 'publish') {
     $byl_newsletter_privacy = get_permalink($byl_newsletter_policy_page);
 } elseif (function_exists('get_privacy_policy_url')) {
@@ -46,7 +52,7 @@ get_header();
       <p class="byl-newsletter__lede"><?php esc_html_e('Discover new arrivals, helpful guides and updates from BeYourLover. Choose whether you want to receive our emails.', 'beyourlover-v3'); ?></p>
       <div class="byl-newsletter__panel" aria-labelledby="byl-newsletter-form-heading">
         <h2 id="byl-newsletter-form-heading"><?php esc_html_e('Join our newsletter', 'beyourlover-v3'); ?></h2>
-        <?php if ($byl_newsletter_core_available) : ?>
+        <?php if ($byl_newsletter_core_ready && $byl_newsletter_privacy !== '') : ?>
           <div class="byl-newsletter__core">
             <?php
             // Deliberately render Core's own controlled UI just once. Its
