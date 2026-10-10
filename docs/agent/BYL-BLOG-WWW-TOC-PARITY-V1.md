@@ -37,3 +37,20 @@ Actual public Dev article #39899 and exact branch JS/CSS loaded into separate **
 3. Owner final Blog visual UAT (Summary, floating menu, anchor navigation, typography). **Do not mark the entire Blog WWW replica PASS until right sidebar, dynamic product callouts and author/footer modules are explicitly checked** against approved examples.
 4. PR #47 remains unmerged while Blog is pending. After Blog owner PASS, reconcile stacked branch into PR #47 with exact-head approval, then separately gate main merge.
 
+
+## Footer parity / Owner reported missing blocks (2026-10-10)
+
+Owner screenshot identified three WWW Blog footer modules absent from Dev: an editorial profile card, prior/next post navigation styled as paired directional cards, and the 5-link Related Content list. The original PR #50 covered only TOC and sidebar. These are now implemented on the same blog-only branch.
+
+- `blog-endmatter.php` renders the **existing public WWW editorial profile** ("Liz B." / "Sexologist", source image on `https://img.beyourlover.com/2025/03/20054038/Bella-profile-scaled.webp`, vetted public biography, Website/Facebook/YouTube/Instagram links). This is a *template editorial byline*, not the WordPress account author: the public WWW article's REST `author=2221` and current Dev REST returns a missing user for that account; do not substitute personal WP login names as the reader-facing author. Three separate WWW articles were observed showing the same public editorial profile. If distinct editorial authors are introduced, separately establish per-Post editorial author metadata instead of guessing.
+- Left/right navigation still uses WordPress `get_previous_post()`, `get_next_post()` and real internal `get_permalink()` rather than invented URLs. Card CSS now has circle arrows, truncation, border and responsive layout matching WWW's UI language.
+- Related Content uses 5 real local published WP Posts: first prefers the current article's categories, falls back to latest published Posts excluding the current and already selected. Data can differ from WWW until its later articles are actually present in Dev; this is *not* hardcoded to a transient screenshot.
+- At the observed Dev sample `/blog/dom-and-brat-play/`, **Next is missing because its WWW next source `/blog/dry-humping-vs-frotting/` returns 404 on Dev and Dev public REST query by that slug returns `[]`**. This is a missing content/import gate, not a template rendering defect. No fake next link, WWW cross-domain fallback or unauthorized Post creation.
+- Blog endmatter source is a new PHP file; `single-post.php` includes it after rendered `the_content()`. `post-single.css` is blog-scoped. No new WP plugin, Content/DB change, URL rewriting or Production deploy.
+
+### Dev-only guarded deployment and tests
+
+- Exact-head GitHub CI PASS for `246c52b1c601324c93b38656efd70b89b86fe1ff`, run `38012893030`; before/after PHP lint PASS.
+- Guarded Dev Hostinger backup `/home/u247343654/byl-v3-backups/pr50-blog-endmatter-246c52b1-20261010/rollback.sh` stored off-webroot, plus two exact prior runtime files. Two preexisting files replaced after comparing their expected SHA; one previously absent `blog-endmatter.php` added; G2 remained `ABSENT_CLOSED`.
+- Real public Dev Chrome UAT: two distinct Posts × 390/1440px: Liz B. + Sexologist + 569-character public bio + loaded R2 image, 4 verified social destinations, Related 5 actual internal posts, navigation with 1 card for missing Next / 2 cards when both are present, no horizontal overflow. **4/4 checks PASS**, including independent check that INDEX remains visible at 89% and is hidden by 90.1% of body at desktop.
+- Owner final visual Blog UAT **NOT YET PASS**. Main PR #47 and stacked PR #50 remain Draft/unmerged; WWW/Production unchanged. Remaining parity scope includes newsletter signup provider correctness and any unported in-body product callouts, plus the Dev content-import gap for Next navigation.
