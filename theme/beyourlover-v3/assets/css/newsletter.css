@@ -15,11 +15,13 @@
 .byl-newsletter__core button,.byl-newsletter__core input[type=submit]{min-height:48px;border:0;border-radius:9px;padding:12px 26px;background:#9e2b37;color:#fff;font:inherit;font-weight:600;cursor:pointer}
 .byl-newsletter__core button:disabled,.byl-newsletter__core input:disabled{opacity:.55;cursor:not-allowed}
 .byl-newsletter__core label{line-height:1.55}
+.byl-newsletter__core .yby-newsletter-consent{display:flex;align-items:flex-start;gap:10px;margin:16px 0}
+.byl-newsletter__core .yby-newsletter-consent input[type=checkbox]{flex:0 0 18px;margin:3px 0 0}
 .byl-newsletter__core input[type=checkbox]{accent-color:#9e2b37;width:18px;height:18px;vertical-align:middle}
 .byl-newsletter :focus-visible{outline:3px solid #9e2b37;outline-offset:3px}
 .byl-newsletter__unavailable{border:1px solid #ddd5d1;border-radius:9px;background:#fff;padding:17px 18px;color:#5a4b46;line-height:1.5;margin:0}
 .byl-newsletter__fine-print{font-size:12px;line-height:1.7;color:#595959;margin:20px 0 0}
-.byl-newsletter__fine-print a{color:#84232d;text-decoration:underline;text-underline-offset:2px;margin-left:4px}
+.byl-newsletter__fine-print a{white-space:nowrap;color:#84232d;text-decoration:underline;text-underline-offset:2px;margin-left:4px}
 .byl-newsletter__details,.byl-newsletter__process{max-width:1050px;margin:88px auto 0}
 .byl-newsletter__details h2,.byl-newsletter__process h2{font-size:clamp(25px,3vw,35px);text-align:center;letter-spacing:-.03em;margin:0 0 34px;color:#171717}
 .byl-newsletter__features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
