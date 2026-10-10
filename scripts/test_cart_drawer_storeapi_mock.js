@@ -54,7 +54,7 @@ function fixture() {
       cartApi:'https://dev.example.invalid/wp-json/wc/store/v1/cart',
       cartUrl:'https://dev.example.invalid/cart/',
       checkoutUrl:'https://dev.example.invalid/checkout/',
-      nonce:'synthetic-nonce',giftEnabled:false
+      nonce:'synthetic-nonce',giftEnabled:''
     },
     location:{href:'https://dev.example.invalid/'},
     setTimeout,clearTimeout
@@ -155,6 +155,18 @@ async function main() {
   assert.equal(root.hidden,true);
   assert.ok(!calls.some(c=>/checkout|place-order|payment/i.test(c.endpoint)),
     'state test must never call Checkout mutations');
-  console.log('PASS Drawer Woo mocked runtime: safe href, coupon fail/retry, qty rollback, debounce, totals, Escape, no payments');
+
+  // Explicitly active Free Gift remains a hard stop, not a way to launch gifts.
+  const forbidden=fixture();
+  forbidden.window.BYLCartDrawerPreview.giftEnabled=true;
+  vm.runInContext(source,vm.createContext({window:forbidden.window,
+    document:forbidden.document,fetch,URL,Intl,Math,Number,String,
+    Promise,Set,Map,Array,Object,Error,setTimeout,clearTimeout,console}),
+    {filename:'cart-drawer-gift-off-gate.js'});
+  assert.equal(forbidden.root.hidden,true,'gift-enabled configuration must fail closed');
+  assert.equal(forbidden.window.BYL_Cart_Drawer_Preview,undefined,
+    'unapproved gift config must not expose an active Drawer');
+
+  console.log('PASS Drawer Woo mocked runtime: localized PHP false, gift guard, safe href, coupon fail/retry, qty rollback, debounce, totals, Escape, no payments');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
