@@ -124,6 +124,14 @@ if ($scenario !== 'not_cli') { define('WP_CLI',true); }
 define('ABSPATH', '/offline-fixture/');
 require $tmp.'/safety.php';
 $filters = array_values(array_filter($GLOBALS['filters']['pre_wp_mail'] ?? [], fn($v) => $v['accepted']===2));
+if ($scenario === 'wrong_environment') {
+    // The MU module never runs outside staging: it must install no hooks.
+    if (count($filters)!==0) { throw new RuntimeException('Production modified by staging plugin'); }
+    foreach (glob($tmp.'/*') ?: [] as $file) { unlink($file); }
+    rmdir($tmp);
+    echo "PASS wrong_environment (no staging filters loaded)".PHP_EOL;
+    exit(0);
+}
 if (count($filters)!==1) { throw new RuntimeException('Expected exact fail-closed mail filter'); }
 $fn=$filters[0]['callback'];
 if ($race) {
