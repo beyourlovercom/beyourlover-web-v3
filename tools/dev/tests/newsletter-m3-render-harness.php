@@ -7,12 +7,12 @@ declare(strict_types=1);
 define('ABSPATH', __DIR__);
 define('OBJECT', 'OBJECT');
 $byl_test_mode = $argv[1] ?? 'off';
-if (!in_array($byl_test_mode, ['off', 'on', 'policy_missing'], true)) {
+if (!in_array($byl_test_mode, ['off', 'on', 'policy_missing', 'missing_core'], true)) {
     fwrite(STDERR, "Invalid isolated scenario\n");
     exit(2);
 }
 class WP_Post { public string $post_status = 'publish'; }
-class YBY_Newsletter_REST_Controller {
+if ($byl_test_mode !== 'missing_core') {\nclass YBY_Newsletter_REST_Controller {
     public static function enabled(): bool {
         global $byl_test_mode;
         return $byl_test_mode !== 'off';
@@ -21,6 +21,7 @@ class YBY_Newsletter_REST_Controller {
         global $byl_test_mode;
         return $byl_test_mode !== 'off';
     }
+}
 }
 function get_page_template_slug(int $id): string { return ''; }
 function get_queried_object_id(): int { return 12537; }
