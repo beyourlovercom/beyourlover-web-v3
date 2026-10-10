@@ -236,7 +236,7 @@ get_header();
            data-endpoint="<?php echo esc_url(admin_url('admin-ajax.php')); ?>"
            data-nonce="<?php echo esc_attr(wp_create_nonce('byl_v3_fs_lookup')); ?>"
            data-currency="<?php echo esc_attr((string)$state['currency']); ?>">
-        <div class="byl-free__lookup-title"><span>Check a destination</span><small>Read-only preview — won't change your cart address</small></div>
+        <div class="byl-free__lookup-title"><span>Check a destination</span><small>Checking here won't change your delivery address</small></div>
         <div class="byl-free__lookup-fields">
           <label for="byl-free-country-select">Country / region
             <select id="byl-free-country-select" data-byl-fs-country>
@@ -288,7 +288,7 @@ get_header();
           </article>
         <?php endforeach; ?>
       </div>
-      <p class="byl-free__country-notice"><strong>Other destinations:</strong> No Free Shipping method is currently configured in the Rest of World zone. Even if a default policy has a dollar threshold, it does not itself create a free delivery option. Check Cart or Checkout for actual shipping rates.</p>
+      <p class="byl-free__country-notice"><strong>Other destinations:</strong> Free shipping is not offered for every destination. Check your Cart or Checkout for the delivery methods and final shipping charges available to your address.</p>
     </section>
     <section id="how-free-shipping-works" class="byl-free__how">
       <p class="byl-free__eyebrow">Three easy steps</p>

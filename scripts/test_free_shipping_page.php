@@ -134,7 +134,7 @@ check(str_contains($below,'Free shipping by country'), 'country policy section i
 check(str_contains($below,'data-shipping-zone="1"') && str_contains($below,'data-shipping-zone="5"')
     && str_contains($below,'data-shipping-zone="4"') && str_contains($below,'data-shipping-zone="3"'), 'four zone policy tiers');
 check(str_contains($below,'$129') && str_contains($below,'$169') && str_contains($below,'$69'), 'four thresholds from Woo policy');
-check(str_contains($below,'Rest of World'), 'unsupported fallback has clear disclosure');
+check(str_contains($below,'Free shipping is not offered for every destination'), 'unsupported fallback has clear disclosure');
 check(!str_contains($below,'an order threshold of $49'), 'legacy global fallback is not falsely advertised');
 
 check(byl_v3_fs_destination_policy('HK')['threshold']===0.0, 'Hong Kong zero minimum');
