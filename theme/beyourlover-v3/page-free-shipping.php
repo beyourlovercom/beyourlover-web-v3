@@ -191,6 +191,105 @@ get_header();
         </div>
       </div>
     </section>
+    <?php
+    // Dynamic policy amounts from Andy Commerce; labels describe geographic
+    // coverage audited against WooCommerce, not another editable config source.
+    $fs_zones = class_exists('WC_Shipping_Zones') ? WC_Shipping_Zones::get_zones() : [];
+    $fs_policy = class_exists('Andy_Commerce_Shipping_Promotion_Policy')
+        ? 'Andy_Commerce_Shipping_Promotion_Policy' : null;
+    $fs_groups = [
+        ['zone'=>1, 'title'=>'Hong Kong', 'region'=>'Hong Kong', 'detail'=>'Hong Kong SAR is its own zero-minimum Free Shipping region.'],
+        ['zone'=>5, 'title'=>'Asia &amp; most of the U.S.', 'region'=>'Most U.S. states and Asian destinations', 'detail'=>'Mainland U.S. destinations excluding Alaska and Hawaii; Asian destinations except Hong Kong. The United Arab Emirates currently matches this region.'],
+        ['zone'=>4, 'title'=>'Extended destinations', 'region'=>'Alaska, Hawaii, Puerto Rico and Mexico', 'detail'=>'U.S. Alaska and Hawaii, Puerto Rico and Mexico. Country/region eligibility is calculated from your exact destination.'],
+        ['zone'=>3, 'title'=>'Selected destinations', 'region'=>'Russia, Venezuela, North Macedonia, Moldova, Costa Rica and Argentina', 'detail'=>'Russia, Venezuela, North Macedonia, Moldova, Costa Rica and Argentina. Available delivery methods and local restrictions still apply.'],
+    ];
+    $fs_countries = function_exists('WC') && WC() && isset(WC()->countries)
+        ? (array)WC()->countries->get_shipping_countries() : [];
+    $fs_states_us = function_exists('WC') && WC() && isset(WC()->countries)
+        ? (array)WC()->countries->get_states('US') : [];
+    $fs_asia = [];
+    if (function_exists('WC') && WC() && isset(WC()->countries)) {
+        $continents = (array)WC()->countries->get_continents();
+        foreach ((array)($continents['AS']['countries'] ?? []) as $code) {
+            if ($code === 'HK' || !isset($fs_countries[$code])) { continue; }
+            // Woo's zone precedence can override continent membership. List
+            // only countries that truly resolve to the $69 tier, not every
+            // country geographically grouped under Asia.
+            $match = WC_Shipping_Zones::get_zone_matching_package([
+                'destination'=>['country'=>$code,'state'=>'','postcode'=>'','city'=>''],
+                'contents'=>[],
+            ]);
+            if ($match && method_exists($match, 'get_id') && (int)$match->get_id() === 5) {
+                $fs_asia[] = (string)$fs_countries[$code];
+            }
+        }
+        sort($fs_asia, SORT_NATURAL | SORT_FLAG_CASE);
+    }
+    ?>
+    <section class="byl-free__country" id="shipping-by-country" aria-labelledby="byl-free-country-title">
+      <p class="byl-free__eyebrow">Shipping destinations</p>
+      <h2 id="byl-free-country-title">Free shipping by country &amp; region</h2>
+      <p class="byl-free__caption">Different destinations have different shipping rules. See the four current free-shipping tiers below, or look up a specific destination. Actual delivery services depend on your address and cart.</p>
+
+      <div class="byl-free__lookup"
+           data-byl-fs-lookup
+           data-endpoint="<?php echo esc_url(admin_url('admin-ajax.php')); ?>"
+           data-nonce="<?php echo esc_attr(wp_create_nonce('byl_v3_fs_lookup')); ?>"
+           data-currency="<?php echo esc_attr((string)$state['currency']); ?>">
+        <div class="byl-free__lookup-title"><span>Check a destination</span><small>Checking here won't change your delivery address</small></div>
+        <div class="byl-free__lookup-fields">
+          <label for="byl-free-country-select">Country / region
+            <select id="byl-free-country-select" data-byl-fs-country>
+              <option value="">Select a country or region</option>
+              <?php foreach ($fs_countries as $code => $country_name) : ?>
+                <option value="<?php echo esc_attr((string)$code); ?>"><?php echo esc_html((string)$country_name); ?></option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+          <label for="byl-free-state-select" data-byl-fs-state-wrapper hidden>U.S. state / territory
+            <select id="byl-free-state-select" data-byl-fs-state>
+              <option value="">Select your state</option>
+              <?php foreach ($fs_states_us as $code => $state_name) : ?>
+                <option value="<?php echo esc_attr((string)$code); ?>"><?php echo esc_html((string)$state_name); ?></option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+        </div>
+        <p class="byl-free__lookup-result" data-byl-fs-result role="status" aria-live="polite">Choose a destination to see its current free-shipping rule.</p>
+      </div>
+
+      <div class="byl-free__tiers">
+        <?php foreach ($fs_groups as $group) :
+          $zone_id = (int)$group['zone'];
+          $supports = $fs_policy && function_exists('byl_v3_fs_zone_free_method')
+              && byl_v3_fs_zone_free_method($zone_id,$fs_zones);
+          $min_amount = $supports ? $fs_policy::get_persisted_zone_effective_threshold($zone_id) : null;
+          $flat_cost = $supports && function_exists('byl_v3_fs_zone_flat_cost')
+              ? byl_v3_fs_zone_flat_cost($zone_id,$fs_zones) : null;
+        ?>
+          <article class="byl-free__tier" data-shipping-zone="<?php echo esc_attr((string)$zone_id); ?>">
+            <div class="byl-free__tier-header"><span><?php echo wp_kses_post((string)$group['title']); ?></span>
+              <strong><?php echo $min_amount !== null ? esc_html($price($min_amount,true)) : 'Check rates'; ?></strong>
+            </div>
+            <p class="byl-free__tier-sub"><?php echo $min_amount !== null && (float)$min_amount === 0.0
+                ? 'No minimum purchase for eligible Free Shipping'
+                : 'Minimum eligible merchandise subtotal'; ?></p>
+            <p class="byl-free__tier-region"><?php echo esc_html((string)$group['region']); ?></p>
+            <details>
+              <summary>Countries &amp; conditions</summary>
+              <p><?php echo esc_html((string)$group['detail']); ?></p>
+              <?php if ($zone_id === 5 && $fs_asia) : ?>
+                <p class="byl-free__country-list"><strong>Included Asian destinations:</strong> <?php echo esc_html(implode(', ', $fs_asia)); ?></p>
+              <?php endif; ?>
+              <?php if ($flat_cost !== null && $flat_cost > 0) : ?>
+                <p>Standard shipping base rate: <?php echo esc_html($price($flat_cost,true)); ?> before any applicable shipping-class charges.</p>
+              <?php endif; ?>
+            </details>
+          </article>
+        <?php endforeach; ?>
+      </div>
+      <p class="byl-free__country-notice"><strong>Other destinations:</strong> Free shipping is not offered for every destination. Check your Cart or Checkout for the delivery methods and final shipping charges available to your address.</p>
+    </section>
     <section id="how-free-shipping-works" class="byl-free__how">
       <p class="byl-free__eyebrow">Three easy steps</p>
       <h2>How it works</h2>

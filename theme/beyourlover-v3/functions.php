@@ -127,6 +127,8 @@ add_action('wp_enqueue_scripts', static function (): void {
     }
     if (is_page('free-shipping') || is_page('free-shipping-guide')) {
         wp_enqueue_style('byl-v3-free-shipping', $uri.'/assets/css/free-shipping.css', ['byl-v3-motion'], $v('assets/css/free-shipping.css'));
+        wp_enqueue_script('byl-v3-free-shipping-v2', $uri.'/assets/js/free-shipping-v2.js', [], $v('assets/js/free-shipping-v2.js'), true);
+        wp_script_add_data('byl-v3-free-shipping-v2', 'strategy', 'defer');
     }
     if (is_page('track-your-order')) {
         wp_enqueue_style('byl-v3-track-order', $uri.'/assets/css/track-order.css', ['byl-v3-motion'], $v('assets/css/track-order.css'));
@@ -160,6 +162,8 @@ add_action('wp_enqueue_scripts', static function (): void {
         wp_script_add_data('byl-v3-checkout', 'strategy', 'defer');
     }
 });
+
+require_once get_stylesheet_directory().'/inc/free-shipping-v2-policy.php';
 
 /**
  * Free Shipping page URL compatibility.
