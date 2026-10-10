@@ -175,8 +175,164 @@ add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
     );
 }, 98, 3);
 
-// No external outgoing email, even from an authorized test order.
-add_filter('pre_wp_mail', static function () { return false; }, 99);
+/**
+ * Shared staging email guard. Default DENY for every WordPress mail,
+ * including test orders, Woo, and background tasks.
+ *
+ * Newsletter Canary: an independently reviewed, one-use permit can allow
+ * precisely one confirmation message through native wp_mail() from WP-CLI.
+ * No public API can create a permit. Code-only; no permit exists by default.
+ * Never deploy this proposed change before shared Dev Safety/G5 Owner review.
+ */
+function byl_dev_newsletter_mail_match(array $mail, string $recipient_hash): bool {
+    if (count(array_diff(array_keys($mail), ['to', 'subject', 'message', 'headers', 'attachments', 'embeds'])) > 0) {
+        return false;
+    }
+    $to = $mail['to'] ?? null;
+    $to = is_array($to) ? $to : [$to];
+    if (count($to) !== 1 || !is_string($to[0]) || !is_email($to[0]) ||
+        !hash_equals($recipient_hash, hash('sha256', strtolower(trim($to[0]))))) {
+        return false;
+    }
+    if (($mail['subject'] ?? null) !== 'Confirm your newsletter subscription') {
+        return false;
+    }
+    if (!empty($mail['headers']) || !empty($mail['attachments']) || !empty($mail['embeds'])) {
+        return false;
+    }
+    $message = $mail['message'] ?? null;
+    if (!is_string($message) || strlen($message) > 4096 ||
+        !preg_match('~\APlease confirm your email subscription by visiting:\n' .
+            '(https://dev\.beyourlover\.com/\?yby_newsletter_action=confirm&token=([a-f0-9]{64}))\n\n' .
+            'If you did not request this, ignore this email\. You can unsubscribe using:\n' .
+            '(https://dev\.beyourlover\.com/\?yby_newsletter_action=unsubscribe&token=([a-f0-9]{64}))\z~D',
+            $message, $tokens)) {
+        return false;
+    }
+    return !hash_equals($tokens[2], $tokens[4]);
+}
+
+function byl_dev_newsletter_mail_consume_once(array $mail): bool {
+    static $attempted = false;
+    if ($attempted || !defined('WP_CLI') || WP_CLI !== true ||
+        wp_get_environment_type() !== 'staging' ||
+        home_url() !== 'https://dev.beyourlover.com') {
+        return false;
+    }
+    // Same protected host directory as the existing G5 gate, separate file/lock.
+    // Permit is manually issued ONLY after separate Owner grant + backup/UAT review.
+    $dir = '/home/u247343654/byl-v3-staging';
+    $path = $dir . '/newsletter-one-mail-permit.json';
+    if (!is_dir($dir) || !is_file($path) || is_link($path) ||
+        !is_readable($path) || (fileperms($path) & 0777) !== 0600) {
+        return false;
+    }
+    $lockPath = $dir . '/newsletter-one-mail-permit.lock';
+    $lock = fopen($lockPath, 'c');
+    if (!$lock) { return false; }
+    chmod($lockPath, 0600);
+    try {
+        if (!flock($lock, LOCK_EX)) { return false; }
+        // Re-check under lock: a separately issued ticket may have been revoked.
+        if (!is_file($path) || is_link($path) ||
+            (fileperms($path) & 0777) !== 0600) { return false; }
+        $json = file_get_contents($path);
+        $ticket = is_string($json) && strlen($json) <= 2048 ? json_decode($json, true) : null;
+        if (!is_array($ticket) ||
+            ($ticket['purpose'] ?? null) !== 'newsletter-confirmation-canary' ||
+            ($ticket['site'] ?? null) !== 'https://dev.beyourlover.com' ||
+            ($ticket['state'] ?? null) !== 'approved' ||
+            ($ticket['approved_by_owner'] ?? null) !== true ||
+            ($ticket['max_messages'] ?? null) !== 1 ||
+            !is_string($ticket['ticket_id'] ?? null) ||
+            !preg_match('/^[a-f0-9]{32}$/D', $ticket['ticket_id']) ||
+            !is_string($ticket['backup_sha256'] ?? null) ||
+            !preg_match('/^[a-f0-9]{64}$/D', $ticket['backup_sha256']) ||
+            !is_string($ticket['recipient_sha256'] ?? null) ||
+            !preg_match('/^[a-f0-9]{64}$/D', $ticket['recipient_sha256']) ||
+            !is_string($ticket['backup_path'] ?? null) ||
+            !preg_match('~^/home/u247343654/backups/newsletter-m37-dev-pretest-[0-9]{8}T[0-9]{6}Z-[A-Za-z0-9]{6}/dev-pretest\\.sql\\.gz$~D',
+                $ticket['backup_path'])) {
+            return false;
+        }
+        $issued = $ticket['issued_at'] ?? null;
+        $expires = $ticket['expires_at'] ?? null;
+        if (!is_int($issued) || !is_int($expires) ||
+            $issued > time() || $issued < time() - 300 ||
+            $expires <= time() || $expires > $issued + 300 ||
+            !byl_dev_newsletter_mail_match($mail, $ticket['recipient_sha256'])) {
+            return false;
+        }
+        // Check the previously verified pre-test backup again before any send.
+        $backup = $ticket['backup_path'];
+        if (is_link($backup) || !is_file($backup) || !is_readable($backup) ||
+            realpath($backup) !== $backup || filesize($backup) < 1024 ||
+            !hash_equals($ticket['backup_sha256'], (string) hash_file('sha256', $backup))) {
+            return false;
+        }
+        // Consume BEFORE attempting transport. A failed or uncertain delivery
+        // cannot be retried with the same grant; concurrency is lock-protected.
+        $ticket['state'] = 'consumed';
+        $ticket['consumed_at'] = time();
+        $next = wp_json_encode($ticket, JSON_UNESCAPED_SLASHES);
+        if (!is_string($next)) { return false; }
+        $tmp = tempnam($dir, 'newsletter-once-');
+        if (!$tmp) { return false; }
+        chmod($tmp, 0600);
+        if (file_put_contents($tmp, $next, LOCK_EX) === false ||
+            !rename($tmp, $path)) {
+            @unlink($tmp);
+            return false;
+        }
+        $attempted = true;
+        $GLOBALS['byl_dev_newsletter_canary_armed'] = $ticket['recipient_sha256'];
+        return true;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+}
+
+add_filter('pre_wp_mail', static function ($pre, $mail) {
+    // Respect any prior deny: no replacement or bypass of other mail gates.
+    if ($pre !== null || !is_array($mail) ||
+        !byl_dev_newsletter_mail_consume_once($mail)) {
+        return false;
+    }
+    return null; // allow exactly this native wp_mail attempt, not a synthetic success
+}, 99, 2);
+
+// A second terminal guard preserves the final DENY decision even if any
+// intermediate WordPress callback tries to overwrite the first gate.
+add_filter('pre_wp_mail', static function ($pre, $mail) {
+    $recipient_hash = $GLOBALS['byl_dev_newsletter_canary_armed'] ?? null;
+    return $pre === null && is_array($mail) && is_string($recipient_hash) &&
+        byl_dev_newsletter_mail_match($mail, $recipient_hash) ? null : false;
+}, PHP_INT_MAX, 2);
+
+// Defence in depth: later mailer hooks must not add any recipients.
+add_action('phpmailer_init', static function ($mailer): void {
+    $hash = $GLOBALS['byl_dev_newsletter_canary_armed'] ?? null;
+    if (!is_string($hash)) { return; }
+    if (!is_object($mailer) || !method_exists($mailer, 'getToAddresses') ||
+        !method_exists($mailer, 'getCcAddresses') ||
+        !method_exists($mailer, 'getBccAddresses') ||
+        !method_exists($mailer, 'getReplyToAddresses') ||
+        !method_exists($mailer, 'getAttachments')) {
+        throw new RuntimeException('Newsletter Canary transport verification unavailable.');
+    }
+    $to = $mailer->getToAddresses();
+    if (!is_array($to) || count($to) !== 1 || !is_array($to[0]) ||
+        !is_string($to[0][0] ?? null) ||
+        !hash_equals($hash, hash('sha256', strtolower(trim($to[0][0])))) ||
+        ($mailer->Subject ?? null) !== 'Confirm your newsletter subscription' ||
+        count($mailer->getCcAddresses()) !== 0 ||
+        count($mailer->getBccAddresses()) !== 0 ||
+        count($mailer->getReplyToAddresses()) !== 0 ||
+        count($mailer->getAttachments()) !== 0) {
+        throw new RuntimeException('Newsletter Canary transport recipients mismatch.');
+    }
+}, PHP_INT_MAX);
 
 // P5: Store API Checkout is a distinct order-creation/payment path from classic Woo.
 // The G2 test permit is classic-checkout only. Even a valid tester grant must

@@ -17,6 +17,10 @@ jobs:
         run: php -l dev/mu-plugins/byl-dev-safety.php && php -l tools/dev/tests/p13-g2-offline-security-smoke.php
       - name: P1.3 G2 sandbox authorization offline security smoke
         run: php tools/dev/tests/p13-g2-offline-security-smoke.php
+      - name: Newsletter single-message Dev Safety PHP syntax
+        run: php -l dev/mu-plugins/byl-dev-safety.php && php -l tools/dev/tests/newsletter-one-mail-safety-smoke.php
+      - name: Newsletter single-message fail-closed, negative and race smoke
+        run: php tools/dev/tests/newsletter-one-mail-safety-smoke.php
       - name: P5 Store API Checkout fail-closed PHP syntax
         run: php -l tools/dev/tests/p5-store-api-checkout-deny-smoke.php
       - name: P5 Store API Checkout fail-closed security smoke
