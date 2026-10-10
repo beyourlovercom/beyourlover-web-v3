@@ -2,7 +2,12 @@
   'use strict';
   const root = document.querySelector('[data-byl-cart-drawer]');
   const config = window.BYLCartDrawerPreview;
-  if (!root || !config || config.giftEnabled !== false) return;
+  // WordPress wp_localize_script serializes PHP false as an empty string.
+  // Keep the no-gift guard strict: only explicit off representations enable
+  // this preview; true/1/missing flags must never activate unapproved gifts.
+  const giftsDisabled = !!config && Object.prototype.hasOwnProperty.call(config,'giftEnabled') &&
+    [false,'',0,'0'].includes(config.giftEnabled);
+  if (!root || !giftsDisabled) return;
 
   const $ = selector => root.querySelector(selector);
   const elements = {
