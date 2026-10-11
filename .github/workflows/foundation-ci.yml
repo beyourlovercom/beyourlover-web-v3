@@ -101,3 +101,5 @@ jobs:
         run: python scripts/test_cart_promotion_ux_contract.py
       - name: Checkout progressive UX contract
         run: python scripts/test_checkout_progressive_ux_contract.py
+      - name: G5 abnormal payment offline readiness (no network/transactions)
+        run: python scripts/test_g5_offline_readiness.py
