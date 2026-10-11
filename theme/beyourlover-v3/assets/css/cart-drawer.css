@@ -87,11 +87,14 @@ html.byl-drawer-open{overflow:hidden}
 @media(max-width:900px){
  .byl-drawer__panel{width:100vw;max-width:none}
  .byl-drawer__aside{display:none}
- .byl-drawer__header{padding:19px 18px 0}
+ /* D3.3: one mobile scrolling surface; the header naturally scrolls away. */
+ .byl-drawer__cart{height:100%;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+ .byl-drawer__header{padding:19px 18px 0;position:relative;flex:none}
  .byl-drawer__header h2{text-align:center;margin:0 35px 16px;font-size:23px}
  .byl-drawer__steps{height:74px;gap:0}
  .byl-drawer__close{right:12px;top:11px}
- .byl-drawer__scroll{padding:13px 17px 100px}
+ /* No nested mobile scroll area: coupon, recommendations and totals remain in one document flow. */
+ .byl-drawer__scroll{flex:1 0 auto;min-height:auto;overflow:visible;overscroll-behavior:auto;padding:13px 17px 112px}
  .byl-drawer__product-image{width:86px;min-width:86px;height:110px}
  .byl-drawer__item{gap:12px;padding:17px 0}
  .byl-drawer__item-top>a{font-size:15px}
@@ -99,8 +102,12 @@ html.byl-drawer-open{overflow:hidden}
  .byl-drawer__mobile-recs .byl-drawer__rec{gap:12px;min-height:112px}
  .byl-drawer__mobile-recs .byl-drawer__rec-image{width:65px;flex-basis:65px;height:80px}
  .byl-drawer__rec-add{min-width:87px}
- .byl-drawer__footer{padding:12px 18px max(14px,env(safe-area-inset-bottom))}
- .byl-drawer__footer a[data-drawer-checkout]{padding:14px}
+ /* Single floating burgundy action; glass-like surface is transparent to content. */
+ .byl-drawer__footer{position:sticky;bottom:0;z-index:2;flex:none;margin-top:-92px;padding:18px 18px max(14px,env(safe-area-inset-bottom));background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.67) 52%,rgba(255,255,255,.84));box-shadow:none;pointer-events:none}
+ .byl-drawer__footer .byl-drawer__total,.byl-drawer__footer p{display:none}
+ .byl-drawer__footer a[data-drawer-checkout]{padding:15px;pointer-events:auto;box-shadow:0 6px 24px rgba(45,18,28,.16)}
+ /* On-screen keyboard: keep the coupon field readable, not hidden beneath an action bar. */
+ .byl-drawer__cart:has(.byl-drawer__coupon input:focus) .byl-drawer__footer{opacity:0;pointer-events:none}
 }
 @media(max-width:360px){
  .byl-drawer__product-image{width:72px;min-width:72px;height:100px}
