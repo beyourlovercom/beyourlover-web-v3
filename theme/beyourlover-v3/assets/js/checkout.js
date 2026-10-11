@@ -328,20 +328,33 @@
   }
   function updateAction() {
     const labels = { address:'Continue to Delivery', delivery:'Continue to Payment', payment:'Continue to Review', review:'Place Order' };
+    const processingPayment = submitting && active === 'review';
     next.innerHTML = '';
-    next.appendChild(document.createTextNode(labels[active] + ' '));
+    next.appendChild(document.createTextNode((processingPayment ? 'Processing payment' : labels[active]) + ' '));
     const arrow = document.createElement('span');
     arrow.textContent = '→';
     arrow.setAttribute('aria-hidden','true');
     next.appendChild(arrow);
-    if ((active === 'payment' || active === 'review') && !paymentConfigured()) {
+    // A 3DS challenge can take longer than six seconds. Keep the visible
+    // submission lock until Woo emits an explicit checkout_error or navigates.
+    // This is a UI guard, NOT a provider-side idempotency guarantee.
+    if (processingPayment) {
       next.disabled = true;
-      message('No payment method is available. Please try again later.');
+      next.setAttribute('aria-busy', 'true');
     } else {
-      next.disabled = false;
+      next.removeAttribute('aria-busy');
+      if ((active === 'payment' || active === 'review') && !paymentConfigured()) {
+        next.disabled = true;
+        message('No payment method is available. Please try again later.');
+      } else {
+        next.disabled = false;
+      }
     }
   }
   function setStep(step) {
+    // Never re-enable the checkout CTA by navigating to another step
+    // while native WooPayments / 3DS authentication is in progress.
+    if (submitting) return;
     const index = steps.indexOf(step);
     if (index < 0 || index > furthest) return;
     active = step;
@@ -387,7 +400,7 @@
         return;
       }
       submitting = true;
-      window.setTimeout(() => {submitting = false;}, 6000);
+      updateAction();
       nativeButton.click(); // Native Woo validation, nonce and gateway callback remain authoritative.
       return;
     }
@@ -404,6 +417,13 @@
       e.preventDefault();
       e.stopImmediatePropagation();
       message('Complete all checkout steps before placing your order.');
+      return;
+    }
+    // Enter-key / native form submissions must display the same pending
+    // state as the BYL CTA. Do not intercept Woo's authoritative submit flow.
+    if (!submitting) {
+      submitting = true;
+      updateAction();
     }
   }, true);
 
@@ -586,7 +606,11 @@
     updateAction();
     fetchPromotion();
   });
-  $(document.body).on('checkout_error', () => { submitting = false; });
+  $(document.body).on('checkout_error', () => {
+    // Release ONLY after Woo reports failure; no timer-driven blind resubmit.
+    submitting = false;
+    updateAction();
+  });
   if (summaryToggle) summaryToggle.addEventListener('click', () => {
     const open = !summary.classList.contains('is-open');
     summary.classList.toggle('is-open',open);
