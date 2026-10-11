@@ -75,8 +75,25 @@ add_action('wp_footer', static function (): void {
           <header class="byl-drawer__header">
             <h2 id="byl-drawer-title">Your Cart <span data-drawer-count></span></h2>
             <button class="byl-drawer__close" data-drawer-close type="button" aria-label="Close shopping cart">×</button>
-            <nav class="byl-drawer__steps" aria-label="Checkout steps">
-              <span class="is-active" aria-label="Cart step">♧</span><span aria-label="Shipping step">⌖</span><span aria-label="Payment step">▤</span>
+            <nav class="byl-drawer__steps" aria-label="Checkout progress">
+              <span class="byl-drawer__step is-active" aria-current="step">
+                <span class="byl-drawer__step-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+                </span>
+                <span class="byl-drawer__step-label">Cart</span>
+              </span>
+              <span class="byl-drawer__step">
+                <span class="byl-drawer__step-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h11v11H3z"/><path d="M14 10h4l3 3v4h-7"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="17.5" cy="18" r="1.5"/></svg>
+                </span>
+                <span class="byl-drawer__step-label">Shipping</span>
+              </span>
+              <span class="byl-drawer__step">
+                <span class="byl-drawer__step-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/></svg>
+                </span>
+                <span class="byl-drawer__step-label">Payment</span>
+              </span>
             </nav>
           </header>
           <div class="byl-drawer__scroll" data-drawer-scroll>
