@@ -87,6 +87,8 @@ jobs:
         run: node scripts/test_cart_vi_tokens.js
       - name: Checkout Secure Shell V1 contract
         run: node scripts/test_checkout_secure_shell.js
+      - name: G5 checkout 3DS and duplicate submit lock regression
+        run: node scripts/test_g5_submission_lock.js
       - name: Migration IDs
         run: python scripts/check_migration_ids.py
       - name: Shipping promotion contract
