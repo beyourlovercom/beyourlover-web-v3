@@ -177,7 +177,9 @@
         "template-simple-page.php",
         "assets/css/page-default.css",
         "assets/css/page-simple.css",
-        "page-terms-and-conditions.php"
+        "page-terms-and-conditions.php",
+        "page-newsletter.php",
+        "assets/css/newsletter.css"
       ]
     },
     "support": {
