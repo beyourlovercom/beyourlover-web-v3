@@ -69,5 +69,20 @@ assert.match(css,/@media\(max-width:900px\)/);
 assert.match(css,/\.byl-drawer__aside\{display:none\}/);
 assert.match(css,/width:100vw/);
 assert.match(css,/--byl-drawer-brand:var\(--byl-brand,#9b3749\)/, 'canonical brand token shared with Theme VI');
+// D3.3 mobile LELO-inspired reading space; desktop layout must remain unchanged.
+assert.match(css,/\.byl-drawer__cart\{height:100%;min-height:0;overflow-y:auto;/,
+  'Mobile cart, not the inner content, owns scrolling so the header can scroll out');
+assert.match(css,/\.byl-drawer__scroll\{flex:1 0 auto;min-height:auto;overflow:visible;/,
+  'Mobile content must not be an independently scrolling pane');
+assert.match(css,/\.byl-drawer__footer\{position:sticky;bottom:0;z-index:2;/,
+  'Mobile Checkout CTA should float at the bottom of the cart scrollport');
+assert.match(css,/\.byl-drawer__footer \.byl-drawer__total,\.byl-drawer__footer p\{display:none\}/,
+  'Mobile fixed action should not show duplicate total or explanation');
+assert.match(css,/\.byl-drawer__footer a\[data-drawer-checkout\]\{padding:15px;pointer-events:auto;/,
+  'Floating CTA remains interactive through the transparent footer');
+assert.match(css,/env\(safe-area-inset-bottom\)/, 'iOS footer honors safe area');
+assert.match(css,/:has\(\.byl-drawer__coupon input:focus\)/, 'Focus on coupon field must not be hidden by floating CTA');
+assert.match(php,/class="byl-drawer__totals" data-drawer-totals/, 'Woo authoritative totals stay in body');
+assert.match(php,/data-drawer-checkout>SECURE CHECKOUT/, 'Checkout stays native GET navigation');
 assert.match(css,/overscroll-behavior:contain/);
 console.log('PASS D3 Dev-only opt-in Drawer preview: Woo Cart authority, no gift launch, mobile/fullscreen, no checkout mutation');
