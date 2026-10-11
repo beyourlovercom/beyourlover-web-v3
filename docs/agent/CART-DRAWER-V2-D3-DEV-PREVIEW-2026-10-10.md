@@ -55,3 +55,11 @@ readable rollback backup, Dev-only URL and independent browser UAT.
 No main merge or WWW deploy without respective Owner approval. PR #61
 Cart mobile striped-background fix is open independently; do not touch
 \`cart-focus.css\` and do not merge it implicitly in this PR.
+
+## D3.2 Owner three-step progress contract
+
+- Global shopping journey: **Cart -> Shipping -> Payment**. The Cart Drawer is always current step Cart; SVG icons are shopping bag, delivery truck, credit card, each accompanied by a visible English label.
+- These indicators are accessible, non-interactive status, NOT links or buttons. aria-current="step" denotes the real current stage.
+- Current Theme Checkout implementation uses WooCommerce classic checkout with internal address -> delivery -> payment -> review stages. Future G3 visual redesign can map address+delivery to Shipping and payment+review to Payment without changing Woo authoritative checkout, provider rails, security or order processing.
+- Checkout visual and runtime changes require a separate design/Owner gate; no early step navigation or fake completion, no Checkout POST in the Cart workstream.
+- Dev-only preview, Free Gift OFF, existing Store API cart ownership and G5 protection remain unchanged.
