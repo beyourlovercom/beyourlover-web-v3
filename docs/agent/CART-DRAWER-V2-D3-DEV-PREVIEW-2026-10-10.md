@@ -63,3 +63,5 @@ Cart mobile striped-background fix is open independently; do not touch
 - Current Theme Checkout implementation uses WooCommerce classic checkout with internal address -> delivery -> payment -> review stages. Future G3 visual redesign can map address+delivery to Shipping and payment+review to Payment without changing Woo authoritative checkout, provider rails, security or order processing.
 - Checkout visual and runtime changes require a separate design/Owner gate; no early step navigation or fake completion, no Checkout POST in the Cart workstream.
 - Dev-only preview, Free Gift OFF, existing Store API cart ownership and G5 protection remain unchanged.
+
+- 2026-10-10 Owner icon follow-up: Cart/Shipping/Payment indicator is presentation-only; isolated Windows and macOS tests of source contract, Woo Cart mocked runtime and PHP syntax passed. Live Dev Owner visual UAT is still pending; Checkout/payment behavior was not changed.
