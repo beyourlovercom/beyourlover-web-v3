@@ -193,6 +193,17 @@
         "page-track-your-order.php",
         "assets/css/track-order.css"
       ]
+    },
+    "notification": {
+      "depends_on": [
+        "foundation",
+        "shell"
+      ],
+      "kind": "presentation",
+      "files": [
+        "assets/js/notification.js",
+        "assets/css/notification.css"
+      ]
     }
   }
 }
