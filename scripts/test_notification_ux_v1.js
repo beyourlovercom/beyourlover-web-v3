@@ -108,7 +108,7 @@ for (const type of ['success','error','warning','info']) assert(surfaceCSS.inclu
 assert(surfaceCSS.includes('.byl-empty-state') && surfaceCSS.includes('.byl-confirm'));
 assert(surfaceCSS.includes('prefers-reduced-motion'));
 assert(n5js.includes('data-demo-action') && !n5js.includes('fetch('));
-assert(n5css.includes('@media(max-width:700px)'));
+assert(n5css.includes('@media(max-width:720px)'));
 
 assert(!source.includes('.innerHTML'), 'dynamic notification text must never use innerHTML');
 console.log('Notification UX V1 N2/N3/N4 offline behavior/contract PASS');
