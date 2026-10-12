@@ -18,7 +18,9 @@ class TestThemeOS(unittest.TestCase):
     def test_registry_positive(self):
         r = theme_os.validate(self.manifest)
         self.assertEqual(r["module_count"], 12)
-        self.assertEqual(r["file_count"], 75)
+        self.assertEqual(r["file_count"], len(r["owner_map"]) + 1)  # includes theme-os.json itself
+        self.assertEqual(r["owner_map"]["page-newsletter.php"], "pages")
+        self.assertEqual(r["owner_map"]["assets/css/newsletter.css"], "pages")
         self.assertEqual(r["version"], "0.1.0")
         self.assertLess(r["module_order"].index("cart"), r["module_order"].index("checkout"))
         self.assertEqual(r["owner_map"]["woocommerce/checkout/form-checkout.php"], "checkout")
@@ -126,10 +128,10 @@ class TestThemeOS(unittest.TestCase):
             self.assertEqual(hashlib.sha256(x.read_bytes()).hexdigest(),
                              hashlib.sha256(y.read_bytes()).hexdigest())
             receipt = json.loads(xr.read_text(encoding="utf8"))
-            self.assertEqual(len(receipt["file_sha256"]), 75)
+            self.assertEqual(len(receipt["file_sha256"]), len(theme_os.validate(self.manifest)["owner_map"]) + 1)
             self.assertEqual(receipt["owner_uat"], "NOT_GRANTED")
             result = theme_os.verify(x, xr)
-            self.assertEqual(result["files"], 75)
+            self.assertEqual(result["files"], len(theme_os.validate(self.manifest)["owner_map"]) + 1)
             payload = json.loads(yr.read_text(encoding="utf8"))
             payload["zip_sha256"] = "0" * 64
             yr.write_text(json.dumps(payload) + "\n", encoding="utf8")
