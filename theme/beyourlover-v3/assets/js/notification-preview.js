@@ -81,7 +81,11 @@
       const cancel=dialog.querySelector('[data-demo-action="dialog-close"]');
       cancel.focus();
     },
-    'dialog-close':()=>{if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open');},
+    'dialog-close':()=>{
+      if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open');
+      if(returnFocus && returnFocus.isConnected && typeof returnFocus.focus==='function')returnFocus.focus();
+      returnFocus=null;
+    },
     'dialog-confirm':()=>{actions['dialog-close']();notify({type:'info',message:'No items changed — preview only',context:'n5-mock',key:'dialog-'+(++sequence)})}
   };
   dialog.addEventListener('close',()=>{if(returnFocus && returnFocus.isConnected && typeof returnFocus.focus==='function')returnFocus.focus();returnFocus=null;});
