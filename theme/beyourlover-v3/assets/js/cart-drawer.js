@@ -18,9 +18,13 @@
     coupons: $('[data-drawer-active-coupons]'), totals: $('[data-drawer-totals]'),
     footer: $('[data-drawer-footer]'), footerTotal: $('[data-drawer-footer-total]'),
     desktopRecs: $('[data-drawer-recommendations]'), mobileRecs: $('[data-drawer-mobile-recs]'),
-    checkout: $('[data-drawer-checkout]')
+    checkout: $('[data-drawer-checkout]'),
+    marketing: $('[data-drawer-marketing-slots]')
   };
   if (!elements.panel || !elements.items) return;
+  // Marketing V1 is a pure off-by-default design reservation, not an advert launcher.
+  // No localStorage, URL param, injected markup, or Woo response enables it.
+  if (elements.marketing) elements.marketing.hidden = true;
   elements.mobileRecs.innerHTML = elements.desktopRecs.innerHTML;
 
   let state = null, nonce = String(config.nonce || ''), loading = false;
@@ -117,8 +121,8 @@
     // Only actual shipping rates from WooCommerce are authoritative.
     if (items.length) {
       const rates = shippingRates(cart);
-      const chosen = rates.find(rate=>rate.selected);
-      const free = rates.find(rate=>rate.rate_id?.startsWith('free_shipping:'));
+      const chosen = rates.find(rate=>rate && rate.selected === true);
+      const free = rates.find(rate=>rate && String(rate.rate_id || '').startsWith('free_shipping:'));
       let status = 'Shipping options depend on your delivery address.';
       if (free && chosen?.rate_id === free.rate_id) {
         status = '🎉 Free shipping applied to your order.';
