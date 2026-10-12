@@ -13,6 +13,7 @@
   const elements = {
     panel: $('.byl-drawer__panel'), count: $('[data-drawer-count]'),
     feedback: $('[data-drawer-feedback]'), delivery: $('[data-drawer-delivery]'),
+    m5progress: $('[data-drawer-m5-progress]'),
     empty: $('[data-drawer-empty]'), items: $('[data-drawer-items]'),
     couponSection: $('[data-drawer-coupon-section]'), couponForm: $('[data-drawer-coupon-form]'),
     coupons: $('[data-drawer-active-coupons]'), totals: $('[data-drawer-totals]'),
@@ -99,6 +100,55 @@
       '</div></article>';
   }
 
+  // M5 progress is a read-only presentation of the accepted Woo Store API
+  // extension, not a client-side promotion or a shipping qualification engine.
+  function renderM5Progress(cart) {
+    const slot = elements.m5progress;
+    if (!slot) return;
+    slot.hidden = true;
+    slot.textContent = '';
+    // The server-owned marketing gate is still OFF, even on Dev. Do not let
+    // query parameters, local storage or cart payloads activate promotions.
+    if (config.marketingEnabled !== true) return;
+    const ext = cart?.extensions?.andy_commerce_marketing_v1;
+    if (!ext || ext.schema_version !== 1 || ext.state !== 'ready' ||
+        ext.show_progress !== true || ext.gift_enabled !== false ||
+        ext.claim_free_shipping !== false || ext.authority !== 'woocommerce' ||
+        ext.reason !== 'read_only_projection') return;
+    const valid = n => Number.isSafeInteger(n) && n >= 0 && n <= 1000000000;
+    const qualified = ext.qualified_minor, threshold = ext.threshold_minor;
+    const remaining = ext.remaining_minor, percent = ext.percent;
+    if (!valid(qualified) || !valid(threshold) || threshold === 0 ||
+        !valid(remaining) || !valid(percent) || percent > 100 ||
+        remaining !== Math.max(0, threshold - qualified) ||
+        percent !== Math.min(100, Math.floor(qualified * 100 / threshold))) return;
+    // Shipping eligibility remains under Woo's authority; this is only a
+    // progress illustration. One package and one confirmed selected rate.
+    const packs = Array.isArray(cart?.shipping_rates) ? cart.shipping_rates : [];
+    if (packs.length !== 1 || !Array.isArray(packs[0]?.shipping_rates) ||
+        packs[0].shipping_rates.filter(r => r?.selected === true).length !== 1) return;
+    const selected = packs[0].shipping_rates.find(r => r?.selected === true);
+    if (typeof selected.rate_id !== 'string' ||
+        !/^[A-Za-z0-9_-]+:[A-Za-z0-9_.-]+$/.test(selected.rate_id)) return;
+    const currencyCode = cart?.totals?.currency_code;
+    const units = cart?.totals?.currency_minor_unit;
+    if (typeof currencyCode !== 'string' || !/^[A-Z]{3}$/.test(currencyCode) ||
+        !Number.isInteger(units) || units < 0 || units > 4) return;
+    const label = document.createElement('strong');
+    label.textContent = remaining > 0
+      ? 'Add ' + money(remaining, cart) + ' toward the free-shipping threshold'
+      : 'Threshold reached. Shipping is confirmed by Woo at checkout.';
+    const track = document.createElement('div');
+    track.className = 'byl-drawer__m5-track';
+    track.setAttribute('aria-hidden','true');
+    const fill = document.createElement('span');
+    fill.style.width = percent + '%';
+    track.appendChild(fill);
+    slot.appendChild(label);
+    slot.appendChild(track);
+    slot.hidden = false;
+  }
+
   function render(cart) {
     state = cart;
     const items = Array.isArray(cart.items) ? cart.items : [];
@@ -117,6 +167,7 @@
     elements.footer.hidden = items.length === 0;
     elements.totals.hidden = items.length === 0;
     elements.delivery.hidden = items.length === 0;
+    renderM5Progress(cart);
 
     // Only actual shipping rates from WooCommerce are authoritative.
     if (items.length) {
