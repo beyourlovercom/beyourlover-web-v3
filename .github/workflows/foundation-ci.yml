@@ -83,6 +83,8 @@ jobs:
         run: node scripts/test_cart_drawer_storeapi_mock.js
       - name: Cart M5 read-only Woo shipping progress fail-closed regression
         run: node --check scripts/test_cart_drawer_m5_progress.js && node scripts/test_cart_drawer_m5_progress.js
+      - name: Cart address authority no false $10 flat rate
+        run: node --check scripts/test_cart_drawer_shipping_address_authority.js && node scripts/test_cart_drawer_shipping_address_authority.js
       - name: Cart to Checkout native handoff contract
         run: node scripts/test_cart_checkout_handoff_c1c4.js
       - name: Cart native Woo shipping-zone parity regression
