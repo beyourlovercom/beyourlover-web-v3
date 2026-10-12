@@ -22,6 +22,8 @@ function cart(ext=good) {
     totals:{total_items:'4500',total_price:'4500',total_shipping:'0',
       currency_minor_unit:2,currency_code:'USD'},
     coupons:[],
+    shipping_address:{country:'US',state:'CA',city:'Los Angeles',postcode:'90001',address_1:'123 Test Street'},
+    has_calculated_shipping:true,
     shipping_rates:[{shipping_rates:[{selected:true,rate_id:'flat_rate:8'}]}],
     extensions:ext?{andy_commerce_marketing_v1:ext}:{}
   };
