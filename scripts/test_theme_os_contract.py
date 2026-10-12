@@ -17,7 +17,9 @@ class TestThemeOS(unittest.TestCase):
 
     def test_registry_positive(self):
         r = theme_os.validate(self.manifest)
-        self.assertEqual(r["module_count"], 12)
+        self.assertEqual(r["module_count"], len(self.manifest["modules"]))
+        self.assertEqual(r["owner_map"]["assets/js/notification.js"], "notification")
+        self.assertEqual(r["owner_map"]["assets/css/notification.css"], "notification")
         self.assertEqual(r["file_count"], len(r["owner_map"]) + 1)  # includes theme-os.json itself
         self.assertEqual(r["owner_map"]["page-newsletter.php"], "pages")
         self.assertEqual(r["owner_map"]["assets/css/newsletter.css"], "pages")
