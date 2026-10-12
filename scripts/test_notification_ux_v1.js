@@ -87,6 +87,8 @@ assert.equal(body.children.length,0);
 assert.equal(notify({type:'info',message:'After navigation'}),false);
 assert(css.includes('--byl-brand') && css.includes('prefers-reduced-motion'));
 assert(css.includes('calc(100vw - 24px)'));
+assert(css.includes('.byl-toast.is-leaving{transform:translateX(calc(100vw + 24px));opacity:0}'), 'Toast must exit to the right');
+assert(!css.includes('translateX(calc(-100vw'), 'Toast must never slide left on exit');
 assert(html.includes('viewport-fit=cover') && html.includes('nonfunctional mock'));
 assert(manifest.modules.notification && manifest.modules.notification.kind==='presentation');
 assert.equal(manifest.modules.notification.files.length,11);
