@@ -35,7 +35,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-sr
 <body>
 <header class="demo-header"><div class="demo-header__inner">
   <div class="demo-logo">BEYOURLOVER<span class="demo-logo__dot">.</span></div>
-  <span class="demo-header__meta">NOTIFICATION OS <span class="demo-v">V1</span></span>
+  
 </div></header>
 <main class="demo" id="main-content">
   <div class="demo-intro">
