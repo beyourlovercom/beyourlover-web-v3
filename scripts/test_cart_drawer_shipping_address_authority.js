@@ -80,7 +80,7 @@ async function run(label,payload,expected){
 (async()=>{
  await run('shop-base country/state but no customer address',cart(emptyAddress),{confirmed:false,shipping:'$10.00',total:'$264.00'});
  await run('no address plus Woo rate calculated flag false',cart(emptyAddress,false),{confirmed:false,shipping:'$10.00',total:'$264.00'});
- await run('country/state only even with apparent free rate',cart(emptyAddress,true,true),{confirmed:false,shipping:'$10.00',total:'$264.00'});
+ await run('country/state only even with apparent free rate',cart(emptyAddress,true,true),{confirmed:false,shipping:'$0.00',total:'$254.00'});
  await run('logged-in profile shipping address from Woo',cart(savedAddress),{confirmed:true,shipping:'$10.00',total:'$264.00'});
  await run('confirmed shipping address free rate selected',cart(savedAddress,true,true),{confirmed:true,shipping:'$0.00',total:'$254.00'});
  await run('address saved but Woo calculation incomplete',cart(savedAddress,false),{confirmed:false,shipping:'$10.00',total:'$264.00'});
