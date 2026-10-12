@@ -8,7 +8,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {spawn}=require('node:child_process');
 const chrome=process.env.CHROME_EXE||'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const out=path.join(os.tmpdir(),'byl-m5-cdp-real-viewports-20261012');
+const out=path.join(os.tmpdir(),'byl-m5-cdp-real-viewports-r2-20261012');
 if(fs.existsSync(out))throw Error('Refusing to overwrite prior screenshots: '+out);
 fs.mkdirSync(out,{recursive:true});
 const profile=path.join(out,'isolated-profile');
@@ -65,7 +65,16 @@ function pause(ms){return new Promise(r=>setTimeout(r,ms))}
    },sessionId);
    await call('Emulation.setTouchEmulationEnabled',{enabled:c.mobile,maxTouchPoints:c.mobile?1:1},sessionId);
    await call('Page.navigate',{url},sessionId);
-   await pause(5500);
+   // Wait for the footer-loaded drawer JS and initial Woo GET; site assets
+   // can take longer than Page.navigate's commit event to become interactive.
+   for(let attempt=0;attempt<30;attempt++){
+     await pause(1000);
+     try{
+       const ready=await call('Runtime.evaluate',{expression:
+         "Boolean(window.BYL_Cart_Drawer_Preview && document.querySelector('[data-byl-cart-drawer]') && !document.querySelector('[data-byl-cart-drawer]').hidden)",returnByValue:true},sessionId);
+       if(ready.result?.value===true)break;
+     }catch(e){if(attempt===29)console.error('READY_WAIT',e.message)}
+   }
    const expression=`(()=>{const d=document.documentElement;
      const drawer=document.querySelector('[data-byl-cart-drawer]');
      const progress=document.querySelector('[data-drawer-m5-progress]');
@@ -74,6 +83,11 @@ function pause(ms){return new Promise(r=>setTimeout(r,ms))}
        .map(el=>({left:Math.round(el.getBoundingClientRect().left),
                   right:Math.round(el.getBoundingClientRect().right)}));
      return {width:innerWidth,height:innerHeight,scrollWidth:d.scrollWidth,
+       readyState:document.readyState,
+       scriptPresent:!!document.querySelector('script[src*="cart-drawer.js"]'),
+       apiPresent:!!window.BYL_Cart_Drawer_Preview,
+       configPresent:!!window.BYLCartDrawerPreview,
+       giftValue:window.BYLCartDrawerPreview?.giftEnabled,
        drawerOpen:!!drawer&&!drawer.hidden,progressExists:!!progress,
        progressHidden:!progress||progress.hidden,promoHidden:!promo||promo.hidden,
        navigationVisible:!!document.querySelector('.byl-drawer__steps'),
