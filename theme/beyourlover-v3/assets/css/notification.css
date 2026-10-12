@@ -1,0 +1,40 @@
+/* BYL Notification UX V1. Loaded only by an explicitly opted-in consumer. */
+.byl-toast-stack{
+  position:fixed;
+  top:calc(env(safe-area-inset-top, 0px) + 12px);
+  right:clamp(12px, 3vw, 20px);
+  left:auto;
+  width:max-content;
+  max-width:calc(100vw - 24px);
+  z-index:calc(var(--byl-z-modal, 1000) + 10);
+  pointer-events:none;
+  overflow:visible;
+}
+.byl-toast{
+  display:flex;align-items:center;gap:9px;
+  min-height:40px;max-width:min(380px, calc(100vw - 24px));
+  padding:9px 13px;
+  background:var(--byl-brand, #9b3749);color:#fff;
+  border-radius:9px;box-shadow:0 7px 22px rgba(22,19,22,.16);
+  font:500 13px/1.35 var(--byl-font, -apple-system, BlinkMacSystemFont, sans-serif);
+  letter-spacing:.005em;
+  transform:translateX(calc(100vw + 24px));
+  opacity:0;
+  transition:transform 230ms cubic-bezier(.2,.8,.2,1),opacity 160ms ease;
+  pointer-events:none;
+}
+.byl-toast.is-visible{transform:translateX(0);opacity:1}
+.byl-toast.is-leaving{transform:translateX(calc(100vw + 24px));opacity:0}
+.byl-toast__icon{display:inline-flex;align-items:center;justify-content:center;
+  flex:none;width:18px;height:18px;border:1.5px solid currentColor;
+  border-radius:50%;font-size:11px;font-weight:700}
+.byl-toast__text{min-width:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.byl-toast--info{background:var(--byl-ink, #161316)}
+@media(max-width:400px){
+  .byl-toast{min-height:40px;padding:9px 12px;font-size:12.5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .byl-toast{transition:none!important}
+  .byl-toast.is-visible{transform:none}
+  .byl-toast.is-leaving{transform:none}
+}
