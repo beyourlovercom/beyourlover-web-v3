@@ -9,7 +9,7 @@ const nativeCart = read('inc/cart-experience.php');
 const quantity = read('assets/js/cart-experience.js');
 const promotion = read('assets/js/cart.js');
 const checkoutJs = read('assets/js/checkout.js');
-const functionSrc = read('functions.php');
+const functionSrc = read('inc/theme-os-assets.php');
 assert(cart.includes("do_shortcode('[woocommerce_cart]')"), 'Cart delegates prices, quantities and coupon to Woo shortcode');
 assert(checkout.includes("do_shortcode('[woocommerce_checkout]')"), 'Checkout owns native Woo checkout runtime');
 assert(cart.includes("get_header('cart')")&&checkout.includes("'checkout'"), 'different focused shells are preserved');
