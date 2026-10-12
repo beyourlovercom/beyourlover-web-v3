@@ -12,8 +12,6 @@ require_once get_stylesheet_directory().'/inc/checkout.php';
 require_once get_stylesheet_directory().'/inc/thank-you.php';
 require_once get_stylesheet_directory().'/inc/cart-experience.php';
 require_once get_stylesheet_directory().'/inc/cart-drawer.php';
-// Fail-closed N6 Notification × Cart integration (Dev opt-in only).
-require_once get_stylesheet_directory().'/inc/notification-cart.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');

@@ -74,7 +74,8 @@ assert(gate.includes("if ($template_name !== 'cart/cart-empty.php'"),'template o
 assert(gate.includes('woocommerce_locate_template') && gate.includes('return $located;'),'default Woo notice/template pass-through');
 assert(gate.includes("is_cart()"),'cart page only');
 assert(gate.includes("['byl-v3-cart-focus']"),'CSS scoped after real Cart');
-assert(functions.includes("require_once get_stylesheet_directory().'/inc/notification-cart.php'"));
+assert(!functions.includes("require_once get_stylesheet_directory().'/inc/notification-cart.php'"), 'no functions.php overwrite required for Theme OS T2 runtime');
+assert(cart.includes("require_once get_stylesheet_directory().'/inc/notification-cart.php'"), 'both Theme OS modular and legacy Cart entrypoints load N6 adapter');
 assert(cart.includes("['byl-v3-notification-cart-bridge']"),'drawer depends on adapter only when enabled');
 assert(cart.includes("'giftEnabled' => false") && cart.includes("'marketingEnabled' => false"));
 assert(emptyPHP.includes("do_action('woocommerce_cart_is_empty')"),'preserve native Woo hooks');
