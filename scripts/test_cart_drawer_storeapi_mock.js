@@ -117,10 +117,12 @@ async function main() {
   assert.ok(!el['[data-drawer-items]'].innerHTML.includes('href="javascript:'),'unsafe Woo product permalink scheme must be rejected');
   assert.ok(!el['[data-drawer-items]'].innerHTML.includes('<img '),'empty Woo thumbnail must not trigger homepage image requests');
   assert.ok(el['[data-drawer-items]'].innerHTML.includes('https://dev.example.invalid/cart/'),'unsafe href falls back to cart URL');
-  assert.equal(el['[data-drawer-footer-total]'].textContent,'Calculated at checkout','total remains unconfirmed without a Woo rate');
+  assert.equal(el['[data-drawer-footer-total]'].textContent,'$59.99','the server Woo total remains a numeric estimate');
   assert.ok(el['[data-drawer-totals]'].innerHTML.includes('$59.99'),'the Woo-authoritative item subtotal stays visible');
-  assert.match(el['[data-drawer-delivery]'].textContent,/Enter your delivery address/,
+  assert.match(el['[data-drawer-delivery]'].textContent,/Estimated shipping shown/,
     'no fabricated free shipping when Woo returns no rates');
+  server.shipping_address={country:'US',state:'CA',postcode:'90001',city:'Los Angeles',address_1:'123 Test Street'};
+  server.has_calculated_shipping=true;
   server.shipping_rates=[{shipping_rates:[
     {rate_id:'flat_rate:1',selected:false},
     {rate_id:'free_shipping:2',selected:true}
@@ -171,8 +173,8 @@ async function main() {
   await waitFor(()=>server.items[0].quantity===3,3500);
   assert.equal(calls.filter(c=>c.endpoint==='update-item').length,2,
     'one rejected update + one coalesced success');
-  assert.equal(el['[data-drawer-footer-total]'].textContent,'Calculated at checkout',
-    'quantity refresh without a selected Woo rate cannot invent a final total');
+  assert.equal(el['[data-drawer-footer-total]'].textContent,'$179.97',
+    'Woo order total is shown as an estimate before shipping confirmation');
   assert.ok(el['[data-drawer-totals]'].innerHTML.includes('$179.97'),'quantity subtotal still uses Woo result');
 
   // Escape works globally, including after focus vanishes during a rerender.
