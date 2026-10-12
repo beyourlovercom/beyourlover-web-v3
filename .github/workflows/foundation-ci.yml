@@ -75,6 +75,12 @@ jobs:
         run: php scripts/test_cart_v2_contract.php
       - name: Cart final quantity and fragment regression
         run: node scripts/test_cart_quantity_refresh_c1c4.js
+      - name: Cart Drawer D3 preview contract
+        run: node scripts/test_cart_drawer_d3_preview.js
+      - name: Cart Drawer D3.4 rolling sales and recent-view contract
+        run: php -l scripts/test_cart_drawer_d34_recommendations.php && php scripts/test_cart_drawer_d34_recommendations.php
+      - name: Cart Drawer Woo Store API mocked runtime and error recovery
+        run: node scripts/test_cart_drawer_storeapi_mock.js
       - name: Cart to Checkout native handoff contract
         run: node scripts/test_cart_checkout_handoff_c1c4.js
       - name: Cart native Woo shipping-zone parity regression
@@ -103,3 +109,5 @@ jobs:
         run: python scripts/test_checkout_progressive_ux_contract.py
       - name: Notification UX V1 opt-in dispatcher regression
         run: php -l theme/beyourlover-v3/notification-preview-v1.php && node --check theme/beyourlover-v3/assets/js/notification.js && node --check theme/beyourlover-v3/assets/js/notification-preview.js && node --check theme/beyourlover-v3/assets/js/notification-surfaces.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js
+      - name: N6 isolated Woo Notice and Cart response regression
+        run: php -l theme/beyourlover-v3/inc/cart-drawer.php && php -l theme/beyourlover-v3/inc/notification-cart.php && php -l theme/beyourlover-v3/inc/notification-cart-empty.php && node --check theme/beyourlover-v3/assets/js/notification-cart-bridge.js && node scripts/test_notification_cart_n6.js
