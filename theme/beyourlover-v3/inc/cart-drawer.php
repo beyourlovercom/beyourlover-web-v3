@@ -100,7 +100,28 @@ function byl_v3_cart_drawer_recommendations(): array {
         if (!$product) { continue; }
         $result[] = $product;
         $seen[$id] = true;
-        if (count($result) === 3) { break; }
+        if (count($result) === 3) { return $result; }
+    }
+    // A store may have fewer than three paid 30-day sellers (Dev currently
+    // has one). Fill remaining positions with eligible catalog picks, ordered
+    // by newest publish date; these are not claimed to have 30-day sales.
+    if (function_exists('wc_get_products')) {
+        $catalog = wc_get_products([
+            'status' => 'publish', 'type' => ['simple', 'variable'],
+            'limit' => 48, 'orderby' => 'date', 'order' => 'DESC',
+        ]);
+        if (is_array($catalog)) {
+            foreach ($catalog as $candidate) {
+                if (!$candidate instanceof WC_Product) { continue; }
+                $id = (int) $candidate->get_id();
+                if (isset($seen[$id])) { continue; }
+                $product = byl_v3_cart_drawer_eligible_product($id);
+                if (!$product) { continue; }
+                $result[] = $product;
+                $seen[$id] = true;
+                if (count($result) === 3) { break; }
+            }
+        }
     }
     return $result;
 }
@@ -139,7 +160,7 @@ add_action('wp_footer', static function (): void {
         <aside class="byl-drawer__aside" aria-label="Recommended products">
           <div class="byl-drawer__aside-inner">
             <h2>You might also like</h2>
-            <p>Recently viewed &amp; best sellers from the past 30 days</p>
+            <p>Recently viewed and thoughtfully selected picks</p>
             <div class="byl-drawer__recommendations" data-drawer-recommendations>
               <?php foreach ($recommendations as $product): ?>
                 <article class="byl-drawer__rec" data-product-id="<?php echo esc_attr((string)$product->get_id()); ?>">
