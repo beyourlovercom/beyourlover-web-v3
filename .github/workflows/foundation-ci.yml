@@ -60,6 +60,8 @@ jobs:
         run: python3 scripts/theme_os.py validate
       - name: Theme OS V1 fail-closed contracts
         run: python3 -m unittest discover -s scripts -p test_theme_os_contract.py -v
+      - name: Theme OS T3 isolated upgrade and rollback rehearsal (no WordPress runtime)
+        run: python3 -m unittest discover -s scripts -p test_theme_os_t3_upgrade.py -v
       - name: Theme OS V1 reproducible ZIP (CI evidence, no deploy)
         run: |
           mkdir -p "$RUNNER_TEMP/byl-os-a" "$RUNNER_TEMP/byl-os-b"
