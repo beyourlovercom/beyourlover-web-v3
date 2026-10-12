@@ -102,4 +102,4 @@ jobs:
       - name: Checkout progressive UX contract
         run: python scripts/test_checkout_progressive_ux_contract.py
       - name: Notification UX V1 opt-in dispatcher regression
-        run: node --check theme/beyourlover-v3/assets/js/notification.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js
+        run: php -l theme/beyourlover-v3/notification-preview-v1.php && node --check theme/beyourlover-v3/assets/js/notification.js && node --check theme/beyourlover-v3/assets/js/notification-preview.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js

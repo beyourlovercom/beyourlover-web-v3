@@ -202,7 +202,10 @@
       "kind": "presentation",
       "files": [
         "assets/js/notification.js",
-        "assets/css/notification.css"
+        "assets/css/notification.css",
+        "notification-preview-v1.php",
+        "assets/css/notification-preview.css",
+        "assets/js/notification-preview.js"
       ]
     }
   }

@@ -89,6 +89,16 @@ assert(css.includes('--byl-brand') && css.includes('prefers-reduced-motion'));
 assert(css.includes('calc(100vw - 24px)'));
 assert(html.includes('viewport-fit=cover') && html.includes('nonfunctional mock'));
 assert(manifest.modules.notification && manifest.modules.notification.kind==='presentation');
-assert.equal(manifest.modules.notification.files.length,2);
+assert.equal(manifest.modules.notification.files.length,5);
+const n5php = fs.readFileSync(path.join(root, 'theme/beyourlover-v3/notification-preview-v1.php'), 'utf8');
+const n5js = fs.readFileSync(path.join(root, 'theme/beyourlover-v3/assets/js/notification-preview.js'), 'utf8');
+const n5css = fs.readFileSync(path.join(root, 'theme/beyourlover-v3/assets/css/notification-preview.css'), 'utf8');
+assert(n5php.includes("$host !== 'dev.beyourlover.com'"));
+assert(n5php.includes("$flag !== '1'"));
+assert(n5php.includes('no-store') && n5php.includes("connect-src 'none'"));
+assert(n5php.includes('No WordPress bootstrap'));
+assert(n5js.includes('data-demo-action') && !n5js.includes('fetch('));
+assert(n5css.includes('@media(max-width:700px)'));
+
 assert(!source.includes('.innerHTML'), 'dynamic notification text must never use innerHTML');
 console.log('Notification UX V1 N2/N3/N4 offline behavior/contract PASS');
