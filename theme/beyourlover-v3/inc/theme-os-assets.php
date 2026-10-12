@@ -45,10 +45,6 @@ add_action('wp_enqueue_scripts', static function (): void {
         ]);
         wp_script_add_data('byl-v3-cart', 'strategy', 'defer');
     }
-    // Existing-order payment route: CSS only, never touch Woo payment processing.
-    if (function_exists('is_checkout_pay_page') && is_checkout_pay_page()) {
-        wp_enqueue_style('byl-v3-order-pay', $uri.'/assets/css/order-pay.css', ['byl-v3-motion'], $v('assets/css/order-pay.css'));
-    }
     if (function_exists('is_checkout') && is_checkout() && !is_order_received_page()) {
         wp_enqueue_style('byl-v3-checkout', $uri.'/assets/css/checkout.css', ['byl-v3-motion'], $v('assets/css/checkout.css'));
         wp_enqueue_style('byl-v3-checkout-shell', $uri.'/assets/css/checkout-shell.css', ['byl-v3-checkout'], $v('assets/css/checkout-shell.css'));
@@ -64,5 +60,9 @@ add_action('wp_enqueue_scripts', static function (): void {
             'nonce' => function_exists('wp_create_nonce') ? wp_create_nonce('wc_store_api') : '',
         ]);
         wp_script_add_data('byl-v3-checkout', 'strategy', 'defer');
+    }
+    // CSS-only Order Pay treatment follows Checkout styles; no gateway changes.
+    if (function_exists('is_checkout_pay_page') && is_checkout_pay_page()) {
+        wp_enqueue_style('byl-v3-order-pay', $uri.'/assets/css/order-pay.css', ['byl-v3-checkout-shell'], $v('assets/css/order-pay.css'));
     }
 });
