@@ -77,6 +77,8 @@ jobs:
         run: node scripts/test_cart_quantity_refresh_c1c4.js
       - name: Cart Drawer D3 preview contract
         run: node scripts/test_cart_drawer_d3_preview.js
+      - name: Cart Drawer D3.4 rolling sales and recent-view contract
+        run: php -l scripts/test_cart_drawer_d34_recommendations.php && php scripts/test_cart_drawer_d34_recommendations.php
       - name: Cart Drawer Woo Store API mocked runtime and error recovery
         run: node scripts/test_cart_drawer_storeapi_mock.js
       - name: Cart to Checkout native handoff contract
