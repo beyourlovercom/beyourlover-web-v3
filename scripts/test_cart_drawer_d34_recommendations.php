@@ -26,6 +26,7 @@ class WC_Product {
     public function get_id() {return $this->id;}
 }
 function wc_get_product($id) {return $GLOBALS['products'][$id]??false;}
+function wc_get_products($args) {return $GLOBALS['catalog']??[];}
 class MockWPDB {
     public string $prefix='wp_';
     public string $sql='';
@@ -54,6 +55,14 @@ $_COOKIE['woocommerce_recently_viewed']='10|60|50';
 check(array_map(fn($p)=>$p->get_id(),byl_v3_cart_drawer_recommendations())===[10,40,30],'ineligible history skipped, top 30d fills');
 unset($_COOKIE['woocommerce_recently_viewed']);
 check(array_map(fn($p)=>$p->get_id(),byl_v3_cart_drawer_recommendations())===[40,30,20],'no history uses monthly paid units rank');
+$wpdb->ids=[40];
+$GLOBALS['catalog']=[$GLOBALS['products'][50],$GLOBALS['products'][20],$GLOBALS['products'][10]];
+check(array_map(fn($p)=>$p->get_id(),byl_v3_cart_drawer_recommendations())===[40,20,10],
+    'only one paid seller: fill from eligible zero-sale catalog, without inventing sales');
+$wpdb->ids=[];
+check(array_map(fn($p)=>$p->get_id(),byl_v3_cart_drawer_recommendations())===[20,10],
+    'no paid units: no fabricated sales, only eligible catalog items');
+$wpdb->ids=[40,30,20,10];
 check(str_contains($wpdb->sql,'SUM(item.product_qty)') && str_contains($wpdb->sql,'JOIN wp_wc_order_stats')
    && str_contains($wpdb->sql,"wc-completed") && str_contains($wpdb->sql,"wc-processing")
    && str_contains($wpdb->sql,'LIMIT 50') && str_contains($wpdb->sql,'item.date_created >='),
