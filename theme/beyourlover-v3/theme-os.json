@@ -205,7 +205,9 @@
         "assets/css/notification.css",
         "notification-preview-v1.php",
         "assets/css/notification-preview.css",
-        "assets/js/notification-preview.js"
+        "assets/js/notification-preview.js",
+        "assets/css/notification-surfaces.css",
+        "assets/js/notification-surfaces.js"
       ]
     }
   }
