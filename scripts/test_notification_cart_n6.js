@@ -86,6 +86,8 @@ assert(!emptyPHP.includes('wc_add_notice') && !emptyPHP.includes('WC()->cart->')
 assert(css.includes('body.byl-n6-notification-preview'), 'all rules fail closed');
 for(const selector of ['.woocommerce-message','.woocommerce-info','.woocommerce-error','.byl-n6-empty-cart'])assert(css.includes(selector));
 assert(css.includes('ul.woocommerce-error li'),'error items preserved');
+assert(css.includes('.woocommerce:has(> .byl-n6-empty-cart) > .wc-empty-cart-message > .cart-empty.woocommerce-info'), 'hide only duplicate Woo empty-cart notice with N6 empty state present');
+assert(!css.includes('.woocommerce-notices-wrapper{display:none'), 'do not globally suppress native Woo notices');
 const manifest=JSON.parse(read('theme-os.json'));
 const notificationModule=manifest.modules.notification;
 assert(notificationModule.files.includes('inc/notification-cart.php') && notificationModule.files.includes('assets/css/notification-woo-adapter.css'));

@@ -59,6 +59,13 @@ body.byl-n6-notification-preview .byl-n6-empty-cart__cta:focus-visible{
   outline:2px solid var(--byl-focus,#9b3749);outline-offset:4px;
 }
 body.byl-n6-notification-preview .byl-n6-empty-cart__cta span{margin-left:5px}
+/* Woo classic renders wc-empty-cart-message BEFORE cart/cart-empty.php.
+ * Hide only the redundant empty-cart *status*, never Woo's main notices wrapper,
+ * action links, errors, or other customer-facing notices.
+ */
+body.byl-n6-notification-preview .byl-cart-runtime .woocommerce:has(> .byl-n6-empty-cart) > .wc-empty-cart-message > .cart-empty.woocommerce-info{
+  display:none!important;
+}
 body.byl-n6-notification-preview .byl-cart-runtime .woocommerce:has(.byl-n6-empty-cart){
   display:block!important;
 }
