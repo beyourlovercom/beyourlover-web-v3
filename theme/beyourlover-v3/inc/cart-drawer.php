@@ -261,7 +261,29 @@ add_action('wp_footer', static function (): void {
           <footer class="byl-drawer__footer" data-drawer-footer hidden>
             <div class="byl-drawer__total"><strong>Order total</strong><strong data-drawer-footer-total></strong></div>
             <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/')); ?>" data-drawer-checkout>SECURE CHECKOUT →</a>
-            <p>Shipping and payment are confirmed securely at checkout.</p>
+            <?php
+            $byl_terms_url = function_exists('wc_get_page_permalink')
+                ? (string) wc_get_page_permalink('terms') : '';
+            if (!$byl_terms_url) { $byl_terms_url = home_url('/terms-and-conditions/'); }
+            // Use existing WooPayments checkout card logos, not invented brands
+            // or new external requests. PayPal is omitted unless verified active.
+            $byl_payment_logos = [
+                ['visa.svg', 'Visa'], ['mastercard.svg', 'Mastercard'],
+                ['amex.svg', 'American Express'], ['discover.svg', 'Discover'],
+                ['apple-pay.svg', 'Apple Pay'], ['google-pay.svg', 'Google Pay'],
+            ];
+            ?>
+            <p class="byl-drawer__terms">By clicking Secure Checkout, you agree to the
+              <a href="<?php echo esc_url($byl_terms_url); ?>" target="_blank" rel="noopener noreferrer">Terms and Conditions</a> of purchase.
+            </p>
+            <div class="byl-drawer__payment-methods" role="group" aria-label="Supported checkout payment methods">
+              <?php foreach ($byl_payment_logos as [$byl_logo, $byl_alt]): ?>
+                <?php if (is_file(WP_PLUGIN_DIR.'/woocommerce-payments/assets/images/cards/'.$byl_logo)): ?>
+                <img src="<?php echo esc_url(plugins_url('woocommerce-payments/assets/images/cards/'.$byl_logo)); ?>"
+                     alt="<?php echo esc_attr($byl_alt); ?>" loading="lazy" decoding="async">
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </div>
           </footer>
         </div>
       </section>
