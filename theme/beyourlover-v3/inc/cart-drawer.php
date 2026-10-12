@@ -224,6 +224,8 @@ add_action('wp_footer', static function (): void {
             <div class="byl-drawer__preview-label">Dev design preview · gift offers are not active</div>
             <div class="byl-drawer__feedback" data-drawer-feedback role="status" aria-live="polite"></div>
             <div class="byl-drawer__delivery" data-drawer-delivery hidden></div>
+            <?php // M5 shipping progress remains hidden unless a separately approved server policy enables it. ?>
+            <div class="byl-drawer__m5-progress" data-drawer-m5-progress role="status" aria-live="polite" hidden></div>
             <section class="byl-drawer__empty" data-drawer-empty hidden>
               <div class="byl-drawer__empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="9" cy="20" r="1.5"/><circle cx="19" cy="20" r="1.5"/><path d="M2 3h2l3 13h13l2-9H5"/></svg></div>
               <h3>Your cart is empty</h3>
