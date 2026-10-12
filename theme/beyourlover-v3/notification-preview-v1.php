@@ -33,7 +33,6 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-sr
 <body>
 <header class="demo-header"><div class="demo-header__inner">
   <div class="demo-logo">BEYOURLOVER<span class="demo-logo__dot">.</span></div>
-  <div class="demo-header__badge">DESIGN SYSTEM / DEV</div>
 </div></header>
 <main class="demo">
   <div class="demo-kicker">INTERFACE COMPONENT · N5 CANARY</div>
