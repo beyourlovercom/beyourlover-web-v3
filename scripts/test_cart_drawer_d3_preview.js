@@ -17,7 +17,8 @@ assert.match(functions,/inc\/cart-drawer\.php/);
 assert.match(php,/giftEnabled' => false/);
 assert.match(php,/wc_get_checkout_url\(\)/);
 assert.match(php,/wp_footer/);
-assert.match(php,/\}, 5\);\s*$/,'Drawer markup must be inserted before wp_print_footer_scripts at wp_footer priority 20');
+assert.match(php,/\}, 5\);/,'Drawer markup must be inserted before wp_print_footer_scripts at wp_footer priority 20');
+assert.match(php,/require_once get_stylesheet_directory\(\)\.'\/inc\/notification-cart\.php';\s*$/, 'N6 adapter loaded after Drawer registration for both Theme OS and legacy bootstrap');
 assert.match(php,/role="dialog" aria-modal="true"/);
 // Owner's three-step UX contract: visual status now, real Checkout state later.
 const progress=php.match(/<nav class="byl-drawer__steps"[\s\S]*?<\/nav>/)?.[0] || '';
