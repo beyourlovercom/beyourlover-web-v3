@@ -134,3 +134,20 @@ html.byl-drawer-open{overflow:hidden}
 .byl-drawer__m5-track{height:6px;border-radius:999px;background:#d5e9de;overflow:hidden;margin-top:11px}
 .byl-drawer__m5-track span{display:block;height:100%;background:#006241;border-radius:inherit}
 @media(max-width:900px){.byl-drawer__m5-progress{margin:0 0 12px;padding:12px 13px}}
+
+/* Owner M7 checkout handoff: notice immediately before subtotal, not a
+ * giant persistent banner. Text remains black / mobile safe. */
+.byl-drawer__charges-notice{margin:0 0 13px;padding:10px 12px;border-left:3px solid #ce7757;border-radius:3px;background:#fff6f2;color:#2b2727;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.byl-drawer__footer .byl-drawer__terms{color:#302b2f;font-size:10px;line-height:1.5;text-align:center;margin:10px auto 8px;max-width:470px}
+.byl-drawer__terms a{color:#702844!important;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.byl-drawer__payment-methods{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:9px;padding:2px 0 0;min-height:27px;max-width:100%;overflow:hidden}
+.byl-drawer__payment-methods img{display:block;max-width:52px;width:auto;height:24px;object-fit:contain;flex:0 1 auto}
+@media(max-width:900px){
+ .byl-drawer__charges-notice{font-size:11px;padding:9px 11px}
+ .byl-drawer__scroll{padding-bottom:160px}
+ /* Keep checkout call-to-action and the legal/payment row together. */
+ .byl-drawer__footer{margin-top:-142px;padding:16px 18px max(10px,env(safe-area-inset-bottom))}
+ .byl-drawer__footer .byl-drawer__terms{display:block;font-size:9px;line-height:1.35;color:#423941;margin:8px 0 6px}
+ .byl-drawer__footer .byl-drawer__payment-methods{display:flex;gap:7px;padding-top:1px}
+ .byl-drawer__payment-methods img{height:21px;max-width:43px}
+}
