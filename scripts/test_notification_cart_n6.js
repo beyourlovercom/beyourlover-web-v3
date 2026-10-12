@@ -86,8 +86,8 @@ assert(css.includes('body.byl-n6-notification-preview'), 'all rules fail closed'
 for(const selector of ['.woocommerce-message','.woocommerce-info','.woocommerce-error','.byl-n6-empty-cart'])assert(css.includes(selector));
 assert(css.includes('ul.woocommerce-error li'),'error items preserved');
 const manifest=JSON.parse(read('theme-os.json'));
-const module=manifest.modules.notification;
-assert(module.files.includes('inc/notification-cart.php') && module.files.includes('assets/css/notification-woo-adapter.css'));
+const notificationModule=manifest.modules.notification;
+assert(notificationModule.files.includes('inc/notification-cart.php') && notificationModule.files.includes('assets/css/notification-woo-adapter.css'));
 assert(manifest.modules.cart.files.includes('assets/js/cart-drawer.js'),'Cart and Notification co-exist');
 const workflow=fs.readFileSync(path.join(root,'.github/workflows/foundation-ci.yml'),'utf8');
 for(const gateName of ['Cart Drawer Woo Store API mocked runtime','Notification UX V1 opt-in dispatcher regression','N6 isolated Woo Notice and Cart response regression','G5 checkout 3DS'])assert(workflow.includes(gateName),'CI gate preserved: '+gateName);
