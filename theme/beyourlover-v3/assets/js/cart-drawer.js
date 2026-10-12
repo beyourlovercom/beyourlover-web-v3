@@ -205,7 +205,7 @@
   }
 
   async function request(endpoint, data=null) {
-    if (loading) return;
+    if (loading) return null; // In-flight or skipped actions are not accepted Woo mutations.
     loading = true;
     elements.panel.setAttribute('aria-busy','true');
     setFeedback(data ? 'Updating your cart…' : 'Loading cart…');
@@ -221,8 +221,15 @@
       const result=await response.json();
       if(!response.ok) throw Error(result.message||'Cart update was not accepted.');
       if(!result || !Array.isArray(result.items)) throw Error('Unexpected Cart API response.');
+      const previous = state;
       render(result);
       setFeedback('');
+      // Notify only after Woo accepted and returned an authoritative Cart.
+      if (data && window.BYL?.cartNoticeBridge?.confirm) {
+        try { window.BYL.cartNoticeBridge.confirm({endpoint, payload:data, before:previous, after:result}); }
+        catch (_) { /* Presentation cannot affect Woo success/error. */ }
+      }
+      return result;
     }catch(error){
       // A failed Woo mutation must not leave optimistic quantity text onscreen.
       // The previously accepted Woo response remains our only displayed truth.
@@ -240,7 +247,7 @@
     // Keep the serial queue alive after an API error so a retry can proceed.
     const operation = mutationQueue.then(()=>request(endpoint,data));
     mutationQueue = operation.catch(()=>{});
-    return operation.then(()=>true,()=>false);
+    return operation.then(result=>Boolean(result && Array.isArray(result.items)),()=>false);
   };
   function open() {
     if(!root.hidden) return;
