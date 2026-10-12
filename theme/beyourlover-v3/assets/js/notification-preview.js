@@ -73,8 +73,8 @@
     'notices-long':()=>{document.querySelector('[data-demo-notice="info"] .byl-notice__body p').textContent='Shipping options are calculated from the destination and available services. Longer notices wrap naturally without clipping information, pushing action controls offscreen, or hiding the details a customer needs to read.'},
     'notice-retry':()=>{setError('Please enter a different code to try again.');field.focus();$('preview-form').scrollIntoView({block:'center',behavior:'instant'});},
     'empty-cta':()=>notify({type:'info',message:'Preview only — no shop navigation',context:'n5-mock',key:'mock-cta-'+(++sequence)}),
-    'dialog-open':()=>{
-      returnFocus=document.activeElement;
+    'dialog-open':event=>{
+      returnFocus=event && event.currentTarget ? event.currentTarget : document.activeElement;
       notify.invalidateAll();
       if(typeof dialog.showModal==='function')dialog.showModal();
       else dialog.setAttribute('open','');
