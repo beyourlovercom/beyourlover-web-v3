@@ -264,4 +264,6 @@ add_action('wp_footer', static function (): void {
 
 // Load via Cart module so both legacy and Theme OS modular bootstraps remain compatible.
 // The N6 adapter itself stays disabled unless BOTH Dev preview flags pass.
-require_once get_stylesheet_directory().'/inc/notification-cart.php';
+if (function_exists('get_stylesheet_directory')) {
+    require_once get_stylesheet_directory().'/inc/notification-cart.php';
+}
