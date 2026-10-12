@@ -32,6 +32,12 @@ No assertion is made about vendor minimum/maximum supported ranges. Those requir
 - Previous Dev M390/PC1440 80/80 browser checks were scoped to earlier T2 Dev code with the native WooPayments failing script temporarily blocked **only in the test browser**; they are not a current-main full Dev browser pass, nor a visual Owner PASS.
 - Owner-approved T2 **technical-only exception** does not erase Homepage/cards **visual FAIL**, assigned to independent Issue #76.
 
+## T3.1a: live Dev **public product GET only** smoke (2026-10-11 PT)
+
+An independent anonymous GET to `/wp-json/wc/store/v1/products?per_page=20` returned HTTP **200** with **20 public products**: **19 simple**, **1 variable**, all 20 publishing Woo Store API `prices` and `is_in_stock=true` in the returned sample. A follow-up **GET** for the one sampled variable product returned HTTP 200, `type=variable`, `has_options=true`, and exposed price/stock metadata. An exploratory **GET** `/products/{id}/variations` returned HTTP **404** (that path is not established here as a supported native Store API endpoint); do **not** call it a product bug or claim that variations were exercised. No Cart/Checkout endpoints, POST, nonce token, purchase, order, login, or database writes were performed.
+
+**Result:** sampled read-only product API availability PASS; actual variation choice, out-of-stock scenarios, nonce expiry, Store API session and cart mutations remain **UNTESTED**. This GET smoke is not part of the reproducible local CI (which must not depend on Dev network).
+
 ## T3.2: repeatable isolated update and rollback
 
 Automated offline test: `python3 -m unittest discover -s scripts -p test_theme_os_t3_upgrade.py -v`.
