@@ -57,7 +57,7 @@ async function run(name,enabled,server,expected){
   const document={createElement:()=>element(),activeElement:element(),
     documentElement:element(),querySelector:s=>s==='[data-byl-cart-drawer]'?root:null,
     querySelectorAll:()=>[],addEventListener(){}};
-  const window={BYLCartDrawerPreview:{giftEnabled:false,marketingEnabled:enabled,
+  const window={BYLCartDrawerPreview:{giftEnabled:false,marketingEnabled:false,shippingProgressEnabled:enabled,
     cartApi:'https://example.invalid/cart',nonce:'mock',cartUrl:'https://example.invalid/cart/',
     checkoutUrl:'https://example.invalid/checkout/'},
     location:{href:'https://example.invalid/'},setTimeout,clearTimeout};
