@@ -26,6 +26,9 @@ add_action('wp_enqueue_scripts', static function (): void {
         'cartUrl' => function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url('/cart/'),
         'checkoutUrl' => function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/'),
         'giftEnabled' => false,
+        // Marketing/notification policy cannot be enabled via request parameters or JS.
+        // The owner must separately approve an Andy Commerce-backed config contract.
+        'marketingEnabled' => false,
     ]);
     wp_script_add_data('byl-v3-cart-drawer', 'strategy', 'defer');
 }, 30);
@@ -150,6 +153,16 @@ add_action('template_redirect', static function (): void {
     wc_setcookie('woocommerce_recently_viewed', implode('|', $list));
 }, 25);
 
+/**
+ * Marketing Slots V1 — structural reservation only. Promotion policy/config
+ * belongs to Andy Commerce in a separate gated phase. No WP option, coupon,
+ * gift line, third-party ad script, remote image or visitor parameter can
+ * activate this slot. A blank/inactive slot takes zero vertical space.
+ */
+function byl_v3_cart_marketing_slots_enabled(): bool {
+    return false;
+}
+
 add_action('wp_footer', static function (): void {
     if (!byl_v3_cart_drawer_preview_enabled()) { return; }
     $recommendations = byl_v3_cart_drawer_recommendations();
@@ -221,6 +234,11 @@ add_action('wp_footer', static function (): void {
             <section class="byl-drawer__mobile-recs">
               <h3>You might enjoy</h3>
               <div data-drawer-mobile-recs></div>
+            </section>
+            <?php // Campaign and service reminder slots are inactive by default and produce no rendered ad or claim. ?>
+            <section class="byl-drawer__marketing" data-drawer-marketing-slots aria-label="Cart promotions" hidden>
+              <div class="byl-drawer__marketing-banner" data-drawer-marketing-banner hidden></div>
+              <div class="byl-drawer__marketing-note" data-drawer-marketing-note hidden></div>
             </section>
             <section class="byl-drawer__coupon" data-drawer-coupon-section hidden>
               <form data-drawer-coupon-form>
