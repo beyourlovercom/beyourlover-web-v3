@@ -92,7 +92,7 @@ assert.match(js,/document\.addEventListener\('keydown'/, 'Esc closes an open Dra
 assert.match(js,/if\(root\.hidden\) return;/, 'Global keydown must not run when Drawer closed');
 assert.match(js,/const operation = mutationQueue\.then\(\(\)=>request\(endpoint,data\)\)/, 'serial Woo mutation queue required');
 assert.match(js,/mutationQueue = operation\.catch\(\(\)=>\{\}\)/, 'failed requests must not poison subsequent retries');
-assert.match(js,/return operation\.then\(\(\)=>true,\(\)=>false\)/, 'mutation success must reach caller');
+assert.match(js,/return operation\.then\(result=>Boolean\(result && Array\.isArray\(result\.items\)\),\(\)=>false\)/, 'mutation success must be backed by a valid accepted Woo cart response');
 assert.match(js,/if\(applied && field\) field\.value=''/, 'failed coupon must stay in editable field');
 assert.match(js,/if \(state\) render\(state\)/, 'rejected Woo mutation must restore authoritative quantity UI');
 assert.match(js,/const safeHref = value =>/, 'prevent non-HTTP product href injection');
