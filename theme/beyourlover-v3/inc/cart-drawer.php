@@ -30,18 +30,104 @@ add_action('wp_enqueue_scripts', static function (): void {
     wp_script_add_data('byl-v3-cart-drawer', 'strategy', 'defer');
 }, 30);
 
+/**
+ * D3.4 / D6 recommendation source:
+ * 1. last three eligible products in Woo's first-party session-view cookie;
+ * 2. fill remaining slots using verified Woo 30-day completed/processing unit sales.
+ * Never use Woo's lifetime 'popularity' ranking for a 30-day claim.
+ */
+function byl_v3_cart_drawer_recent_ids(string $cookie): array {
+    $ids = [];
+    foreach (explode('|', $cookie) as $raw) {
+        // Strict positive integer IDs; avoid user-supplied SQL/string input.
+        if (!preg_match('/^[1-9][0-9]{0,9}$/D', $raw)) { continue; }
+        $id = (int) $raw;
+        if ($id > 0) { $ids = array_values(array_diff($ids, [$id])); $ids[] = $id; }
+    }
+    return array_slice(array_reverse($ids), 0, 15);
+}
+
+function byl_v3_cart_drawer_eligible_product(int $id): ?WC_Product {
+    if ($id <= 0 || !function_exists('wc_get_product')) { return null; }
+    $product = wc_get_product($id);
+    if (!$product instanceof WC_Product || $product->get_type() !== 'simple'
+        || $product->get_status() !== 'publish' || !$product->is_purchasable()
+        || !$product->is_in_stock() || $product->is_virtual()) { return null; }
+    return $product;
+}
+
+function byl_v3_cart_drawer_monthly_best_seller_ids(): array {
+    global $wpdb;
+    if (!isset($wpdb) || !method_exists($wpdb, 'prepare') || !method_exists($wpdb, 'get_col')) { return []; }
+    // Woo Analytics order/product lookups are read-only. No cached writes or
+    // customer/order PII is fetched; only product IDs + unit counts aggregated.
+    $lookup = $wpdb->prefix.'wc_order_product_lookup';
+    $stats = $wpdb->prefix.'wc_order_stats';
+    $cutoff = wp_date('Y-m-d H:i:s', time() - (30 * DAY_IN_SECONDS));
+    $sql = $wpdb->prepare(
+        "SELECT item.product_id
+         FROM {$lookup} AS item
+         INNER JOIN {$stats} AS orders ON orders.order_id = item.order_id
+         WHERE item.date_created >= %s
+           AND orders.status IN ('wc-processing','wc-completed')
+         GROUP BY item.product_id
+         HAVING SUM(item.product_qty) > 0
+         ORDER BY SUM(item.product_qty) DESC, item.product_id ASC
+         LIMIT 50",
+        $cutoff
+    );
+    $ids = $wpdb->get_col($sql);
+    return is_array($ids) ? array_values(array_filter(array_map('intval', $ids))) : [];
+}
+
 function byl_v3_cart_drawer_recommendations(): array {
-    if (!function_exists('wc_get_products')) { return []; }
-    $products = wc_get_products(['status'=>'publish', 'type'=>'simple', 'limit'=>12, 'orderby'=>'popularity', 'order'=>'DESC']);
-    if (!is_array($products)) { return []; }
+    $recent = isset($_COOKIE['woocommerce_recently_viewed']) && is_string($_COOKIE['woocommerce_recently_viewed'])
+        ? byl_v3_cart_drawer_recent_ids(wp_unslash($_COOKIE['woocommerce_recently_viewed']))
+        : [];
     $result = [];
-    foreach ($products as $product) {
-        if (!$product instanceof WC_Product || !$product->is_purchasable() || !$product->is_in_stock() || $product->is_virtual()) { continue; }
+    $seen = [];
+    foreach ($recent as $id) {
+        $product = byl_v3_cart_drawer_eligible_product((int) $id);
+        if (!$product) { continue; }
         $result[] = $product;
+        $seen[$id] = true;
+        if (count($result) === 3) { return $result; }
+    }
+    // A short history is filled by 30-day best sellers, never duplicate IDs.
+    foreach (byl_v3_cart_drawer_monthly_best_seller_ids() as $id) {
+        if (isset($seen[$id])) { continue; }
+        $product = byl_v3_cart_drawer_eligible_product((int) $id);
+        if (!$product) { continue; }
+        $result[] = $product;
+        $seen[$id] = true;
         if (count($result) === 3) { break; }
     }
     return $result;
 }
+
+/** Woo tracks this cookie only when its Recently Viewed widget is active.
+ * On Dev product pages we complete the same session-only flow, without a new
+ * plugin, database writes, persistent IDs, external services or WWW changes.
+ */
+add_action('template_redirect', static function (): void {
+    $host = (string) wp_parse_url(home_url('/'), PHP_URL_HOST);
+    if ($host !== 'dev.beyourlover.com') { return; }
+    if (byl_v3_cart_drawer_preview_enabled()) {
+        // Prevent cached guest HTML leaking one shopper's recent product list.
+        nocache_headers();
+    }
+    if (!function_exists('wc_setcookie') || !is_singular('product')) { return; }
+    if (is_active_widget(false, false, 'woocommerce_recently_viewed_products', true)) { return; }
+    $id = (int) get_queried_object_id();
+    if ($id <= 0) { return; }
+    $cookie = isset($_COOKIE['woocommerce_recently_viewed']) && is_string($_COOKIE['woocommerce_recently_viewed'])
+        ? wp_unslash($_COOKIE['woocommerce_recently_viewed']) : '';
+    $newest = byl_v3_cart_drawer_recent_ids($cookie);
+    $list = array_reverse(array_values(array_diff($newest, [$id])));
+    $list[] = $id;
+    $list = array_slice($list, -15);
+    wc_setcookie('woocommerce_recently_viewed', implode('|', $list));
+}, 25);
 
 add_action('wp_footer', static function (): void {
     if (!byl_v3_cart_drawer_preview_enabled()) { return; }
@@ -53,7 +139,7 @@ add_action('wp_footer', static function (): void {
         <aside class="byl-drawer__aside" aria-label="Recommended products">
           <div class="byl-drawer__aside-inner">
             <h2>You might also like</h2>
-            <p>Frequently bought together</p>
+            <p>Recently viewed &amp; best sellers from the past 30 days</p>
             <div class="byl-drawer__recommendations" data-drawer-recommendations>
               <?php foreach ($recommendations as $product): ?>
                 <article class="byl-drawer__rec" data-product-id="<?php echo esc_attr((string)$product->get_id()); ?>">
@@ -101,7 +187,7 @@ add_action('wp_footer', static function (): void {
             <div class="byl-drawer__feedback" data-drawer-feedback role="status" aria-live="polite"></div>
             <div class="byl-drawer__delivery" data-drawer-delivery hidden></div>
             <section class="byl-drawer__empty" data-drawer-empty hidden>
-              <div class="byl-drawer__empty-icon" aria-hidden="true">♧</div>
+              <div class="byl-drawer__empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="9" cy="20" r="1.5"/><circle cx="19" cy="20" r="1.5"/><path d="M2 3h2l3 13h13l2-9H5"/></svg></div>
               <h3>Your cart is empty</h3>
               <p>Explore our best sellers and find something for you.</p>
               <a class="byl-drawer__browse" href="<?php echo esc_url(home_url('/shop/')); ?>">SHOP BEST SELLERS</a>
