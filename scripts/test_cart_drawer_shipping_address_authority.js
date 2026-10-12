@@ -61,8 +61,8 @@ async function run(label,payload,expected){
  const footer=nodes['[data-drawer-footer-total]'].textContent;
  const delivery=nodes['[data-drawer-delivery]'].textContent;
  const provisional = !expected.confirmed;
- const label = provisional ? 'Shipping (estimated)' : 'Shipping';
- assert.ok(totals.includes(label),label+' shipping must be visible');
+ const shippingLabel = provisional ? 'Shipping (estimated)' : 'Shipping';
+ assert.ok(totals.includes(shippingLabel),label+' shipping must be visible');
  assert.equal(footer,expected.total,label+' numeric footer');
  assert.ok(totals.includes('$254.00'),label+' subtotal stays visible');
  assert.ok(totals.includes(expected.shipping),label+' shipping amount');
