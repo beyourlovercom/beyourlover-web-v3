@@ -1,0 +1,86 @@
+'use strict';
+/**
+ * No-address $10 bug regression on existing Cart Drawer:
+ * Woo shop-base US/CA fallback is not a customer-confirmed destination.
+ * Offline, GET-only mocked Store API. Never creates Woo carts or orders.
+ */
+const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path'),assert=require('node:assert/strict');
+const js=fs.readFileSync(path.join(__dirname,'../theme/beyourlover-v3/assets/js/cart-drawer.js'),'utf8');
+const emptyAddress={country:'US',state:'CA',city:'',postcode:'',address_1:''};
+const savedAddress={country:'US',state:'CA',city:'Los Angeles',postcode:'90001',address_1:'123 Test Street'};
+function el(){
+ return {hidden:false,textContent:'',innerHTML:'',dataset:{},style:{},children:[],
+  attrs:{},classList:{add(){},remove(){},toggle(){}},setAttribute(k,v){this.attrs[k]=v;},
+  removeAttribute(k){delete this.attrs[k]},appendChild(x){this.children.push(x)},
+  getClientRects(){return [1]},addEventListener(){},querySelector(){return null},
+  querySelectorAll(){return []},focus(){}};
+}
+function cart(address,hasCalculated=true,freeSelected=false){
+ return {
+  items:[
+   {key:'tara',id:51,name:'TARA S2 tara',quantity:2,permalink:'https://example.invalid/a',
+    quantity_limits:{editable:true,minimum:1,maximum:10},variation:[],images:[],
+    prices:{price:'7900',regular_price:'9900'},totals:{line_total:'15800'}},
+   {key:'skull',id:52,name:'SKULL MAN',quantity:1,permalink:'https://example.invalid/b',
+    quantity_limits:{editable:true,minimum:1,maximum:10},variation:[],images:[],
+    prices:{price:'9600',regular_price:'14900'},totals:{line_total:'9600'}}],
+  coupons:[],has_calculated_shipping:hasCalculated,needs_shipping:true,
+  shipping_address:address,
+  shipping_rates:[{shipping_rates:[
+   {selected:!freeSelected,rate_id:'flat_rate:10'},
+   {selected:freeSelected,rate_id:'free_shipping:9'}]}],
+  totals:{currency_code:'USD',currency_minor_unit:2,total_items:'25400',
+   total_discount:'0',total_shipping:freeSelected?'0':'1000',
+   total_price:freeSelected?'25400':'26400'}
+ };
+}
+async function run(label,payload,expected){
+ const keys=['.byl-drawer__panel','[data-drawer-count]','[data-drawer-feedback]',
+  '[data-drawer-delivery]','[data-drawer-m5-progress]','[data-drawer-empty]',
+  '[data-drawer-items]','[data-drawer-coupon-section]','[data-drawer-coupon-form]',
+  '[data-drawer-active-coupons]','[data-drawer-totals]','[data-drawer-footer]',
+  '[data-drawer-footer-total]','[data-drawer-recommendations]',
+  '[data-drawer-mobile-recs]','[data-drawer-checkout]','[data-drawer-marketing-slots]'];
+ const nodes=Object.fromEntries(keys.map(k=>[k,el()]));
+ const root=el();root.hidden=true;root.querySelector=key=>nodes[key]||null;
+ const document={activeElement:el(),documentElement:el(),createElement:()=>el(),
+  querySelector:key=>key==='[data-byl-cart-drawer]'?root:null,
+  querySelectorAll:()=>[],addEventListener(){}};
+ const window={BYLCartDrawerPreview:{
+    cartApi:'https://example.invalid/cart',nonce:'test',marketingEnabled:false,
+    giftEnabled:false,shippingProgressEnabled:true,
+    cartUrl:'https://example.invalid/cart/',checkoutUrl:'https://example.invalid/checkout/'
+  },location:{href:'https://example.invalid/'},setTimeout,clearTimeout};
+ const fetch=async()=>({ok:true,headers:{get:()=>null},json:async()=>payload});
+ vm.runInNewContext(js,{window,document,fetch,URL,Intl,Number,Math,String,Boolean,
+  Promise,Map,Set,Array,Object,Error,setTimeout,clearTimeout,console});
+ let spin=0;while(!nodes['[data-drawer-items]'].innerHTML.includes('TARA')&&spin++<220)
+  await new Promise(r=>setTimeout(r,5));
+ assert.ok(spin<220,label+' ready');
+ const totals=nodes['[data-drawer-totals]'].innerHTML;
+ const footer=nodes['[data-drawer-footer-total]'].textContent;
+ const delivery=nodes['[data-drawer-delivery]'].textContent;
+ const hasEstimate=totals.includes('Calculated at checkout');
+ assert.equal(hasEstimate,expected.pending,label+' pending label');
+ assert.equal(footer,expected.pending?'Calculated at checkout':expected.total,label+' footer');
+ assert.ok(totals.includes('$254.00'),label+' subtotal stays visible');
+ if(expected.pending){
+  assert.ok(!totals.includes('$10.00')&&!totals.includes('$264.00'),label+' no false $10/264');
+  assert.match(delivery,/Enter your delivery address/,label+' plain actionable notice');
+ }else{
+  assert.ok(totals.includes(expected.shipping),label+' Woo shipping is authoritative');
+  assert.ok(totals.includes(expected.total),label+' Woo total is authoritative');
+ }
+ assert.equal(nodes['[data-drawer-marketing-slots]'].hidden,true,'promotions OFF');
+}
+(async()=>{
+ await run('shop-base country/state but no customer address',cart(emptyAddress),{pending:true});
+ await run('no address plus Woo rate calculated flag false',cart(emptyAddress,false),{pending:true});
+ await run('country/state only even with apparent free rate',cart(emptyAddress,true,true),{pending:true});
+ await run('logged-in profile shipping address from Woo',cart(savedAddress),{pending:false,shipping:'$10.00',total:'$264.00'});
+ await run('confirmed shipping address free rate selected',cart(savedAddress,true,true),{pending:false,shipping:'$0.00',total:'$254.00'});
+ await run('address saved but Woo calculation incomplete',cart(savedAddress,false),{pending:true});
+ const noRate=cart(savedAddress);noRate.shipping_rates=[];
+ await run('address saved but no selected shipping rate',noRate,{pending:true});
+ console.log('CART_UNCONFIRMED_SHIPPING_NO_FALSE_10_USD=PASS_7; REAL_ORDER_WRITES=0');
+})().catch(e=>{console.error(e.stack||e);process.exitCode=1});
