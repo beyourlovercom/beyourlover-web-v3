@@ -3,7 +3,7 @@
   "theme": "beyourlover-v3",
   "theme_version": "0.1.0",
   "version_policy": "semver",
-  "runtime_mode": "existing-hooks-unchanged",
+  "runtime_mode": "ordered-bootstrap-and-route-assets-v1",
   "release_policy": "github-exact-head-owner-gated",
   "business_logic_owners": {
     "theme": "presentation-and-interaction-only",
@@ -20,6 +20,8 @@
         "style.css",
         "theme.json",
         "functions.php",
+        "inc/theme-os-bootstrap.php",
+        "inc/theme-os-assets.php",
         "index.php",
         "inc/components.php",
         "template-component-library.php",
@@ -115,7 +117,10 @@
         "assets/css/cart.css",
         "assets/css/cart-focus.css",
         "assets/js/cart-experience.js",
-        "assets/js/cart.js"
+        "assets/js/cart.js",
+        "inc/cart-drawer.php",
+        "assets/css/cart-drawer.css",
+        "assets/js/cart-drawer.js"
       ]
     },
     "checkout": {

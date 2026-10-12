@@ -4,7 +4,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 runtime = (ROOT / "platform/byl-platform/includes/class-byl-shipping-promotion-runtime.php").read_text(encoding="utf-8")
-theme = (ROOT / "theme/beyourlover-v3/functions.php").read_text(encoding="utf-8")
+theme = (ROOT / "theme/beyourlover-v3/inc/theme-os-assets.php").read_text(encoding="utf-8")
 js = (ROOT / "theme/beyourlover-v3/assets/js/cart.js").read_text(encoding="utf-8")
 css = (ROOT / "theme/beyourlover-v3/assets/css/cart.css").read_text(encoding="utf-8")
 docs = (ROOT / "docs/S5-CART-PROMOTION-UX.md").read_text(encoding="utf-8")

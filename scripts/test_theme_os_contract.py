@@ -86,6 +86,43 @@ class TestThemeOS(unittest.TestCase):
         with self.assertRaisesRegex(theme_os.ThemeOSViolation, "no owner"):
             theme_os.affected(self.manifest, ["theme/beyourlover-v3/inc/new-cart-script.php"])
 
+    def test_ordered_runtime_bootstrap(self):
+        """No lazy module init, Woo hook or bootstrap ordering drift."""
+        import re
+        root = theme_os.THEME
+        entry = (root / "functions.php").read_text(encoding="utf8")
+        loader = (root / "inc/theme-os-bootstrap.php").read_text(encoding="utf8")
+        self.assertEqual(entry.count("require_once get_stylesheet_directory().'/inc/theme-os-bootstrap.php';"), 1)
+        self.assertLess(entry.index("inc/theme-os-bootstrap.php"), entry.index("add_action('after_setup_theme'"))
+        self.assertLess(entry.index("inc/theme-os-assets.php"), entry.index("inc/free-shipping-v2-policy.php"))
+        paths = re.findall(r"require_once get_stylesheet_directory\(\)\.'/((?:inc/)[^']+\.php)';", loader)
+        expected = [
+            "inc/components.php", "inc/shell-profiles.php", "inc/homepage.php",
+            "inc/archive.php", "inc/product.php", "inc/product-modules.php",
+            "inc/checkout.php", "inc/thank-you.php", "inc/cart-experience.php",
+            "inc/cart-drawer.php",
+        ]
+        self.assertEqual(paths, expected)
+        self.assertEqual(loader.count("require_once get_stylesheet_directory()"), len(expected))
+        self.assertTrue(all((root / p).is_file() for p in paths))
+        self.assertEqual(entry.count("add_action('wp_enqueue_scripts'"), 0)
+        assets = (root / "inc/theme-os-assets.php").read_text(encoding="utf8")
+        self.assertEqual(assets.count("add_action('wp_enqueue_scripts'"), 1)
+        for marker in ("BYLShippingPromotionCart", "BYLShippingPromotionCheckout", "'wc-checkout'", "wc_store_api"):
+            self.assertIn(marker, assets)
+        for route in ("is_front_page()", "is_shop()", "is_product()", "is_cart()", "is_checkout()", "is_order_received_page()"):
+            self.assertIn(route, assets)
+
+    def test_route_scoped_wordpress_asset_parity(self):
+        """Execute isolated PHP callback fixtures without WordPress or any network."""
+        import subprocess
+        p = subprocess.run(
+            ["php", str(theme_os.ROOT / "scripts/test_theme_os_route_assets.php")],
+            cwd=theme_os.ROOT, text=True, capture_output=True, check=False,
+        )
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+        self.assertIn("PASS Theme OS T2.4", p.stdout)
+
     def test_reproducible_and_sha_verified(self):
         with TemporaryDirectory() as a, TemporaryDirectory() as b:
             x, xr = theme_os.build(Path(a), allow_dirty=True)

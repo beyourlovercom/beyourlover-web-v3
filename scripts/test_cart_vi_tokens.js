@@ -28,6 +28,6 @@ assert(focus.includes('body.byl-focus-cart-shell .byl-cart-recommendations{conta
 assert(focus.includes('overflow-x:auto;scroll-snap-type:x mandatory'), 'Mobile recommendations keep independent horizontal scrolling');
 assert(cart.includes('background: var(--byl-brand)'), 'Legacy cart coupon component must inherit BYL brand');
 assert(!/CanvasText|#a51d2d/.test(cart), 'generic system or legacy danger tokens not allowed');
-const fn = fs.readFileSync(path.join(theme,'functions.php'),'utf8');
+const fn = fs.readFileSync(path.join(theme,'inc/theme-os-assets.php'),'utf8');
 assert(fn.includes("'byl-v3-tokens'") && fn.includes("'byl-v3-cart-focus'"), 'Theme must load tokens + Cart VI');
 console.log('PASS cart-vi-canonical — Poppins + Burgundy, semantic tokens, no green-brand overrides');
