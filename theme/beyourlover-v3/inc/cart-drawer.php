@@ -50,7 +50,7 @@ function byl_v3_cart_drawer_recent_ids(string $cookie): array {
 function byl_v3_cart_drawer_eligible_product(int $id): ?WC_Product {
     if ($id <= 0 || !function_exists('wc_get_product')) { return null; }
     $product = wc_get_product($id);
-    if (!$product instanceof WC_Product || $product->get_type() !== 'simple'
+    if (!$product instanceof WC_Product || !in_array($product->get_type(), ['simple', 'variable'], true)
         || $product->get_status() !== 'publish' || !$product->is_purchasable()
         || !$product->is_in_stock() || $product->is_virtual()) { return null; }
     return $product;
@@ -150,7 +150,11 @@ add_action('wp_footer', static function (): void {
                     <a href="<?php echo esc_url(get_permalink($product->get_id())); ?>"><?php echo esc_html($product->get_name()); ?></a>
                     <span><?php echo wp_kses_post($product->get_price_html()); ?></span>
                   </div>
-                  <button type="button" class="byl-drawer__rec-add" data-drawer-add="<?php echo esc_attr((string)$product->get_id()); ?>">Add to cart</button>
+                  <?php if ($product->is_type('simple')): ?>
+                    <button type="button" class="byl-drawer__rec-add" data-drawer-add="<?php echo esc_attr((string)$product->get_id()); ?>">Add to cart</button>
+                  <?php else: ?>
+                    <a class="byl-drawer__rec-add" href="<?php echo esc_url(get_permalink($product->get_id())); ?>">View options</a>
+                  <?php endif; ?>
                 </article>
               <?php endforeach; ?>
             </div>
