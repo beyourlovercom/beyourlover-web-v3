@@ -204,7 +204,7 @@
       const chosen = rates.find(rate=>rate && rate.selected === true);
       const free = rates.find(rate=>rate && String(rate.rate_id || '').startsWith('free_shipping:'));
       const calculated = confirmedShipping(cart);
-      let status = 'Enter your delivery address to confirm shipping and free-shipping eligibility.';
+      let status = 'Estimated shipping shown. Final shipping and free-shipping eligibility depend on your delivery address.';
       if (calculated && free && chosen?.rate_id === free.rate_id) {
         status = '🎉 Free shipping confirmed for your delivery address.';
       } else if (calculated && free) {
@@ -213,21 +213,28 @@
         status = 'Shipping is calculated for your current delivery address.';
       }
       elements.delivery.textContent = status;
-      // Do not pass Woo's base-zone $10 estimate off as a confirmed charge,
-      // and do not fold it into a definitive order total before an address.
+      // Owner V2: keep Woo's actual base-zone shipping estimate and
+      // total numeric BEFORE address, but never call the estimate final.
+      // On checkout Woo re-rates shipping for the actual destination.
       const subtotal = line('Subtotal',cart.totals?.total_items || 0,cart) +
         (Number(cart.totals?.total_discount)>0 ? line('Discount',-Number(cart.totals.total_discount),cart,'is-discount') : '');
-      if (calculated) {
-        elements.totals.innerHTML = subtotal +
-          line('Shipping',cart.totals?.total_shipping || 0,cart) +
-          line('Order total',cart.totals?.total_price || 0,cart,'is-total');
-        elements.footerTotal.textContent = money(cart.totals?.total_price || 0,cart);
-      } else {
-        elements.totals.innerHTML = subtotal +
-          lineLabel('Shipping','Calculated at checkout') +
-          lineLabel('Order total','Calculated at checkout','is-total');
-        elements.footerTotal.textContent = 'Calculated at checkout';
-      }
+      const chargesNotice = '<p class="byl-drawer__charges-notice" role="note">' +
+        'Please check shipping costs, import duties and local taxes for your country or region. ' +
+        'Final charges depend on your delivery address.' +
+        '</p>';
+      const hasShippingValue = cart.totals?.total_shipping !== null &&
+        cart.totals?.total_shipping !== undefined && cart.totals?.total_shipping !== '';
+      const hasTotalValue = cart.totals?.total_price !== null &&
+        cart.totals?.total_price !== undefined && cart.totals?.total_price !== '';
+      const shippingLabel = calculated ? 'Shipping' : 'Shipping (estimated)';
+      const totalLabel = calculated ? 'Order total' : 'Order total (estimated)';
+      elements.totals.innerHTML = chargesNotice + subtotal +
+        (hasShippingValue ? line(shippingLabel,cart.totals.total_shipping,cart) :
+          lineLabel(shippingLabel,'Calculated at checkout')) +
+        (hasTotalValue ? line(totalLabel,cart.totals.total_price,cart,'is-total') :
+          lineLabel(totalLabel,'Calculated at checkout','is-total'));
+      elements.footerTotal.textContent = hasTotalValue
+        ? money(cart.totals.total_price,cart) : 'Calculated at checkout';
     }
 
     const activeCoupons = (cart.coupons || []).map(c =>
