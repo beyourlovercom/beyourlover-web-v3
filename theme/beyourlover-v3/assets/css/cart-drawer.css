@@ -126,3 +126,11 @@ html.byl-drawer-open{overflow:hidden}
  .byl-drawer__rec-add{min-width:74px;padding:10px 4px}
 }
 @media(prefers-reduced-motion:reduce){.byl-drawer__panel{animation:none}}
+
+/* M5: isolated read-only free-shipping threshold visual, strictly OFF by default. */
+.byl-drawer__m5-progress[hidden]{display:none!important}
+.byl-drawer__m5-progress{margin:0 0 15px;padding:12px 14px;border:1px solid #c7e3d6;border-radius:8px;background:#f1faf6;color:#174d36;min-width:0}
+.byl-drawer__m5-progress strong{display:block;font-size:12px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.byl-drawer__m5-track{height:6px;border-radius:999px;background:#d5e9de;overflow:hidden;margin-top:11px}
+.byl-drawer__m5-track span{display:block;height:100%;background:#006241;border-radius:inherit}
+@media(max-width:900px){.byl-drawer__m5-progress{margin:0 0 12px;padding:12px 13px}}
