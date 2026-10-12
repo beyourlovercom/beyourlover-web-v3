@@ -52,6 +52,26 @@ assert.match(php,/data-drawer-mobile-recs/);
 assert.match(php,/data-drawer-coupon-form/);
 assert.match(php,/data-drawer-items/);
 assert.match(php,/data-drawer-footer/);
+// M1 Campaign/banner + service reminder slots: no visible promotions in current Dev.
+assert.match(php,/function byl_v3_cart_marketing_slots_enabled\(\): bool \{\s*return false;/,
+  'marketing policy must fail closed in PHP, never be driven by a query/cookie/option');
+assert.match(php,/'marketingEnabled' => false/,'marketing must be OFF in localized JS data');
+assert.match(php,/<section class="byl-drawer__marketing" data-drawer-marketing-slots aria-label="Cart promotions" hidden>/,
+  'marketing container must start hidden');
+assert.match(php,/data-drawer-marketing-banner hidden/,'one banner slot reserved but hidden');
+assert.match(php,/data-drawer-marketing-note hidden/,'one service text slot reserved but hidden');
+assert.match(css,/\.byl-drawer__marketing\[hidden\],\.byl-drawer__marketing \[hidden\]\{display:none!important\}/,
+  'OFF slots must have no footprint on mobile or desktop');
+assert.match(js,/if \(elements\.marketing\) elements\.marketing\.hidden = true/,
+  'Cart runtime cannot activate marketing without separate gated policy');
+assert.doesNotMatch(php,/byl_v3_cart_marketing_slots_enabled\(\)\s*===?\s*true.*get_option/s,
+  'marketing must not be wired to an uncontrolled WP option');
+assert.match(js,/rate\.selected === true/,'selected shipping source is authoritative');
+assert.match(js,/String\(rate\.rate_id \|\| ''\)\.startsWith\('free_shipping:'\)/,
+  'shipping rate IDs normalized; no synthetic free threshold');
+assert.match(php,/data-drawer-checkout>SECURE CHECKOUT →<\/a>/,
+  'native Checkout GET anchor remains untouched');
+
 assert.match(php,/wp_localize_script/);
 assert.match(js,/Object\.prototype\.hasOwnProperty\.call\(config,'giftEnabled'\)/, 'Drawer must require explicit gift feature policy flag');
 assert.match(js,/\[false,'',0,'0'\]\.includes\(config\.giftEnabled\)/, 'WordPress-localized false must not prevent Drawer preview initialization');
