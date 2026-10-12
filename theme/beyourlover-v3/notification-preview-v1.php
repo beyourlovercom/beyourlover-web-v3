@@ -57,7 +57,7 @@ header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-sr
       <span class="demo-tag">2 seconds · automatic</span>
     </div>
     <div class="demo-panel demo-panel--toast">
-      <div class="demo-toast-guide"><span class="demo-swatch"></span><div><strong>Quick. Quiet. Reassuring.</strong><p>Burgundy success, neutral information. Right in, left out, no layout shift.</p></div></div>
+      <div class="demo-toast-guide"><span class="demo-swatch"></span><div><strong>Quick. Quiet. Reassuring.</strong><p>Burgundy success, neutral information. Slides in from the right and back out to the right. No layout shift.</p></div></div>
       <div class="demo-actions demo-actions--wrap">
         <button type="button" data-demo-action="add">✓ &nbsp; Add confirmed</button>
         <button type="button" class="demo-outline" data-demo-action="remove">Remove confirmed</button>
