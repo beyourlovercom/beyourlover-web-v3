@@ -210,7 +210,11 @@
         "assets/css/notification-preview.css",
         "assets/js/notification-preview.js",
         "assets/css/notification-surfaces.css",
-        "assets/js/notification-surfaces.js"
+        "assets/js/notification-surfaces.js",
+        "inc/notification-cart.php",
+        "inc/notification-cart-empty.php",
+        "assets/css/notification-woo-adapter.css",
+        "assets/js/notification-cart-bridge.js"
       ]
     }
   }
