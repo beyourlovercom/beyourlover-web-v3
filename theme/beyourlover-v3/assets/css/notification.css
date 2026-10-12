@@ -24,7 +24,7 @@
   pointer-events:none;
 }
 .byl-toast.is-visible{transform:translateX(0);opacity:1}
-.byl-toast.is-leaving{transform:translateX(calc(-100vw - 460px));opacity:0}
+.byl-toast.is-leaving{transform:translateX(calc(100vw + 24px));opacity:0}
 .byl-toast__icon{display:inline-flex;align-items:center;justify-content:center;
   flex:none;width:18px;height:18px;border:1.5px solid currentColor;
   border-radius:50%;font-size:11px;font-weight:700}
