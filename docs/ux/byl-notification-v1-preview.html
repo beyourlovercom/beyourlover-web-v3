@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover">
+<title>BYL Notification UX V1 — Offline Visual Mock</title>
+<link rel="stylesheet" href="../../theme/beyourlover-v3/assets/css/tokens.css">
+<link rel="stylesheet" href="../../theme/beyourlover-v3/assets/css/notification.css">
+<style>
+body{margin:0;background:#f8f6f7;font:15px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#161316}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 112px}
+header{background:white;padding:16px 20px;border-bottom:1px solid #e7e2e4}
+.brand{font-weight:700;letter-spacing:.12em;color:var(--byl-brand)}
+h1{font-size:22px;margin:0 0 6px}p{margin:0 0 16px;color:#655e62}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:20px}
+.card{background:#fff;padding:22px;border:1px solid #e7e2e4;border-radius:14px}
+.mock-item{display:flex;gap:16px;align-items:center;border-bottom:1px solid #eee;padding:14px 0}
+.thumb{width:68px;height:76px;flex:none;background:#f7ecef;border-radius:9px}
+button{font:inherit;cursor:pointer;border-radius:9px;border:1px solid #9b3749;background:#9b3749;color:#fff;padding:10px 13px;margin:5px 5px 5px 0}
+button.secondary{background:#fff;color:#9b3749}
+input{font:inherit;width:100%;padding:12px;border-radius:8px;border:1px solid #aaa;box-sizing:border-box}
+.error{color:#b4233e;font-size:14px;margin-top:9px}
+.status{color:#4d5950;font-size:14px}
+.cta{position:fixed;bottom:0;left:0;right:0;padding:13px max(14px,env(safe-area-inset-left));background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-top:1px solid #eee;text-align:center}
+.cta button{width:min(460px,100%);margin:0}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.card{padding:16px}main{padding:20px 14px 110px}}
+</style></head>
+<body><header><span class="brand">BEYOURLOVER</span></header>
+<main><h1>Notification UX V1</h1><p>Offline visual mock. Buttons simulate verified events; no Woo data, cart mutation, checkout or network request.</p>
+<div class="grid"><section class="card"><h2>Shopping bag</h2>
+<div class="mock-item"><div class="thumb" aria-hidden="true"></div><div><strong>Example product A</strong><p>Mock catalog only</p><button id="add">Simulate confirmed Add</button></div></div>
+<div class="mock-item"><div class="thumb" aria-hidden="true"></div><div><strong>Example product B</strong><p>Mock catalog only</p><button id="remove" class="secondary">Simulate confirmed Remove</button></div></div>
+<label for="coupon">Promo / Coupon Code</label><input id="coupon" placeholder="Focus here to test collision avoidance">
+<p id="error" class="error" hidden></p><p id="delivery" class="status">Shipping is calculated by WooCommerce, not this mock.</p>
+</section><aside class="card"><h2>UX scenarios</h2>
+<button id="success">Confirmed coupon success</button><button id="fail" class="secondary">Persistent coupon error</button>
+<button id="burst" class="secondary">Quick burst x 5</button><button id="clear" class="secondary">Clear / invalidate</button>
+<p>In real integration, only Woo-approved results may trigger a success toast.</p></aside></div></main>
+<div class="cta"><button type="button" onclick="void 0">Checkout CTA (nonfunctional mock)</button></div>
+<script src="../../theme/beyourlover-v3/assets/js/notification.js"></script><script>
+(function(){const n=window.BYL.notify;let count=0;
+document.getElementById('add').onclick=()=>n({type:'success',confirmed:true,context:'mock',key:'add-'+(++count),message:'Added to your cart'});
+document.getElementById('remove').onclick=()=>n({type:'success',confirmed:true,context:'mock',key:'remove-'+(++count),message:'Removed from your cart'});
+document.getElementById('success').onclick=()=>{n.inlineError(document.getElementById('error'),'');n({type:'success',confirmed:true,context:'mock',key:'coupon-'+(++count),message:'Promo code applied'})};
+document.getElementById('fail').onclick=()=>n.inlineError(document.getElementById('error'),'This promo code was not accepted. Please check it and retry.');
+document.getElementById('clear').onclick=()=>{n.invalidateAll();n.inlineError(document.getElementById('error'),'')};
+document.getElementById('burst').onclick=()=>{for(let i=0;i<5;i++)n({type:'success',confirmed:true,context:'mock',key:'burst-'+(++count),message:'Added to your cart'});};
+})();</script></body></html>

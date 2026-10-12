@@ -115,7 +115,10 @@
         "assets/css/cart.css",
         "assets/css/cart-focus.css",
         "assets/js/cart-experience.js",
-        "assets/js/cart.js"
+        "assets/js/cart.js",
+        "inc/cart-drawer.php",
+        "assets/css/cart-drawer.css",
+        "assets/js/cart-drawer.js"
       ]
     },
     "checkout": {
@@ -192,6 +195,22 @@
       "files": [
         "page-track-your-order.php",
         "assets/css/track-order.css"
+      ]
+    },
+    "notification": {
+      "depends_on": [
+        "foundation",
+        "shell"
+      ],
+      "kind": "presentation",
+      "files": [
+        "assets/js/notification.js",
+        "assets/css/notification.css",
+        "notification-preview-v1.php",
+        "assets/css/notification-preview.css",
+        "assets/js/notification-preview.js",
+        "assets/css/notification-surfaces.css",
+        "assets/js/notification-surfaces.js"
       ]
     }
   }
