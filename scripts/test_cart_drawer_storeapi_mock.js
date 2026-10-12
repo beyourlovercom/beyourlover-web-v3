@@ -33,7 +33,7 @@ function fixture() {
     '[data-drawer-active-coupons]','[data-drawer-totals]',
     '[data-drawer-footer]','[data-drawer-footer-total]',
     '[data-drawer-recommendations]','[data-drawer-mobile-recs]',
-    '[data-drawer-checkout]'
+    '[data-drawer-checkout]','[data-drawer-marketing-slots]'
   ];
   const el=Object.fromEntries(keys.map(k=>[k,domElement()]));
   el['[data-drawer-recommendations]'].innerHTML='<div class="byl-drawer__rec">Demo</div>';
@@ -54,7 +54,7 @@ function fixture() {
       cartApi:'https://dev.example.invalid/wp-json/wc/store/v1/cart',
       cartUrl:'https://dev.example.invalid/cart/',
       checkoutUrl:'https://dev.example.invalid/checkout/',
-      nonce:'synthetic-nonce',giftEnabled:''
+      nonce:'synthetic-nonce',giftEnabled:'',marketingEnabled:''
     },
     location:{href:'https://dev.example.invalid/'},
     setTimeout,clearTimeout
@@ -110,10 +110,28 @@ async function main() {
   vm.runInContext(source,context,{filename:'cart-drawer.js'});
   await waitFor(()=>window.BYL_Cart_Drawer_Preview && el['[data-drawer-items]'].innerHTML.includes('Safe Product'));
   assert.equal(root.hidden,false,'explicit preview must open the Drawer');
+  assert.equal(el['[data-drawer-marketing-slots]'].hidden,true,
+    'marketing slots remain OFF with no visible markup/advertisements');
   assert.ok(!el['[data-drawer-items]'].innerHTML.includes('href="javascript:'),'unsafe Woo product permalink scheme must be rejected');
   assert.ok(!el['[data-drawer-items]'].innerHTML.includes('<img '),'empty Woo thumbnail must not trigger homepage image requests');
   assert.ok(el['[data-drawer-items]'].innerHTML.includes('https://dev.example.invalid/cart/'),'unsafe href falls back to cart URL');
   assert.equal(el['[data-drawer-footer-total]'].textContent,'$59.99','display Woo-authoritative minor-unit totals');
+  assert.match(el['[data-drawer-delivery]'].textContent,/Shipping options depend on your delivery address/,
+    'no fabricated free shipping when Woo returns no rates');
+  server.shipping_rates=[{shipping_rates:[
+    {rate_id:'flat_rate:1',selected:false},
+    {rate_id:'free_shipping:2',selected:true}
+  ]}];
+  await window.BYL_Cart_Drawer_Preview.refresh();
+  assert.match(el['[data-drawer-delivery]'].textContent,/Free shipping applied/,
+    'free shipping claim only after selected Woo confirmed free rate');
+  server.shipping_rates[0].shipping_rates[0].selected=true;
+  server.shipping_rates[0].shipping_rates[1].selected=false;
+  await window.BYL_Cart_Drawer_Preview.refresh();
+  assert.match(el['[data-drawer-delivery]'].textContent,/Free shipping available/,
+    'eligible but non-selected free shipping rate must not claim applied');
+  server.shipping_rates=[];
+  await window.BYL_Cart_Drawer_Preview.refresh();
 
   // Invalid coupon stays in form. A subsequent successful request still works.
   input.value='BAD';
