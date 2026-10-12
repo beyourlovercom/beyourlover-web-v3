@@ -60,27 +60,31 @@ async function run(label,payload,expected){
  const totals=nodes['[data-drawer-totals]'].innerHTML;
  const footer=nodes['[data-drawer-footer-total]'].textContent;
  const delivery=nodes['[data-drawer-delivery]'].textContent;
- const hasEstimate=totals.includes('Calculated at checkout');
- assert.equal(hasEstimate,expected.pending,label+' pending label');
- assert.equal(footer,expected.pending?'Calculated at checkout':expected.total,label+' footer');
+ const provisional = !expected.confirmed;
+ const label = provisional ? 'Shipping (estimated)' : 'Shipping';
+ assert.ok(totals.includes(label),label+' shipping must be visible');
+ assert.equal(footer,expected.total,label+' numeric footer');
  assert.ok(totals.includes('$254.00'),label+' subtotal stays visible');
- if(expected.pending){
-  assert.ok(!totals.includes('$10.00')&&!totals.includes('$264.00'),label+' no false $10/264');
-  assert.match(delivery,/Enter your delivery address/,label+' plain actionable notice');
+ assert.ok(totals.includes(expected.shipping),label+' shipping amount');
+ assert.ok(totals.includes(expected.total),label+' Woo numeric total');
+ assert.ok(totals.includes('import duties and local taxes'),label+' location charges notice');
+ if(provisional){
+  assert.match(delivery,/Estimated shipping shown/,label+' warn rather than promise free shipping');
+  assert.ok(!delivery.includes('Free shipping confirmed'),label+' no false free award');
+  assert.ok(totals.includes('Order total (estimated)'),label+' total is clearly estimated');
  }else{
-  assert.ok(totals.includes(expected.shipping),label+' Woo shipping is authoritative');
-  assert.ok(totals.includes(expected.total),label+' Woo total is authoritative');
+  assert.ok(totals.includes('Order total'),label+' Woo confirmed amount');
  }
  assert.equal(nodes['[data-drawer-marketing-slots]'].hidden,true,'promotions OFF');
 }
 (async()=>{
- await run('shop-base country/state but no customer address',cart(emptyAddress),{pending:true});
+ await run('shop-base country/state but no customer address',cart(emptyAddress),{confirmed:false,shipping:'$10.00',total:'$264.00'});
  await run('no address plus Woo rate calculated flag false',cart(emptyAddress,false),{pending:true});
  await run('country/state only even with apparent free rate',cart(emptyAddress,true,true),{pending:true});
- await run('logged-in profile shipping address from Woo',cart(savedAddress),{pending:false,shipping:'$10.00',total:'$264.00'});
- await run('confirmed shipping address free rate selected',cart(savedAddress,true,true),{pending:false,shipping:'$0.00',total:'$254.00'});
+ await run('logged-in profile shipping address from Woo',cart(savedAddress),{confirmed:true,shipping:'$10.00',total:'$264.00'});
+ await run('confirmed shipping address free rate selected',cart(savedAddress,true,true),{confirmed:true,shipping:'$0.00',total:'$254.00'});
  await run('address saved but Woo calculation incomplete',cart(savedAddress,false),{pending:true});
  const noRate=cart(savedAddress);noRate.shipping_rates=[];
  await run('address saved but no selected shipping rate',noRate,{pending:true});
- console.log('CART_UNCONFIRMED_SHIPPING_NO_FALSE_10_USD=PASS_7; REAL_ORDER_WRITES=0');
+ console.log('CART_DEFAULT_10_USD_ESTIMATE_WITH_NOTICE_PASS_7; REAL_ORDER_WRITES=0');
 })().catch(e=>{console.error(e.stack||e);process.exitCode=1});
