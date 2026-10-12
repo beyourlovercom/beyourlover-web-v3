@@ -29,6 +29,10 @@ add_action('wp_enqueue_scripts', static function (): void {
         // Marketing/notification policy cannot be enabled via request parameters or JS.
         // The owner must separately approve an Andy Commerce-backed config contract.
         'marketingEnabled' => false,
+        // M4 approved Dev-only canary. Independent of all promotional
+        // campaigns and bounded by a server-side expiring v1-fingerprint gate.
+        'shippingProgressEnabled' => class_exists('Andy_Commerce_M4_V2_Dev_Canary')
+            && Andy_Commerce_M4_V2_Dev_Canary::enabled(),
     ]);
     wp_script_add_data('byl-v3-cart-drawer', 'strategy', 'defer');
 }, 30);
