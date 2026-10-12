@@ -112,6 +112,14 @@ class TestThemeOS(unittest.TestCase):
         for route in ("is_front_page()", "is_shop()", "is_product()", "is_cart()", "is_checkout()", "is_order_received_page()"):
             self.assertIn(route, assets)
 
+    def test_cart_mobile_table_striping_fix_preserved(self):
+        # Dev production-like Cart fix must survive composite Theme upgrades.
+        css = (theme_os.THEME / "assets/css/cart-focus.css").read_text(encoding="utf8")
+        import re
+        self.assertRegex(css,
+            r"table\.shop_table tbody tr\.cart_item > td\s*\{\s*"
+            r"background:transparent!important;\s*\}")
+
     def test_route_scoped_wordpress_asset_parity(self):
         """Execute isolated PHP callback fixtures without WordPress or any network."""
         import subprocess

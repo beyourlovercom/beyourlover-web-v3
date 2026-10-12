@@ -59,6 +59,14 @@ body.byl-focus-cart-shell{color:var(--byl-ink);}
 .byl-cart-runtime .woocommerce-cart-form table.shop_table thead{background:var(--byl-surface-soft)}
 .byl-cart-runtime .woocommerce-cart-form table.shop_table th{padding:16px 11px!important;font-size:12px!important;color:var(--byl-ink-2);font-weight:600!important;text-align:left}
 .byl-cart-runtime .woocommerce-cart-form table.shop_table td{padding:20px 11px!important;border-top:1px solid var(--byl-line)!important;vertical-align:middle!important;font-size:14px;color:var(--byl-ink)}
+/* WooCommerce responsive table styles add backgrounds to every cell in an
+   alternating row. Cart turns those cells into a mobile grid; the inherited
+   stripe then appears as disconnected gray rectangular patches. Keep the
+   product row white/transparent while preserving borders and image surfaces. */
+.byl-cart-runtime .woocommerce-cart-form table.shop_table tbody tr.cart_item > td{
+  background:transparent!important;
+}
+
 .byl-cart-runtime .woocommerce-cart-form .product-remove{width:38px}
 .byl-cart-runtime .woocommerce-cart-form .product-remove a.remove{width:25px;height:25px;margin:auto;color:var(--byl-ink-2)!important;background:var(--byl-surface-soft)!important;border-radius:50%;font-size:20px;line-height:24px;text-align:center;text-decoration:none}
 .byl-cart-runtime .woocommerce-cart-form .product-thumbnail{width:106px}
