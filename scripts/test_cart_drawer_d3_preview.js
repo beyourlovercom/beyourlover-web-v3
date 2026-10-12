@@ -32,6 +32,21 @@ assert.doesNotMatch(progress,/[♧⌖▤]/,'discard confusing placeholder symbol
 assert.doesNotMatch(progress,/<(?:a|button)\b/,'future Checkout steps must not pretend to be clickable today');
 assert.match(css,/\.byl-drawer__steps\{height:74px;display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(css,/\.byl-drawer__step\.is-active::after/);
+// D3.4: empty-cart icon and 3-personalized + monthly fallback candidates.
+const empty=php.match(/<div class="byl-drawer__empty-icon"[\s\S]*?<\/div>/)?.[0]||'';
+assert.match(empty,/<svg viewBox="0 0 24 24"/,'empty cart must use actual cart SVG');
+assert.doesNotMatch(empty,/♧/,'never show decorative club glyph');
+assert.match(css,/\.byl-drawer__empty-icon svg/,'empty cart SVG styling');
+assert.match(php,/byl_v3_cart_drawer_recent_ids/,'Woo session viewed ids');
+assert.match(php,/woocommerce_recently_viewed/,'reads existing first-party recent cookie');
+assert.match(php,/byl_v3_cart_drawer_monthly_best_seller_ids/,'uses real 30-day paid-unit sales');
+assert.match(php,/SUM\(item\.product_qty\) DESC/,'orders by actual unit count');
+assert.match(php,/orders\.status IN \('wc-processing','wc-completed'\)/,'excludes pending, failed, refunded orders');
+assert.match(php,/30 \* DAY_IN_SECONDS/,'rolling 30 days, not lifetime total_sales');
+assert.doesNotMatch(php,/orderby['"]\s*=>\s*['"]popularity/,'forbid lifetime popularity fallback');
+assert.match(php,/\$product->is_type\('simple'\)/,'non-simple items must link to View options');
+assert.match(php,/>View options<\/a>/,'support recently viewed variation parent without unsafe direct add');
+assert.match(php,/nocache_headers\(\)/,'avoid caching personalized guest markup');
 assert.match(php,/data-drawer-recommendations/);
 assert.match(php,/data-drawer-mobile-recs/);
 assert.match(php,/data-drawer-coupon-form/);
