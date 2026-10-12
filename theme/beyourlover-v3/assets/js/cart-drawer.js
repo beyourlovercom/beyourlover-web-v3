@@ -75,6 +75,32 @@
   const line = (text, value, c, suffix='') =>
     '<div class="byl-drawer__sumline ' + suffix + '"><span>' + escape(text) +
     '</span><strong>' + money(value, c) + '</strong></div>';
+  const lineLabel = (text, value, suffix='') =>
+    '<div class="byl-drawer__sumline ' + suffix + '"><span>' + escape(text) +
+    '</span><strong>' + escape(value) + '</strong></div>';
+  // Woo uses the shop base as an anonymous customer's initial "country/state".
+  // Country/state alone is NOT proof that the shopper entered a destination.
+  // Previously the fallback flat rate $10 was shown as a confirmed total.
+  const hasConfirmedDestination = cart => {
+    const a = cart && cart.shipping_address;
+    if (!a || typeof a !== 'object') return false;
+    const str = key => typeof a[key] === 'string' ? a[key].trim() : '';
+    const country = str('country');
+    const postcode = str('postcode');
+    const city = str('city');
+    const street = str('address_1');
+    return /^[A-Z]{2}$/i.test(country) &&
+      (postcode.length >= 3 || (city.length >= 2 && street.length >= 3));
+  };
+  const confirmedShipping = cart => {
+    if (!hasConfirmedDestination(cart) || cart?.has_calculated_shipping !== true) return false;
+    const packages = cart?.shipping_rates;
+    if (!Array.isArray(packages) || packages.length !== 1 ||
+        !Array.isArray(packages[0]?.shipping_rates)) return false;
+    const selected = packages[0].shipping_rates.filter(rate=>rate?.selected === true);
+    return selected.length === 1 && typeof selected[0].rate_id === 'string' &&
+      /^[A-Za-z0-9_-]+:[A-Za-z0-9_.-]+$/.test(selected[0].rate_id);
+  };
 
   function renderItem(item, cart) {
     const quantity = Math.max(1, Number(item.quantity) || 1);
@@ -111,7 +137,8 @@
     // query parameters, local storage or cart payloads activate promotions.
     // Dedicated Dev M4 shipping gate is independent of Marketing campaigns.
     // Marketing/BOGO/Free Gift remain OFF even when read-only progress is shown.
-    if (config.shippingProgressEnabled !== true) return;
+    if (config.shippingProgressEnabled !== true ||
+        !confirmedShipping(cart)) return;
     const ext = cart?.extensions?.andy_commerce_marketing_v1;
     if (!ext || ext.schema_version !== 1 || ext.state !== 'ready' ||
         ext.show_progress !== true || ext.gift_enabled !== false ||
@@ -176,19 +203,31 @@
       const rates = shippingRates(cart);
       const chosen = rates.find(rate=>rate && rate.selected === true);
       const free = rates.find(rate=>rate && String(rate.rate_id || '').startsWith('free_shipping:'));
-      let status = 'Shipping options depend on your delivery address.';
-      if (free && chosen?.rate_id === free.rate_id) {
-        status = '🎉 Free shipping applied to your order.';
-      } else if (free) {
+      const calculated = confirmedShipping(cart);
+      let status = 'Enter your delivery address to confirm shipping and free-shipping eligibility.';
+      if (calculated && free && chosen?.rate_id === free.rate_id) {
+        status = '🎉 Free shipping confirmed for your delivery address.';
+      } else if (calculated && free) {
         status = '🎉 Free shipping available — select Free Shipping to apply it.';
+      } else if (calculated) {
+        status = 'Shipping is calculated for your current delivery address.';
       }
       elements.delivery.textContent = status;
-      elements.totals.innerHTML =
-        line('Subtotal',cart.totals?.total_items || 0,cart) +
-        (Number(cart.totals?.total_discount)>0 ? line('Discount',-Number(cart.totals.total_discount),cart,'is-discount') : '') +
-        line('Shipping',cart.totals?.total_shipping || 0,cart) +
-        line('Order total',cart.totals?.total_price || 0,cart,'is-total');
-      elements.footerTotal.textContent = money(cart.totals?.total_price || 0,cart);
+      // Do not pass Woo's base-zone $10 estimate off as a confirmed charge,
+      // and do not fold it into a definitive order total before an address.
+      const subtotal = line('Subtotal',cart.totals?.total_items || 0,cart) +
+        (Number(cart.totals?.total_discount)>0 ? line('Discount',-Number(cart.totals.total_discount),cart,'is-discount') : '');
+      if (calculated) {
+        elements.totals.innerHTML = subtotal +
+          line('Shipping',cart.totals?.total_shipping || 0,cart) +
+          line('Order total',cart.totals?.total_price || 0,cart,'is-total');
+        elements.footerTotal.textContent = money(cart.totals?.total_price || 0,cart);
+      } else {
+        elements.totals.innerHTML = subtotal +
+          lineLabel('Shipping','Calculated at checkout') +
+          lineLabel('Order total','Calculated at checkout','is-total');
+        elements.footerTotal.textContent = 'Calculated at checkout';
+      }
     }
 
     const activeCoupons = (cart.coupons || []).map(c =>
