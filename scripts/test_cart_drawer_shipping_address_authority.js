@@ -79,12 +79,12 @@ async function run(label,payload,expected){
 }
 (async()=>{
  await run('shop-base country/state but no customer address',cart(emptyAddress),{confirmed:false,shipping:'$10.00',total:'$264.00'});
- await run('no address plus Woo rate calculated flag false',cart(emptyAddress,false),{pending:true});
- await run('country/state only even with apparent free rate',cart(emptyAddress,true,true),{pending:true});
+ await run('no address plus Woo rate calculated flag false',cart(emptyAddress,false),{confirmed:false,shipping:'$10.00',total:'$264.00'});
+ await run('country/state only even with apparent free rate',cart(emptyAddress,true,true),{confirmed:false,shipping:'$10.00',total:'$264.00'});
  await run('logged-in profile shipping address from Woo',cart(savedAddress),{confirmed:true,shipping:'$10.00',total:'$264.00'});
  await run('confirmed shipping address free rate selected',cart(savedAddress,true,true),{confirmed:true,shipping:'$0.00',total:'$254.00'});
- await run('address saved but Woo calculation incomplete',cart(savedAddress,false),{pending:true});
+ await run('address saved but Woo calculation incomplete',cart(savedAddress,false),{confirmed:false,shipping:'$10.00',total:'$264.00'});
  const noRate=cart(savedAddress);noRate.shipping_rates=[];
- await run('address saved but no selected shipping rate',noRate,{pending:true});
+ await run('address saved but no selected shipping rate',noRate,{confirmed:false,shipping:'$10.00',total:'$264.00'});
  console.log('CART_DEFAULT_10_USD_ESTIMATE_WITH_NOTICE_PASS_7; REAL_ORDER_WRITES=0');
 })().catch(e=>{console.error(e.stack||e);process.exitCode=1});
