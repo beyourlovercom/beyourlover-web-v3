@@ -99,7 +99,7 @@ class TestThemeOS(unittest.TestCase):
         expected = [
             "inc/components.php", "inc/shell-profiles.php", "inc/homepage.php",
             "inc/archive.php", "inc/product.php", "inc/product-modules.php",
-            "inc/checkout.php", "inc/thank-you.php", "inc/cart-experience.php",
+            "inc/checkout.php", "inc/thank-you.php", "inc/cart-experience.php", "inc/cart-drawer.php",
         ]
         self.assertEqual(paths, expected)
         self.assertEqual(loader.count("require_once get_stylesheet_directory()"), len(expected))
