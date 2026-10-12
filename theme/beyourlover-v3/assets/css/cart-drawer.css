@@ -23,7 +23,9 @@ html.byl-drawer-open{overflow:hidden}
 .byl-drawer__rec-info>span{font-size:14px;font-weight:650}
 .byl-drawer__rec-info del{opacity:.5;font-size:12px}
 .byl-drawer__rec-info ins{text-decoration:none;color:var(--byl-drawer-brand)}
-.byl-drawer__rec-add{min-width:95px;padding:11px 8px;border:0;background:#161316;color:#fff;font-size:12px!important;font-weight:700}
+.byl-drawer__rec-add{min-width:95px;padding:11px 8px;border:0;background:#161316;color:#fff;font-size:12px!important;font-weight:700;display:inline-flex;align-items:center;justify-content:center;text-align:center}
+.byl-drawer a.byl-drawer__rec-add{color:#fff;text-decoration:none}
+.byl-drawer__empty-icon svg{display:block;width:48px;height:48px;margin:0 auto;color:var(--byl-drawer-brand)}
 .byl-drawer__rec-browse{display:block;padding:25px 0;font-size:13px;text-decoration:underline!important}
 .byl-drawer__cart{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;background:#fff}
 .byl-drawer__header{padding:22px 25px 0;position:relative;flex:none;background:#fff}
