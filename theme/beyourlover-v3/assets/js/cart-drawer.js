@@ -109,7 +109,9 @@
     slot.textContent = '';
     // The server-owned marketing gate is still OFF, even on Dev. Do not let
     // query parameters, local storage or cart payloads activate promotions.
-    if (config.marketingEnabled !== true) return;
+    // Dedicated Dev M4 shipping gate is independent of Marketing campaigns.
+    // Marketing/BOGO/Free Gift remain OFF even when read-only progress is shown.
+    if (config.shippingProgressEnabled !== true) return;
     const ext = cart?.extensions?.andy_commerce_marketing_v1;
     if (!ext || ext.schema_version !== 1 || ext.state !== 'ready' ||
         ext.show_progress !== true || ext.gift_enabled !== false ||
