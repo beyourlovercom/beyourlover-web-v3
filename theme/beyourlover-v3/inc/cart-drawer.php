@@ -36,6 +36,12 @@ add_action('wp_enqueue_scripts', static function (): void {
         // campaigns and bounded by a server-side expiring v1-fingerprint gate.
         'shippingProgressEnabled' => class_exists('Andy_Commerce_M4_V2_Dev_Canary')
             && Andy_Commerce_M4_V2_Dev_Canary::enabled(),
+        // Site-level, low-frequency copy is owned by Andy Commerce Settings.
+        // The Cart only consumes sanitized data; never changes Woo totals.
+        'cartSubtotalNotice' => class_exists('Andy_Commerce_Cart_Notice_Settings')
+            ? Andy_Commerce_Cart_Notice_Settings::get()
+            : ['enabled'=>true,
+               'text'=>'Please check shipping costs, import duties and local taxes for your country or region. Final charges depend on your delivery address.'],
     ]);
     wp_script_add_data('byl-v3-cart-drawer', 'strategy', 'defer');
 }, 30);
