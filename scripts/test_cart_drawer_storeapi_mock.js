@@ -24,7 +24,7 @@ function domElement() {
     getClientRects(){return [1];}
   };
 }
-function fixture() {
+function fixture(href='https://dev.example.invalid/?byl_cart_drawer_preview=1') {
   const root=domElement();root.hidden=true;
   const keys=[
     '.byl-drawer__panel','[data-drawer-count]','[data-drawer-feedback]',
@@ -56,7 +56,7 @@ function fixture() {
       checkoutUrl:'https://dev.example.invalid/checkout/',
       nonce:'synthetic-nonce',giftEnabled:'',marketingEnabled:''
     },
-    location:{href:'https://dev.example.invalid/'},
+    location:{href},
     setTimeout,clearTimeout
   };
   return {root,el,input,document,window};
@@ -183,6 +183,29 @@ async function main() {
   assert.ok(!calls.some(c=>/checkout|place-order|payment/i.test(c.endpoint)),
     'state test must never call Checkout mutations');
 
+  // Normal Dev pages must not auto-open or make a Store API request.
+  // Clicking the existing header cart icon should open the Drawer instead of
+  // navigating to the legacy /cart/ fallback.
+  const normal=fixture('https://dev.example.invalid/');
+  const beforeNormalCalls=calls.length;
+  vm.runInContext(source,vm.createContext({window:normal.window,
+    document:normal.document,fetch,URL,Intl,Math,Number,String,
+    Promise,Set,Map,Array,Object,Error,setTimeout,clearTimeout,console}),
+    {filename:'cart-drawer-normal-dev.js'});
+  assert.equal(normal.root.hidden,true,'normal Dev Drawer starts closed');
+  assert.equal(calls.length,beforeNormalCalls,'normal page must not fetch cart until opened');
+  let prevented=false;
+  events['document.click']({
+    target:{closest(selector){return selector==='a.byl-shell-cart, a[data-byl-drawer-open]'?{}:null;}},
+    preventDefault(){prevented=true;}
+  });
+  await waitFor(()=>normal.el['[data-drawer-items]'].innerHTML.includes('Safe Product'));
+  assert.equal(prevented,true,'header cart click must prevent /cart/ navigation');
+  assert.equal(normal.root.hidden,false,'header cart click must open Drawer');
+  assert.ok(calls.length>beforeNormalCalls,'opening Drawer fetches Woo-authoritative cart');
+  events['document.keydown']({key:'Escape',preventDefault(){}});
+  assert.equal(normal.root.hidden,true,'Escape closes normal Dev Drawer');
+
   // Explicitly active Free Gift remains a hard stop, not a way to launch gifts.
   const forbidden=fixture();
   forbidden.window.BYLCartDrawerPreview.giftEnabled=true;
@@ -194,6 +217,6 @@ async function main() {
   assert.equal(forbidden.window.BYL_Cart_Drawer_Preview,undefined,
     'unapproved gift config must not expose an active Drawer');
 
-  console.log('PASS Drawer Woo mocked runtime: localized PHP false, gift guard, safe href, coupon fail/retry, qty rollback, debounce, totals, Escape, no payments');
+  console.log('PASS Drawer Woo mocked runtime: explicit preview auto-open, normal Dev closed until header click, gift guard, safe href, coupon fail/retry, qty rollback, debounce, totals, Escape, no payments');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
