@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       exact_sha:
-        description: 'Full, exact 40-char Cart PR #80 HEAD SHA'
+        description: 'Full, exact 40-char Cart PR #95 HEAD SHA'
         required: true
         type: string
       profile:
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Verify intended Cart #80 and exact successful Foundation CI
+      - name: Verify intended Cart #95 and exact successful Foundation CI
         id: source
         shell: bash
         env:
@@ -69,9 +69,9 @@ jobs:
           set -euo pipefail
           [[ "$EXACT_SHA" =~ ^[a-f0-9]{40}$ ]] || exit 2
           test "$(git -C candidate rev-parse HEAD)" = "$EXACT_SHA"
-          PR_HEAD="$(gh api "repos/$GITHUB_REPOSITORY/pulls/80" --jq '.head.sha')"
+          PR_HEAD="$(gh api "repos/$GITHUB_REPOSITORY/pulls/95" --jq '.head.sha')"
           test "$PR_HEAD" = "$EXACT_SHA"
-          PR_BASE="$(gh api "repos/$GITHUB_REPOSITORY/pulls/80" --jq '.base.ref')"
+          PR_BASE="$(gh api "repos/$GITHUB_REPOSITORY/pulls/95" --jq '.base.ref')"
           test "$PR_BASE" = main
           gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$EXACT_SHA&event=pull_request&per_page=100" > "$RUNNER_TEMP/runs.json"
           python - "$RUNNER_TEMP/runs.json" "$EXACT_SHA" <<'PY'
