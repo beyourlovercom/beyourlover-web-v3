@@ -24,6 +24,28 @@ done
   { echo "SIGNED_APPLY_SCRIPT_MISSING" >&2; exit 4; }
 [[ -d "$BASE" ]] || { echo "DEV_ROOT_MISSING" >&2; exit 4; }
 
+# IMPORTANT: A restricted key can still submit arbitrary PHP + self-chosen SHA
+# unless the approved bytes are pinned independently by an ADMIN key.
+# This manifest is created OFFLINE by a separately approved administrator,
+# outside docroot and never by this forced-command key or GitHub Actions.
+# Format: one exact line, six space-separated tokens:
+# BYL-CART-M72-V1 <commit40> <zip64> <php64> <css64> <js64>
+APPROVAL=/home/u247343654/.byl-dev-gate/approved-cart-m72-v1.txt
+[[ -f "$APPROVAL" && ! -L "$APPROVAL" && -r "$APPROVAL" ]] ||
+  { echo "ADMIN_APPROVAL_MISSING" >&2; exit 4; }
+[[ "$(stat -c %u "$APPROVAL")" == "$(id -u)" &&
+   "$(stat -c %a "$APPROVAL")" == "600" ]] ||
+  { echo "ADMIN_APPROVAL_PERMISSIONS_FAIL" >&2; exit 4; }
+mapfile -t approval_lines < "$APPROVAL"
+[[ "${#approval_lines[@]}" -eq 1 ]] ||
+  { echo "ADMIN_APPROVAL_FORMAT_FAIL" >&2; exit 4; }
+read -r tag approved_commit approved_zip approved_php approved_css approved_js extra <<< "${approval_lines[0]}"
+[[ "$tag" == "BYL-CART-M72-V1" && -z "${extra:-}" &&
+   "$approved_commit" == "${argv[1]}" && "$approved_zip" == "${argv[2]}" &&
+   "$approved_php" == "${argv[3]}" && "$approved_css" == "${argv[4]}" &&
+   "$approved_js" == "${argv[5]}" ]] ||
+  { echo "ADMIN_APPROVAL_MISMATCH" >&2; exit 4; }
+
 ZIP="$BASE/.byl-dev-gate-cart-m7.2-${argv[1]}.zip"
 [[ ! -e "$ZIP" ]] || { echo "CANDIDATE_ZIP_ALREADY_EXISTS" >&2; exit 4; }
 # noclobber prevents concurrent releases clobbering a staged archive.
