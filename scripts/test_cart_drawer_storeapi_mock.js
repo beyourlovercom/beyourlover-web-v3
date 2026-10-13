@@ -68,6 +68,8 @@ function makeCart(q=1,coupons=[]) {
       quantity_limits:{minimum:1,maximum:9,editable:true},variation:[],images:[],
       prices:{price:'5999',regular_price:'5999'},totals:{line_total:String(amount)}}]:[],
     coupons:coupons.map(code=>({code})),
+    shipping_address:{country:'US',state:'CA',postcode:'90001',city:'Los Angeles',address_1:'123 Test Street'},
+    has_calculated_shipping:true,
     shipping_rates:[],
     totals:{currency_code:'USD',currency_minor_unit:2,total_items:String(amount),
       total_discount:'0',total_shipping:'0',total_price:String(amount)}
@@ -115,15 +117,18 @@ async function main() {
   assert.ok(!el['[data-drawer-items]'].innerHTML.includes('href="javascript:'),'unsafe Woo product permalink scheme must be rejected');
   assert.ok(!el['[data-drawer-items]'].innerHTML.includes('<img '),'empty Woo thumbnail must not trigger homepage image requests');
   assert.ok(el['[data-drawer-items]'].innerHTML.includes('https://dev.example.invalid/cart/'),'unsafe href falls back to cart URL');
-  assert.equal(el['[data-drawer-footer-total]'].textContent,'$59.99','display Woo-authoritative minor-unit totals');
-  assert.match(el['[data-drawer-delivery]'].textContent,/Shipping options depend on your delivery address/,
+  assert.equal(el['[data-drawer-footer-total]'].textContent,'$59.99','the server Woo total remains a numeric estimate');
+  assert.ok(el['[data-drawer-totals]'].innerHTML.includes('$59.99'),'the Woo-authoritative item subtotal stays visible');
+  assert.match(el['[data-drawer-delivery]'].textContent,/Estimated shipping shown/,
     'no fabricated free shipping when Woo returns no rates');
+  server.shipping_address={country:'US',state:'CA',postcode:'90001',city:'Los Angeles',address_1:'123 Test Street'};
+  server.has_calculated_shipping=true;
   server.shipping_rates=[{shipping_rates:[
     {rate_id:'flat_rate:1',selected:false},
     {rate_id:'free_shipping:2',selected:true}
   ]}];
   await window.BYL_Cart_Drawer_Preview.refresh();
-  assert.match(el['[data-drawer-delivery]'].textContent,/Free shipping applied/,
+  assert.match(el['[data-drawer-delivery]'].textContent,/Free shipping confirmed/,
     'free shipping claim only after selected Woo confirmed free rate');
   server.shipping_rates[0].shipping_rates[0].selected=true;
   server.shipping_rates[0].shipping_rates[1].selected=false;
@@ -168,7 +173,9 @@ async function main() {
   await waitFor(()=>server.items[0].quantity===3,3500);
   assert.equal(calls.filter(c=>c.endpoint==='update-item').length,2,
     'one rejected update + one coalesced success');
-  assert.equal(el['[data-drawer-footer-total]'].textContent,'$179.97');
+  assert.equal(el['[data-drawer-footer-total]'].textContent,'$179.97',
+    'Woo order total is shown as an estimate before shipping confirmation');
+  assert.ok(el['[data-drawer-totals]'].innerHTML.includes('$179.97'),'quantity subtotal still uses Woo result');
 
   // Escape works globally, including after focus vanishes during a rerender.
   events['document.keydown']({key:'Escape',preventDefault(){}});

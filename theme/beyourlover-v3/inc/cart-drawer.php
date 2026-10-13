@@ -31,6 +31,16 @@ add_action('wp_enqueue_scripts', static function (): void {
         // Marketing/notification policy cannot be enabled via request parameters or JS.
         // The owner must separately approve an Andy Commerce-backed config contract.
         'marketingEnabled' => false,
+        // M4 approved Dev-only canary. Independent of all promotional
+        // campaigns and bounded by a server-side expiring v1-fingerprint gate.
+        'shippingProgressEnabled' => class_exists('Andy_Commerce_M4_V2_Dev_Canary')
+            && Andy_Commerce_M4_V2_Dev_Canary::enabled(),
+        // Site-level, low-frequency copy is owned by Andy Commerce Settings.
+        // The Cart only consumes sanitized data; never changes Woo totals.
+        'cartSubtotalNotice' => class_exists('Andy_Commerce_Cart_Notice_Settings')
+            ? Andy_Commerce_Cart_Notice_Settings::get()
+            : ['enabled'=>true,
+               'text'=>'Please check shipping costs, import duties and local taxes for your country or region. Final charges depend on your delivery address.'],
     ]);
     wp_script_add_data('byl-v3-cart-drawer', 'strategy', 'defer');
 }, 30);
@@ -198,6 +208,7 @@ add_action('wp_footer', static function (): void {
           </div>
         </aside>
         <div class="byl-drawer__cart">
+          <div class="byl-drawer__scroll" data-drawer-scroll>
           <header class="byl-drawer__header">
             <h2 id="byl-drawer-title">Your Cart <span data-drawer-count></span></h2>
             <button class="byl-drawer__close" data-drawer-close type="button" aria-label="Close shopping cart">×</button>
@@ -222,10 +233,11 @@ add_action('wp_footer', static function (): void {
               </span>
             </nav>
           </header>
-          <div class="byl-drawer__scroll" data-drawer-scroll>
             <div class="byl-drawer__preview-label">Dev design preview · gift offers are not active</div>
             <div class="byl-drawer__feedback" data-drawer-feedback role="status" aria-live="polite"></div>
             <div class="byl-drawer__delivery" data-drawer-delivery hidden></div>
+            <?php // M5 shipping progress remains hidden unless a separately approved server policy enables it. ?>
+            <div class="byl-drawer__m5-progress" data-drawer-m5-progress role="status" aria-live="polite" hidden></div>
             <section class="byl-drawer__empty" data-drawer-empty hidden>
               <div class="byl-drawer__empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="9" cy="20" r="1.5"/><circle cx="19" cy="20" r="1.5"/><path d="M2 3h2l3 13h13l2-9H5"/></svg></div>
               <h3>Your cart is empty</h3>
@@ -250,11 +262,35 @@ add_action('wp_footer', static function (): void {
               <div data-drawer-active-coupons></div>
             </section>
             <div class="byl-drawer__totals" data-drawer-totals hidden></div>
+            <section class="byl-drawer__legal-payment" data-drawer-legal-payment aria-label="Purchase terms and payment options" hidden>
+            <?php
+            $byl_terms_url = function_exists('wc_get_page_permalink')
+                ? (string) wc_get_page_permalink('terms') : '';
+            if (!$byl_terms_url) { $byl_terms_url = home_url('/terms-and-conditions/'); }
+            // Use existing WooPayments checkout card logos, not invented brands
+            // or new external requests. PayPal is omitted unless verified active.
+            $byl_payment_logos = [
+                ['visa.svg', 'Visa'], ['mastercard.svg', 'Mastercard'],
+                ['amex.svg', 'American Express'], ['discover.svg', 'Discover'],
+                ['apple-pay.svg', 'Apple Pay'], ['google-pay.svg', 'Google Pay'],
+            ];
+            ?>
+            <p class="byl-drawer__terms">By clicking Secure Checkout, you agree to the
+              <a href="<?php echo esc_url($byl_terms_url); ?>" target="_blank" rel="noopener noreferrer">Terms and Conditions</a> of purchase.
+            </p>
+            <div class="byl-drawer__payment-methods" role="group" aria-label="Supported checkout payment methods">
+              <?php foreach ($byl_payment_logos as [$byl_logo, $byl_alt]): ?>
+                <?php if (is_file(WP_PLUGIN_DIR.'/woocommerce-payments/assets/images/cards/'.$byl_logo)): ?>
+                <img src="<?php echo esc_url(plugins_url('woocommerce-payments/assets/images/cards/'.$byl_logo)); ?>"
+                     alt="<?php echo esc_attr($byl_alt); ?>" loading="lazy" decoding="async">
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </div>
+            </section>
           </div>
           <footer class="byl-drawer__footer" data-drawer-footer hidden>
             <div class="byl-drawer__total"><strong>Order total</strong><strong data-drawer-footer-total></strong></div>
             <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/')); ?>" data-drawer-checkout>SECURE CHECKOUT →</a>
-            <p>Shipping and payment are confirmed securely at checkout.</p>
           </footer>
         </div>
       </section>
