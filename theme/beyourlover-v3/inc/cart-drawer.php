@@ -3,19 +3,27 @@ declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 
 /**
- * BYL V3 Cart Drawer D3.1 preview gate.
- * No global cart takeover and no external orders or payment state changes.
+ * BYL V3 Cart Drawer Dev-only activation.
+ * Normal Dev pages may open the Drawer via the cart icon; the preview query
+ * additionally auto-opens it. WWW, non-staging, and missing Woo fail closed.
+ * /cart/ remains the untouched Woo fallback; no payment/order takeover.
  */
-function byl_v3_cart_drawer_preview_enabled(): bool {
+function byl_v3_cart_drawer_runtime_enabled(): bool {
     if (!function_exists('WC') || !WC()) { return false; }
     $host = (string) wp_parse_url(home_url('/'), PHP_URL_HOST);
     return $host === 'dev.beyourlover.com'
+        && function_exists('wp_get_environment_type')
+        && wp_get_environment_type() === 'staging';
+}
+
+function byl_v3_cart_drawer_preview_enabled(): bool {
+    return byl_v3_cart_drawer_runtime_enabled()
         && isset($_GET['byl_cart_drawer_preview'])
         && (string) wp_unslash($_GET['byl_cart_drawer_preview']) === '1';
 }
 
 add_action('wp_enqueue_scripts', static function (): void {
-    if (!byl_v3_cart_drawer_preview_enabled()) { return; }
+    if (!byl_v3_cart_drawer_runtime_enabled()) { return; }
     $dir = get_stylesheet_directory();
     $uri = get_stylesheet_directory_uri();
     wp_enqueue_style('byl-v3-cart-drawer', $uri.'/assets/css/cart-drawer.css', ['byl-v3-motion'], (string) filemtime($dir.'/assets/css/cart-drawer.css'));
@@ -146,12 +154,10 @@ function byl_v3_cart_drawer_recommendations(): array {
  * plugin, database writes, persistent IDs, external services or WWW changes.
  */
 add_action('template_redirect', static function (): void {
-    $host = (string) wp_parse_url(home_url('/'), PHP_URL_HOST);
-    if ($host !== 'dev.beyourlover.com') { return; }
-    if (byl_v3_cart_drawer_preview_enabled()) {
-        // Prevent cached guest HTML leaking one shopper's recent product list.
-        nocache_headers();
-    }
+    if (!byl_v3_cart_drawer_runtime_enabled()) { return; }
+    // Recommendations use session-view cookies. Never share personalized
+    // Dev Drawer HTML through a guest full-page cache.
+    nocache_headers();
     if (!function_exists('wc_setcookie') || !is_singular('product')) { return; }
     if (is_active_widget(false, false, 'woocommerce_recently_viewed_products', true)) { return; }
     $id = (int) get_queried_object_id();
@@ -176,7 +182,7 @@ function byl_v3_cart_marketing_slots_enabled(): bool {
 }
 
 add_action('wp_footer', static function (): void {
-    if (!byl_v3_cart_drawer_preview_enabled()) { return; }
+    if (!byl_v3_cart_drawer_runtime_enabled()) { return; }
     $recommendations = byl_v3_cart_drawer_recommendations();
     ?>
     <div id="byl-cart-drawer-v2" class="byl-drawer" data-byl-cart-drawer hidden>
