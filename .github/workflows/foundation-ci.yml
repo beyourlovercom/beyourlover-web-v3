@@ -13,6 +13,11 @@ jobs:
           php-version: '8.2'
       - name: PHP syntax
         run: find theme platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Legacy WWW Shoptimizer Order Pay address isolated safety contract
+        run: |
+          php -l release/byl-www-orderpay-v1.php
+          php -l scripts/test_www_shoptimizer_orderpay_v1.php
+          php scripts/test_www_shoptimizer_orderpay_v1.php
       - name: P1.3 G2 Dev Safety PHP syntax
         run: php -l dev/mu-plugins/byl-dev-safety.php && php -l tools/dev/tests/p13-g2-offline-security-smoke.php
       - name: P1.3 G2 sandbox authorization offline security smoke
@@ -117,3 +122,5 @@ jobs:
         run: python scripts/test_checkout_progressive_ux_contract.py
       - name: Notification UX V1 opt-in dispatcher regression
         run: php -l theme/beyourlover-v3/notification-preview-v1.php && node --check theme/beyourlover-v3/assets/js/notification.js && node --check theme/beyourlover-v3/assets/js/notification-preview.js && node --check theme/beyourlover-v3/assets/js/notification-surfaces.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js
+      - name: N6 isolated Woo Notice and Cart response regression
+        run: php -l theme/beyourlover-v3/inc/cart-drawer.php && php -l theme/beyourlover-v3/inc/notification-cart.php && php -l theme/beyourlover-v3/inc/notification-cart-empty.php && node --check theme/beyourlover-v3/assets/js/notification-cart-bridge.js && node scripts/test_notification_cart_n6.js

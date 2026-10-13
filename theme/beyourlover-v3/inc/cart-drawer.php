@@ -20,8 +20,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     $uri = get_stylesheet_directory_uri();
     wp_enqueue_style('byl-v3-cart-drawer', $uri.'/assets/css/cart-drawer.css', ['byl-v3-motion'], (string) filemtime($dir.'/assets/css/cart-drawer.css'));
     wp_enqueue_script('byl-v3-cart-drawer', $uri.'/assets/js/cart-drawer.js',
-        function_exists('byl_v3_notification_cart_bridge_enabled') && byl_v3_notification_cart_bridge_enabled()
-            ? ['byl-v3-notification-cart-bridge'] : [],
+        function_exists('byl_v3_notification_cart_bridge_enabled') && byl_v3_notification_cart_bridge_enabled() ? ['byl-v3-notification-cart-bridge'] : [],
         (string) filemtime($dir.'/assets/js/cart-drawer.js'), true);
     wp_localize_script('byl-v3-cart-drawer', 'BYLCartDrawerPreview', [
         'cartApi' => esc_url_raw(rest_url('wc/store/v1/cart')),
@@ -298,3 +297,9 @@ add_action('wp_footer', static function (): void {
     </div>
     <?php
 }, 5);
+
+// Load via Cart module so both legacy and Theme OS modular bootstraps remain compatible.
+// The N6 adapter itself stays disabled unless BOTH Dev preview flags pass.
+if (function_exists('get_stylesheet_directory')) {
+    require_once get_stylesheet_directory().'/inc/notification-cart.php';
+}

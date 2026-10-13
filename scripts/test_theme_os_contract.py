@@ -26,6 +26,8 @@ class TestThemeOS(unittest.TestCase):
         self.assertEqual(r["version"], "0.1.0")
         self.assertLess(r["module_order"].index("cart"), r["module_order"].index("checkout"))
         self.assertEqual(r["owner_map"]["woocommerce/checkout/form-checkout.php"], "checkout")
+        self.assertEqual(r["owner_map"]["inc/order-pay-address.php"], "checkout")
+        self.assertEqual(r["owner_map"]["assets/css/order-pay.css"], "checkout")
 
     def test_duplicate_registration_rejected(self):
         m = copy.deepcopy(self.manifest)
@@ -99,7 +101,7 @@ class TestThemeOS(unittest.TestCase):
         expected = [
             "inc/components.php", "inc/shell-profiles.php", "inc/homepage.php",
             "inc/archive.php", "inc/product.php", "inc/product-modules.php",
-            "inc/checkout.php", "inc/thank-you.php", "inc/cart-experience.php", "inc/cart-drawer.php",
+            "inc/checkout.php", "inc/order-pay-address.php", "inc/thank-you.php", "inc/cart-experience.php", "inc/cart-drawer.php",
         ]
         self.assertEqual(paths, expected)
         self.assertEqual(loader.count("require_once get_stylesheet_directory()"), len(expected))
@@ -111,6 +113,14 @@ class TestThemeOS(unittest.TestCase):
             self.assertIn(marker, assets)
         for route in ("is_front_page()", "is_shop()", "is_product()", "is_cart()", "is_checkout()", "is_order_received_page()"):
             self.assertIn(route, assets)
+
+    def test_cart_mobile_table_striping_fix_preserved(self):
+        # Dev production-like Cart fix must survive composite Theme upgrades.
+        css = (theme_os.THEME / "assets/css/cart-focus.css").read_text(encoding="utf8")
+        import re
+        self.assertRegex(css,
+            r"table\.shop_table tbody tr\.cart_item > td\s*\{\s*"
+            r"background:transparent!important;\s*\}")
 
     def test_route_scoped_wordpress_asset_parity(self):
         """Execute isolated PHP callback fixtures without WordPress or any network."""

@@ -18,7 +18,8 @@ assert.match(read('inc/theme-os-bootstrap.php'),/inc\/cart-drawer\.php/);
 assert.match(php,/giftEnabled' => false/);
 assert.match(php,/wc_get_checkout_url\(\)/);
 assert.match(php,/wp_footer/);
-assert.match(php,/\}, 5\);\s*$/,'Drawer markup must be inserted before wp_print_footer_scripts at wp_footer priority 20');
+assert.match(php,/\}, 5\);/,'Drawer markup must be inserted before wp_print_footer_scripts at wp_footer priority 20');
+assert.match(php,/require_once get_stylesheet_directory\(\)\.'\/inc\/notification-cart\.php'/, 'N6 adapter included after Cart Drawer registration');
 assert.match(php,/role="dialog" aria-modal="true"/);
 // Owner's three-step UX contract: visual status now, real Checkout state later.
 const progress=php.match(/<nav class="byl-drawer__steps"[\s\S]*?<\/nav>/)?.[0] || '';
@@ -93,7 +94,7 @@ assert.match(js,/document\.addEventListener\('keydown'/, 'Esc closes an open Dra
 assert.match(js,/if\(root\.hidden\) return;/, 'Global keydown must not run when Drawer closed');
 assert.match(js,/const operation = mutationQueue\.then\(\(\)=>request\(endpoint,data\)\)/, 'serial Woo mutation queue required');
 assert.match(js,/mutationQueue = operation\.catch\(\(\)=>\{\}\)/, 'failed requests must not poison subsequent retries');
-assert.match(js,/return operation\.then\(\(\)=>true,\(\)=>false\)/, 'mutation success must reach caller');
+assert.match(js,/return operation\.then\(result=>Boolean\(result && Array\.isArray\(result\.items\)\),\(\)=>false\)/, 'mutation success must be backed by a valid accepted Woo cart response');
 assert.match(js,/if\(applied && field\) field\.value=''/, 'failed coupon must stay in editable field');
 assert.match(js,/if \(state\) render\(state\)/, 'rejected Woo mutation must restore authoritative quantity UI');
 assert.match(js,/const safeHref = value =>/, 'prevent non-HTTP product href injection');

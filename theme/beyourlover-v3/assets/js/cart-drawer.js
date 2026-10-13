@@ -277,10 +277,11 @@
       const previous = state;
       render(result);
       setFeedback('');
-      // Notify only after Woo accepted and returned an authoritative Cart.
+      // Bridge only after an accepted, validated Woo Cart response was rendered.
+      // Notification presentation must never change the authoritative mutation result.
       if (data && window.BYL?.cartNoticeBridge?.confirm) {
         try { window.BYL.cartNoticeBridge.confirm({endpoint, payload:data, before:previous, after:result}); }
-        catch (_) { /* Presentation cannot affect Woo success/error. */ }
+        catch (_) { /* Fail closed: visual bridge cannot affect Woo success/error. */ }
       }
       return result;
     }catch(error){
