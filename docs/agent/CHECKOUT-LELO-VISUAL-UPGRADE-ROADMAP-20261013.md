@@ -1,6 +1,17 @@
 # Checkout LELO Visual Upgrade — GitHub Roadmap
 
-> STATUS: PLANNED / L0 PENDING · 2026-10-13
+## OWNER CHANGE REQUEST — 2026-10-13 — supersedes all proposed four-step Checkout design requirements below
+
+> **FIRST L1 MOCK = OWNER VISUAL FAIL. NO OWNER DESIGN APPROVAL. DO NOT IMPLEMENT OR DEPLOY.**
+> **NEW REQUIRED CUSTOMER JOURNEY = Cart → Shipping → Payments (THREE visible steps total).**
+> Step 1 `Cart` is the existing **Cart Drawer**, not an added Checkout pane. Keep `/cart/` fallback.
+> Step 2 `Shipping` is the first Checkout page stage and **combines address with delivery/shipping selection**.
+> Step 3 `Payments` **combines native Woo payment with final order review/confirmation**; there is NO separate visible Delivery or Review step.
+> Owner must first review a **single continuous Cart Drawer → Checkout** design preview at PC1440 / M390 / M320, with consistent BYL tokens, CTA, copy and summary. Obtain Owner Visual PASS **before final L2 contract, L3 implementation, Dev deploy or merging docs as design signoff**.
+> The legacy four-stage Apple Checkout is **existing runtime evidence only**, not an approved design target. Woo shipping calculations, legal consent, order review and G5 3DS/payment security remain authoritative behind the simplified UI. A Checkout Drawer is not approved; `/checkout/` remains primary Checkout surface unless Owner separately changes the architecture.
+> See [Issue #89](https://github.com/beyourlovercom/beyourlover-web-v3/issues/89) for current acceptance gates; Issue #87 remains HOLD.
+
+> STATUS: L0 technical audit PASS · L1 v1 OWNER VISUAL FAIL · REWORK / L3-L5 HOLD · 2026-10-13
 > OWNER DIRECTIVE: formalize LELO-inspired Checkout visual redesign without replacing WooCommerce/G3/G5 and without bypassing cart/checkout integration gate.
 > PRIMARY TRACKER: [Issue #89](https://github.com/beyourlovercom/beyourlover-web-v3/issues/89)
 > TARGET: `beyourlovercom/beyourlover-web-v3` `main` (merge only with explicit Owner approval); **this document is planning-only and is proposed via Draft PR**.
