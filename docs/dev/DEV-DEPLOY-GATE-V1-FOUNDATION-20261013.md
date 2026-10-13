@@ -37,7 +37,17 @@ python tools/dev/deploy_gate.py verify \
 
 **Important:** Candidate ZIPs built from the independent **foundation** PR branch contain that branch's current Cart sources, **not** the unmerged Cart #80 fix. They are only format/provenance evidence and **must not be deployed as the Cart correction**. Before applying the Cart correction, reconcile the approved gate with **exact** Cart #80 code in an approved checkout; do not merge #80 merely to reuse this tool.
 
-## Separate future remote deployment gate (NOT implemented/activated)
+## Protected manual remote-apply candidate (STAGED, DEFAULT OFF)
+
+Now included in the same Draft PR; **NOT active or deployed**:
+
+- `.github/workflows/dev-only-cart-manual-apply.yml`: `workflow_dispatch` **only**, never `push`/`pull_request` execution. `plan` performs read-only Gate CI and builds an exact Cart PR #80 candidate. `apply` is blocked unless the repository variable `BYL_DEV_DEPLOY_ENABLED=true`, an explicit Owner confirmation phrase, exact current Cart #80 SHA, a completed successful Foundation CI for that SHA, and protected GitHub Environment `byl-dev-protected` approval are all present.
+- Environment needs **Owner configured** restricted Dev-only secrets `BYL_DEV_SSH_HOST`, `BYL_DEV_SSH_USER`, `BYL_DEV_SSH_PRIVATE_KEY`, `BYL_DEV_SSH_KNOWN_HOSTS`; no credentials were obtained, modified, copied from Windows, or installed here. Require approved environment reviewers before enabling the repository variable.
+- The remote `tools/dev/apply_dev_cart_m72.sh` script targets a hardcoded Dev path, independently checks staging + exact old file SHA + bundle member allowlist + SHA, backs up off-webroot, atomically installs only three files, and runs PHP lint / three read-only GET checks. Failure triggers rollback attempt. Script is authored, **not executed** on Dev. Static protection contracts and Bash syntax are part of CI.
+- This is a separately reviewed, protected *future* write transport, not a way to retry or bypass the prior platform security denial. It will only become callable after a separately authorized Foundation PR merge, environment setup, and explicit Dev deploy approval.
+- After actual approved Dev deploy, M390/M1440 *real files, non-mocked DOM* are required before Owner Final UAT; CI mock screenshots cannot replace that gate.
+
+## Remote apply safety prerequisites and required human gates (NOT activated)
 
 1. Verify exact candidate PR SHA and the related **completed exact-head** CI, Owner's Dev-only scope and the specific source diff.
 2. Establish a demonstrably security-approved write channel (official remote MCP execution if allowed; otherwise separately approved protected GitHub Environment and credentials). This tool does not grant or create that permission.
