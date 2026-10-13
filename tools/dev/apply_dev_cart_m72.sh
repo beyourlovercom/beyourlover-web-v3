@@ -91,8 +91,7 @@ mkdir -m 700 "$BACKUP"
 for i in 0 1 2; do
   mkdir -p "$BACKUP/$(dirname "${rel[$i]}")"
   cp -p "$THEME/${rel[$i]}" "$BACKUP/${rel[$i]}"
-  [[ "$(sha256sum "$BACKUP/${rel[$i]}" | cut -d' ' -f1)" ==
-     "${old[$i]}" ]] || { echo "BACKUP_VERIFICATION_FAILED" >&2; exit 5; }
+  [[ "$(sha256sum "$BACKUP/${rel[$i]}" | cut -d' ' -f1)" == "${old[$i]}" ]] || { echo "BACKUP_VERIFICATION_FAILED" >&2; exit 5; }
 done
 backup_ready=1
 applied=1
