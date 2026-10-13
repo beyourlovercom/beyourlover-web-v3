@@ -35,8 +35,7 @@ new=("$new_php" "$new_css" "$new_js")
 [[ -d "$WP" && -d "$THEME" && -f "$BUNDLE" &&
    ! -e "$LOCK" && ! -e "$BACKUP" ]] ||
   { echo "DEV_ROOT_OR_LOCK_GATE_FAIL" >&2; exit 3; }
-[[ "$(cd "$WP" && wp option get home --skip-themes --skip-plugins)" ==
-   "https://dev.beyourlover.com" ]] ||
+[[ "$(cd "$WP" && wp option get home --skip-themes --skip-plugins)" == "https://dev.beyourlover.com" ]] ||
   { echo "DEV_HOME_GATE_FAIL" >&2; exit 3; }
 [[ "$(cd "$WP" && wp config get WP_ENVIRONMENT_TYPE)" == "staging" ]] ||
   { echo "STAGING_GATE_FAIL" >&2; exit 3; }
