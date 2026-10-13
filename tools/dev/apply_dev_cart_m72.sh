@@ -26,9 +26,9 @@ rel=(
   "assets/js/cart-drawer.js"
 )
 old=(
-  "a3af11253263d16e9da7de3be78e93fdf03bc3e197f2a38923844f584aded443"
-  "f561b3948ca711079c304d54448a0aa207cf51e2dec038f6aecab418828661bb"
-  "267c3fe43c745e5171bfdf644ad9cd36d962e30938b8e9290d7ca6248a50a47c"
+  "ccb294d18116ce91d7339a474bc8e20006a3bcd42d76302a1f2efb3bb616468f"
+  "6d81bbb19da8eee39c20167d9268f555f5cecd53f75cac02cf540d257bd7cca4"
+  "e120f3fcfd54bba7b52d5b5614e9f54ebd1e4ffa280c29326362e7185ddebf85"
 )
 new=("$new_php" "$new_css" "$new_js")
 
@@ -82,6 +82,10 @@ for i in 0 1 2; do
   path="$stage/${rel[$i]}"
   mkdir -p "$(dirname "$path")"
   unzip -p "$BUNDLE" "wp-content/themes/beyourlover-v3/${rel[$i]}" > "$path"
+  # umask 077 protects private staging, but publicly served theme files must
+  # be readable by LiteSpeed after atomic replacement (Issue #93).
+  chmod 0644 "$path"
+  [[ "$(stat -c %a "$path")" == "644" ]] || { echo "STAGE_MODE_FAIL" >&2; exit 5; }
   [[ "$(sha256sum "$path" | cut -d' ' -f1)" == "${new[$i]}" ]] ||
     { echo "NEW_FILE_SHA_GATE_FAIL" >&2; exit 5; }
 done
@@ -104,12 +108,21 @@ for i in 0 1 2; do
   mv -f "$target.byl-incoming-$commit" "$target"
   [[ "$(sha256sum "$target" | cut -d' ' -f1)" == "${new[$i]}" ]] ||
     { echo "POST_DEPLOY_SHA_FAIL" >&2; exit 6; }
+  [[ "$(stat -c %a "$target")" == "644" ]] ||
+    { echo "POST_DEPLOY_MODE_FAIL" >&2; exit 6; }
 done
 php -l "$THEME/inc/cart-drawer.php" | grep -q "No syntax errors"
 for route in "/" "/?byl_cart_drawer_preview=1" "/checkout/"; do
   code="$(curl -sSL --max-time 15 -o /dev/null -w '%{http_code}' \
     "https://dev.beyourlover.com$route")"
   [[ "$code" == "200" ]] || { echo "POSTDEPLOY_HTTP_FAIL" >&2; exit 6; }
+done
+# Static resources must be accessible as well as PHP-rendered pages.
+for asset in "/wp-content/themes/beyourlover-v3/assets/css/cart-drawer.css" \
+             "/wp-content/themes/beyourlover-v3/assets/js/cart-drawer.js"; do
+  code="$(curl -sSL --max-time 15 -o /dev/null -w '%{http_code}' \
+    "https://dev.beyourlover.com$asset")"
+  [[ "$code" == "200" ]] || { echo "POSTDEPLOY_ASSET_HTTP_FAIL:$asset" >&2; exit 6; }
 done
 applied=0
 echo "DEV_ONLY_EXACT_THREE_FILES=PASS"

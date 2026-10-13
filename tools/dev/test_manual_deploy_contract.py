@@ -28,7 +28,7 @@ class ManualApplyContract(unittest.TestCase):
         self.assertIn("UserKnownHostsFile=", WORKFLOW)
 
     def test_no_arbitrary_pr_source(self):
-        self.assertIn('pulls/80', WORKFLOW)
+        self.assertIn('pulls/95', WORKFLOW)
         self.assertIn('test "$PR_HEAD" = "$EXACT_SHA"', WORKFLOW)
         self.assertIn('test "$PR_BASE" = main', WORKFLOW)
         self.assertIn('NO_EXACT_SHA_GREEN_FOUNDATION_CI', WORKFLOW)

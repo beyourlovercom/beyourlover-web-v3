@@ -38,6 +38,22 @@ class DeployGateTests(unittest.TestCase):
     def build(self, name="out"):
         return gate.build_package(self.repo, HEAD, self.root / name)
 
+    def test_release_baseline_matches_previous_dev_release(self):
+        self.assertEqual(gate.EXPECTED_OLD, {
+            "inc/cart-drawer.php": "ccb294d18116ce91d7339a474bc8e20006a3bcd42d76302a1f2efb3bb616468f",
+            "assets/css/cart-drawer.css": "6d81bbb19da8eee39c20167d9268f555f5cecd53f75cac02cf540d257bd7cca4",
+            "assets/js/cart-drawer.js": "e120f3fcfd54bba7b52d5b5614e9f54ebd1e4ffa280c29326362e7185ddebf85",
+        })
+
+    def test_remote_apply_enforces_readable_theme_files_and_http_assets(self):
+        source = (FILE.parent / "apply_dev_cart_m72.sh").read_text(encoding="utf-8")
+        self.assertIn('chmod 0644 "$path"', source)
+        self.assertIn('[[ "$(stat -c %a "$target")" == "644" ]]', source)
+        self.assertIn('POSTDEPLOY_ASSET_HTTP_FAIL', source)
+        self.assertIn('/assets/css/cart-drawer.css', source)
+        self.assertIn('/assets/js/cart-drawer.js', source)
+        self.assertIn('AUTOMATIC_ROLLBACK_ATTEMPTED=YES', source)
+
     def test_deterministic_two_independent_outputs(self):
         z1, r1 = self.build("first")
         z2, r2 = self.build("second")

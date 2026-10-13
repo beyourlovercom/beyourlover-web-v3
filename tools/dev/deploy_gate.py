@@ -23,11 +23,11 @@ ALLOWLIST = (
     "assets/css/cart-drawer.css",
     "assets/js/cart-drawer.js",
 )
-# Confirmed *Dev*, never WWW, 2026-10-13 09:27 +0800.
+# Confirmed *Dev*, never WWW, after Cart M7.2 exact release 2026-10-13.
 EXPECTED_OLD = {
-    "inc/cart-drawer.php": "a3af11253263d16e9da7de3be78e93fdf03bc3e197f2a38923844f584aded443",
-    "assets/css/cart-drawer.css": "f561b3948ca711079c304d54448a0aa207cf51e2dec038f6aecab418828661bb",
-    "assets/js/cart-drawer.js": "267c3fe43c745e5171bfdf644ad9cd36d962e30938b8e9290d7ca6248a50a47c",
+    "inc/cart-drawer.php": "ccb294d18116ce91d7339a474bc8e20006a3bcd42d76302a1f2efb3bb616468f",
+    "assets/css/cart-drawer.css": "6d81bbb19da8eee39c20167d9268f555f5cecd53f75cac02cf540d257bd7cca4",
+    "assets/js/cart-drawer.js": "e120f3fcfd54bba7b52d5b5614e9f54ebd1e4ffa280c29326362e7185ddebf85",
 }
 REQUIRED_SITE = "https://dev.beyourlover.com"
 ZIP_TIME = (2020, 1, 1, 0, 0, 0)
