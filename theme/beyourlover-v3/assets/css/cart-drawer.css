@@ -135,69 +135,55 @@ html.byl-drawer-open{overflow:hidden}
 .byl-drawer__m5-track span{display:block;height:100%;background:#006241;border-radius:inherit}
 @media(max-width:900px){.byl-drawer__m5-progress{margin:0 0 12px;padding:12px 13px}}
 
-/* Owner M7 checkout handoff: notice immediately before subtotal, not a
- * giant persistent banner. Text remains black / mobile safe. */
+/* M7.2: exactly ONE mobile viewport-fixed element — the CTA itself. */
 .byl-drawer__charges-notice{margin:0 0 13px;padding:10px 12px;border-left:3px solid #ce7757;border-radius:3px;background:#fff6f2;color:#2b2727;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
-.byl-drawer__footer .byl-drawer__terms{color:#302b2f;font-size:10px;line-height:1.5;text-align:center;margin:10px auto 8px;max-width:470px}
+.byl-drawer__scroll>.byl-drawer__header{margin:-13px -23px 14px}
+.byl-drawer__legal-payment{margin:0 0 16px;padding:14px 0 20px;border-top:1px solid var(--byl-drawer-line);text-align:center}
+.byl-drawer__legal-payment .byl-drawer__terms{display:block;margin:0 auto 11px;color:#302b2f;font-size:10px;line-height:1.5;max-width:470px}
 .byl-drawer__terms a{color:#702844!important;font-weight:700;text-decoration:underline;text-underline-offset:2px}
-.byl-drawer__payment-methods{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:9px;padding:2px 0 0;min-height:27px;max-width:100%;overflow:hidden}
+.byl-drawer__legal-payment .byl-drawer__payment-methods{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:9px;min-height:24px;max-width:100%;overflow:hidden}
 .byl-drawer__payment-methods img{display:block;max-width:52px;width:auto;height:24px;object-fit:contain;flex:0 1 auto}
 @media(max-width:900px){
- .byl-drawer__charges-notice{font-size:11px;padding:9px 11px}
- .byl-drawer__scroll{padding-bottom:160px}
- /* Keep checkout call-to-action and the legal/payment row together. */
- .byl-drawer__footer{margin-top:-142px;padding:16px 18px max(10px,env(safe-area-inset-bottom))}
- .byl-drawer__footer .byl-drawer__terms{display:block;font-size:9px;line-height:1.35;color:#423941;margin:8px 0 6px}
- .byl-drawer__footer .byl-drawer__payment-methods{display:flex;gap:7px;padding-top:1px}
- .byl-drawer__payment-methods img{height:21px;max-width:43px}
-}
-
-/* M7.1 mobile viewport footer: checkout action + legal text + accepted cards
- * never participate in the product/coupon/totals scrolling surface.
- * Override the two legacy sticky/negative-margin rules above without
- * changing desktop. iOS dynamic viewport avoids address-bar jump. */
-@media (max-width:900px){
- .byl-drawer__panel{height:100dvh;max-height:100dvh;overflow:hidden}
- .byl-drawer__cart{
-   display:flex;flex-direction:column;height:100%;min-height:0;
-   overflow:hidden;overscroll-behavior:none
- }
- .byl-drawer__header{flex:0 0 auto}
+ .byl-drawer__panel{width:100vw;max-width:none;height:100dvh;max-height:100dvh;overflow:hidden}
+ .byl-drawer__cart{height:100%;min-height:0;min-width:0;display:flex;flex-direction:column;overflow:hidden;overscroll-behavior:none}
  .byl-drawer__scroll{
    flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
-   -webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;
-   padding:13px 17px 18px;scrollbar-width:thin
+   overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+   padding:13px 17px 24px;scrollbar-width:thin
  }
+ .byl-drawer__scroll>.byl-drawer__header{
+   margin:-13px -17px 0;padding:19px 18px 0;
+   position:relative;flex:none;background:#fff
+ }
+ .byl-drawer__steps{position:static;height:74px;gap:0}
+ .byl-drawer__charges-notice{font-size:11px;padding:9px 11px}
+ .byl-drawer__legal-payment{margin:12px 0 0;padding:12px 0 20px}
+ .byl-drawer__legal-payment .byl-drawer__terms{
+   display:block;margin:0 0 9px;font-size:9px;line-height:1.45;color:#302b2f
+ }
+ .byl-drawer__legal-payment .byl-drawer__payment-methods{
+   display:flex;gap:7px;min-height:21px;margin:0 0 8px
+ }
+ .byl-drawer__payment-methods img{max-width:43px;height:21px}
+ /* No header, terms or card icons may appear in this fixed CTA container. */
  .byl-drawer__footer{
-   position:relative;bottom:auto;z-index:3;flex:0 0 auto;
+   position:relative;bottom:auto;flex:0 0 auto;z-index:3;
    margin:0;padding:10px 17px max(10px,env(safe-area-inset-bottom));
    background:#fff;box-shadow:0 -5px 16px rgba(30,20,25,.09);
    border-top:1px solid var(--byl-drawer-line);
-   pointer-events:auto;opacity:1;max-height:38dvh;overflow-y:auto;
- }
- .byl-drawer__footer a[data-drawer-checkout]{
-   display:block;min-height:44px;padding:12px 10px;
-   box-shadow:none;pointer-events:auto;line-height:1.3
+   overflow:visible;max-height:none;pointer-events:auto;opacity:1
  }
  .byl-drawer__footer .byl-drawer__total{display:none}
- .byl-drawer__footer .byl-drawer__terms{
-   display:block;margin:7px 0 6px;
-   font-size:9px;line-height:1.35;color:#302b2f
+ .byl-drawer__footer a[data-drawer-checkout]{
+   display:block;min-height:44px;line-height:1.3;padding:12px 10px;
+   box-shadow:none;pointer-events:auto
  }
- .byl-drawer__footer .byl-drawer__payment-methods{
-   display:flex;gap:6px;min-height:18px;padding:0;
-   justify-content:center;align-items:center
- }
- .byl-drawer__payment-methods img{max-width:43px;height:19px;object-fit:contain}
- /* Only the coupon input receives focus; collapse the footer when
-  * the virtual keyboard needs room, restore automatically on blur. */
+ /* Avoid obscuring the coupon text field behind a phone keyboard. */
  .byl-drawer__cart:has(.byl-drawer__coupon input:focus) .byl-drawer__footer{
    visibility:hidden;max-height:0;padding:0;border:0;box-shadow:none;
    overflow:hidden;opacity:0;pointer-events:none
  }
 }
 @supports not (height:100dvh){
- @media(max-width:900px){
-  .byl-drawer__panel{height:100vh;max-height:100vh}
- }
+ @media(max-width:900px){.byl-drawer__panel{height:100vh;max-height:100vh}}
 }
