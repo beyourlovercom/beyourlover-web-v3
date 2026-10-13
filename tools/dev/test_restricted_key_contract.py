@@ -5,21 +5,24 @@ Static tests + negative dynamic invocations. No Hostinger connectivity,
 SSH credentials, staging file writes or Woo order/payment calls.
 """
 from pathlib import Path
-import re
+import os
 import subprocess
 import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
 FORCED=ROOT/"tools/dev/forced_dev_cart_m72.sh"
-WORKFLOW=(ROOT/".github/workflows/dev-only-cart-manual-apply.yml").read_text()
-SCRIPT=FORCED.read_text()
+WORKFLOW=(ROOT/".github/workflows/dev-only-cart-manual-apply.yml").read_text(encoding="utf-8")
+SCRIPT=FORCED.read_text(encoding="utf-8")
 
 class RestrictedDevKeyContract(unittest.TestCase):
     def reject(self, cmd):
-        r=subprocess.run(["bash",str(FORCED)],input=b"",env={
-            "PATH":"/usr/bin:/bin",
-            "SSH_ORIGINAL_COMMAND":cmd
-        },capture_output=True,check=False,timeout=10)
+        # Windows host verifies static safety; Linux CI tests the real Bash entry.
+        if os.name=="nt":
+            self.skipTest("dynamic forced-command rejection tested in Linux CI")
+        env=os.environ.copy()
+        env["SSH_ORIGINAL_COMMAND"]=cmd
+        r=subprocess.run(["bash",str(FORCED)],input=b"",env=env,
+                         capture_output=True,check=False,timeout=10)
         self.assertNotEqual(r.returncode,0)
         self.assertTrue(b"DENIED" in r.stderr or b"SSH_" in r.stderr)
         return r
