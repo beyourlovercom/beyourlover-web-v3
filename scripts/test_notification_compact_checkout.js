@@ -11,6 +11,16 @@ assert(manifest.modules.notification.files.includes('assets/css/notification-com
 assert(manifest.modules.notification.files.includes('inc/notification-compact-checkout.php'));
 assert(manifest.modules.notification.kind==='presentation');
 assert(css.includes('body.byl-cpn-checkout-preview #main-content.byl-commerce-content > .woocommerce'));
+assert(css.includes('width:100%'),'C2 persistent banner remains full-width');
+for(const [,selectors,body] of css.matchAll(/([^{}]+)\{([^{}]+)\}/g)){
+  if(!body.includes('width:16px')||!body.includes('height:16px'))continue;
+  const arms=selectors.split('\n').map(x=>x.trim()).filter(x=>x.startsWith('body.'));
+  assert.equal(arms.length,2,'both Woo native notice selector arms required');
+  for(const arm of arms){
+    assert(arm.replace(/,$/,'').endsWith('::before'),
+      '16px icon sizing must not shrink the notice container');
+  }
+}
 for (const type of ['.woocommerce-message','.woocommerce-info','.woocommerce-error'])assert(css.includes(type),type);
 for (const t of ['13px/1.38','padding:7px 10px 7px 34px','width:16px','min-height:44px','overflow-wrap:anywhere'])
  assert(css.includes(t),t);
