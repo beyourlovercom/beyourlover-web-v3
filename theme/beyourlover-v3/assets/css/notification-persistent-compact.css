@@ -1,0 +1,104 @@
+/* BYL Compact Persistent Notice V1 — explicit opt-in, presentation only.
+ * Use with .byl-notice from notification-surfaces.css. Load AFTER that file.
+ * No WooCommerce, Toast, field-error, order, payment or session selectors.
+ * No CSS is enqueued by this file or by this changeset.
+ */
+.byl-notice.byl-notice--compact{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  margin:0 0 8px;
+  padding:7px 10px;
+  border:0;
+  border-inline-start:3px solid var(--byl-note-accent);
+  border-radius:6px;
+  background:var(--byl-note-soft);
+  color:#161316;
+  font:400 13px/1.38 var(--byl-font,"PingFang SC",-apple-system,BlinkMacSystemFont,sans-serif);
+  overflow-wrap:anywhere;
+}
+.byl-notice.byl-notice--compact.byl-notice--success{
+  --byl-note-accent:#216349;
+  --byl-note-soft:#f2f8f4;
+}
+.byl-notice.byl-notice--compact.byl-notice--error{
+  --byl-note-accent:#b6293f;
+  --byl-note-soft:#fdf3f4;
+}
+.byl-notice.byl-notice--compact.byl-notice--warning{
+  --byl-note-accent:#9b3749;
+  --byl-note-soft:#fbf5f6;
+}
+.byl-notice.byl-notice--compact.byl-notice--info{
+  --byl-note-accent:#55545a;
+  --byl-note-soft:#f6f5f5;
+}
+.byl-notice.byl-notice--compact .byl-notice__icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 16px;
+  width:16px;
+  height:16px;
+  margin:0;
+  border-radius:50%;
+  background:var(--byl-note-accent);
+  color:#fff;
+  font-size:10px;
+  line-height:1;
+}
+.byl-notice.byl-notice--compact .byl-notice__body{
+  flex:1 1 auto;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.byl-notice.byl-notice--compact .byl-notice__body strong{
+  display:inline;
+  font-size:12px;
+  font-weight:700;
+  line-height:inherit;
+  color:var(--byl-note-accent);
+}
+.byl-notice.byl-notice--compact .byl-notice__body p{
+  display:inline;
+  margin:0;
+  color:#292429;
+  font-size:13px;
+  line-height:inherit;
+  overflow-wrap:anywhere;
+}
+.byl-notice.byl-notice--compact .byl-notice__body p::before{
+  content:" ";
+  white-space:pre;
+}
+.byl-notice.byl-notice--compact .byl-notice__type{
+  display:none;
+}
+.byl-notice.byl-notice--compact .byl-notice__action{
+  align-self:center;
+  flex:none;
+  min-height:44px;
+  padding:7px 10px;
+  border-radius:6px;
+  font-size:11px;
+  line-height:1.3;
+}
+@media(min-width:768px){
+  .byl-notice.byl-notice--compact{
+    padding:8px 12px;
+    line-height:1.42;
+    margin-bottom:10px;
+  }
+}
+@media(max-width:450px){
+  .byl-notice.byl-notice--compact{
+    padding:7px 10px;
+    gap:8px;
+  }
+  .byl-notice.byl-notice--compact .byl-notice__action{
+    padding:7px 9px;
+  }
+}
