@@ -1,0 +1,98 @@
+/* Legacy Shoptimizer Order Pay Address V1 — only for the payment of an existing order.
+ * Does not restyle the normal Checkout, Thank You, Cart or payment gateways.
+ * The authorized address section is emitted by the PHP after Woo's security gate.
+ */
+body.woocommerce-order-pay .entry-content .woocommerce > .byl-www-orderpay-address {
+    box-sizing: border-box;
+    float: left;
+    width: 56%;
+    min-width: 0;
+    margin: 20px 0 28px;
+    padding: 23px 22px;
+    border: 1px solid #e8e3e4;
+    border-radius: 14px;
+    background: #fff;
+    color: #181818;
+    box-shadow: 0 2px 10px rgba(0,0,0,.025);
+}
+body.woocommerce-order-pay .entry-content .woocommerce > .byl-www-orderpay-address * { box-sizing: border-box; }
+body.woocommerce-order-pay .byl-www-orderpay-address__heading { margin-bottom: 18px; }
+body.woocommerce-order-pay .byl-www-orderpay-address__eyebrow {
+    display: block; font-size: 11px; font-weight: 650; letter-spacing: .075em;
+    text-transform: uppercase; color: #9c3749; margin-bottom: 7px;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__heading h2 {
+    font-size: 23px; font-weight: 650; line-height: 1.25;
+    margin: 0 0 8px; color: #181818;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__heading p {
+    margin: 0; font-size: 13px; color: #5b5b5b; line-height: 1.6;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__group {
+    border-top: 1px solid #eee7e8; padding: 17px 0;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__group h3 {
+    font-size: 14px; font-weight: 650; line-height: 1.4; margin: 0 0 9px;
+    color: #181818;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__group address {
+    font-style: normal; font-size: 13px; line-height: 1.75;
+    color: #181818; overflow-wrap: anywhere;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__detail {
+    margin: 9px 0 0; font-size: 12px; line-height: 1.6;
+    color: #181818; overflow-wrap: anywhere;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__detail strong { color: #616161; margin-right: 7px; }
+body.woocommerce-order-pay .byl-www-orderpay-address__missing {
+    font-size: 12px; line-height: 1.6; color: #555; margin: 0;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__footer {
+    margin: 0; padding-top: 16px; border-top: 1px solid #eee7e8;
+    font-size: 12px; line-height: 1.7; color: #626262;
+}
+body.woocommerce-order-pay .byl-www-orderpay-address__footer a {
+    color: #9c3749; text-decoration: underline; text-underline-offset: 3px;
+    display: inline-block;
+}
+/* Existing Shoptimizer form remains Woo-owned; only correct grid placement.
+ * :has() scopes the grid to authorized orders that actually rendered the panel.
+ * Older browsers use the floated-card fallback above.
+ */
+@supports selector(:has(> section)) {
+    body.woocommerce-order-pay .entry-content .woocommerce:has(> .byl-www-orderpay-address) {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, .95fr);
+        gap: 22px 24px;
+        align-items: start;
+    }
+    body.woocommerce-order-pay .entry-content .woocommerce:has(> .byl-www-orderpay-address) > :not(.byl-www-orderpay-address):not(form#order_review) {
+        grid-column: 1 / -1;
+    }
+    body.woocommerce-order-pay .entry-content .woocommerce:has(> .byl-www-orderpay-address) > .byl-www-orderpay-address {
+        grid-column: 1; float: none; width: 100%; margin: 0;
+    }
+    body.woocommerce-order-pay .entry-content .woocommerce:has(> .byl-www-orderpay-address) > form#order_review {
+        grid-column: 2; float: none !important; width: 100% !important;
+        min-width: 0; margin: 0 !important;
+    }
+}
+@media (max-width: 800px) {
+    body.woocommerce-order-pay .entry-content .woocommerce > .byl-www-orderpay-address {
+        float: none; clear: both; width: 100%; margin: 14px 0;
+        padding: 18px 17px;
+    }
+    body.woocommerce-order-pay .entry-content .woocommerce > form#order_review {
+        float: none !important; clear: both; width: 100% !important; max-width: none !important;
+    }
+    @supports selector(:has(> section)) {
+        body.woocommerce-order-pay .entry-content .woocommerce:has(> .byl-www-orderpay-address) {
+            grid-template-columns: minmax(0,1fr); gap: 14px;
+        }
+        body.woocommerce-order-pay .entry-content .woocommerce:has(> .byl-www-orderpay-address) > .byl-www-orderpay-address,
+        body.woocommerce-order-pay .entry-content .woocommerce:has(> .byl-www-orderpay-address) > form#order_review {
+            grid-column: 1;
+        }
+    }
+    body.woocommerce-order-pay .byl-www-orderpay-address__heading h2 {font-size: 20px;}
+}
