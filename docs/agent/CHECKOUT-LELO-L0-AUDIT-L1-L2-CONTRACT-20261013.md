@@ -1,6 +1,17 @@
 # Checkout LELO Visual Upgrade — L0 Findings / L1 Candidate / L2 Interaction Contract
 
-> 2026-10-13 · Issue [#89](https://github.com/beyourlovercom/beyourlover-web-v3/issues/89) · **DESIGN CANDIDATE ONLY — Owner Visual PASS pending**
+## OWNER CHANGE REQUEST — 2026-10-13 — supersedes all proposed four-step Checkout design requirements below
+
+> **FIRST L1 MOCK = OWNER VISUAL FAIL. NO OWNER DESIGN APPROVAL. DO NOT IMPLEMENT OR DEPLOY.**
+> **NEW REQUIRED CUSTOMER JOURNEY = Cart → Shipping → Payments (THREE visible steps total).**
+> Step 1 `Cart` is the existing **Cart Drawer**, not an added Checkout pane. Keep `/cart/` fallback.
+> Step 2 `Shipping` is the first Checkout page stage and **combines address with delivery/shipping selection**.
+> Step 3 `Payments` **combines native Woo payment with final order review/confirmation**; there is NO separate visible Delivery or Review step.
+> Owner must first review a **single continuous Cart Drawer → Checkout** design preview at PC1440 / M390 / M320, with consistent BYL tokens, CTA, copy and summary. Obtain Owner Visual PASS **before final L2 contract, L3 implementation, Dev deploy or merging docs as design signoff**.
+> The legacy four-stage Apple Checkout is **existing runtime evidence only**, not an approved design target. Woo shipping calculations, legal consent, order review and G5 3DS/payment security remain authoritative behind the simplified UI. A Checkout Drawer is not approved; `/checkout/` remains primary Checkout surface unless Owner separately changes the architecture.
+> See [Issue #89](https://github.com/beyourlovercom/beyourlover-web-v3/issues/89) for current acceptance gates; Issue #87 remains HOLD.
+
+> 2026-10-13 · Issue [#89](https://github.com/beyourlovercom/beyourlover-web-v3/issues/89) · **L1 ORIGINAL DESIGN REJECTED — Owner Visual FAIL**
 > This is a design and source audit, not a checkout/payment patch and not a Dev/WWW deployment.
 
 ## 0. L0 read-only source inventory
