@@ -14,12 +14,12 @@ MAX_ZIP_BYTES=1048576
 read -r -a argv <<< "${SSH_ORIGINAL_COMMAND:-}"
 [[ "${#argv[@]}" -eq 6 && "${argv[0]}" == "apply-cart-m72" ]] ||
   { echo "SSH_COMMAND_DENIED" >&2; exit 4; }
-for i in 1 2 3 4 5; do
+[[ "${argv[1]}" =~ ^[a-f0-9]{40}$ ]] ||
+  { echo "SSH_COMMIT_DENIED" >&2; exit 4; }
+for i in 2 3 4 5; do
   [[ "${argv[$i]}" =~ ^[a-f0-9]{64}$ ]] ||
     { echo "SSH_ARGUMENT_DENIED" >&2; exit 4; }
 done
-[[ "${argv[1]}" =~ ^[a-f0-9]{40}$ ]] ||
-  { echo "SSH_COMMIT_DENIED" >&2; exit 4; }
 [[ -f "$ENTRY" && ! -L "$ENTRY" && -r "$ENTRY" ]] ||
   { echo "SIGNED_APPLY_SCRIPT_MISSING" >&2; exit 4; }
 [[ -d "$BASE" ]] || { echo "DEV_ROOT_MISSING" >&2; exit 4; }
