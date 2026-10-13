@@ -75,6 +75,23 @@ function pause(ms){return new Promise(r=>setTimeout(r,ms))}
        if(ready.result?.value===true)break;
      }catch(e){if(attempt===29)console.error('READY_WAIT',e.message)}
    }
+   // Match the candidate PHP DOM on an isolated browser only.
+   // Dev still runs the old PHP structure until the guarded deployment.
+   const restructure=`(()=>{const scroll=document.querySelector('.byl-drawer__scroll');
+     const header=document.querySelector('.byl-drawer__header');
+     const footer=document.querySelector('.byl-drawer__footer');
+     const terms=footer?.querySelector('.byl-drawer__terms');
+     const logos=footer?.querySelector('.byl-drawer__payment-methods');
+     if(!scroll||!header||!footer||!terms||!logos)throw Error('BASELINE_COMPONENT_MISSING');
+     scroll.prepend(header);
+     const legal=document.createElement('section');
+     legal.className='byl-drawer__legal-payment';
+     legal.setAttribute('data-drawer-legal-payment','');
+     legal.setAttribute('aria-label','Purchase terms and payment options');
+     legal.append(terms,logos);scroll.appendChild(legal);
+     return true;})()`;
+   const dom=(await call('Runtime.evaluate',{expression:restructure,returnByValue:true},sessionId)).result;
+   if(dom?.value!==true)throw Error('Cannot simulate updated Cart DOM');
    // Apply exact current candidate CSS to real Dev DOM, without writing to
    // WWW/Dev, so layout UAT is independent of the deployment gate.
    const css=fs.readFileSync(path.join(__dirname,'../theme/beyourlover-v3/assets/css/cart-drawer.css'),'utf8');
