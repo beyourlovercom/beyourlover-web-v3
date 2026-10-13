@@ -124,5 +124,13 @@ jobs:
         run: php -l theme/beyourlover-v3/notification-preview-v1.php && node --check theme/beyourlover-v3/assets/js/notification.js && node --check theme/beyourlover-v3/assets/js/notification-preview.js && node --check theme/beyourlover-v3/assets/js/notification-surfaces.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js
       - name: Compact Persistent Notice V1 scoped CSS and source-only safety
         run: node scripts/test_compact_persistent_notice_v1.js
+      - name: Compact Persistent Notice C1 Cart guarded visual contract
+        run: php -l theme/beyourlover-v3/inc/notification-compact-cart.php && php -l scripts/test_notification_compact_cart.php && php scripts/test_notification_compact_cart.php && node scripts/test_notification_compact_cart.js
+      - name: Compact Persistent Notice C2 Checkout guarded visual contract
+        run: php -l theme/beyourlover-v3/inc/notification-compact-checkout.php && php -l theme/beyourlover-v3/notification-checkout-c2-preview.php && php -l scripts/test_notification_compact_checkout.php && php scripts/test_notification_compact_checkout.php && node scripts/test_notification_compact_checkout.js
+      - name: Compact Persistent Notice C3 Order Pay guarded visual contract
+        run: php -l theme/beyourlover-v3/inc/notification-compact-orderpay.php && php -l theme/beyourlover-v3/notification-orderpay-c3-preview.php && php -l scripts/test_notification_compact_orderpay.php && php scripts/test_notification_compact_orderpay.php && node scripts/test_notification_compact_orderpay.js
+      - name: Compact Persistent Notice C1-C3 isolation and combined-module regression
+        run: node scripts/test_compact_persistent_c1c3_integrated.js
       - name: N6 isolated Woo Notice and Cart response regression
         run: php -l theme/beyourlover-v3/inc/cart-drawer.php && php -l theme/beyourlover-v3/inc/notification-cart.php && php -l theme/beyourlover-v3/inc/notification-cart-empty.php && node --check theme/beyourlover-v3/assets/js/notification-cart-bridge.js && node scripts/test_notification_cart_n6.js

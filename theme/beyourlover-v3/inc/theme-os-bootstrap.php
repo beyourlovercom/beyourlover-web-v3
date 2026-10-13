@@ -19,3 +19,7 @@ require_once get_stylesheet_directory().'/inc/order-pay-address.php';
 require_once get_stylesheet_directory().'/inc/thank-you.php';
 require_once get_stylesheet_directory().'/inc/cart-experience.php';
 require_once get_stylesheet_directory().'/inc/cart-drawer.php';
+// Compact persistent Woo Notice C1/C2/C3: Dev-only, GET-only explicit opt-in.
+require_once get_stylesheet_directory().'/inc/notification-compact-cart.php';
+require_once get_stylesheet_directory().'/inc/notification-compact-checkout.php';
+require_once get_stylesheet_directory().'/inc/notification-compact-orderpay.php';
