@@ -87,6 +87,8 @@ jobs:
         run: node --check scripts/test_cart_drawer_shipping_address_authority.js && node scripts/test_cart_drawer_shipping_address_authority.js
       - name: Cart linked terms + Checkout Dev consent gate contract
         run: php -l scripts/test_cart_checkout_terms_dev_contract.php && php scripts/test_cart_checkout_terms_dev_contract.php
+      - name: Cart mobile only CTA fixed DOM contract
+        run: node --check scripts/test_cart_only_cta_fixed_dom_contract.js && node scripts/test_cart_only_cta_fixed_dom_contract.js
       - name: Cart to Checkout native handoff contract
         run: node scripts/test_cart_checkout_handoff_c1c4.js
       - name: Cart native Woo shipping-zone parity regression
