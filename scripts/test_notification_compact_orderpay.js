@@ -12,6 +12,16 @@ for(const path of ['inc/notification-compact-orderpay.php','assets/css/notificat
  assert(os.modules.notification.files.includes(path),'Theme OS missing '+path);
 assert(os.modules.notification.kind==='presentation');
 assert(css.includes('body.byl-cpn-orderpay-preview.woocommerce-order-pay'));
+assert(css.includes('width:100%'),'full-width notice contract');
+for(const [,selectors,body] of css.matchAll(/([^{}]+)\{([^{}]+)\}/g)){
+  if(!body.includes('width:16px')||!body.includes('height:16px'))continue;
+  const arms=selectors.split('\n').map(x=>x.trim()).filter(x=>x.startsWith('body.'));
+  assert(arms.length===2,'both native notice arms must be styled');
+  for(const arm of arms){
+    assert(arm.replace(/,$/,'').endsWith('::before'),
+      'icon sizing must never affect the notice container');
+  }
+}
 for(const type of ['.woocommerce-error','.woocommerce-info','.woocommerce-message'])assert(css.includes(type));
 for(const token of ['13px/1.38','padding:7px 10px 7px 34px','width:16px','min-height:44px','overflow-wrap:anywhere'])
  assert(css.includes(token),'Style missing '+token);
