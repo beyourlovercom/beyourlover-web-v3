@@ -19,3 +19,5 @@ require_once get_stylesheet_directory().'/inc/order-pay-address.php';
 require_once get_stylesheet_directory().'/inc/thank-you.php';
 require_once get_stylesheet_directory().'/inc/cart-experience.php';
 require_once get_stylesheet_directory().'/inc/cart-drawer.php';
+// C2 Dev Checkout persistent-notice density, strict GET-only opt-in.
+require_once get_stylesheet_directory().'/inc/notification-compact-checkout.php';

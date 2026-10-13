@@ -91,7 +91,7 @@ assert(css.includes('.byl-toast.is-leaving{transform:translateX(calc(100vw + 24p
 assert(!css.includes('translateX(calc(-100vw'), 'Toast must never slide left on exit');
 assert(html.includes('viewport-fit=cover') && html.includes('nonfunctional mock'));
 assert(manifest.modules.notification && manifest.modules.notification.kind==='presentation');
-assert.equal(manifest.modules.notification.files.length,12);
+assert.equal(manifest.modules.notification.files.length,15);
 for(const p of ['inc/notification-cart.php','inc/notification-cart-empty.php','assets/css/notification-woo-adapter.css','assets/js/notification-cart-bridge.js']) assert(manifest.modules.notification.files.includes(p), 'N6 integration module file missing: '+p);
 const n5php = fs.readFileSync(path.join(root, 'theme/beyourlover-v3/notification-preview-v1.php'), 'utf8');
 const n5js = fs.readFileSync(path.join(root, 'theme/beyourlover-v3/assets/js/notification-preview.js'), 'utf8');

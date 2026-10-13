@@ -124,5 +124,7 @@ jobs:
         run: php -l theme/beyourlover-v3/notification-preview-v1.php && node --check theme/beyourlover-v3/assets/js/notification.js && node --check theme/beyourlover-v3/assets/js/notification-preview.js && node --check theme/beyourlover-v3/assets/js/notification-surfaces.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js
       - name: Compact Persistent Notice V1 scoped CSS and source-only safety
         run: node scripts/test_compact_persistent_notice_v1.js
+      - name: Compact Persistent Notice C2 Checkout Dev-only visual contract
+        run: php -l theme/beyourlover-v3/inc/notification-compact-checkout.php && php -l scripts/test_notification_compact_checkout.php && php -l theme/beyourlover-v3/notification-checkout-c2-preview.php && php scripts/test_notification_compact_checkout.php && node scripts/test_notification_compact_checkout.js
       - name: N6 isolated Woo Notice and Cart response regression
         run: php -l theme/beyourlover-v3/inc/cart-drawer.php && php -l theme/beyourlover-v3/inc/notification-cart.php && php -l theme/beyourlover-v3/inc/notification-cart-empty.php && node --check theme/beyourlover-v3/assets/js/notification-cart-bridge.js && node scripts/test_notification_cart_n6.js
