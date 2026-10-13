@@ -23,3 +23,12 @@ for(const forbidden of ['wc_add_notice','wc_print_notice','wp_insert_post','wp_r
  assert(!php.includes(forbidden),'business mutation '+forbidden);
 assert(workflow.includes('scripts/test_notification_compact_checkout.php'));
 console.log('CPN_C2_CHECKOUT_VISUAL_CONTRACT_PASS');
+
+const visual=get('theme/beyourlover-v3/notification-checkout-c2-preview.php');
+for(const token of ["byl_checkout_c2_visual","REQUEST_METHOD","dev.beyourlover.com",
+  "Content-Security-Policy","connect-src \\'none\\'","byl-cpn-checkout-preview",
+  "notification-compact-checkout.css",'data-view="compact"','data-view="original"'])
+ assert(visual.includes(token),'C2 isolated visual fixture safeguard missing: '+token);
+for(const forbidden of ['wp-load.php','require_once get_stylesheet_directory','WC()->',
+  'wc_add_notice','wp_enqueue_scripts','XMLHttpRequest','fetch(','<form'])
+ assert(!visual.includes(forbidden),'C2 visual fixture unsafe: '+forbidden);
