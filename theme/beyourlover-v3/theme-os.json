@@ -215,6 +215,8 @@
         "assets/js/notification-preview.js",
         "assets/css/notification-surfaces.css",
         "assets/css/notification-persistent-compact.css",
+        "assets/css/notification-compact-cart.css",
+        "inc/notification-compact-cart.php",
         "assets/js/notification-surfaces.js",
         "inc/notification-cart.php",
         "inc/notification-cart-empty.php",

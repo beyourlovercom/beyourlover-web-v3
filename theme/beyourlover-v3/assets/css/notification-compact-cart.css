@@ -1,0 +1,41 @@
+/* Compact Persistent Notice C1: Dev-only Cart opt-in. Woo content unchanged. */
+body.byl-cpn-cart-preview .byl-cart-runtime .woocommerce-notices-wrapper > :is(.woocommerce-message,.woocommerce-info,.woocommerce-error),
+body.byl-cpn-cart-preview .byl-cart-runtime .woocommerce > :is(.woocommerce-message,.woocommerce-info,.woocommerce-error){
+  --cpn-accent:#55545a;--cpn-bg:#f6f5f5;
+  position:relative;display:block;box-sizing:border-box;min-width:0;min-height:0;
+  padding:7px 10px 7px 34px!important;padding-inline-start:34px!important;
+  margin:0 0 8px!important;border:0!important;
+  border-inline-start:3px solid var(--cpn-accent)!important;border-radius:6px!important;
+  background:var(--cpn-bg)!important;color:#161316!important;
+  font:400 13px/1.38 var(--byl-font,Arial,sans-serif)!important;
+  box-shadow:none!important;overflow-wrap:anywhere;
+}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > .woocommerce-message{
+  --cpn-accent:#216349;--cpn-bg:#f2f8f4;
+}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > .woocommerce-info{
+  --cpn-accent:#55545a;--cpn-bg:#f6f5f5;
+}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > .woocommerce-error{
+  --cpn-accent:#b6293f;--cpn-bg:#fdf3f4;
+}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > :is(.woocommerce-message,.woocommerce-info,.woocommerce-error)::before{
+  content:'i';position:absolute;inset-inline-start:9px;inset-inline-end:auto;top:7px;
+  width:16px;height:16px;display:grid;place-items:center;margin:0;border-radius:50%;
+  background:var(--cpn-accent);color:white;font:700 10px/1 Arial,sans-serif;
+}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > .woocommerce-message::before{content:'✓'}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > .woocommerce-error::before{content:'!'}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > .woocommerce-error li{
+  margin:0 0 2px;padding:0;overflow-wrap:anywhere;
+}
+body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > :is(.woocommerce-message,.woocommerce-info,.woocommerce-error) .button{
+  display:inline-flex;align-items:center;min-height:44px;padding:6px 10px;
+  border-radius:6px;text-decoration:underline;
+}
+@media(min-width:768px){
+  body.byl-cpn-cart-preview .byl-cart-runtime :is(.woocommerce-notices-wrapper,.woocommerce) > :is(.woocommerce-message,.woocommerce-info,.woocommerce-error){
+    padding:8px 12px 8px 36px!important;padding-inline-start:36px!important;
+    margin-bottom:10px!important;line-height:1.42!important;
+  }
+}
