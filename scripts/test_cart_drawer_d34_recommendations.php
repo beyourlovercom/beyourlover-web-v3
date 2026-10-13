@@ -6,7 +6,8 @@ define('DAY_IN_SECONDS', 86400);
 $GLOBALS['hooks'] = [];
 $GLOBALS['products'] = [];
 function add_action($hook,$callback,$priority=10): void { $GLOBALS['hooks'][$hook][] = $callback; }
-function home_url($path='/'): string { return 'https://dev.beyourlover.com'.$path; }
+function home_url($path='/'): string { return 'https://'.($GLOBALS['test_host']??'dev.beyourlover.com').$path; }
+function wp_get_environment_type(): string { return (string)($GLOBALS['test_environment']??'staging'); }
 function wp_parse_url($url,$part) { return parse_url($url,$part); }
 function wp_unslash($str) { return stripslashes($str); }
 function wp_date($format,$time): string { return gmdate($format,$time); }
@@ -69,6 +70,14 @@ check(str_contains($wpdb->sql,'SUM(item.product_qty)') && str_contains($wpdb->sq
    'Woo paid order lookup only and rolling 30 day query');
 check(!str_contains(strtolower($wpdb->sql),'update ') && !str_contains(strtolower($wpdb->sql),'insert '),'sales lookup read-only');
 check(abs(strtotime($wpdb->cutoff)-(time()-30*86400))<3,'rolling exactly 30 days');
+// Fail closed on WWW or on a Dev host misconfigured as production.
+$GLOBALS['test_host']='www.beyourlover.com';
+check(!byl_v3_cart_drawer_runtime_enabled(),'WWW Drawer stays disabled');
+$GLOBALS['test_host']='dev.beyourlover.com';
+$GLOBALS['test_environment']='production';
+check(!byl_v3_cart_drawer_runtime_enabled(),'non-staging Dev Drawer stays disabled');
+$GLOBALS['test_environment']='staging';
+check(byl_v3_cart_drawer_runtime_enabled(),'staging Dev Drawer runtime enabled');
 $GLOBALS['product_page']=true;$GLOBALS['product_id']=20;
 $GLOBALS['cookie_writes']=[];
 foreach($GLOBALS['hooks']['template_redirect'] as $hook){$hook();}
@@ -80,5 +89,5 @@ check(count($GLOBALS['cookie_writes'])===1,'native Woo active widget avoids dupl
 $GLOBALS['product_page']=false;
 $_GET['byl_cart_drawer_preview']='1';
 foreach($GLOBALS['hooks']['template_redirect'] as $hook){$hook();}
-check(($GLOBALS['nocache_calls']??0)===1,'personalized preview sends no-cache headers');
+check(($GLOBALS['nocache_calls']??0)===3,'all staging Dev pages with personalized Drawer send no-cache headers');
 echo "PASS D3.4 recent viewed 3, rolling 30-day Woo paid units, valid variable links, Dev-only session tracker and privacy/cache gates\n";
