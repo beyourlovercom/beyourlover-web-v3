@@ -63,7 +63,7 @@ class RestrictedDevKeyContract(unittest.TestCase):
             base=root/"dev"
             base.mkdir()
             entry=root/"apply.sh"
-            entry.write_text("#!/usr/bin/env bash\\nexit 0\\n",encoding="utf-8")
+            entry.write_text("#!/usr/bin/env bash\nexit 0\n",encoding="utf-8")
             entry.chmod(0o700)
             approval=root/"approved.txt"
             mocked=(SCRIPT
@@ -87,7 +87,7 @@ class RestrictedDevKeyContract(unittest.TestCase):
                                       capture_output=True,timeout=10)
             def approved(c,expiry):
                 approval.write_text("BYL-CART-M72-V1 "+
-                    " ".join([c,z,hp,hc,hj,str(expiry)])+"\\n",encoding="utf-8")
+                    " ".join([c,z,hp,hc,hj,str(expiry)])+"\n",encoding="utf-8")
                 approval.chmod(0o600)
             self.assertIn(b"ADMIN_APPROVAL_MISSING",invoke().stderr)
             approved("f"*40,int(time.time())+600)
