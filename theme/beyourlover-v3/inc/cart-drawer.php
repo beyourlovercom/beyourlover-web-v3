@@ -209,6 +209,7 @@ add_action('wp_footer', static function (): void {
           </div>
         </aside>
         <div class="byl-drawer__cart">
+          <div class="byl-drawer__scroll" data-drawer-scroll>
           <header class="byl-drawer__header">
             <h2 id="byl-drawer-title">Your Cart <span data-drawer-count></span></h2>
             <button class="byl-drawer__close" data-drawer-close type="button" aria-label="Close shopping cart">×</button>
@@ -233,7 +234,6 @@ add_action('wp_footer', static function (): void {
               </span>
             </nav>
           </header>
-          <div class="byl-drawer__scroll" data-drawer-scroll>
             <div class="byl-drawer__preview-label">Dev design preview · gift offers are not active</div>
             <div class="byl-drawer__feedback" data-drawer-feedback role="status" aria-live="polite"></div>
             <div class="byl-drawer__delivery" data-drawer-delivery hidden></div>
@@ -263,10 +263,7 @@ add_action('wp_footer', static function (): void {
               <div data-drawer-active-coupons></div>
             </section>
             <div class="byl-drawer__totals" data-drawer-totals hidden></div>
-          </div>
-          <footer class="byl-drawer__footer" data-drawer-footer hidden>
-            <div class="byl-drawer__total"><strong>Order total</strong><strong data-drawer-footer-total></strong></div>
-            <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/')); ?>" data-drawer-checkout>SECURE CHECKOUT →</a>
+            <section class="byl-drawer__legal-payment" data-drawer-legal-payment aria-label="Purchase terms and payment options" hidden>
             <?php
             $byl_terms_url = function_exists('wc_get_page_permalink')
                 ? (string) wc_get_page_permalink('terms') : '';
@@ -290,6 +287,11 @@ add_action('wp_footer', static function (): void {
                 <?php endif; ?>
               <?php endforeach; ?>
             </div>
+            </section>
+          </div>
+          <footer class="byl-drawer__footer" data-drawer-footer hidden>
+            <div class="byl-drawer__total"><strong>Order total</strong><strong data-drawer-footer-total></strong></div>
+            <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/')); ?>" data-drawer-checkout>SECURE CHECKOUT →</a>
           </footer>
         </div>
       </section>
