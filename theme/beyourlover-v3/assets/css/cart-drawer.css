@@ -126,3 +126,64 @@ html.byl-drawer-open{overflow:hidden}
  .byl-drawer__rec-add{min-width:74px;padding:10px 4px}
 }
 @media(prefers-reduced-motion:reduce){.byl-drawer__panel{animation:none}}
+
+/* M5: isolated read-only free-shipping threshold visual, strictly OFF by default. */
+.byl-drawer__m5-progress[hidden]{display:none!important}
+.byl-drawer__m5-progress{margin:0 0 15px;padding:12px 14px;border:1px solid #c7e3d6;border-radius:8px;background:#f1faf6;color:#174d36;min-width:0}
+.byl-drawer__m5-progress strong{display:block;font-size:12px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+.byl-drawer__m5-track{height:6px;border-radius:999px;background:#d5e9de;overflow:hidden;margin-top:11px}
+.byl-drawer__m5-track span{display:block;height:100%;background:#006241;border-radius:inherit}
+@media(max-width:900px){.byl-drawer__m5-progress{margin:0 0 12px;padding:12px 13px}}
+
+/* M7.2: exactly ONE mobile viewport-fixed element — the CTA itself. */
+.byl-drawer__charges-notice{margin:0 0 13px;padding:10px 12px;border-left:3px solid #ce7757;border-radius:3px;background:#fff6f2;color:#2b2727;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.byl-drawer__scroll>.byl-drawer__header{margin:-13px -23px 14px}
+.byl-drawer__legal-payment{margin:0 0 16px;padding:14px 0 20px;border-top:1px solid var(--byl-drawer-line);text-align:center}
+.byl-drawer__legal-payment .byl-drawer__terms{display:block;margin:0 auto 11px;color:#302b2f;font-size:10px;line-height:1.5;max-width:470px}
+.byl-drawer__terms a{color:#702844!important;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.byl-drawer__legal-payment .byl-drawer__payment-methods{display:flex;flex-wrap:nowrap;align-items:center;justify-content:center;gap:9px;min-height:24px;max-width:100%;overflow:hidden}
+.byl-drawer__payment-methods img{display:block;max-width:52px;width:auto;height:24px;object-fit:contain;flex:0 1 auto}
+@media(max-width:900px){
+ .byl-drawer__panel{width:100vw;max-width:none;height:100dvh;max-height:100dvh;overflow:hidden}
+ .byl-drawer__cart{height:100%;min-height:0;min-width:0;display:flex;flex-direction:column;overflow:hidden;overscroll-behavior:none}
+ .byl-drawer__scroll{
+   flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+   overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
+   padding:13px 17px 24px;scrollbar-width:thin
+ }
+ .byl-drawer__scroll>.byl-drawer__header{
+   margin:-13px -17px 0;padding:19px 18px 0;
+   position:relative;flex:none;background:#fff
+ }
+ .byl-drawer__steps{position:static;height:74px;gap:0}
+ .byl-drawer__charges-notice{font-size:11px;padding:9px 11px}
+ .byl-drawer__legal-payment{margin:12px 0 0;padding:12px 0 20px}
+ .byl-drawer__legal-payment .byl-drawer__terms{
+   display:block;margin:0 0 9px;font-size:9px;line-height:1.45;color:#302b2f
+ }
+ .byl-drawer__legal-payment .byl-drawer__payment-methods{
+   display:flex;gap:7px;min-height:21px;margin:0 0 8px
+ }
+ .byl-drawer__payment-methods img{max-width:43px;height:21px}
+ /* No header, terms or card icons may appear in this fixed CTA container. */
+ .byl-drawer__footer{
+   position:relative;bottom:auto;flex:0 0 auto;z-index:3;
+   margin:0;padding:10px 17px max(10px,env(safe-area-inset-bottom));
+   background:#fff;box-shadow:0 -5px 16px rgba(30,20,25,.09);
+   border-top:1px solid var(--byl-drawer-line);
+   overflow:visible;max-height:none;pointer-events:auto;opacity:1
+ }
+ .byl-drawer__footer .byl-drawer__total{display:none}
+ .byl-drawer__footer a[data-drawer-checkout]{
+   display:block;min-height:44px;line-height:1.3;padding:12px 10px;
+   box-shadow:none;pointer-events:auto
+ }
+ /* Avoid obscuring the coupon text field behind a phone keyboard. */
+ .byl-drawer__cart:has(.byl-drawer__coupon input:focus) .byl-drawer__footer{
+   visibility:hidden;max-height:0;padding:0;border:0;box-shadow:none;
+   overflow:hidden;opacity:0;pointer-events:none
+ }
+}
+@supports not (height:100dvh){
+ @media(max-width:900px){.byl-drawer__panel{height:100vh;max-height:100vh}}
+}

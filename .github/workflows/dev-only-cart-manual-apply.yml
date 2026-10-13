@@ -1,0 +1,177 @@
+name: BYL Dev-only Cart Deploy — manual protected gate
+
+# This workflow does NOT run on PR or push. Dispatch exists on default branch
+# only after separate Owner-approved merge of the Foundation code.
+on:
+  workflow_dispatch:
+    inputs:
+      exact_sha:
+        description: 'Full, exact 40-char Cart PR #80 HEAD SHA'
+        required: true
+        type: string
+      profile:
+        description: 'Locked deploy profile'
+        required: true
+        type: choice
+        options:
+          - cart-m7.2
+      mode:
+        description: 'plan means NO writes; apply additionally needs protected env and owner code'
+        required: true
+        default: plan
+        type: choice
+        options:
+          - plan
+          - apply
+      owner_confirmation:
+        description: 'For apply type exactly APPROVED-DEV-ONLY-3-FILES'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: read
+
+concurrency:
+  group: byl-dev-only-cart-single-deploy
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: Verify Cart PR exact SHA & prepare offline-only plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      approved_sha: ${{ steps.source.outputs.approved_sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: gate
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.exact_sha }}
+          path: candidate
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify intended Cart #80 and exact successful Foundation CI
+        id: source
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXACT_SHA: ${{ inputs.exact_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EXACT_SHA" =~ ^[a-f0-9]{40}$ ]] || exit 2
+          test "$(git -C candidate rev-parse HEAD)" = "$EXACT_SHA"
+          PR_HEAD="$(gh api "repos/$GITHUB_REPOSITORY/pulls/80" --jq '.head.sha')"
+          test "$PR_HEAD" = "$EXACT_SHA"
+          PR_BASE="$(gh api "repos/$GITHUB_REPOSITORY/pulls/80" --jq '.base.ref')"
+          test "$PR_BASE" = main
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$EXACT_SHA&event=pull_request&per_page=100" > "$RUNNER_TEMP/runs.json"
+          python - "$RUNNER_TEMP/runs.json" "$EXACT_SHA" <<'PY'
+          import json,sys
+          raw=json.load(open(sys.argv[1],encoding="utf-8"))
+          sha=sys.argv[2]
+          successes=[r for r in raw.get("workflow_runs",[]) if
+            r.get("head_sha")==sha and r.get("name")=="Foundation CI" and
+            r.get("conclusion")=="success"]
+          if not successes: raise SystemExit("NO_EXACT_SHA_GREEN_FOUNDATION_CI: fail closed")
+          print("EXACT_SHA_FOUNDATION_CI=SUCCESS")
+          PY
+          echo "approved_sha=$EXACT_SHA" >> "$GITHUB_OUTPUT"
+      - name: Test candidate gate and build evidence, no remote writes
+        shell: bash
+        env:
+          SHA: ${{ steps.source.outputs.approved_sha }}
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s gate/tools/dev -p test_deploy_gate.py -v
+          python gate/tools/dev/deploy_gate.py build \
+            --repo candidate --exact-sha "$SHA" --out "$RUNNER_TEMP/cart-candidate"
+          python gate/tools/dev/deploy_gate.py verify \
+            --zip "$RUNNER_TEMP/cart-candidate/cart-m7.2-dev-only-candidate.zip" \
+            --receipt "$RUNNER_TEMP/cart-candidate/cart-m7.2-dev-only-candidate.receipt.json"
+          echo "CANDIDATE_ONLY=PASS; REMOTE_WRITE=NONE"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cart-m72-manually-reviewed-candidate-no-deploy
+          path: ${{ runner.temp }}/cart-candidate
+          retention-days: 3
+
+  apply:
+    name: Protected three-file Dev-only apply — disabled by default
+    needs: plan
+    # Job-level repository var is absent/false by default. Enable only after
+    # configuring the protected environment, reviewer and dedicated credentials.
+    if: >-
+      ${{ inputs.mode == 'apply'
+        && inputs.owner_confirmation == 'APPROVED-DEV-ONLY-3-FILES'
+        && vars.BYL_DEV_DEPLOY_ENABLED == 'true'
+        && needs.plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: byl-dev-protected
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.approved_sha }}
+          path: candidate
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Reverify and rebuild exact pinned file bytes
+        env:
+          SHA: ${{ needs.plan.outputs.approved_sha }}
+        run: |
+          set -euo pipefail
+          python tools/dev/deploy_gate.py build \
+            --repo candidate --exact-sha "$SHA" --out "$RUNNER_TEMP/apply-candidate"
+      - name: Use dedicated reviewed Hostinger credentials; apply on DEV only
+        shell: bash
+        env:
+          SHA: ${{ needs.plan.outputs.approved_sha }}
+          DEV_HOST: ${{ secrets.BYL_DEV_SSH_HOST }}
+          DEV_USER: ${{ secrets.BYL_DEV_SSH_USER }}
+          DEV_PRIVATE_KEY: ${{ secrets.BYL_DEV_SSH_PRIVATE_KEY }}
+          DEV_KNOWN_HOSTS: ${{ secrets.BYL_DEV_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          test -n "$SHA" && test -n "$DEV_HOST" && test -n "$DEV_USER"
+          test -n "$DEV_PRIVATE_KEY" && test -n "$DEV_KNOWN_HOSTS"
+          [[ "$DEV_HOST" =~ ^[a-zA-Z0-9.-]+$ && "$DEV_USER" =~ ^[a-zA-Z0-9._-]+$ ]]
+          SSH_KEY="$RUNNER_TEMP/byl-dev-key"
+          KNOWN="$RUNNER_TEMP/byl-dev-knownhosts"
+          trap 'rm -f "$SSH_KEY" "$KNOWN"' EXIT
+          (umask 077; printf '%s\n' "$DEV_PRIVATE_KEY" > "$SSH_KEY")
+          (umask 077; printf '%s\n' "$DEV_KNOWN_HOSTS" > "$KNOWN")
+          SSH_OPTS=(-i "$SSH_KEY" -o BatchMode=yes -o ConnectTimeout=12
+            -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$KNOWN")
+          ARCHIVE="$RUNNER_TEMP/apply-candidate/cart-m7.2-dev-only-candidate.zip"
+          RECEIPT="$RUNNER_TEMP/apply-candidate/cart-m7.2-dev-only-candidate.receipt.json"
+          python tools/dev/deploy_gate.py verify --zip "$ARCHIVE" --receipt "$RECEIPT"
+          ZIP_SHA=$(sha256sum "$ARCHIVE" | cut -d' ' -f1)
+          read -r PHP_SHA CSS_SHA JS_SHA < <(python - "$RECEIPT" <<'PY'
+          import json,sys
+          obj=json.load(open(sys.argv[1],encoding="utf-8"))["allowlisted_files"]
+          names=("inc/cart-drawer.php","assets/css/cart-drawer.css","assets/js/cart-drawer.js")
+          print(" ".join(obj[n]["candidate_new_sha256"] for n in names))
+          PY
+          )
+          DEST="/home/u247343654/domains/dev.beyourlover.com/.byl-dev-gate-cart-m7.2-$SHA.zip"
+          scp "${SSH_OPTS[@]}" "$ARCHIVE" "$DEV_USER@$DEV_HOST:$DEST"
+          ssh "${SSH_OPTS[@]}" "$DEV_USER@$DEV_HOST" \
+            "bash -s -- $SHA $ZIP_SHA $PHP_SHA $CSS_SHA $JS_SHA" \
+            < tools/dev/apply_dev_cart_m72.sh
+          echo "APPROVED_DEV_ONLY_REMOTE_APPLY=COMPLETE; WWW=UNTOUCHED"

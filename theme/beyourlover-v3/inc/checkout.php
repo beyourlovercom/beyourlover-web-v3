@@ -41,3 +41,28 @@ add_filter('woocommerce_form_field_args', static function (array $args, string $
     }
     return $args;
 }, 99999, 2);
+
+
+/**
+ * Dev-only Cart Terms handoff UAT. Woo Classic Checkout normally renders a
+ * required checkbox AND validates it on wc-ajax; hiding only the HTML would
+ * cause blocked checkouts. Return no checkbox label in both request contexts.
+ *
+ * The Cart CTA now links directly to the actual Terms page and states the
+ * assent disclosure. Scope strictly to dev.beyourlover.com; production
+ * retains its existing checkout consent behavior until separate review.
+ */
+function byl_v3_dev_checkout_terms_handoff_enabled(): bool {
+    return function_exists('home_url')
+        && (string) wp_parse_url(home_url('/'), PHP_URL_HOST) === 'dev.beyourlover.com';
+}
+
+add_filter('woocommerce_checkout_show_terms', static function ($show) {
+    return byl_v3_dev_checkout_terms_handoff_enabled() ? false : $show;
+}, 20);
+
+add_filter('woocommerce_get_terms_and_conditions_checkbox_text', static function ($text) {
+    // wc_terms_and_conditions_checkbox_enabled() also uses this server-side,
+    // so only when dev opt-in is active can a checkbox-less order be valid.
+    return byl_v3_dev_checkout_terms_handoff_enabled() ? '' : $text;
+}, 20);

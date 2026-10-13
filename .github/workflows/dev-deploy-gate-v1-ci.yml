@@ -1,0 +1,72 @@
+name: Dev Deploy Gate V1 — offline candidate only
+
+on:
+  pull_request:
+    paths:
+      - 'tools/dev/deploy_gate.py'
+      - 'tools/dev/test_deploy_gate.py'
+      - 'tools/dev/apply_dev_cart_m72.sh'
+      - 'tools/dev/test_manual_deploy_contract.py'
+      - '.github/workflows/dev-only-cart-manual-apply.yml'
+      - '.github/workflows/dev-deploy-gate-v1-ci.yml'
+  push:
+    branches:
+      - 'feat/dev-deploy-gate-*'
+    paths:
+      - 'tools/dev/deploy_gate.py'
+      - 'tools/dev/test_deploy_gate.py'
+      - 'tools/dev/apply_dev_cart_m72.sh'
+      - 'tools/dev/test_manual_deploy_contract.py'
+      - '.github/workflows/dev-only-cart-manual-apply.yml'
+      - '.github/workflows/dev-deploy-gate-v1-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dev-gate-offline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline-only:
+    name: Verify reproducible three-file allowlisted Dev candidate — NO DEPLOY
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact source commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+      - name: Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Offline gate regression
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tools/dev -p 'test_*deploy*.py' -v
+          python -m py_compile tools/dev/deploy_gate.py tools/dev/test_manual_deploy_contract.py
+          bash -n tools/dev/apply_dev_cart_m72.sh
+      - name: Build verified no-secret candidate in CI
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHA=$(git rev-parse HEAD)
+          python tools/dev/deploy_gate.py build --exact-sha "$SHA" --out "$RUNNER_TEMP/candidate-a"
+          python tools/dev/deploy_gate.py build --exact-sha "$SHA" --out "$RUNNER_TEMP/candidate-b"
+          sha256sum "$RUNNER_TEMP/candidate-a/cart-m7.2-dev-only-candidate.zip"
+          cmp "$RUNNER_TEMP/candidate-a/cart-m7.2-dev-only-candidate.zip" "$RUNNER_TEMP/candidate-b/cart-m7.2-dev-only-candidate.zip"
+          cmp "$RUNNER_TEMP/candidate-a/cart-m7.2-dev-only-candidate.receipt.json" "$RUNNER_TEMP/candidate-b/cart-m7.2-dev-only-candidate.receipt.json"
+          python tools/dev/deploy_gate.py verify \
+            --zip "$RUNNER_TEMP/candidate-a/cart-m7.2-dev-only-candidate.zip" \
+            --receipt "$RUNNER_TEMP/candidate-a/cart-m7.2-dev-only-candidate.receipt.json"
+      - name: Upload short-lived candidate evidence (not deployed)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cart-dev-only-candidate-not-deployed
+          path: ${{ runner.temp }}/candidate-a
+          retention-days: 3
+          if-no-files-found: error
