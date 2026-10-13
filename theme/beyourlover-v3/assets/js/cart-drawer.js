@@ -218,10 +218,15 @@
       // On checkout Woo re-rates shipping for the actual destination.
       const subtotal = line('Subtotal',cart.totals?.total_items || 0,cart) +
         (Number(cart.totals?.total_discount)>0 ? line('Discount',-Number(cart.totals.total_discount),cart,'is-discount') : '');
-      const chargesNotice = '<p class="byl-drawer__charges-notice" role="note">' +
+      const noticeSettings = config.cartSubtotalNotice || {};
+      const noticeText = typeof noticeSettings.text === 'string' &&
+        noticeSettings.text.trim() !== '' ? noticeSettings.text.trim() :
         'Please check shipping costs, import duties and local taxes for your country or region. ' +
-        'Final charges depend on your delivery address.' +
-        '</p>';
+        'Final charges depend on your delivery address.';
+      // Localized server copy only, escaped to text; never raw HTML.
+      const chargesNotice = noticeSettings.enabled === false ? '' :
+        '<p class="byl-drawer__charges-notice" role="note">' +
+        escape(noticeText) + '</p>';
       const hasShippingValue = cart.totals?.total_shipping !== null &&
         cart.totals?.total_shipping !== undefined && cart.totals?.total_shipping !== '';
       const hasTotalValue = cart.totals?.total_price !== null &&
