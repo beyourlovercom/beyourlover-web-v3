@@ -35,6 +35,21 @@ class RestrictedDevKeyContract(unittest.TestCase):
         self.assertNotIn('eval ',SCRIPT)
         self.assertNotIn('bash -c ',SCRIPT)
 
+    def test_admin_pinned_receipt_is_mandatory_before_upload(self):
+        self.assertIn("approved-cart-m72-v1.txt",SCRIPT)
+        self.assertIn("BYL-CART-M72-V1",SCRIPT)
+        self.assertIn("ADMIN_APPROVAL_MISSING",SCRIPT)
+        self.assertIn("ADMIN_APPROVAL_PERMISSIONS_FAIL",SCRIPT)
+        self.assertIn("ADMIN_APPROVAL_FORMAT_FAIL",SCRIPT)
+        self.assertIn("ADMIN_APPROVAL_MISMATCH",SCRIPT)
+        self.assertIn('"${#approval_lines[@]}" -eq 1',SCRIPT)
+        self.assertIn('"$approved_php" == "${argv[3]}"',SCRIPT)
+        self.assertIn('"$approved_css" == "${argv[4]}"',SCRIPT)
+        self.assertIn('"$approved_js" == "${argv[5]}"',SCRIPT)
+        self.assertLess(SCRIPT.index("ADMIN_APPROVAL_MISMATCH"),
+                        SCRIPT.index('ZIP="$BASE/.byl-dev-gate-cart-m7.2-'),
+                        "approval must precede even creating an upload archive")
+
     def test_reject_scp_and_sftp_subsystem(self):
         for v in ("", "scp -t /tmp/a", "sftp", "sftp-server",
                   "bash -c whoami", "apply-cart-m72"):
