@@ -52,8 +52,11 @@ for(const route of ['checkout','orderpay']){
 }
 const c2=read(base+'notification-checkout-c2-preview.php');
 const c3=read(base+'notification-orderpay-c3-preview.php');
-for(const page of [c2,c3]){
-  assert(page.includes("connect-src 'none'")&&page.includes("form-action 'none'"));
+for(const raw of [c2,c3]){
+  // PHP may encode literal single quotes as backslash-escaped quotes.
+  const page=raw.replaceAll(String.raw`\'`,"'");
+  assert(page.includes("connect-src 'none'")&&page.includes("form-action 'none'"),
+    'visual preview must deny network connections and form submissions');
   assert(!page.includes('wp-load.php')&&!page.includes('<form'),'isolated visuals only');
 }
 assert(c3.includes('You are paying for a guest order. Please continue with payment only if you recognize this order.'));
