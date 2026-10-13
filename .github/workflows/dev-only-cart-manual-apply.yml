@@ -169,9 +169,9 @@ jobs:
           print(" ".join(obj[n]["candidate_new_sha256"] for n in names))
           PY
           )
-          DEST="/home/u247343654/domains/dev.beyourlover.com/.byl-dev-gate-cart-m7.2-$SHA.zip"
-          scp "${SSH_OPTS[@]}" "$ARCHIVE" "$DEV_USER@$DEV_HOST:$DEST"
+          # The restricted SSH key rejects scp/sftp/shell. It only accepts
+          # a single forced-command entrypoint with a ZIP streamed on stdin.
+          # Remote validation, rollback and file writes remain Dev-only.
           ssh "${SSH_OPTS[@]}" "$DEV_USER@$DEV_HOST" \
-            "bash -s -- $SHA $ZIP_SHA $PHP_SHA $CSS_SHA $JS_SHA" \
-            < tools/dev/apply_dev_cart_m72.sh
-          echo "APPROVED_DEV_ONLY_REMOTE_APPLY=COMPLETE; WWW=UNTOUCHED"
+            "apply-cart-m72 $SHA $ZIP_SHA $PHP_SHA $CSS_SHA $JS_SHA" < "$ARCHIVE"
+          echo "APPROVED_DEV_ONLY_RESTRICTED_APPLY=COMPLETE; WWW=UNTOUCHED"
