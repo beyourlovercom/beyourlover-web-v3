@@ -17,7 +17,8 @@
     empty: $('[data-drawer-empty]'), items: $('[data-drawer-items]'),
     couponSection: $('[data-drawer-coupon-section]'), couponForm: $('[data-drawer-coupon-form]'),
     coupons: $('[data-drawer-active-coupons]'), totals: $('[data-drawer-totals]'),
-    footer: $('[data-drawer-footer]'), footerTotal: $('[data-drawer-footer-total]'),
+    footer: $('[data-drawer-footer]'), legal: $('[data-drawer-legal-payment]'),
+    footerTotal: $('[data-drawer-footer-total]'),
     desktopRecs: $('[data-drawer-recommendations]'), mobileRecs: $('[data-drawer-mobile-recs]'),
     checkout: $('[data-drawer-checkout]'),
     marketing: $('[data-drawer-marketing-slots]')
@@ -194,6 +195,7 @@
     elements.items.innerHTML = items.map(item=>renderItem(item,cart)).join('');
     elements.couponSection.hidden = items.length === 0;
     elements.footer.hidden = items.length === 0;
+    if (elements.legal) elements.legal.hidden = items.length === 0;
     elements.totals.hidden = items.length === 0;
     elements.delivery.hidden = items.length === 0;
     renderM5Progress(cart);
