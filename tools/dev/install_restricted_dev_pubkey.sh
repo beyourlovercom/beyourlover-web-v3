@@ -7,9 +7,14 @@ BASE=/home/u247343654
 PUB="$BASE/.byl-dev-gate/byl-dev-m72-id_ed25519.pub"
 ENTRY="$BASE/.byl-dev-gate/forced_dev_cart_m72.sh"
 AUTH="$BASE/.ssh/authorized_keys"
-BACK="$BASE/.byl-dev-gate/authorized_keys-pre-m72-20261013"
+# Backup is unique to the new reviewed public key. Earlier safety canary
+# backups remain untouched; refuse a duplicate key or repeat install.
 [[ -f "$PUB" && ! -L "$PUB" && -f "$ENTRY" && -x "$ENTRY" ]] ||
   { echo "PUBLIC_KEY_OR_ENTRY_MISSING" >&2; exit 2; }
+PUB_DIGEST="$(sha256sum "$PUB" | cut -d' ' -f1)"
+[[ "$PUB_DIGEST" =~ ^[a-f0-9]{64}$ ]] ||
+  { echo "PUBLIC_KEY_DIGEST_FAIL" >&2; exit 2; }
+BACK="$BASE/.byl-dev-gate/authorized_keys-pre-m72-${PUB_DIGEST:0:20}"
 [[ -f "$AUTH" && ! -L "$AUTH" && -w "$AUTH" && ! -e "$BACK" ]] ||
   { echo "AUTHORIZED_KEYS_BASELINE_FAIL" >&2; exit 2; }
 read -r typ key comment < "$PUB"
