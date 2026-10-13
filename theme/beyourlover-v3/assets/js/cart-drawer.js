@@ -386,6 +386,9 @@
     else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
   });
   window.BYL_Cart_Drawer_Preview={open,close,refresh:()=>update('',null)};
-  // Explicit opt-in preview should open automatically. Do not affect ordinary visitors.
-  open();
+  // Ordinary Dev visitors start with a closed Drawer. Only the explicit
+  // Dev visual-preview URL auto-opens; the header cart icon opens on demand.
+  if (new URL(window.location.href).searchParams.get('byl_cart_drawer_preview') === '1') {
+    open();
+  }
 })();

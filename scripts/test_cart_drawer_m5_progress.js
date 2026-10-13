@@ -62,7 +62,8 @@ async function run(name,enabled,server,expected){
   const window={BYLCartDrawerPreview:{giftEnabled:false,marketingEnabled:false,shippingProgressEnabled:enabled,
     cartApi:'https://example.invalid/cart',nonce:'mock',cartUrl:'https://example.invalid/cart/',
     checkoutUrl:'https://example.invalid/checkout/'},
-    location:{href:'https://example.invalid/'},setTimeout,clearTimeout};
+    // This harness tests rendered progress in the explicitly opened Dev preview.
+    location:{href:'https://example.invalid/?byl_cart_drawer_preview=1'},setTimeout,clearTimeout};
   const fetch=async()=>({ok:true,headers:{get:()=>null},json:async()=>server});
   vm.runInNewContext(js,{window,document,fetch,URL,Intl,Math,Number,String,
     Promise,Set,Map,Array,Object,Error,setTimeout,clearTimeout,console});

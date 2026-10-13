@@ -54,7 +54,7 @@ async function run(label,payload,expected){
       text:expected.noticeText||'Please check shipping costs, import duties and local taxes for your country or region. Final charges depend on your delivery address.'
     },
     cartUrl:'https://example.invalid/cart/',checkoutUrl:'https://example.invalid/checkout/'
-  },location:{href:'https://example.invalid/'},setTimeout,clearTimeout};
+  },location:{href:'https://example.invalid/?byl_cart_drawer_preview=1'},setTimeout,clearTimeout};
  const fetch=async()=>({ok:true,headers:{get:()=>null},json:async()=>payload});
  vm.runInNewContext(js,{window,document,fetch,URL,Intl,Number,Math,String,Boolean,
   Promise,Map,Set,Array,Object,Error,setTimeout,clearTimeout,console});
