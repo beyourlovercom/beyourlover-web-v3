@@ -72,6 +72,7 @@ class RestrictedDevKeyContract(unittest.TestCase):
         self.assertIn("BYL_DEV_DEPLOY_ENABLED == 'true'",WORKFLOW)
         self.assertIn("environment: byl-dev-protected",WORKFLOW)
         self.assertIn("StrictHostKeyChecking=yes",WORKFLOW)
+        self.assertIn("SSH_OPTS=(-p 65002",WORKFLOW)
 
     def test_forced_command_install_requires_admin(self):
         # Hostinger site access is provisioned via admin SSH, not this key.
