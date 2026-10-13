@@ -61,4 +61,8 @@ add_action('wp_enqueue_scripts', static function (): void {
         ]);
         wp_script_add_data('byl-v3-checkout', 'strategy', 'defer');
     }
+    // CSS-only Order Pay treatment follows Checkout styles; no gateway changes.
+    if (function_exists('is_checkout_pay_page') && is_checkout_pay_page()) {
+        wp_enqueue_style('byl-v3-order-pay', $uri.'/assets/css/order-pay.css', ['byl-v3-checkout-shell'], $v('assets/css/order-pay.css'));
+    }
 });

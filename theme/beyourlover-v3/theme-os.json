@@ -136,9 +136,11 @@
         "header-checkout.php",
         "footer-checkout.php",
         "inc/checkout.php",
+        "inc/order-pay-address.php",
         "woocommerce/checkout/form-checkout.php",
         "assets/css/checkout.css",
         "assets/css/checkout-shell.css",
+        "assets/css/order-pay.css",
         "assets/js/checkout.js"
       ]
     },

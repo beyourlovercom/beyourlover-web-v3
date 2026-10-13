@@ -26,6 +26,8 @@ class TestThemeOS(unittest.TestCase):
         self.assertEqual(r["version"], "0.1.0")
         self.assertLess(r["module_order"].index("cart"), r["module_order"].index("checkout"))
         self.assertEqual(r["owner_map"]["woocommerce/checkout/form-checkout.php"], "checkout")
+        self.assertEqual(r["owner_map"]["inc/order-pay-address.php"], "checkout")
+        self.assertEqual(r["owner_map"]["assets/css/order-pay.css"], "checkout")
 
     def test_duplicate_registration_rejected(self):
         m = copy.deepcopy(self.manifest)
@@ -99,7 +101,7 @@ class TestThemeOS(unittest.TestCase):
         expected = [
             "inc/components.php", "inc/shell-profiles.php", "inc/homepage.php",
             "inc/archive.php", "inc/product.php", "inc/product-modules.php",
-            "inc/checkout.php", "inc/thank-you.php", "inc/cart-experience.php", "inc/cart-drawer.php",
+            "inc/checkout.php", "inc/order-pay-address.php", "inc/thank-you.php", "inc/cart-experience.php", "inc/cart-drawer.php",
         ]
         self.assertEqual(paths, expected)
         self.assertEqual(loader.count("require_once get_stylesheet_directory()"), len(expected))

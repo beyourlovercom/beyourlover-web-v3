@@ -38,7 +38,8 @@ function is_page($slug): bool {
         || ($GLOBALS['route'] === 'support' && $slug === 'track-your-order');
 }
 function is_cart(): bool { return $GLOBALS['route'] === 'cart'; }
-function is_checkout(): bool { return $GLOBALS['route'] === 'checkout' || $GLOBALS['route'] === 'received'; }
+function is_checkout(): bool { return in_array($GLOBALS['route'], ['checkout', 'orderpay', 'received'], true); }
+function is_checkout_pay_page(): bool { return $GLOBALS['route'] === 'orderpay'; }
 function is_order_received_page(): bool { return $GLOBALS['route'] === 'received'; }
 function check(bool $yes,string $why): void {
     if (!$yes) { fwrite(STDERR, "FAIL: ".$why."\n"); exit(1); }
@@ -57,6 +58,7 @@ $routes = [
     'support'  => [['byl-v3-track-order'],[]],
     'cart'     => [['byl-v3-cart','byl-v3-cart-focus'],['byl-v3-cart-experience','byl-v3-cart']],
     'checkout' => [['byl-v3-checkout','byl-v3-checkout-shell'],['byl-v3-checkout']],
+    'orderpay' => [['byl-v3-checkout','byl-v3-checkout-shell','byl-v3-order-pay'],['byl-v3-checkout']],
     'received' => [[],[]],
 ];
 foreach ($routes as $route=>$pair) {
@@ -77,7 +79,7 @@ foreach ($routes as $route=>$pair) {
     } else {
         check(!isset($GLOBALS['localizations']['byl-v3-cart']), "$route no Cart localization");
     }
-    if ($route === 'checkout') {
+    if ($route === 'checkout' || $route === 'orderpay') {
         check($GLOBALS['scripts']['byl-v3-checkout']['deps'] === ['jquery','wc-checkout'], 'native Checkout dependency');
         $payload = $GLOBALS['localizations']['byl-v3-checkout']['BYLShippingPromotionCheckout'] ?? [];
         check($payload['nonce'] === 'fixed-fixture' && str_contains($payload['cartUrl'],'wc/store/v1/cart'), 'Checkout native Store API');
