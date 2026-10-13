@@ -8,7 +8,7 @@
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {spawn}=require('node:child_process');
 const chrome=process.env.CHROME_EXE||'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const out=path.join(os.tmpdir(),'byl-cart-only-cta-pinned-candidate-20261013');
+const out=path.join(os.tmpdir(),'byl-cart-only-cta-pinned-candidate-r3-20261013');
 if(fs.existsSync(out))throw Error('Refusing to overwrite prior screenshots: '+out);
 fs.mkdirSync(out,{recursive:true});
 const profile=path.join(out,'isolated-profile');
