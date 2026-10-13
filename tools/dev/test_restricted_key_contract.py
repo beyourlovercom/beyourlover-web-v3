@@ -7,6 +7,8 @@ SSH credentials, staging file writes or Woo order/payment calls.
 from pathlib import Path
 import os
 import subprocess
+import tempfile
+import time
 import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -46,9 +48,58 @@ class RestrictedDevKeyContract(unittest.TestCase):
         self.assertIn('"$approved_php" == "${argv[3]}"',SCRIPT)
         self.assertIn('"$approved_css" == "${argv[4]}"',SCRIPT)
         self.assertIn('"$approved_js" == "${argv[5]}"',SCRIPT)
+        self.assertIn('ADMIN_APPROVAL_EXPIRY_INVALID',SCRIPT)
+        self.assertIn('ADMIN_APPROVAL_EXPIRED_OR_TOO_LONG',SCRIPT)
+        self.assertIn('"$((now + 1800))"',SCRIPT)
         self.assertLess(SCRIPT.index("ADMIN_APPROVAL_MISMATCH"),
                         SCRIPT.index('ZIP="$BASE/.byl-dev-gate-cart-m7.2-'),
                         "approval must precede even creating an upload archive")
+
+    def test_admin_receipt_dynamic_fail_closed(self):
+        if os.name=="nt":
+            self.skipTest("Hostinger-style Bash receipt contract runs on Linux CI")
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            base=root/"dev"
+            base.mkdir()
+            entry=root/"apply.sh"
+            entry.write_text("#!/usr/bin/env bash\\nexit 0\\n",encoding="utf-8")
+            entry.chmod(0o700)
+            approval=root/"approved.txt"
+            mocked=(SCRIPT
+                .replace("BASE=/home/u247343654/domains/dev.beyourlover.com",
+                         "BASE="+str(base))
+                .replace("ENTRY=/home/u247343654/.byl-dev-gate/apply_dev_cart_m72.sh",
+                         "ENTRY="+str(entry))
+                .replace("APPROVAL=/home/u247343654/.byl-dev-gate/approved-cart-m72-v1.txt",
+                         "APPROVAL="+str(approval)))
+            assert mocked!=SCRIPT
+            fake=root/"forced.sh"
+            fake.write_text(mocked,encoding="utf-8")
+            fake.chmod(0o700)
+            commit="a"*40
+            z,hp,hc,hj=("b"*64,"c"*64,"d"*64,"e"*64)
+            command="apply-cart-m72 "+" ".join([commit,z,hp,hc,hj])
+            env=os.environ.copy()
+            env["SSH_ORIGINAL_COMMAND"]=command
+            def invoke():
+                return subprocess.run(["bash",str(fake)],input=b"",env=env,
+                                      capture_output=True,timeout=10)
+            def approved(c,expiry):
+                approval.write_text("BYL-CART-M72-V1 "+
+                    " ".join([c,z,hp,hc,hj,str(expiry)])+"\\n",encoding="utf-8")
+                approval.chmod(0o600)
+            self.assertIn(b"ADMIN_APPROVAL_MISSING",invoke().stderr)
+            approved("f"*40,int(time.time())+600)
+            self.assertIn(b"ADMIN_APPROVAL_MISMATCH",invoke().stderr)
+            approved(commit,int(time.time())-10)
+            self.assertIn(b"ADMIN_APPROVAL_EXPIRED_OR_TOO_LONG",invoke().stderr)
+            approved(commit,int(time.time())+7200)
+            self.assertIn(b"ADMIN_APPROVAL_EXPIRED_OR_TOO_LONG",invoke().stderr)
+            approved(commit,int(time.time())+600)
+            # Valid approval reaches ZIP input gate; an empty stdin never applies.
+            self.assertIn(b"UPLOAD_SIZE_GATE_FAIL",invoke().stderr)
+            self.assertFalse(any(base.iterdir()),"failed upload must leave no ZIP")
 
     def test_reject_scp_and_sftp_subsystem(self):
         for v in ("", "scp -t /tmp/a", "sftp", "sftp-server",
