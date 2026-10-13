@@ -6,7 +6,10 @@ on:
       - 'tools/dev/deploy_gate.py'
       - 'tools/dev/test_deploy_gate.py'
       - 'tools/dev/apply_dev_cart_m72.sh'
+      - 'tools/dev/forced_dev_cart_m72.sh'
+      - 'tools/dev/install_restricted_dev_pubkey.sh'
       - 'tools/dev/test_manual_deploy_contract.py'
+      - 'tools/dev/test_restricted_key_contract.py'
       - '.github/workflows/dev-only-cart-manual-apply.yml'
       - '.github/workflows/dev-deploy-gate-v1-ci.yml'
   push:
@@ -16,7 +19,10 @@ on:
       - 'tools/dev/deploy_gate.py'
       - 'tools/dev/test_deploy_gate.py'
       - 'tools/dev/apply_dev_cart_m72.sh'
+      - 'tools/dev/forced_dev_cart_m72.sh'
+      - 'tools/dev/install_restricted_dev_pubkey.sh'
       - 'tools/dev/test_manual_deploy_contract.py'
+      - 'tools/dev/test_restricted_key_contract.py'
       - '.github/workflows/dev-only-cart-manual-apply.yml'
       - '.github/workflows/dev-deploy-gate-v1-ci.yml'
   workflow_dispatch:
@@ -47,9 +53,12 @@ jobs:
       - name: Offline gate regression
         run: |
           set -euo pipefail
-          python -m unittest discover -s tools/dev -p 'test_*deploy*.py' -v
-          python -m py_compile tools/dev/deploy_gate.py tools/dev/test_manual_deploy_contract.py
+          # All security suites must run, including test_restricted_key_contract.py.
+          python -m unittest discover -s tools/dev -p 'test_*.py' -v
+          python -m py_compile tools/dev/deploy_gate.py tools/dev/test_manual_deploy_contract.py tools/dev/test_restricted_key_contract.py
           bash -n tools/dev/apply_dev_cart_m72.sh
+          bash -n tools/dev/forced_dev_cart_m72.sh
+          bash -n tools/dev/install_restricted_dev_pubkey.sh
       - name: Build verified no-secret candidate in CI
         shell: bash
         run: |
