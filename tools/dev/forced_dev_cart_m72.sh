@@ -29,7 +29,8 @@ done
 # This manifest is created OFFLINE by a separately approved administrator,
 # outside docroot and never by this forced-command key or GitHub Actions.
 # Format: one exact line, six space-separated tokens:
-# BYL-CART-M72-V1 <commit40> <zip64> <php64> <css64> <js64>
+# BYL-CART-M72-V1 <commit40> <zip64> <php64> <css64> <js64> <expires_unix>
+# Approval must expire within 30 minutes and be replaced for every release.
 APPROVAL=/home/u247343654/.byl-dev-gate/approved-cart-m72-v1.txt
 [[ -f "$APPROVAL" && ! -L "$APPROVAL" && -r "$APPROVAL" ]] ||
   { echo "ADMIN_APPROVAL_MISSING" >&2; exit 4; }
@@ -39,12 +40,17 @@ APPROVAL=/home/u247343654/.byl-dev-gate/approved-cart-m72-v1.txt
 mapfile -t approval_lines < "$APPROVAL"
 [[ "${#approval_lines[@]}" -eq 1 ]] ||
   { echo "ADMIN_APPROVAL_FORMAT_FAIL" >&2; exit 4; }
-read -r tag approved_commit approved_zip approved_php approved_css approved_js extra <<< "${approval_lines[0]}"
+read -r tag approved_commit approved_zip approved_php approved_css approved_js expiry extra <<< "${approval_lines[0]}"
 [[ "$tag" == "BYL-CART-M72-V1" && -z "${extra:-}" &&
    "$approved_commit" == "${argv[1]}" && "$approved_zip" == "${argv[2]}" &&
    "$approved_php" == "${argv[3]}" && "$approved_css" == "${argv[4]}" &&
    "$approved_js" == "${argv[5]}" ]] ||
   { echo "ADMIN_APPROVAL_MISMATCH" >&2; exit 4; }
+[[ "$expiry" =~ ^[0-9]{10}$ ]] ||
+  { echo "ADMIN_APPROVAL_EXPIRY_INVALID" >&2; exit 4; }
+now="$(date -u +%s)"
+[[ "$expiry" -gt "$now" && "$expiry" -le "$((now + 1800))" ]] ||
+  { echo "ADMIN_APPROVAL_EXPIRED_OR_TOO_LONG" >&2; exit 4; }
 
 ZIP="$BASE/.byl-dev-gate-cart-m7.2-${argv[1]}.zip"
 [[ ! -e "$ZIP" ]] || { echo "CANDIDATE_ZIP_ALREADY_EXISTS" >&2; exit 4; }
