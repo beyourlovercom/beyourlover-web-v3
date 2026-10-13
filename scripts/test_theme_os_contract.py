@@ -102,6 +102,7 @@ class TestThemeOS(unittest.TestCase):
             "inc/components.php", "inc/shell-profiles.php", "inc/homepage.php",
             "inc/archive.php", "inc/product.php", "inc/product-modules.php",
             "inc/checkout.php", "inc/order-pay-address.php", "inc/thank-you.php", "inc/cart-experience.php", "inc/cart-drawer.php",
+            "inc/notification-compact-orderpay.php",
         ]
         self.assertEqual(paths, expected)
         self.assertEqual(loader.count("require_once get_stylesheet_directory()"), len(expected))
