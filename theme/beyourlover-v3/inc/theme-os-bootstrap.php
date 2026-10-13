@@ -19,3 +19,5 @@ require_once get_stylesheet_directory().'/inc/order-pay-address.php';
 require_once get_stylesheet_directory().'/inc/thank-you.php';
 require_once get_stylesheet_directory().'/inc/cart-experience.php';
 require_once get_stylesheet_directory().'/inc/cart-drawer.php';
+// C3 Dev Order Pay native notice compact preview (GET-only, default OFF).
+require_once get_stylesheet_directory().'/inc/notification-compact-orderpay.php';
