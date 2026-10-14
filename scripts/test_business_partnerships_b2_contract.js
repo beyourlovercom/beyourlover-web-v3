@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+/* B2 Business frontend offline code contract: no calls to WP, Woo, ERP or external endpoints. */
+'use strict';
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const root = 'theme/beyourlover-v3/';
+const page = fs.readFileSync(root+'page-business.php','utf8');
+const css = fs.readFileSync(root+'assets/css/business.css','utf8');
+const js = fs.readFileSync(root+'assets/js/business.js','utf8');
+let count=0;const check=(cond,msg)=>{assert.ok(cond,msg);count++};
+check(page.includes("['dev.beyourlover.com', 'localdev.beyourlover.com']"), 'Dev host allowlist');
+check(page.includes("wp_die(") && page.includes("'response' => 404"), 'WWW default denied');
+check(!page.includes('SVAKOM') && !css.includes('SVAKOM') && !js.includes('SVAKOM'), 'No parent-group branding');
+check(page.includes("data-byl-business=\"dev-preview-v1\""), 'Page-scoped JS hook');
+check(page.includes("get_header()") && page.includes("get_footer()"), 'Use canonical WP shell');
+check(page.includes('wp_enqueue_style') && page.includes('wp_enqueue_script'), 'Scoped assets');
+check(page.includes('byl-v3-motion'), 'Canonical theme dependency');
+check(page.includes('name="program[]"') && page.includes('name="privacy"'), 'Form selects programs and privacy consent');
+check(page.includes('type="email"') && page.includes('required name="company"'), 'Contact validation');
+check((page.match(/'id'=>'/g)||[]).length===6, 'Six program options');
+check(page.includes('Dropshipping') && page.includes('Wholesale') && page.includes('Retail Partners'), 'Core programs');
+check(page.includes('BeYourLover') && !page.includes('BEYOURLOVER'), 'Canonical brand casing');
+check(css.includes('var(--byl-brand,#9b3749)'), 'Canonical wine red token');
+check(css.includes('@media(max-width:650px)') && css.includes('grid-template-columns:1fr'), 'M390 responsive layout');
+check(css.includes('prefers-reduced-motion'), 'Respect reduced motion');
+check(js.includes("event.preventDefault()") && js.includes("form.reportValidity()"), 'No real form submit');
+check(!/fetch\s*\(|XMLHttpRequest|sendBeacon|wp_mail|wp_insert_post|register_rest_route|localStorage|sessionStorage/i.test(page+'\n'+js), 'No network, persistence or mail');
+check(js.includes('replaceChildren') && js.includes('textContent'), 'Text rendered safely');
+check(js.includes('aria-pressed') && page.includes('aria-labelledby'), 'Accessible controls');
+check(js.includes('dialog.showModal') && js.includes('data-business-match') && js.includes('applyFilters'), 'Interaction controls wired');
+console.log('PASS business-partnerships-b2-contract: '+count+' checks');

@@ -1,0 +1,121 @@
+/* BYL Business V1 B2 — scoped, Dev-only frontend. Brand token #9B3749. */
+.byl-business{--biz-brand:var(--byl-brand,#9b3749);--biz-soft:var(--byl-brand-soft,#f7ecef);--biz-border:var(--byl-line,#e7e2e4);color:var(--byl-ink,#161316);font-family:var(--byl-font,'Poppins',sans-serif)}
+.byl-business [hidden]{display:none!important}
+.byl-business__wrap{max-width:1200px;padding-left:clamp(20px,4vw,54px);padding-right:clamp(20px,4vw,54px);margin-inline:auto}
+.byl-business__sr{position:absolute;width:1px;height:1px;clip:rect(0,0,0,0);overflow:hidden;white-space:nowrap}
+.byl-business__devnote{padding:8px 16px;background:#f8eef0;color:#864153;text-align:center;font-size:12px}
+.byl-business__subnav{display:flex;justify-content:space-between;align-items:center;min-height:70px;gap:16px}
+.byl-business__subbrand{text-decoration:none;color:#221b1e;font-size:17px;font-weight:600}
+.byl-business__subbrand span{color:var(--biz-brand);font-size:12px}
+.byl-business__sublinks{display:flex;gap:26px}
+.byl-business__sublinks a{text-decoration:none;color:#585157;font-size:13px}
+.byl-business__sublinks a:hover{color:var(--biz-brand)}
+.byl-business__button{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--biz-brand);color:#fff!important;text-decoration:none;border:1px solid var(--biz-brand);padding:13px 20px;border-radius:10px;min-height:48px;font-weight:600;font-size:13px;cursor:pointer}
+.byl-business__button:hover{background:#7f2d3c;border-color:#7f2d3c}
+.byl-business__button--small{font-size:12px;padding:10px 15px;min-height:42px}
+.byl-business__button--outline{background:transparent;color:var(--biz-brand)!important;border-color:#c89ea8}
+.byl-business__button--outline:hover{background:var(--biz-soft)}
+.byl-business__hero{display:grid;grid-template-columns:1.1fr .9fr;min-height:480px}
+.byl-business__hero-content{max-width:690px;padding:70px clamp(22px,5vw,95px);display:flex;flex-direction:column;align-items:start;justify-content:center}
+.byl-business__eyebrow{font-size:11px;letter-spacing:.15em;font-weight:700;color:var(--biz-brand);text-transform:uppercase}
+.byl-business h1{font-size:clamp(39px,4.2vw,64px);line-height:1.13;font-weight:500;letter-spacing:-.052em;margin:19px 0}
+.byl-business h1 em{font-style:normal;color:var(--biz-brand)}
+.byl-business h2{font-size:clamp(28px,3.3vw,42px);line-height:1.2;letter-spacing:-.036em;font-weight:500;margin:11px 0 20px}
+.byl-business h3{font-size:18px;font-weight:600;line-height:1.3;margin:0}
+.byl-business p{color:#746d72;line-height:1.8;margin:0 0 12px;font-size:14px}
+.byl-business__hero-content p{max-width:470px}
+.byl-business__actions{display:flex;gap:12px;flex-wrap:wrap;margin:23px 0}
+.byl-business__hero-content small{font-size:11px;color:#978e94}
+.byl-business__hero-art{background:linear-gradient(140deg,#f4e3e7,#e0b9c5);position:relative;min-height:400px;overflow:hidden;display:grid;place-items:center}
+.byl-business__art-ring{position:absolute;width:390px;height:390px;border:1px solid #fff9;border-radius:50%;transform:translate(30px,-10px)}
+.byl-business__art-panel{z-index:1;transform:rotate(6deg);box-shadow:18px 24px 46px #5b22363b;background:linear-gradient(140deg,#fff,#f8e8ed);width:210px;height:284px;border:1px solid #ffffffbc;border-radius:15px;padding:24px;display:flex;flex-direction:column;justify-content:space-between}
+.byl-business__art-panel span{font-size:11px;letter-spacing:-.03em;font-weight:700}
+.byl-business__art-panel span:last-child{color:#a58993;font-size:9px;letter-spacing:.1em}
+.byl-business__art-panel strong{color:#9b3749;font-size:28px;font-weight:500;line-height:1.2}
+.byl-business__art-caption{position:absolute;bottom:26px;left:25px;background:white;padding:13px 16px;border-radius:9px;font-weight:600;font-size:12px;z-index:2;box-shadow:0 8px 25px #70415625}
+.byl-business__art-caption small{display:block;font-size:10px;color:#a0808d;font-weight:400}
+.byl-business__trust{display:flex;justify-content:center;gap:clamp(14px,6vw,75px);flex-wrap:wrap;padding:23px 20px;border-block:1px solid #f0eaed;color:#655e62;font-size:12px}
+.byl-business__section{padding-top:76px;padding-bottom:78px}
+.byl-business__section--soft{background:#fbf7f8}
+.byl-business__sectionhead{display:flex;justify-content:space-between;align-items:end;gap:35px}
+.byl-business__sectionhead p{max-width:370px}
+.byl-business__filters{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 23px}
+.byl-business__filters input,.byl-business__filters select,.byl-business__form-grid input:not([type=checkbox]),.byl-business__form-grid select,.byl-business__form-grid textarea{border:1px solid #ded7db;border-radius:9px;padding:12px;min-height:46px;font-family:inherit;font-size:13px;background:white;max-width:100%}
+.byl-business__filters input{width:230px}
+.byl-business__program-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.byl-business__program{border:1px solid var(--biz-border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:13px;min-height:248px;background:white;transition:border-color .16s,box-shadow .16s}
+.byl-business__program:hover{border-color:#b88492;box-shadow:0 8px 25px #5630410c}
+.byl-business__programtop{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.byl-business__program-icon{display:grid;place-items:center;background:var(--biz-soft);color:var(--biz-brand);font-size:17px;font-weight:700;width:41px;height:41px;border-radius:10px}
+.byl-business__programtype{font-size:10px;letter-spacing:.08em;color:var(--biz-brand);text-transform:uppercase}
+.byl-business__program p{font-size:13px;flex:1}
+.byl-business__textbutton{border:0;background:none;color:var(--biz-brand);font-size:12px;font-weight:700;padding:7px 0;align-self:flex-start;cursor:pointer}
+.byl-business__noresults{padding:20px}
+.byl-business__split{display:grid;grid-template-columns:1fr 1fr;gap:46px;align-items:center}
+.byl-business__support-art{background:linear-gradient(140deg,#eed7de,#f7eaed);border-radius:16px;min-height:335px;padding:30px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.byl-business__support-art>div{max-width:295px;background:white;border:1px solid #efdde2;border-radius:11px;padding:20px;box-shadow:0 8px 25px #862c4420}
+.byl-business__support-art small{font-size:10px;letter-spacing:.1em;color:#a27583}
+.byl-business__support-art strong{display:block;font-weight:600;margin:8px 0}
+.byl-business__support-art div span{display:block;font-size:11px;color:#7b6c72}
+.byl-business__art-blocks{font-size:70px;letter-spacing:-.2em;color:var(--biz-brand);opacity:.7;text-align:right}
+.byl-business__benefits{padding:0;margin:18px 0 24px;list-style:none;display:grid;gap:12px}
+.byl-business__benefits li{font-size:13px;line-height:1.65}
+.byl-business__benefits li:before{content:'✓';color:var(--biz-brand);margin-right:9px}
+.byl-business__steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:23px;margin:33px 0 45px}
+.byl-business__steps article{border-top:2px solid #e3bdc7;padding-top:18px}
+.byl-business__steps article>span{font-size:22px;color:var(--biz-brand)}
+.byl-business__steps h3{margin:14px 0 9px}
+.byl-business__steps p{font-size:13px}
+.byl-business__match{border:1px solid #e7dfe3;border-radius:16px;padding:28px}
+.byl-business__match h3{margin:9px 0 18px}
+.byl-business__match-options{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.byl-business__match-options button{background:white;border:1px solid #e1d8dd;padding:10px 15px;border-radius:99px;color:#594d54;cursor:pointer;font-size:12px;min-height:44px}
+.byl-business__match-options button[aria-pressed=true]{background:var(--biz-brand);color:white;border-color:var(--biz-brand)}
+.byl-business__recommend{background:#fcf3f6;border-radius:11px;padding:21px;display:flex;justify-content:space-between;align-items:center;gap:18px}
+.byl-business__recommend strong{display:block;color:var(--biz-brand);font-size:18px;margin:5px 0}
+.byl-business__faqs{max-width:890px}
+.byl-business__faqheading{text-align:center;padding-bottom:19px}
+.byl-business__faqs details{border-bottom:1px solid #e5dfe1;padding:0 0 2px}
+.byl-business__faqs summary{list-style:none;font-size:14px;font-weight:600;padding:21px 0;cursor:pointer;display:flex;justify-content:space-between;gap:10px}
+.byl-business__faqs summary::-webkit-details-marker{display:none}
+.byl-business__faqs summary:after{content:'+';color:var(--biz-brand);font-size:23px;line-height:1}
+.byl-business__faqs details[open] summary:after{content:'−'}
+.byl-business__faqs details p{font-size:13px;padding:0 15px 20px 0}
+.byl-business__closing{background:#7c2a3e;padding:53px 0}
+.byl-business__closing-inner{display:flex;align-items:center;justify-content:space-between;gap:25px}
+.byl-business__closing h2{color:#fff;margin:12px 0}
+.byl-business__closing .byl-business__eyebrow{color:#f3d2dc}
+.byl-business__closing p{color:#ead3dc}
+.byl-business__button--white{background:white;border-color:white;color:#7c2a3e!important}
+.byl-business__button--white:hover{background:#f7e4e9;color:#7c2a3e!important}
+.byl-business__dialog{width:min(680px,calc(100% - 28px));max-height:90vh;overflow-y:auto;border:0;border-radius:16px;padding:0;color:var(--byl-ink);box-shadow:0 22px 80px #0004}
+.byl-business__dialog::backdrop{background:#1710169c}
+.byl-business__dialog-heading{display:flex;align-items:start;justify-content:space-between;gap:14px;padding:25px 28px 17px;border-bottom:1px solid var(--biz-border)}
+.byl-business__dialog-heading h2{font-size:26px;margin:7px 0}
+.byl-business__dialog-heading p{font-size:12px}
+.byl-business__dismiss{background:none;border:0;font-size:29px;color:#7c7278;cursor:pointer}
+.byl-business__dialog-details{padding:20px 28px;background:#fcf4f6;font-size:14px}
+.byl-business__dialog-details h3{margin-bottom:8px}
+.byl-business__dialog-details p{font-size:13px}
+.byl-business__dialog form{padding:22px 28px}
+.byl-business__form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.byl-business__form-grid>label{font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:6px}
+.byl-business__form-grid input:not([type=checkbox]),.byl-business__form-grid select,.byl-business__form-grid textarea{width:100%;font-weight:400}
+.byl-business__form-grid textarea{resize:vertical}
+.byl-business__form-grid .byl-business__full{grid-column:1/-1}
+.byl-business__form-grid fieldset{border:0;padding:0;margin:0}
+.byl-business__form-grid legend{font-size:12px;font-weight:600;margin-bottom:8px}
+.byl-business__checks{display:flex;flex-wrap:wrap;gap:8px}
+.byl-business__checks label{font-size:11px;font-weight:500;border:1px solid #e7dfe3;border-radius:8px;display:flex;align-items:center;gap:7px;padding:9px 10px}
+.byl-business__checks input,.byl-business__privacy input{accent-color:var(--biz-brand)}
+.byl-business__form-grid .byl-business__privacy{flex-direction:row;align-items:start;font-weight:400}
+.byl-business__privacy input{margin-top:4px}
+.byl-business__dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+.byl-business__form-error{color:#b4233e!important;font-size:12px!important;margin-top:8px!important}
+.byl-business__success{text-align:center;padding:42px 30px}
+.byl-business__success>span{display:inline-grid;place-items:center;font-size:22px;color:var(--biz-brand);background:var(--biz-soft);width:55px;height:55px;border-radius:50%;margin-bottom:16px}
+.byl-business__success h3{margin-bottom:12px}
+.byl-business__success .byl-business__button{margin-top:12px}
+@media(max-width:850px){.byl-business__program-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.byl-business__steps{grid-template-columns:repeat(2,minmax(0,1fr))}.byl-business__sectionhead{display:block}.byl-business__hero-content{padding:44px 24px}.byl-business__subnav{gap:10px}.byl-business__sublinks{gap:12px}}
+@media(max-width:650px){.byl-business__subnav{flex-wrap:wrap;min-height:0;padding-top:15px;padding-bottom:15px}.byl-business__sublinks{width:100%;order:3;justify-content:space-between}.byl-business__subnav .byl-business__button{padding:8px 11px;min-height:40px}.byl-business__hero,.byl-business__split{grid-template-columns:1fr}.byl-business__hero-content{padding:49px 22px}.byl-business h1{font-size:clamp(34px,9vw,46px)}.byl-business__hero-art{min-height:320px}.byl-business__trust{padding:16px 23px;justify-content:flex-start;gap:15px}.byl-business__section{padding-top:51px;padding-bottom:55px}.byl-business__program-grid{grid-template-columns:1fr}.byl-business__program{min-height:0}.byl-business__filters{display:grid}.byl-business__filters input,.byl-business__filters select{width:100%}.byl-business__steps{grid-template-columns:1fr 1fr;gap:15px}.byl-business__match{padding:20px}.byl-business__recommend{flex-direction:column;align-items:flex-start}.byl-business__closing-inner{flex-direction:column;align-items:start}.byl-business__form-grid{grid-template-columns:1fr}.byl-business__form-grid .byl-business__full{grid-column:1}.byl-business__dialog-heading{padding:20px}.byl-business__dialog form,.byl-business__dialog-details{padding:18px 20px}.byl-business__dialog-actions{flex-direction:column}.byl-business__dialog-actions button{width:100%}}
+@media(prefers-reduced-motion:reduce){.byl-business *{transition:none!important;scroll-behavior:auto!important}}
