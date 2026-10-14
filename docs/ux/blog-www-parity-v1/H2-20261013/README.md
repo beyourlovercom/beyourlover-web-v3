@@ -14,7 +14,7 @@ Do not mark Owner UAT PASS without an explicit Owner review of the visual target
 | PC1440 | ![WWW Blog PC1440](www-blog-1440.png) | ![Dev Blog PC1440](dev-blog-1440.png) | ![H2 Concept PC1440](h2-preview-1440.png) |
 
 The visual proof uses **existing public WWW Blog markup and content** sampled
-at capture time, with a simplified V3-compatible top navigation mock. It is not
+at capture time, with a WWW-like announcement bar and pink navigation mock, intended to be implemented using V3 shell components. It is not
 evidence that Dev article inventory and banner assets have already been migrated.
 Preview source: [H2 static prototype](H2-www-blog-preserve-preview.html).
 

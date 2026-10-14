@@ -1,18 +1,46 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><title>BYL Blog WWW Parity — H2 Review Only</title><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 *{box-sizing:border-box}html,body{padding:0;margin:0;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#151515}
-.byl-preview-top{position:relative;z-index:20;background:#fff;border-bottom:1px solid #eee;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px}
-.byl-preview-brand{font-family:Georgia,serif;color:#9d2e49;font-size:18px;letter-spacing:.015em}
-.byl-preview-nav{font-size:13px;display:flex;gap:28px;align-items:center}
+
+/* H2 reference header: preserve WWW's small announcement + pink blog nav,
+   while keeping eventual runtime ownership inside BYL Theme V3. */
+.byl-preview-announcement{min-height:24px;display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;background:#fff;color:#444;padding:4px max(14px,3vw);gap:12px}
+.byl-preview-top{position:relative;z-index:20;background:#fac5ec;border-bottom:1px solid #f1a7d8;
+  min-height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 3vw;gap:16px}
+.byl-preview-brand{display:flex;align-items:center;gap:7px;font-family:Georgia,serif;color:#a12f4c;font-size:18px;white-space:nowrap}
+.byl-preview-brand img{max-width:138px;width:138px;height:auto;display:block}
+.byl-preview-nav{font-size:12px;display:flex;align-items:center;gap:24px;justify-content:space-between;flex:1}
+.byl-preview-nav a{text-decoration:none;color:#1c1c1c}
+.byl-preview-mobile-icon{display:none;color:#1d1d1d;font-size:21px;line-height:1}
+.byl-preview-crumbs{background:#f7f7f7;color:#888;padding:5px 3vw;font-size:11px}
 .byl-preview-stamp{position:fixed;z-index:1000;right:8px;bottom:10px;padding:5px 8px;background:#111;color:#fff;font-size:10px;border-radius:3px;opacity:.82}
 .byl-preview-end{background:#f6f5f6;padding:42px 18px;color:#333;text-align:center}
-.byl-preview-end h2{font-size:25px;margin:0 0 14px}.byl-preview-end p{max-width:800px;margin:0 auto 20px;line-height:1.65}
+.byl-preview-end h2{font-size:25px;margin:0 0 14px}
+.byl-preview-end p{max-width:800px;margin:0 auto 20px;line-height:1.65}
 .byl-preview-end a{color:#9d2e49}
+@media(max-width:767px){
+ .byl-preview-announcement{min-height:33px;justify-content:center;text-align:center;font-size:9px;max-height:33px}
+ .byl-preview-announcement span:last-child{display:none}
+ .byl-preview-top{height:33px;min-height:33px;padding:0 13px}
+ .byl-preview-brand img{width:104px}
+ .byl-preview-nav{display:none}
+ .byl-preview-mobile-icon{display:block}
+ .byl-preview-crumbs{display:none}
+}
 .blog-banner,.blog-categories,.blog-cat-module{max-width:100%;overflow:hidden}
 @media(max-width:767px){.byl-preview-top{height:50px;padding:0 14px}.byl-preview-brand{font-size:15px}.byl-preview-nav{gap:18px;font-size:12px}.byl-preview-nav a:not(:last-child){display:none}}
 </style>
 </head><body>
-<header class="byl-preview-top"><div class="byl-preview-brand">BEYOURLOVER <span style="font-family:Arial;font-size:10px;letter-spacing:.3em">Lovely present</span></div><nav class="byl-preview-nav"><a>Shop</a><a>Categories</a><a>Blog</a><a>Support</a><a aria-label="Cart">🛒</a></nav></header>
+<div class="byl-preview-announcement"><span>Cute, Original Toys Made With ❤️<br>Fast Worldwide Discreet Shipping</span><span>Discreet worldwide shipping</span></div>
+<header class="byl-preview-top">
+  <span class="byl-preview-mobile-icon" aria-label="Menu">☰</span>
+  <nav class="byl-preview-nav"><a>Shop</a><a>Sex Educations</a><a>Sex Position</a><a>Tips</a></nav>
+  <div class="byl-preview-brand"><img alt="BeYourLover" src="https://img.beyourlover.com/2025/06/21035821/logo-slogan-red-1-scaled-1.webp"></div>
+  <nav class="byl-preview-nav"><a>Guide</a><a>Sexual Wellness</a><a>Support</a><a aria-label="Search">⌕</a></nav>
+  <span class="byl-preview-mobile-icon" aria-label="Search">⌕</span>
+</header>
+<div class="byl-preview-crumbs">Home / Blog</div>
 <main id="blog-parity-h2">
 <link rel="stylesheet" href="https://www.beyourlover.com/css/swiper-bundle.min.css" />
 <script src="https://www.beyourlover.com/js/swiper-bundle.min.js"></script>
