@@ -200,3 +200,85 @@ body.byl-blog-standalone{
   .byl-blogv1-footer-details{grid-template-columns:repeat(2,minmax(0,1fr));padding:43px 18px;gap:29px 18px}
   .byl-blogv1-footer-bottom{padding:18px 17px;font-size:10px}
 }
+
+
+/* Blog OS V1.1 — one consistent horizontal content rail across ALL modules.
+ * Full-bleed pink backgrounds and banner art remain outside the rail.
+ * Never modify Shop shell selectors or its global width tokens. */
+body.byl-blog-standalone{
+  --byl-blog-content-max:1260px;
+  --byl-blog-content-gutter:32px;
+}
+.byl-blogv1-container,
+.byl-blogv1-journal,
+.byl-blogv1-sections,
+.byl-blogv1-explore{
+  box-sizing:border-box;
+  width:100%;
+  max-width:var(--byl-blog-content-max);
+  margin-inline:auto;
+  padding-inline:var(--byl-blog-content-gutter);
+}
+.byl-blogv1-site-header{
+  display:block;
+  padding:0;
+}
+.byl-blogv1-header-inner{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) 36px;
+  align-items:center;
+  gap:14px;
+  min-height:81px;
+}
+.byl-blogv1-journal{padding-block:78px 60px}
+.byl-blogv1-categories{max-width:none}
+.byl-blogv1-sections{padding-block:0 30px}
+.byl-blogv1-explore{padding-block:65px 75px}
+.byl-blogv1-footer-intro{
+  width:100%;max-width:none;margin:0;padding:0;
+}
+.byl-blogv1-footer-intro-inner{padding-block:40px 58px}
+.byl-blogv1-footer-connect{
+  display:block;width:100%;padding:0;
+}
+.byl-blogv1-footer-connect-inner{
+  display:grid;grid-template-columns:3fr 2fr;gap:42px;
+  align-items:end;padding-block:62px;
+}
+.byl-blogv1-footer-details{
+  display:block;width:100%;padding:0;
+}
+.byl-blogv1-footer-details-inner{
+  display:grid;grid-template-columns:1.5fr repeat(3,minmax(0,1fr));
+  gap:25px;padding-block:55px 85px;
+}
+.byl-blogv1-footer-bottom{
+  display:block;width:100%;padding:0;
+}
+.byl-blogv1-footer-bottom-inner{
+  display:flex;justify-content:space-between;gap:14px;
+  flex-wrap:wrap;padding-block:18px;
+}
+@media(max-width:900px){
+ .byl-blogv1-header-inner{gap:7px;min-height:66px}
+ .byl-blogv1-footer-details-inner{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+}
+@media(max-width:700px){
+ body.byl-blog-standalone{--byl-blog-content-gutter:16px}
+ .byl-blogv1-header-inner{
+   grid-template-columns:38px minmax(0,1fr) 38px;
+   min-height:45px;height:45px;gap:4px;
+ }
+ .byl-blogv1-journal{padding-block:36px 35px}
+ .byl-blogv1-sections{padding-block:0 30px}
+ .byl-blogv1-explore{padding-block:40px 60px}
+ .byl-blogv1-footer-intro-inner{padding-block:35px 42px}
+ .byl-blogv1-footer-connect-inner{
+   grid-template-columns:1fr;gap:35px;padding-block:40px;
+ }
+ .byl-blogv1-footer-details-inner{
+   grid-template-columns:repeat(2,minmax(0,1fr));
+   gap:29px 18px;padding-block:43px;
+ }
+ .byl-blogv1-footer-bottom-inner{padding-block:18px}
+}

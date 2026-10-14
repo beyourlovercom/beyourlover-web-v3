@@ -19,6 +19,13 @@ assert(blogHeader.includes('byl-blogv1-site-header')&&blogHeader.includes('data-
 assert(blogFooter.includes('byl-blogv1-site-footer')&&blogFooter.includes('byl-blogv1-footer-intro')&&blogFooter.includes('byl-blogv1-footer-connect')&&blogFooter.includes('byl-blogv1-footer-details'),'independent WWW-style footer modules');
 assert(!blogHeader.includes('byl-shell-header')&&!blogFooter.includes('byl-shell-footer'),'no Shop shell in Blog parts');
 assert(blogFooter.includes("/newsletter/"),'independent newsletter link retained');
+assert(blogHeader.includes('byl-blogv1-header-inner byl-blogv1-container'),'dedicated Blog header inner rail');
+for(const region of ['footer-intro','footer-connect','footer-details','footer-bottom']){
+ assert(blogFooter.includes('byl-blogv1-container byl-blogv1-'+region+'-inner'),'independent Blog '+region+' rail');
+}
+assert(css.includes('--byl-blog-content-max:1260px')&&css.includes('--byl-blog-content-gutter:32px')&&css.includes('--byl-blog-content-gutter:16px'),'one desktop/mobile gutter source');
+assert(css.includes('.byl-blogv1-journal,')&&css.includes('.byl-blogv1-sections,')&&css.includes('.byl-blogv1-explore{'),'body content follows same rail');
+
 assert(js.includes('data-blog-header-submit')&&js.includes('data-blog-menu-toggle')&&js.includes('data-blog-about-toggle'),'Blog-only header/footer interactive controls');
 
 assert(template.includes('new WP_Query([')&&template.includes("'post_status'=>'publish'")&&template.includes("'cat'=>(int) $term->term_id"),'published WordPress articles, scoped terms');

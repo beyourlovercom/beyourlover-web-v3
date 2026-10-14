@@ -23,6 +23,7 @@ $blog_logo = 'https://img.beyourlover.com/2025/06/21035821/logo-slogan-red-1-sca
 <a class="byl-blogv1-skip" href="#main-content">Skip to blog content</a>
 <div class="byl-blogv1-topline">Cute, Original Toys Made With ❤️ &nbsp; · &nbsp; Fast Worldwide Discreet Shipping</div>
 <header class="byl-blogv1-site-header" data-blog-header>
+  <div class="byl-blogv1-header-inner byl-blogv1-container">
     <button class="byl-blogv1-nav-icon byl-blogv1-menu-toggle" type="button" data-blog-menu-toggle
       aria-expanded="false" aria-controls="byl-blog-mobile-menu" aria-label="Open Blog menu">
       <span></span><span></span><span></span>
@@ -44,6 +45,7 @@ $blog_logo = 'https://img.beyourlover.com/2025/06/21035821/logo-slogan-red-1-sca
       aria-expanded="false" aria-controls="byl-blog-header-search" aria-label="Search Blog articles">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.7" cy="10.7" r="6.5"/><path d="m15.5 15.5 5.2 5.2"/></svg>
     </button>
+  </div>
 </header>
 <nav class="byl-blogv1-mobile-menu" id="byl-blog-mobile-menu" aria-label="Blog mobile navigation" hidden>
   <?php foreach ($blog_nav as $item): ?><a href="<?php echo esc_url($item['url']); ?>"><?php echo esc_html($item['label']); ?></a><?php endforeach; ?>

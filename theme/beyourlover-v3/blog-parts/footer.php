@@ -5,6 +5,7 @@ defined('ABSPATH') || exit;
 ?>
 <footer class="byl-blogv1-site-footer" aria-label="BeYourLover Blog footer">
   <section class="byl-blogv1-footer-intro">
+    <div class="byl-blogv1-container byl-blogv1-footer-intro-inner">
     <div class="byl-blogv1-footer-intro-text" id="byl-blog-footer-about" data-blog-about>
       <h2>Welcome to the BeYourLover Blog</h2>
       <p>The BeYourLover Blog is a place to explore original stories, thoughtful relationship advice,
@@ -19,8 +20,10 @@ defined('ABSPATH') || exit;
       </div>
     </div>
     <button type="button" data-blog-about-toggle aria-controls="byl-blog-about-extra" aria-expanded="false">READ MORE <span aria-hidden="true">⌄</span></button>
+      </div>
   </section>
   <section class="byl-blogv1-footer-connect">
+    <div class="byl-blogv1-container byl-blogv1-footer-connect-inner">
     <div>
       <p class="byl-blogv1-footer-kicker">MORE FROM BEYOURLOVER</p>
       <h2>Stay in the loop.</h2>
@@ -36,8 +39,10 @@ defined('ABSPATH') || exit;
         <a href="https://www.reddit.com/r/beyourlovercom/" rel="noopener noreferrer" target="_blank">Reddit</a>
       </nav>
     </div>
+      </div>
   </section>
   <section class="byl-blogv1-footer-details">
+    <div class="byl-blogv1-container byl-blogv1-footer-details-inner">
     <div><h3>BeYourLover</h3><p>Lovely present</p><p>Stories, guides and personal discovery.</p></div>
     <nav aria-label="Blog customer support"><h3>Help</h3>
       <a href="<?php echo esc_url(home_url('/faqs/')); ?>">FAQs</a>
@@ -55,10 +60,13 @@ defined('ABSPATH') || exit;
       <a href="<?php echo esc_url(home_url('/privacy-policies/')); ?>">Privacy Policy</a>
       <a href="<?php echo esc_url(home_url('/terms-and-conditions/')); ?>">Terms</a>
     </nav>
+      </div>
   </section>
   <div class="byl-blogv1-footer-bottom">
+    <div class="byl-blogv1-container byl-blogv1-footer-bottom-inner">
     <span>© <?php echo esc_html(wp_date('Y')); ?> BeYourLover. All rights reserved.</span>
     <a href="<?php echo esc_url(home_url('/blog/')); ?>">Back to Blog ↑</a>
+      </div>
   </div>
 </footer>
 <?php wp_footer(); ?>
