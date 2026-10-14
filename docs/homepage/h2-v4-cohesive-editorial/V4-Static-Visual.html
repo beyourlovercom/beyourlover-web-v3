@@ -1,0 +1,296 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BeYourLover | Homepage H2 V4 — Art Direction Reset</title>
+<style>
+:root{--ink:#322c2b;--ox:#763841;--oxdeep:#552833;--rose:#b97780;--muted:#746964;--ivory:#fbfaf7;--warm:#f2eae3;--line:#d8cfca;--sage:#abb5a6}
+*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}h1,h2,h3,p{margin-top:0}h1,h2,h3,.serif{font-family:Georgia,"Times New Roman",serif;font-weight:400}
+.original{position:relative;overflow:hidden;width:100%;background:white}
+.original img{display:block;position:absolute;left:0;top:0;max-width:none;width:1440px}
+.original img.mob{display:none}.orig-header{height:194px}
+.unchanged{height:8298px}.unchanged>img.desk{top:-2260px}
+button,a{font-family:inherit}
+.v4{background:var(--ivory)}
+.container{max-width:1370px;margin:auto;padding:0 48px}
+.hero{height:725px;position:relative;overflow:hidden;background:#f7f3ed}
+.hero .hero-copy{position:absolute;z-index:2;top:152px;left:max(64px,calc((100vw - 1270px)/2));max-width:600px}
+.eyebrow{font-size:11px;letter-spacing:3.5px;font-weight:700;color:#95606b;line-height:1.35}
+.hero .hero-copy .eyebrow{letter-spacing:3px}
+.hero h1{font-size:108px;line-height:.94;letter-spacing:-6px;margin:29px 0 25px;color:#503138}
+.hero h1 em{font-weight:400;color:#a96e77}
+.hero-copy p{font-size:15px;line-height:1.9;color:#655d59;max-width:420px;margin-bottom:28px}
+.cta{display:inline-flex;align-items:center;justify-content:space-between;gap:42px;padding:17px 25px;background:var(--oxdeep);color:#fff;font-size:12px;letter-spacing:.4px;text-decoration:none;min-width:244px}
+.hero-smallprint{position:absolute;bottom:45px;left:max(64px,calc((100vw - 1270px)/2));font-size:10px;letter-spacing:1.8px;color:#967a78;z-index:3}
+.hero-art{position:absolute;right:0;top:-4px;height:100%;width:57%;display:flex;align-items:center;justify-content:center}
+.hero-art svg{height:100%;max-height:730px;width:100%;overflow:visible}
+.hero .thin{position:absolute;top:0;left:50%;height:100%;width:1px;background:linear-gradient(transparent,#d1c0bd55,transparent)}
+.quick{background:#fefdfa;border-bottom:1px solid #e9e3df}
+.quick .container{padding-top:26px;padding-bottom:29px}
+.quick-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid #dfd6d1;padding-bottom:13px;margin-bottom:7px}
+.quick-heading h2{font-size:24px;line-height:1.2;letter-spacing:-.5px;margin:0;color:#463538}
+.quick-heading .small{font-size:10px;color:#968782;letter-spacing:2.2px}
+.quick-list{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));align-items:start;gap:15px;padding-top:8px}
+.quick-item{color:#514148;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;min-width:0;justify-content:flex-end;padding:13px 0 4px;height:153px}
+.quick-item .art{width:118px;height:109px;display:flex;align-items:center;justify-content:center;transition:transform .2s ease}
+.quick-item .art img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.quick-item:hover .art,.quick-item:focus-visible .art{transform:translateY(-5px) scale(1.04)}
+.quick-item .name{font-size:10px;letter-spacing:1.7px;font-weight:700;text-align:center}
+.quick-item:after{content:"";display:block;position:absolute;bottom:-9px;left:50%;width:0;height:1px;background:#8e5160;transition:width .25s,left .25s}
+.quick-item:hover:after,.quick-item:focus-visible:after{left:25%;width:50%}
+.quick-swipe{display:none}
+.manifesto{background:#fff;position:relative;overflow:hidden}
+.manifesto .container{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:4%;padding-top:103px;padding-bottom:100px}
+.manifesto-art{height:420px;position:relative;border-left:1px solid #dec9c4;background:radial-gradient(circle at 60% 45%,#f3ded9 2%,#f9f6f2 68%)}
+.manifesto-art svg{width:100%;height:100%}
+.manifesto-copy{padding-right:60px}
+.manifesto-copy h2{font-size:66px;line-height:1.08;letter-spacing:-2.5px;margin:20px 0 22px;color:#573c3d}
+.manifesto-copy h2 i{font-family:Georgia,serif;color:#a46e79}
+.manifesto-copy p{font-size:14px;line-height:1.8;color:#746964;max-width:400px}
+.manifesto-rule{width:64px;height:1px;background:var(--ox);margin:26px 0}
+.manifesto .overprint{position:absolute;right:20px;bottom:-35px;font:italic 150px Georgia;color:#ead3d0;opacity:.45;pointer-events:none}
+.arrivals{background:#f7f6f3;padding:93px 0 105px}
+.arrivals-top{display:flex;justify-content:space-between;align-items:end;margin-bottom:44px}
+.arrivals h2{font-size:76px;line-height:.95;letter-spacing:-3px;color:#3f3635;margin:10px 0 0}
+.arrivals-top a{font-size:12px;color:#553c40;text-decoration:none;border-bottom:1px solid #7e595e;padding-bottom:10px}
+.gallery{display:grid;grid-template-columns:1.38fr 1fr 1fr 1fr;gap:15px;align-items:stretch}
+.gallery-main{background:#e6dbd3;min-height:505px;overflow:hidden;position:relative}
+.gallery-main::before{content:"";position:absolute;border-radius:50%;height:330px;width:520px;background:#f5ece5;top:30px;left:30px}
+.gallery-main img{position:absolute;z-index:1;top:10px;width:93%;height:80%;left:3%;object-fit:contain;mix-blend-mode:multiply}
+.gallery-main .new-name{position:absolute;z-index:2;bottom:38px;left:30px}
+.gallery-main .new-name h3{font-size:41px;color:#4d3438;margin:10px 0 0;letter-spacing:-1px}
+.gallery-main .new-name span{font-size:11px;letter-spacing:2px;color:#96636d;font-weight:700}
+.gallery-side{min-height:505px;display:flex;flex-direction:column;position:relative;border-bottom:1px solid #cfc5c1;padding-bottom:23px}
+.gallery-side .art{width:100%;height:392px;display:flex;align-items:center;justify-content:center;background:#eee8e2}
+.gallery-side:nth-of-type(3) .art{background:#e5e8e0}
+.gallery-side:nth-of-type(4) .art{background:#eadeda}
+.gallery-side img{display:block;width:97%;height:96%;object-fit:contain;mix-blend-mode:multiply}
+.gallery-side .meta{margin-top:19px;display:flex;align-items:end;justify-content:space-between;gap:8px}
+.gallery-side h3{font-size:21px;line-height:1.2;margin:0;color:#4e393d;letter-spacing:-.3px}
+.gallery-side small{display:block;margin-bottom:5px;font-size:10px;letter-spacing:1.2px;color:#857873}
+.gallery-side .angle{font-size:24px;color:#8a555f}
+.arrivals-note{display:flex;justify-content:space-between;font-size:10px;color:#9f8e89;margin-top:25px;letter-spacing:1.3px}
+.collection-intro{display:flex;justify-content:center;align-items:center;padding:60px 0;background:#fff;font-size:10px;color:#9c7d79;letter-spacing:4px}
+.ww-bottom{position:relative;overflow:hidden;width:100%;height:8298px;background:white}
+.ww-bottom>img{position:absolute;display:block;left:0;width:1440px;max-width:none;top:-2260px}
+.ww-bottom>img.mob{display:none}
+.editorial-overlay{position:absolute;left:30px;width:1380px;height:551px;overflow:hidden;z-index:2}
+.editorial-overlay.women{top:0;background:#f0e1db}
+.editorial-overlay.men{top:1119px;background:#ecede6}
+.editorial-overlay.couples{top:2238px;background:#553541;color:#fff}
+.overlay-shell{height:100%;display:grid;grid-template-columns:53% 47%;position:relative}
+.overlay-text{padding:95px 85px;position:relative;z-index:2}
+.overlay-text h2{font-size:82px;line-height:1;letter-spacing:-4px;margin:25px 0;color:#5e3841}
+.overlay-text .eyebrow{color:#946875}
+.overlay-text p{font-size:14px;line-height:1.75;color:#74625f;max-width:330px}
+.overlay-text .line{font-size:12px;color:#794754;display:inline-block;border-bottom:1px solid #925e69;padding-bottom:9px;margin-top:15px}
+.overlay-art{position:relative;overflow:hidden}
+.overlay-art svg{width:100%;height:100%}
+.editorial-overlay.men .overlay-shell{grid-template-columns:45% 55%}
+.editorial-overlay.men .overlay-text{padding:115px 70px 50px}
+.editorial-overlay.men h2{color:#515650}
+.editorial-overlay.men .eyebrow,.editorial-overlay.men .line{color:#606f68}
+.editorial-overlay.couples .overlay-shell{grid-template-columns:50% 50%}
+.editorial-overlay.couples .overlay-text{padding:95px 90px}
+.editorial-overlay.couples h2,.editorial-overlay.couples .eyebrow,.editorial-overlay.couples .line{color:#fff1eb}
+.editorial-overlay.couples p{color:#e8d3d8}
+.editorial-overlay.couples .line{border-color:#ebc7c7}
+@media(max-width:700px){
+ .original img.desk{display:none}.original img.mob{display:block;width:390px}
+ .orig-header{height:104px}
+ .container{padding-left:20px;padding-right:20px}
+ .hero{height:750px}
+ .hero .hero-copy{top:49px;left:23px;max-width:345px}
+ .hero h1{font-size:66px;letter-spacing:-3.5px;line-height:.99;margin:17px 0 16px}
+ .hero-copy p{font-size:12px;line-height:1.65;max-width:310px}
+ .eyebrow{font-size:9px;letter-spacing:2.1px}
+ .cta{padding:12px 16px;min-width:220px;font-size:11px;margin-top:5px}
+ .hero-art{top:320px;right:0;width:100%;height:428px;overflow:hidden}
+ .hero-art svg{height:115%;max-height:none;margin-left:15px;margin-top:0}
+ .hero-smallprint{bottom:11px;left:20px;font-size:7px;letter-spacing:1px}
+ .quick .container{padding:22px 0 23px}
+ .quick-heading{margin:0 20px 10px;padding-bottom:12px}
+ .quick-heading h2{font-size:22px}
+ .quick-heading .small{font-size:8px}
+ .quick-list{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:1px 18px 8px}
+ .quick-list::-webkit-scrollbar{display:none}
+ .quick-item{flex:0 0 82px;width:82px;height:119px;padding:4px 0 9px;scroll-snap-align:start;gap:4px}
+ .quick-item .art{width:80px;height:84px}
+ .quick-item .name{font-size:8px;letter-spacing:.6px}
+ .quick-swipe{display:flex;font-size:8px;letter-spacing:1.3px;color:#a08d8b;padding:0 20px;justify-content:space-between}
+ .manifesto .container{padding-top:45px;padding-bottom:48px;grid-template-columns:1fr;gap:20px}
+ .manifesto-copy{padding:0}
+ .manifesto-copy h2{font-size:45px;letter-spacing:-1.7px;margin:13px 0 12px}
+ .manifesto-copy p{font-size:12px}
+ .manifesto-rule{margin:15px 0}
+ .manifesto-art{height:255px}
+ .manifesto .overprint{font-size:60px;bottom:-14px}
+ .arrivals{padding:55px 0 65px}
+ .arrivals-top{margin-bottom:21px}
+ .arrivals h2{font-size:50px;letter-spacing:-2px}
+ .arrivals-top a{font-size:10px}
+ .gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .gallery-main{grid-column:span 2;min-height:340px}
+ .gallery-main::before{width:360px;height:260px;top:-25px;left:0}
+ .gallery-main img{height:76%;width:86%;left:7%;top:-7px}
+ .gallery-main .new-name{bottom:23px;left:22px}
+ .gallery-main .new-name h3{font-size:35px}
+ .gallery-side{min-height:300px;padding-bottom:12px}
+ .gallery-side .art{height:225px}
+ .gallery-side small{font-size:8px}
+ .gallery-side h3{font-size:16px}
+ .gallery-side .angle{font-size:18px}
+ .gallery-side:nth-last-child(1){display:flex;grid-column:span 2;min-height:250px}.gallery-side:nth-last-child(1) .art{height:190px}
+ .arrivals-note{font-size:8px}
+ .collection-intro{padding:39px 0;letter-spacing:2px}
+ .ww-bottom{height:7889px}
+ .ww-bottom>img.desk{display:none}
+ .ww-bottom>img.mob{display:block;width:390px;top:-1880px}
+ .editorial-overlay{left:10px;width:370px;height:223px}
+ .editorial-overlay.women{top:0}
+ .editorial-overlay.men{top:925px}
+ .editorial-overlay.couples{top:1849px}
+ .overlay-shell{grid-template-columns:52% 48%}
+ .overlay-text{padding:27px 14px}
+ .overlay-text h2{font-size:36px;letter-spacing:-1.8px;margin:9px 0 6px}
+ .overlay-text p{font-size:9px;line-height:1.45}
+ .overlay-text .line{font-size:9px;margin-top:4px;padding-bottom:4px}
+ .editorial-overlay.men .overlay-shell{grid-template-columns:52% 48%}
+ .editorial-overlay.men .overlay-text{padding:34px 15px}
+ .editorial-overlay.couples .overlay-shell{grid-template-columns:52% 48%}
+ .editorial-overlay.couples .overlay-text{padding:29px 14px}
+}
+</style>
+</head><body>
+<div class="original orig-header" data-source="WWW real Header untouched">
+<img class="desk" src="WWW-Original-PC1440-Source.jpeg" alt="">
+<img class="mob" src="WWW-Original-M390-Source.jpeg" alt=""></div>
+<main class="v4">
+<section class="hero">
+ <div class="thin"></div>
+ <div class="hero-copy"><span class="eyebrow">BEYOURLOVER / THE ART OF DESIRE</span>
+ <h1>Feel<br>everything.<br><em>Beautifully.</em></h1>
+ <p>Playful by nature. Thoughtful by design. A different expression of pleasure, for every version of you.</p>
+ <a class="cta" href="#v4-arrivals">Enter the collection <span>↗</span></a>
+ </div>
+ <div class="hero-smallprint">01 / AN ORIGINAL WORLD OF DISCOVERY</div>
+ <div class="hero-art">
+  <svg viewBox="0 0 720 730" xmlns="http://www.w3.org/2000/svg" aria-label="Original editorial line illustration, portrait and flowers">
+   <defs>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ede1d9"/><stop offset="1" stop-color="#f7f3ed" stop-opacity="0"/></radialGradient>
+    <linearGradient id="headshade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0cfc2"/><stop offset=".7" stop-color="#e8bcb3"/><stop offset="1" stop-color="#c89fa0"/></linearGradient>
+    <linearGradient id="winefade"><stop stop-color="#b88087"/><stop offset="1" stop-color="#823e52"/></linearGradient>
+    <linearGradient id="petal"><stop stop-color="#dcb1ac"/><stop offset="1" stop-color="#f1dcd3"/></linearGradient>
+   </defs>
+   <ellipse cx="350" cy="376" rx="341" ry="328" fill="url(#glow)"/>
+   <circle cx="465" cy="330" r="248" fill="#d9b1ad" opacity=".25"/>
+   <circle cx="466" cy="330" r="230" fill="none" stroke="#b57d85" stroke-opacity=".31" stroke-width="1"/>
+   <path d="M120 734 C200 630 238 577 275 494 C290 462 295 433 292 401 C312 433 345 448 373 431 C415 412 437 380 449 334 C477 300 491 251 472 211 C450 161 393 161 364 186 C338 204 336 238 331 260 C321 302 287 316 270 350 C260 392 288 443 305 482 C273 566 251 644 235 734 Z" fill="url(#headshade)" opacity=".88"/>
+   <path d="M475 215 C490 245 491 278 470 313 C464 332 467 347 451 369 C449 402 418 426 392 437 C347 459 325 446 306 428" fill="none" stroke="#76515b" stroke-width="2.4"/>
+   <path d="M375 296 Q397 285 414 288 M383 295 Q395 291 408 291" fill="none" stroke="#78565f" stroke-width="2.5" stroke-linecap="round"/>
+   <path d="M417 332 Q433 324 443 323 Q429 336 416 332" fill="#ae6a73" opacity=".8"/>
+   <path d="M429 349 Q434 355 441 352" fill="none" stroke="#a86b76" stroke-width="2"/>
+   <path d="M328 292 C325 230 345 178 390 154 C426 137 459 164 481 184 C532 229 552 300 534 395 C510 452 473 500 485 550 C438 518 431 460 440 423" fill="none" stroke="#6d4a55" stroke-width="14" stroke-linecap="round" opacity=".52"/>
+   <path d="M304 379 C271 329 295 229 354 174 C390 138 430 145 475 170 M298 381 C278 321 301 247 335 221" fill="none" stroke="#835d65" stroke-width="3" stroke-linecap="round"/>
+   <path d="M268 735 C265 646 309 540 325 492 C378 531 428 549 479 520 C523 578 552 645 561 735 Z" fill="#8f4d5f" opacity=".84"/>
+   <path d="M215 723 C269 622 295 588 323 531 M330 501 C346 566 389 616 434 641" fill="none" stroke="#e3c1bb" stroke-width="2" opacity=".74"/>
+   <g fill="none" stroke="#8c7d75" stroke-width="2" opacity=".9">
+    <path d="M125 732 C147 611 142 513 88 406 C58 344 53 278 76 220"/>
+    <path d="M137 682 C167 607 189 577 205 510 M163 604 C144 532 141 474 157 406"/>
+    <path d="M592 739 C569 653 571 562 603 476 C625 421 632 346 601 287"/>
+   </g>
+   <g fill="#aab5a6" opacity=".8">
+    <path d="M108 591 C41 569 20 531 29 485 C78 493 111 520 108 591Z"/>
+    <path d="M144 519 C197 475 209 434 195 394 C159 425 140 464 144 519Z"/>
+    <path d="M68 416 C12 393 2 362 20 324 C60 346 78 377 68 416Z"/>
+    <path d="M599 560 C651 540 681 497 682 449 C636 474 607 507 599 560Z"/>
+    <path d="M574 651 C520 611 516 563 530 523 C571 555 587 597 574 651Z"/>
+   </g>
+   <g transform="translate(97 244)">
+    <path d="M0 0 C-13 -47 -47 -63 -68 -39 C-84 -12 -63 14 -28 23 C-66 34 -75 67 -53 86 C-28 102 -8 83 0 49 C8 83 33 93 57 75 C78 49 58 28 26 23 C61 9 69 -25 51 -45 C26 -67 1 -47 0 0Z" fill="url(#petal)" stroke="#c18e91" stroke-width="1.5"/>
+    <circle cx="0" cy="20" r="19" fill="#994d61"/>
+    <circle cx="-4" cy="15" r="5" fill="#efdcc2"/>
+   </g>
+   <g transform="translate(593 226) scale(.8)">
+    <path d="M0 0 C-13 -47 -47 -63 -68 -39 C-84 -12 -63 14 -28 23 C-66 34 -75 67 -53 86 C-28 102 -8 83 0 49 C8 83 33 93 57 75 C78 49 58 28 26 23 C61 9 69 -25 51 -45 C26 -67 1 -47 0 0Z" fill="#a86778" stroke="#9f6170" stroke-width="1.5" opacity=".82"/>
+    <circle cx="0" cy="20" r="17" fill="#6e3548"/>
+   </g>
+   <g transform="translate(590 612) scale(1.1)">
+    <path d="M0 0 C-13 -47 -47 -63 -68 -39 C-84 -12 -63 14 -28 23 C-66 34 -75 67 -53 86 C-28 102 -8 83 0 49 C8 83 33 93 57 75 C78 49 58 28 26 23 C61 9 69 -25 51 -45 C26 -67 1 -47 0 0Z" fill="url(#petal)" stroke="#bd838d" stroke-width="1.5"/>
+    <circle cx="0" cy="20" r="18" fill="#9a5b6b"/>
+   </g>
+   <g fill="none" stroke="#bb8a83" stroke-width="1" opacity=".6"><circle cx="464" cy="330" r="276"/><path d="M142 103 Q203 61 257 88 M557 101 Q594 135 613 171"/></g>
+  </svg>
+ </div>
+</section>
+<section class="quick" id="v4-quick" aria-label="Original eight BeYourLover product shortcuts">
+ <div class="container">
+  <div class="quick-heading"><h2>Discover the originals.</h2><span class="small">YOUR NEXT FAVORITE, ONE TAP AWAY</span></div>
+  <nav class="quick-list">
+   <a class="quick-item" href="/skullman/"><span class="art"><img src="https://img.beyourlover.com/2025/07/21065415/skullman-banner-image1-300x300.webp" alt="Skullman"></span><span class="name">SKULLMAN</span></a>
+   <a class="quick-item" href="/beyourlover-fatima-green/"><span class="art"><img src="https://img.beyourlover.com/2025/03/20052055/beyourlover-fatima.webp" alt="Fatima"></span><span class="name">FATIMA</span></a>
+   <a class="quick-item" href="/clock"><span class="art"><img src="https://img.beyourlover.com/2025/02/07075510/new-clock-main05-300x300.png" alt="Clock"></span><span class="name">CLOCK</span></a>
+   <a class="quick-item" href="/beyourlover-magic-suitcase-green/"><span class="art"><img src="https://img.beyourlover.com/2025/02/09054036/magic-suitcase-pink-banner-300x300.webp" alt="Suitcase"></span><span class="name">SUITCASE</span></a>
+   <a class="quick-item" href="/beyourlover-joy-cup-diamond-version/"><span class="art"><img src="https://img.beyourlover.com/2025/03/20052056/beyourlover-joy-cup.webp" alt="Joy Cup"></span><span class="name">JOY CUP</span></a>
+   <a class="quick-item" href="/beyourlover-alggie/"><span class="art"><img src="https://img.beyourlover.com/2025/03/20052053/beyourlover-earphone.webp" alt="Earpod"></span><span class="name">EARPOD</span></a>
+   <a class="quick-item" href="/m2/"><span class="art"><img src="https://img.beyourlover.com/2025/11/23013116/M2-Masturbator-Main-Image0-1-300x300.png" alt="M2"></span><span class="name">M2</span></a>
+   <a class="quick-item" href="/lippy/"><span class="art"><img src="https://img.beyourlover.com/2026/03/24092622/lippy-main-pictures-01-300x300.png" alt="Lippy"></span><span class="name">LIPPY</span></a>
+  </nav>
+  <div class="quick-swipe"><span>SWIPE TO EXPLORE ALL EIGHT</span><span>←&nbsp;&nbsp;&nbsp;→</span></div>
+ </div>
+</section>
+<section class="manifesto">
+ <div class="container">
+  <div class="manifesto-art">
+   <svg viewBox="0 0 650 430" xmlns="http://www.w3.org/2000/svg" aria-label="Sculptural botanical illustration">
+    <defs><linearGradient id="sculp"><stop stop-color="#b46d79"/><stop offset="1" stop-color="#dba9a4"/></linearGradient></defs>
+    <circle cx="300" cy="185" r="161" fill="#e7cbc5" opacity=".55"/>
+    <path d="M144 430 C101 343 125 226 234 184 C304 158 366 188 385 245 C415 338 350 429 256 430" fill="none" stroke="#7c4d58" stroke-width="17" stroke-linecap="round"/>
+    <path d="M208 430 C184 329 231 241 305 233 C364 227 421 289 417 369 C416 395 412 416 402 430" fill="none" stroke="url(#sculp)" stroke-width="37" stroke-linecap="round"/>
+    <path d="M465 420 C461 289 492 182 528 90" stroke="#879489" stroke-width="4" fill="none"/>
+    <path d="M504 185 C546 175 580 141 578 103 C547 102 520 122 504 185Z" fill="#acb6a9"/>
+    <path d="M487 286 C436 247 431 210 443 177 C480 203 494 239 487 286Z" fill="#aab5a6"/>
+    <path d="M468 353 C518 335 549 306 552 260 C506 270 478 298 468 353Z" fill="#c0c9bb"/>
+    <path d="M139 395 C120 305 65 239 35 171" stroke="#9aa697" stroke-width="4" fill="none"/>
+    <path d="M83 281 C26 285 2 247 0 218 C45 220 75 238 83 281Z" fill="#b5c0b1"/>
+    <path d="M116 354 C158 328 172 285 156 249 C120 269 108 311 116 354Z" fill="#c0cabe"/>
+    <g transform="translate(526 82)"><path d="M0 0 C-22 -27 -58 -19 -53 13 C-44 40 -22 38 0 24 C26 47 49 37 45 10 C40 -18 18 -27 0 0Z" fill="#dcb4ae" stroke="#bc858e" stroke-width="1.5"/><circle cx="0" cy="12" r="11" fill="#8f5662"/></g>
+   </svg>
+  </div>
+  <div class="manifesto-copy"><span class="eyebrow">FORM. FEELING. FREEDOM.</span><h2>It's personal.<br><i>Make it yours.</i></h2><div class="manifesto-rule"></div><p>Not another product. A little more curiosity, confidence and room to discover. Designed to fit beautifully into the life you're living.</p></div>
+ </div><span class="overprint">Be.</span>
+</section>
+<section class="arrivals" id="v4-arrivals">
+ <div class="container">
+  <div class="arrivals-top"><div><span class="eyebrow">LATEST FROM THE STUDIO</span><h2>New arrivals.</h2></div><a href="/product-category/new-arrivals/">Discover all ↗</a></div>
+  <div class="gallery">
+   <article class="gallery-main"><img src="https://img.beyourlover.com/2026/08/14100230/s2-main-pictures-01-1000x1000.png" alt="TARA S2 official product photography"><div class="new-name"><span>THE EDIT / 01</span><h3>TARA S2</h3></div></article>
+   <article class="gallery-side"><div class="art"><img src="https://img.beyourlover.com/2026/06/16065328/minaka-main-pictures.png" alt="MINAKA"></div><div class="meta"><div><small>THE EDIT / 02</small><h3>MINAKA</h3></div><span class="angle">↗</span></div></article>
+   <article class="gallery-side"><div class="art"><img src="https://img.beyourlover.com/2026/04/10042552/main-pictures-03-1.webp" alt="NAUGHTY CLOCK PINK"></div><div class="meta"><div><small>THE EDIT / 03</small><h3>CLOCK PINK</h3></div><span class="angle">↗</span></div></article>
+   <article class="gallery-side"><div class="art"><img src="https://img.beyourlover.com/2025/12/23013024/naughty-clock.png" alt="NAUGHTY CLOCK GREEN"></div><div class="meta"><div><small>THE EDIT / 04</small><h3>CLOCK GREEN</h3></div><span class="angle">↗</span></div></article>
+  </div>
+  <div class="arrivals-note"><span>THE BEYOURLOVER COLLECTION / ORIGINAL DESIGN</span><span>DISCOVER SOMETHING BEAUTIFUL.</span></div>
+ </div>
+</section><div class="collection-intro">CURATED WORLDS &nbsp; / &nbsp; THREE WAYS TO EXPLORE</div>
+</main>
+<div class="ww-bottom" data-keep-from-www="Creator Signed Editions through Footer pixel exact">
+ <img class="desk" src="WWW-Original-PC1440-Source.jpeg" alt="Unmodified WWW source snapshot" />
+ <img class="mob" src="WWW-Original-M390-Source.jpeg" alt="Unmodified WWW source snapshot" />
+ <section class="editorial-overlay women">
+  <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">DESIGNED FOR YOUR WORLD</span><h2>Always<br>your own.</h2><p>An original approach to personal pleasure. Explore what feels right for you.</p><span class="line">Explore for her &nbsp; ↗</span></div>
+   <div class="overlay-art">
+    <svg viewBox="0 0 630 551" xmlns="http://www.w3.org/2000/svg"><ellipse cx="355" cy="270" rx="240" ry="255" fill="#e2c1b8"/><path d="M188 551 C158 441 188 353 251 276 C322 194 405 206 437 267 C457 335 415 378 385 410 C378 467 399 520 427 551Z" fill="#b06c7a"/><path d="M230 355 C216 282 235 201 294 159 C370 106 433 142 478 220 C509 267 513 344 493 404" fill="none" stroke="#714451" stroke-width="16" opacity=".46"/><path d="M317 291 Q346 278 361 280 M370 330 Q392 323 409 335" fill="none" stroke="#f9dfd0" stroke-width="3"/><path d="M464 551 C500 447 504 346 558 205" fill="none" stroke="#7f8c7f" stroke-width="3"/><path d="M517 328 C552 284 598 278 628 304 C596 347 559 358 517 328Z" fill="#a4afa2"/><path d="M515 410 C453 388 440 352 442 313 C491 334 515 363 515 410Z" fill="#bbc8b5"/><g transform="translate(512 174)"><path d="M0 0 C-15 -35 -42 -43 -56 -20 C-68 1 -42 21 -16 26 C-44 46 -36 71 -10 76 C15 79 26 59 20 33 C55 48 70 29 60 5 C45 -22 20 -26 0 0Z" fill="#ead3cb"/><circle cx="4" cy="18" r="15" fill="#9c6878"/></g></svg>
+   </div></div>
+ </section>
+ <section class="editorial-overlay men">
+  <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">EXPLORE THE UNEXPECTED</span><h2>Your<br>next move.</h2><p>Curiosity in every detail. Design that feels as good as it looks.</p><span class="line">Explore for him &nbsp; ↗</span></div>
+   <div class="overlay-art">
+    <svg viewBox="0 0 720 551" xmlns="http://www.w3.org/2000/svg"><circle cx="426" cy="246" r="246" fill="#d9dfd2"/><circle cx="426" cy="246" r="217" fill="none" stroke="#99aa9a" stroke-width="1.5"/><path d="M329 592 C309 441 410 389 455 275 C482 207 450 165 400 175 C339 184 314 247 346 291" fill="none" stroke="#677566" stroke-width="55" stroke-linecap="round"/><path d="M446 582 C532 450 552 355 502 292 C465 245 441 283 431 310" fill="none" stroke="#9e7779" stroke-width="46" stroke-linecap="round"/><path d="M267 416 C206 339 211 263 220 196" fill="none" stroke="#b09a8c" stroke-width="2"/><path d="M224 275 C170 262 156 219 173 178 C212 201 230 228 224 275Z" fill="#9daa9b"/><path d="M299 453 C361 435 396 394 402 347 C342 369 309 404 299 453Z" fill="#bdc4b9"/><path d="M592 391 C640 341 661 267 649 232" stroke="#768b7c" fill="none" stroke-width="3"/></svg>
+   </div></div>
+ </section>
+ <section class="editorial-overlay couples">
+  <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">TOGETHER, IN YOUR OWN WAY</span><h2>Better<br>connected.</h2><p>Explore the moments that move you. Thoughtfully made for two.</p><span class="line">Explore together &nbsp; ↗</span></div>
+   <div class="overlay-art">
+    <svg viewBox="0 0 650 551" xmlns="http://www.w3.org/2000/svg"><ellipse cx="351" cy="274" rx="266" ry="271" fill="#734958"/><ellipse cx="351" cy="274" rx="226" ry="235" fill="none" stroke="#c69ba1" opacity=".3"/><path d="M180 546 C220 451 237 361 275 307 C326 232 382 264 374 317 C360 415 264 451 287 546" fill="none" stroke="#d6aaa4" stroke-width="58" stroke-linecap="round"/><path d="M433 552 C394 440 382 352 414 286 C452 206 497 222 490 296 C484 365 435 403 435 446" fill="none" stroke="#a97886" stroke-width="49" stroke-linecap="round"/><path d="M221 505 Q325 453 420 500" fill="none" stroke="#f1d4ca" stroke-width="2"/><path d="M532 543 C529 434 562 309 594 216" fill="none" stroke="#d2a6b1" stroke-width="3"/><path d="M574 302 C616 268 649 273 654 302 C621 338 598 337 574 302Z" fill="#a87b84"/><path d="M554 398 C512 372 512 337 525 307 C556 330 564 365 554 398Z" fill="#d4acb7"/><g transform="translate(544 188)"><path d="M0 0 C-17 -31 -54 -23 -51 4 C-48 32 -22 32 0 19 C24 40 54 36 55 12 C56 -12 26 -18 0 0Z" fill="#d1a4a8"/><circle cx="3" cy="10" r="11" fill="#724051"/></g></svg>
+   </div></div>
+ </section>
+</div>
+</body></html>
