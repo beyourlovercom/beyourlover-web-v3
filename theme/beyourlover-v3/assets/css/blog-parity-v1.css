@@ -118,3 +118,13 @@ body.byl-blog-parity-v1 .byl-context-nav{display:none}
 .byl-blogv1-pagination{justify-content:center}
 }
 @media(prefers-reduced-motion:reduce){.byl-blogv1 *{scroll-behavior:auto!important;transition:none!important}}
+/* Owner UAT P1: columns popover must stay inside the mobile viewport.
+   Global form input height styles must not inflate the checkbox hit target. */
+.byl-blogv1-column-anchor [data-col-menu] input[type=checkbox]{
+  width:18px;height:18px;min-width:18px;flex:0 0 18px;padding:0;margin:0;accent-color:#a34174;
+}
+@media(max-width:700px){
+  .byl-blogv1-column-anchor [data-col-menu]{
+    left:0;right:auto;width:245px;max-width:calc(100vw - 26px);
+  }
+}
