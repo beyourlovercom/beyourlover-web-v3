@@ -19,3 +19,4 @@ require_once get_stylesheet_directory().'/inc/order-pay-address.php';
 require_once get_stylesheet_directory().'/inc/thank-you.php';
 require_once get_stylesheet_directory().'/inc/cart-experience.php';
 require_once get_stylesheet_directory().'/inc/cart-drawer.php';
+require_once get_stylesheet_directory().'/inc/blog-legacy-script-ampersand.php';

@@ -170,7 +170,8 @@
         "blog-sidebar.php",
         "inc/blog-product-card.php",
         "assets/css/post-single.css",
-        "assets/js/post-toc.js"
+        "assets/js/post-toc.js",
+        "inc/blog-legacy-script-ampersand.php"
       ]
     },
     "pages": {
