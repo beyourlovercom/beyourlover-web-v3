@@ -8,6 +8,51 @@
   if (!root || root.dataset.enhanced === '1') return;
   root.dataset.enhanced = '1';
   const q = selector => root.querySelector(selector);
+  // Independent Blog shell: do not interact with Shop shell/menu/search.
+  const blogHeader = document.querySelector('[data-blog-header]');
+  const menuToggle = blogHeader?.querySelector('[data-blog-menu-toggle]');
+  const menu = document.querySelector('#byl-blog-mobile-menu');
+  const searchToggle = blogHeader?.querySelector('[data-blog-search-toggle]');
+  const searchPanel = document.querySelector('#byl-blog-header-search');
+  const searchInput = searchPanel?.querySelector('[data-blog-header-query]');
+  const aboutToggle = document.querySelector('[data-blog-about-toggle]');
+  const aboutExtra = document.querySelector('#byl-blog-about-extra');
+  function toggleBlogMenu(force){
+    if (!menu || !menuToggle) return;
+    const open = force === undefined ? menu.hidden : Boolean(force);
+    menu.hidden = !open;
+    menuToggle.setAttribute('aria-expanded', String(open));
+  }
+  function toggleBlogSearch(force){
+    if (!searchPanel || !searchToggle) return;
+    const open = force === undefined ? searchPanel.hidden : Boolean(force);
+    searchPanel.hidden = !open;
+    searchToggle.setAttribute('aria-expanded', String(open));
+    if (open) searchInput?.focus();
+  }
+  function runBlogSearch(){
+    if (!searchInput) return;
+    const filter = root.querySelector('[data-explore-search] [name=search]');
+    if (!filter) return;
+    filter.value = searchInput.value;
+    filter.dispatchEvent(new Event('input',{bubbles:true}));
+    toggleBlogSearch(false);
+    document.querySelector('#byl-blogv1-explore')?.scrollIntoView({block:'start',behavior:'smooth'});
+  }
+  menuToggle?.addEventListener('click',()=>toggleBlogMenu());
+  searchToggle?.addEventListener('click',()=>toggleBlogSearch());
+  searchPanel?.querySelector('[data-blog-header-submit]')?.addEventListener('click',runBlogSearch);
+  searchPanel?.querySelector('[data-blog-search-close]')?.addEventListener('click',()=>toggleBlogSearch(false));
+  searchInput?.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();runBlogSearch();}});
+  aboutToggle?.addEventListener('click',()=>{
+    if (!aboutExtra) return;
+    aboutExtra.hidden = !aboutExtra.hidden;
+    aboutToggle.setAttribute('aria-expanded',String(!aboutExtra.hidden));
+    aboutToggle.innerHTML = aboutExtra.hidden?'READ MORE <span aria-hidden="true">⌄</span>':'READ LESS <span aria-hidden="true">⌃</span>';
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'){toggleBlogMenu(false);toggleBlogSearch(false);}
+  });
   const data = q('#byl-blogv1-data');
   let posts = [];
   try {

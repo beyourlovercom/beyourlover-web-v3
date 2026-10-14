@@ -6,12 +6,21 @@ const read=p=>fs.readFileSync(path.join(theme,p),'utf8');
 const template=read('page-blog.php'),css=read('assets/css/blog-parity-v1.css'),js=read('assets/js/blog-parity-v1.js');
 const manifest=JSON.parse(read('theme-os.json'));
 const editor=manifest.modules.editorial.files;
-for(const file of ['page-blog.php','assets/css/blog-parity-v1.css','assets/js/blog-parity-v1.js']){
+for(const file of ['page-blog.php','blog-parts/header.php','blog-parts/footer.php','assets/css/blog-parity-v1.css','assets/js/blog-parity-v1.js']){
  assert(editor.includes(file),'editorial ownership '+file);
  assert(fs.existsSync(path.join(theme,file)),'file exists '+file);
 }
 assert(!template.includes('byl_blog_v1_preview') && !template.includes("require get_stylesheet_directory() . '/index.php';"),'Blog template active directly on Dev /blog/ for UAT');
-assert(template.includes('get_header();')&&template.includes('get_footer();'),'reuse V3 shell');
+const blogHeader=read('blog-parts/header.php'),blogFooter=read('blog-parts/footer.php');
+assert(template.includes("require get_stylesheet_directory().'/blog-parts/header.php';") && template.includes("require get_stylesheet_directory().'/blog-parts/footer.php';"),'only independent Blog shell');
+assert(!template.includes('get_header();')&&!template.includes('get_footer();'),'Shop header/footer must not load in Blog');
+assert(blogHeader.includes('wp_head();')&&blogHeader.includes('wp_body_open();')&&blogFooter.includes('wp_footer();'),'WordPress head/footer hooks preserved');
+assert(blogHeader.includes('byl-blogv1-site-header')&&blogHeader.includes('data-blog-menu-toggle')&&blogHeader.includes('data-blog-search-toggle'),'independent header with menu/search');
+assert(blogFooter.includes('byl-blogv1-site-footer')&&blogFooter.includes('byl-blogv1-footer-intro')&&blogFooter.includes('byl-blogv1-footer-connect')&&blogFooter.includes('byl-blogv1-footer-details'),'independent WWW-style footer modules');
+assert(!blogHeader.includes('byl-shell-header')&&!blogFooter.includes('byl-shell-footer'),'no Shop shell in Blog parts');
+assert(blogFooter.includes("/newsletter/"),'independent newsletter link retained');
+assert(js.includes('data-blog-header-submit')&&js.includes('data-blog-menu-toggle')&&js.includes('data-blog-about-toggle'),'Blog-only header/footer interactive controls');
+
 assert(template.includes('new WP_Query([')&&template.includes("'post_status'=>'publish'")&&template.includes("'cat'=>(int) $term->term_id"),'published WordPress articles, scoped terms');
 assert(template.includes("get_term_by('slug'")&&template.includes('get_term_link($term)'),'real category permalinks');
 assert(template.includes('get_the_post_thumbnail_url')&&template.includes('wp_json_encode'),'real post media / JSON encoding');
@@ -25,5 +34,5 @@ assert(js.includes('dialog.hidden = false')&&js.includes('event.key===\'Escape\'
 assert(css.includes('body.byl-blog-parity-v1')&&css.includes('.byl-blogv1-category')&&css.includes('grid-template-columns:repeat(2'),'route-scoped WWW visual baseline');
 assert(!template.includes('localdev.beyourlover.com'),'no stale dev host dependency');
 assert(!template.includes('<form action=')&&!template.includes('type="email"'),'no deceptive newsletter submission');
-assert(template.includes('home_url(\'/newsletter/\')'),'newsletter routes to existing page');
+assert(!template.includes('get_header()')&&!template.includes('get_footer()'),'no Shop shell calls');
 console.log('BLOG_WWW_PARITY_V1_H3_SOURCE_CONTRACT=PASS');

@@ -16,7 +16,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     foreach (['css' => 'assets/css/blog-parity-v1.css', 'js' => 'assets/js/blog-parity-v1.js'] as $kind => $name) {
         $version = is_file($dir.'/'.$name) ? (string) filemtime($dir.'/'.$name) : '0.1.0';
         if ($kind === 'css') {
-            wp_enqueue_style('byl-blog-parity-v1', $uri.'/'.$name, ['byl-v3-shell'], $version);
+            wp_enqueue_style('byl-blog-parity-v1', $uri.'/'.$name, [], $version);
         } else {
             wp_enqueue_script('byl-blog-parity-v1', $uri.'/'.$name, [], $version, true);
             wp_script_add_data('byl-blog-parity-v1', 'strategy', 'defer');
@@ -76,13 +76,9 @@ foreach ($featured as $post) {
 if (empty($hero_posts)) {
     $hero_posts[] = ['title'=>'Lover’s Journal','url'=>home_url('/blog/'),'image'=>''];
 }
-get_header();
+require get_stylesheet_directory().'/blog-parts/header.php';
 ?>
 <main id="main-content" class="byl-blogv1" data-byl-blogv1>
-  <div class="byl-blogv1-announcement">Cute, Original Toys Made With ❤️ &nbsp;·&nbsp; Fast Worldwide Discreet Shipping</div>
-  <div class="byl-blogv1-headingbar">
-    <span>BeYourLover Blog</span><nav aria-label="Blog sections"><a href="#byl-blogv1-journal">Journal</a><a href="#byl-blogv1-explore">Explore</a></nav>
-  </div>
   <section class="byl-blogv1-hero" aria-label="Featured stories">
     <div class="byl-blogv1-hero-track" data-hero-track>
     <?php foreach ($hero_posts as $k=>$h): ?>
@@ -140,10 +136,8 @@ get_header();
     <div data-explore-results></div>
     <div class="byl-blogv1-pagination"><label>Per page <select data-page-size><option value="6">6</option><option value="12">12</option><option value="24">24</option><option value="all">All</option></select></label><div data-pages></div></div>
   </section>
-  <section class="byl-blogv1-club"><h2>STAY IN THE LOOP ♡</h2><p>Get new stories and discoveries. Newsletter subscriptions remain on the existing, dedicated page.</p><a href="<?php echo esc_url(home_url('/newsletter/')); ?>">Visit Newsletter →</a></section>
-  <section class="byl-blogv1-about"><h2>Welcome to the BeYourLover Blog</h2><p>Explore helpful guides, thoughtful relationship advice and the latest stories. Posts and categories are served directly from WordPress.</p></section>
   <div class="byl-blogv1-dialog" data-dialog-wrap hidden><div class="byl-blogv1-backdrop" data-modal-close></div><section role="dialog" aria-modal="true" aria-labelledby="byl-blogv1-dialog-title" data-modal-content><button type="button" data-modal-close aria-label="Close article preview">×</button><div data-dialog-body></div></section></div>
   <script type="application/json" id="byl-blogv1-data"><?php echo wp_json_encode(array_values($all_posts), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
   <div class="byl-blogv1-preview-note">B1–B4 Dev Owner UAT · real published posts · no checkout/order changes</div>
 </main>
-<?php get_footer(); ?>
+<?php require get_stylesheet_directory().'/blog-parts/footer.php'; ?>
