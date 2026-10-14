@@ -1,0 +1,45 @@
+'use strict';
+// Blog WWW Parity H3 scoped source contract, no DB, network, orders or mail.
+const fs=require('fs'),assert=require('assert'),path=require('path');
+const home=path.resolve(__dirname,'..'),theme=path.join(home,'theme/beyourlover-v3');
+const read=p=>fs.readFileSync(path.join(theme,p),'utf8');
+const template=read('page-blog.php'),css=read('assets/css/blog-parity-v1.css'),js=read('assets/js/blog-parity-v1.js');
+const manifest=JSON.parse(read('theme-os.json'));
+const editor=manifest.modules.editorial.files;
+for(const file of ['page-blog.php','blog-parts/header.php','blog-parts/footer.php','assets/css/blog-parity-v1.css','assets/js/blog-parity-v1.js']){
+ assert(editor.includes(file),'editorial ownership '+file);
+ assert(fs.existsSync(path.join(theme,file)),'file exists '+file);
+}
+assert(!template.includes('byl_blog_v1_preview') && !template.includes("require get_stylesheet_directory() . '/index.php';"),'Blog template active directly on Dev /blog/ for UAT');
+const blogHeader=read('blog-parts/header.php'),blogFooter=read('blog-parts/footer.php');
+assert(template.includes("require get_stylesheet_directory().'/blog-parts/header.php';") && template.includes("require get_stylesheet_directory().'/blog-parts/footer.php';"),'only independent Blog shell');
+assert(!template.includes('get_header();')&&!template.includes('get_footer();'),'Shop header/footer must not load in Blog');
+assert(blogHeader.includes('wp_head();')&&blogHeader.includes('wp_body_open();')&&blogFooter.includes('wp_footer();'),'WordPress head/footer hooks preserved');
+assert(blogHeader.includes('byl-blogv1-site-header')&&blogHeader.includes('data-blog-menu-toggle')&&blogHeader.includes('data-blog-search-toggle'),'independent header with menu/search');
+assert(blogFooter.includes('byl-blogv1-site-footer')&&blogFooter.includes('byl-blogv1-footer-intro')&&blogFooter.includes('byl-blogv1-footer-connect')&&blogFooter.includes('byl-blogv1-footer-details'),'independent WWW-style footer modules');
+assert(!blogHeader.includes('byl-shell-header')&&!blogFooter.includes('byl-shell-footer'),'no Shop shell in Blog parts');
+assert(blogFooter.includes("/newsletter/"),'independent newsletter link retained');
+assert(blogHeader.includes('byl-blogv1-header-inner byl-blogv1-container'),'dedicated Blog header inner rail');
+for(const region of ['footer-intro','footer-connect','footer-details','footer-bottom']){
+ assert(blogFooter.includes('byl-blogv1-container byl-blogv1-'+region+'-inner'),'independent Blog '+region+' rail');
+}
+assert(css.includes('--byl-blog-content-max:1260px')&&css.includes('--byl-blog-content-gutter:32px')&&css.includes('--byl-blog-content-gutter:16px'),'one desktop/mobile gutter source');
+assert(css.includes('.byl-blogv1-journal,')&&css.includes('.byl-blogv1-sections,')&&css.includes('.byl-blogv1-explore{'),'body content follows same rail');
+
+assert(js.includes('data-blog-header-submit')&&js.includes('data-blog-menu-toggle')&&js.includes('data-blog-about-toggle'),'Blog-only header/footer interactive controls');
+
+assert(template.includes('new WP_Query([')&&template.includes("'post_status'=>'publish'")&&template.includes("'cat'=>(int) $term->term_id"),'published WordPress articles, scoped terms');
+assert(template.includes("get_term_by('slug'")&&template.includes('get_term_link($term)'),'real category permalinks');
+assert(template.includes('get_the_post_thumbnail_url')&&template.includes('wp_json_encode'),'real post media / JSON encoding');
+assert(template.includes('JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT'),'JSON HTML-safe serialization');
+assert(!template.includes('the_content()'),'legacy Page126 content must not be emitted in preview');
+assert(!/wp_insert_post|wp_update_post|wp_mail\s*\(|wp_remote_post|woocommerce_checkout|WC_Order|update_option\s*\(/i.test(template),'no mutation or payment calls');
+assert(!js.includes('fetch(')&&!js.includes('XMLHttpRequest')&&!js.includes('localStorage')&&!js.includes('document.cookie'),'JS local read-only content');
+assert(js.includes('data-col-done'),'column chooser includes Owner-approved Done control');
+assert(js.includes('data-page-size')&&js.includes('data-col-toggle')&&js.includes('data-col-move')&&js.includes('data-hero-select')&&js.includes('data-view'),'H2 interactive controls');
+assert(js.includes('dialog.hidden = false')&&js.includes('event.key===\'Escape\''),'dialog interactive and escape');
+assert(css.includes('body.byl-blog-parity-v1')&&css.includes('.byl-blogv1-category')&&css.includes('grid-template-columns:repeat(2'),'route-scoped WWW visual baseline');
+assert(!template.includes('localdev.beyourlover.com'),'no stale dev host dependency');
+assert(!template.includes('<form action=')&&!template.includes('type="email"'),'no deceptive newsletter submission');
+assert(!template.includes('get_header()')&&!template.includes('get_footer()'),'no Shop shell calls');
+console.log('BLOG_WWW_PARITY_V1_H3_SOURCE_CONTRACT=PASS');

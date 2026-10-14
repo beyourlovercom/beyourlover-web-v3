@@ -53,6 +53,11 @@ jobs:
           php tools/dev/tests/p71-payment-title-smoke.php
       - name: Default Page/Post template offline regression
         run: php -l tools/dev/tests/page-post-defaults-offline-smoke.php && php tools/dev/tests/page-post-defaults-offline-smoke.php
+      - name: Blog WWW Parity V1 H3 scoped WordPress source and interactivity regression
+        run: |
+          php -l theme/beyourlover-v3/page-blog.php
+          node --check theme/beyourlover-v3/assets/js/blog-parity-v1.js
+          node scripts/test_blog_parity_v1_contract.js
       - name: Blog TOC offline source and script syntax regression
         run: node --check theme/beyourlover-v3/assets/js/post-toc.js && node scripts/test_blog_toc_contract.js
       - name: Blog product-card legacy Woo shortcode offline regression

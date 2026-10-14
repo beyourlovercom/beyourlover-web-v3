@@ -171,7 +171,12 @@
         "inc/blog-product-card.php",
         "assets/css/post-single.css",
         "assets/js/post-toc.js",
-        "inc/blog-legacy-script-ampersand.php"
+        "inc/blog-legacy-script-ampersand.php",
+        "page-blog.php",
+        "assets/css/blog-parity-v1.css",
+        "assets/js/blog-parity-v1.js",
+        "blog-parts/header.php",
+        "blog-parts/footer.php"
       ]
     },
     "pages": {
