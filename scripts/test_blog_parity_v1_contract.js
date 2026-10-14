@@ -19,6 +19,7 @@ assert(template.includes('JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX
 assert(!template.includes('the_content()'),'legacy Page126 content must not be emitted in preview');
 assert(!/wp_insert_post|wp_update_post|wp_mail\s*\(|wp_remote_post|woocommerce_checkout|WC_Order|update_option\s*\(/i.test(template),'no mutation or payment calls');
 assert(!js.includes('fetch(')&&!js.includes('XMLHttpRequest')&&!js.includes('localStorage')&&!js.includes('document.cookie'),'JS local read-only content');
+assert(js.includes('data-col-done'),'column chooser includes Owner-approved Done control');
 assert(js.includes('data-page-size')&&js.includes('data-col-toggle')&&js.includes('data-col-move')&&js.includes('data-hero-select')&&js.includes('data-view'),'H2 interactive controls');
 assert(js.includes('dialog.hidden = false')&&js.includes('event.key===\'Escape\''),'dialog interactive and escape');
 assert(css.includes('body.byl-blog-parity-v1')&&css.includes('.byl-blogv1-category')&&css.includes('grid-template-columns:repeat(2'),'route-scoped WWW visual baseline');

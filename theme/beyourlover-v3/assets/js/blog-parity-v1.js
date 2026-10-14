@@ -94,7 +94,7 @@
         '<input type="checkbox" aria-label="Show '+escapeHtml(columnTitles[key])+'" data-col-toggle="'+key+'" '+(key==='title'?'disabled ':'')+(!state.hidden.includes(key)?'checked':'')+'>'+
         '<span>'+escapeHtml(columnTitles[key])+'</span>'+
         '<button type="button" data-col-move="'+key+'" data-move="-1" '+(i===0?'disabled':'')+' aria-label="Move column up">↑</button>'+
-        '<button type="button" data-col-move="'+key+'" data-move="1" '+(i===state.columns.length-1?'disabled':'')+' aria-label="Move column down">↓</button></div>').join('');
+        '<button type="button" data-col-move="'+key+'" data-move="1" '+(i===state.columns.length-1?'disabled':'')+' aria-label="Move column down">↓</button></div>').join('')+'<button type="button" data-col-done>Done</button>';
   }
   const cell=(post,key)=>{
     const value = key==='readTime'?toText(post.readTime)+' min':toText(post[key]);
@@ -156,6 +156,11 @@
       if(!columnsMenu.hidden)buildColumns();
       return;
     }
+    if(button.hasAttribute('data-col-done')){
+      columnsMenu.hidden=true;
+      q('[data-col-open]').setAttribute('aria-expanded','false');
+      return;
+    }
     if(button.dataset.colMove){
       const i=state.columns.indexOf(button.dataset.colMove),j=i+Number(button.dataset.move);
       if(i>=0&&j>=0&&j<state.columns.length){[state.columns[i],state.columns[j]]=[state.columns[j],state.columns[i]];buildColumns();render();}
@@ -168,6 +173,12 @@
       const k=button.dataset.sortColumn;
       state.sort=k==='title'?'title':k==='category'?'category':k==='date'?'new':state.sort;
       form.elements.sort.value=state.sort;state.page=1;render();
+    }
+  });
+  root.addEventListener('pointerdown',event=>{
+    const toggle=q('[data-col-open]');
+    if(!columnsMenu.hidden && !columnsMenu.contains(event.target) && !toggle.contains(event.target)){
+      columnsMenu.hidden=true; toggle.setAttribute('aria-expanded','false');
     }
   });
   root.addEventListener('change',event=>{

@@ -53,7 +53,7 @@ foreach ($specs as &$spec) {
         $image = (string) get_the_post_thumbnail_url($post_id, 'medium_large');
         $entry = [
             'id'=>$post_id,
-            'title'=>get_the_title($post_id),
+            'title'=>html_entity_decode((string)get_the_title($post_id), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'url'=>get_permalink($post_id),
             'image'=>$image,
             'date'=>get_the_date('Y-m-d', $post_id),
@@ -72,7 +72,7 @@ $featured = get_posts(['post_type'=>'post','post_status'=>'publish','posts_per_p
 $hero_posts = [];
 foreach ($featured as $post) {
     $id = (int) $post->ID;
-    $hero_posts[] = ['title'=>get_the_title($id),'url'=>get_permalink($id),
+    $hero_posts[] = ['title'=>html_entity_decode((string)get_the_title($id), ENT_QUOTES | ENT_HTML5, 'UTF-8'),'url'=>get_permalink($id),
         'image'=>(string) get_the_post_thumbnail_url($id, 'full')];
 }
 // Visual UAT uses a current public WWW campaign reference only as a temporary
