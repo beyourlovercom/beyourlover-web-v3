@@ -1,0 +1,55 @@
+name: Business B2 Dev-only Candidate (NO DEPLOY)
+on:
+  pull_request:
+    paths:
+      - "theme/beyourlover-v3/page-business.php"
+      - "theme/beyourlover-v3/assets/css/business.css"
+      - "theme/beyourlover-v3/assets/js/business.js"
+      - "theme/beyourlover-v3/theme-os.json"
+      - "tools/dev/business_b2_candidate.py"
+      - "tools/dev/test_business_b2_candidate.py"
+      - "scripts/test_business_partnerships_b2_contract.js"
+      - ".github/workflows/business-b2-candidate.yml"
+permissions:
+  contents: read
+jobs:
+  offline-only:
+    name: Verify exact PR HEAD and publish 3-file offline artifact
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact PR head — no write token
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+      - name: Lint and no-network source contract
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          php -l theme/beyourlover-v3/page-business.php
+          node --check theme/beyourlover-v3/assets/js/business.js
+          node scripts/test_business_partnerships_b2_contract.js
+          python3 -m unittest discover -s tools/dev -p test_business_b2_candidate.py -v
+      - name: Build and verify deterministic three-file candidate
+        env:
+          EXACT_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          python3 tools/dev/business_b2_candidate.py build --source . --exact-sha "$EXACT_HEAD" --out "$RUNNER_TEMP/byl-business-a"
+          python3 tools/dev/business_b2_candidate.py build --source . --exact-sha "$EXACT_HEAD" --out "$RUNNER_TEMP/byl-business-b"
+          cmp "$RUNNER_TEMP/byl-business-a/byl-business-b2-dev-only-THREE-FILES.zip" "$RUNNER_TEMP/byl-business-b/byl-business-b2-dev-only-THREE-FILES.zip"
+          python3 tools/dev/business_b2_candidate.py verify --out "$RUNNER_TEMP/byl-business-a"
+      - name: Upload candidate for reviewed Dev-only release (never installed by CI)
+        uses: actions/upload-artifact@v4
+        with:
+          name: byl-business-b2-dev-only-offline-candidate
+          path: ${{ runner.temp }}/byl-business-a/
+          retention-days: 3
+          if-no-files-found: error
