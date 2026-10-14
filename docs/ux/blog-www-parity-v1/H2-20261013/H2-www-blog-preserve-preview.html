@@ -1,0 +1,804 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>BYL Blog WWW Parity — H2 Review Only</title><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}html,body{padding:0;margin:0;font-family:Arial,Helvetica,sans-serif;background:#fff;color:#151515}
+.byl-preview-top{position:relative;z-index:20;background:#fff;border-bottom:1px solid #eee;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px}
+.byl-preview-brand{font-family:Georgia,serif;color:#9d2e49;font-size:18px;letter-spacing:.015em}
+.byl-preview-nav{font-size:13px;display:flex;gap:28px;align-items:center}
+.byl-preview-stamp{position:fixed;z-index:1000;right:8px;bottom:10px;padding:5px 8px;background:#111;color:#fff;font-size:10px;border-radius:3px;opacity:.82}
+.byl-preview-end{background:#f6f5f6;padding:42px 18px;color:#333;text-align:center}
+.byl-preview-end h2{font-size:25px;margin:0 0 14px}.byl-preview-end p{max-width:800px;margin:0 auto 20px;line-height:1.65}
+.byl-preview-end a{color:#9d2e49}
+.blog-banner,.blog-categories,.blog-cat-module{max-width:100%;overflow:hidden}
+@media(max-width:767px){.byl-preview-top{height:50px;padding:0 14px}.byl-preview-brand{font-size:15px}.byl-preview-nav{gap:18px;font-size:12px}.byl-preview-nav a:not(:last-child){display:none}}
+</style>
+</head><body>
+<header class="byl-preview-top"><div class="byl-preview-brand">BEYOURLOVER <span style="font-family:Arial;font-size:10px;letter-spacing:.3em">Lovely present</span></div><nav class="byl-preview-nav"><a>Shop</a><a>Categories</a><a>Blog</a><a>Support</a><a aria-label="Cart">🛒</a></nav></header>
+<main id="blog-parity-h2">
+<link rel="stylesheet" href="https://www.beyourlover.com/css/swiper-bundle.min.css" />
+<script src="https://www.beyourlover.com/js/swiper-bundle.min.js"></script>
+<style>
+    body:has(:not(.woocommerce-breadcrumb)) .site-content {
+        padding-top: 0 !important;
+    }
+
+    .shoptimizer-archive>.col-full {
+        max-width: inherit;
+        padding: 0;
+    }
+
+    .shoptimizer-archive .page-title {
+        display: none;
+    }
+
+    .shoptimizer-archive .archive-header {
+        display: none;
+    }
+
+    /*  */
+    .blog-banner {
+        overflow: hidden;
+        max-width: 1480px;
+        margin: auto;
+    }
+
+    .blog-banner img {
+        width: 100%;
+        height: auto;
+        vertical-align: top;
+    }
+
+    .blog-banner .home-swiper {
+        position: relative;
+        height: 100%;
+    }
+
+    .blog-banner .swiper-pagination-bullet-active {
+        background-color: #A2394A;
+    }
+
+    .blog-banner .swiper-button-next,
+    .blog-banner .swiper-button-prev {
+        color: #FFFFFF;
+    }
+
+    .blog-banner .swiper-pagination {
+        bottom: 10px;
+    }
+
+    @media (min-width: 769px) {
+        .blog-banner {
+            aspect-ratio: 64 / 43;
+        }
+
+        .mobile-banner-image {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .blog-banner .home-swiper {
+            --swiper-navigation-size: 30px;
+        }
+
+        .pc-banner-image {
+            display: none;
+        }
+
+        .mobile-banner-image {
+            display: block;
+        }
+    }
+
+    /* 加载提示样式 */
+    .banner-loading {
+        width: 100%;
+        aspect-ratio: 64 / 25;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 16px;
+    }
+
+    @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    @media (max-width: 768px) {
+        .banner-loading {
+            aspect-ratio: 125 / 183;
+        }
+    }
+</style>
+    <div class="blog-banner">
+        <div class="home-swiper">
+            <div class="swiper-wrapper" id="dynamic-blog-wrapper">
+                                                                                    <div class="swiper-slide">
+                            <a href="https://www.beyourlover.com/blog/what-women-think-about-penis-size/">
+                                <!-- PC 大图 (桌面端可见) -->
+                                <img src="https://img.beyourlover.com/2026/10/13090449/what-size-penis-do-women-prefer.png"
+                                     alt="Big, Small, Somewhere in Between: What Women Think About Penis Size?"
+                                     class="banner-image pc-banner-image"
+                                     loading="lazy"
+                                     width="1920" height="750">
+                                <!-- 移动端图片 (目前使用同一张，若需单独移动端图片可替换) -->
+                                <img src="https://img.beyourlover.com/2026/10/13090449/what-size-penis-do-women-prefer.png"
+                                     alt="Big, Small, Somewhere in Between: What Women Think About Penis Size? mobile"
+                                     class="banner-image mobile-banner-image"
+                                     loading="lazy"
+                                     width="768" height="1124">
+                            </a>
+                        </div>
+                                                                    <div class="swiper-slide">
+                            <a href="https://www.beyourlover.com/blog/losing-erection-during-sex/">
+                                <!-- PC 大图 (桌面端可见) -->
+                                <img src="https://img.beyourlover.com/2026/10/10063003/losing-erection-during-sex.png"
+                                     alt="Losing Erection Mid-Sex Isn&#039;t the End of the Night - Here&#039;s How to Handle It"
+                                     class="banner-image pc-banner-image"
+                                     loading="lazy"
+                                     width="1920" height="750">
+                                <!-- 移动端图片 (目前使用同一张，若需单独移动端图片可替换) -->
+                                <img src="https://img.beyourlover.com/2026/10/10063003/losing-erection-during-sex.png"
+                                     alt="Losing Erection Mid-Sex Isn&#039;t the End of the Night - Here&#039;s How to Handle It mobile"
+                                     class="banner-image mobile-banner-image"
+                                     loading="lazy"
+                                     width="768" height="1124">
+                            </a>
+                        </div>
+                                                                    <div class="swiper-slide">
+                            <a href="https://www.beyourlover.com/blog/penis-weights/">
+                                <!-- PC 大图 (桌面端可见) -->
+                                <img src="https://img.beyourlover.com/2026/10/09053527/penis-weights.png"
+                                     alt="Penis Weights: What They Are, What They Don&#039;t Do, and How to Stay Safe"
+                                     class="banner-image pc-banner-image"
+                                     loading="lazy"
+                                     width="1920" height="750">
+                                <!-- 移动端图片 (目前使用同一张，若需单独移动端图片可替换) -->
+                                <img src="https://img.beyourlover.com/2026/10/09053527/penis-weights.png"
+                                     alt="Penis Weights: What They Are, What They Don&#039;t Do, and How to Stay Safe mobile"
+                                     class="banner-image mobile-banner-image"
+                                     loading="lazy"
+                                     width="768" height="1124">
+                            </a>
+                        </div>
+                                                                </div>
+            <!-- 分页器 -->
+            <div class="swiper-pagination"></div>
+            <!-- 导航按钮 -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+
+
+<!-- 注意：Swiper 初始化JS仍需保留，但不再负责获取文章数据，仅负责轮播功能 -->
+<script defer="defer">
+document.addEventListener('DOMContentLoaded', function() {
+    // 初始化Swiper (与服务端渲染的DOM配合)
+    if (typeof Swiper !== 'undefined' && document.querySelector('.home-swiper')) {
+        // 如果之前有实例，先销毁（避免重复）
+        if (window.blogBannerSwiper) {
+            window.blogBannerSwiper.destroy(true, true);
+        }
+        window.blogBannerSwiper = new Swiper('.home-swiper', {
+            direction: 'horizontal',
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                pauseOnMouseEnter: true,
+                disableOnInteraction: false
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            }
+        });
+    } else {
+        // 如果Swiper库未加载，可以稍后重试或记录错误
+        console.warn('Swiper library not loaded yet.');
+    }
+});
+</script>
+
+<!-- 博客分类模块 -->
+    <style type="text/css">
+    :root {
+        --blog-cont-width: 1480px;
+        --blog-text-color1: #FB5DD8;
+    }
+    .blog-categories {
+        text-align: center;
+        padding: 100px 0;
+    }
+
+    .blog-categories .blog-categories-tit {
+        font-size: 50px;
+        font-weight: bold;
+        margin-bottom: 80px;
+    }
+
+    .blog-categories .blog-categories-list {
+        max-width: var(--blog-cont-width);
+        margin: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 10px;
+    }
+
+    .blog-categories .blog-categories-list .blog-categorie-box {
+        position: relative;
+    }
+
+    .blog-categories .blog-categorie-box a {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        border-radius: 20px;
+        text-decoration: none;
+    }
+    .blog-categories .blog-categorie-box a::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 129, 214, 0.5);
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+        z-index: 2;
+        border-radius: 20px;
+    }
+    .blog-categories .blog-categorie-box span {
+        width: 100%;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translate(0, -50%);
+        font-weight: bold;
+        color: #EDFE33;
+        line-height: 1.2;
+        text-transform: uppercase;
+        z-index: 3;
+    }
+
+    .blog-categories .blog-categorie-box img {
+        width: 100%;
+        height: 101%;
+        object-fit: cover;
+        transition-duration: .5s;
+        vertical-align: top;
+    }
+
+    .blog-categories .blog-categorie-box:hover img {
+        transform: scale(1.1);
+    }
+    .blog-categories .blog-categorie-box a:hover::after {
+        opacity: 0;
+    }
+    @media (min-width: 769px) {
+        .blog-categories .blog-categories-list .blog-categorie-box {
+            /* aspect-ratio: 14 / 15; */
+        }
+
+        .blog-categories .blog-categories-tit {
+            font-size: 50px;
+            font-weight: bold;
+            margin-bottom: 80px;
+        }
+
+        .blog-categories .blog-categorie-box span {
+            font-size: 50px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .blog-categories {
+            padding: 10vw 2vw;
+        }
+
+        .blog-categories .blog-categories-tit {
+            font-size: 6vw;
+            font-weight: bold;
+            margin-bottom: 8vw;
+        }
+
+        .blog-categories .blog-categories-list {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .blog-categories .blog-categorie-box a {
+            border-radius: 10px;
+        }
+
+        .blog-categories .blog-categorie-box span {
+            font-size: 5vw;
+        }
+    }
+</style>
+<!-- 博客分类模块 -->
+<div class="blog-categories">
+    <div class="blog-categories-tit">
+        LOVER'S JOURNAL
+    </div>
+    <div class="blog-categories-list">
+        <div class="blog-categorie-box">
+            <a href="https://dev.beyourlover.com/sex-toy-guides">
+                <img src="https://img.beyourlover.com/2026/09/08032619/blog-class-icon01.webp" alt="SEX TOY GUIDES" loading="eager">
+                <span>SEX TOY<br />GUIDES</span>
+            </a>
+        </div>
+        <div class="blog-categorie-box">
+            <a href="https://dev.beyourlover.com/sex-positions">
+                <img src="https://img.beyourlover.com/2026/09/08032625/blog-class-icon02.webp" alt="SEX POSITIONS" loading="eager">
+                <span>SEX<br />POSITIONS</span>
+            </a>
+        </div>
+        <div class="blog-categorie-box">
+            <a href="https://dev.beyourlover.com/sex-tips-advice">
+                <img src="https://img.beyourlover.com/2026/09/08032632/blog-class-icon03.webp" alt="SEX TIPS & ADVICE" loading="eager">
+                <span>SEX TIPS<br />&<br />ADVICE</span>
+            </a>
+        </div>
+        <div class="blog-categorie-box">
+            <a href="https://dev.beyourlover.com/sexual-wellness">
+                <img src="https://img.beyourlover.com/2026/09/08032638/blog-class-icon04.webp" alt="SEXUAL WELLNESS" loading="eager">
+                <span>SEXUAL<br />WELLNESS</span>
+            </a>
+        </div>
+        <div class="blog-categorie-box">
+            <a href="https://dev.beyourlover.com/relationships">
+                <img src="https://img.beyourlover.com/2026/09/08032644/blog-class-icon05.webp" alt="SEX EDUCATIONS" loading="eager">
+                <span>relationships</span>
+            </a>
+        </div>
+        <div class="blog-categorie-box">
+            <a href="https://dev.beyourlover.com/news">
+                <img src="https://img.beyourlover.com/2026/09/08032650/blog-class-icon06.webp" alt="SEX CARTOON" loading="eager">
+                <span>NEWS</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 单个博客分类模块 -->
+        <style type="text/css">
+            .blog-cat-module {
+                background-color: #FFF5FD;
+                padding: 170px 0 110px;
+            }
+
+            .blog-cat-module a {
+                display: inline-block;
+                text-decoration: none;
+            }
+
+            .blog-cat-module:nth-child(even) {
+                background-color: #FEFEF4;
+            }
+            .blog-cat-module:nth-child(even) .blog-cat-top .blog-cat-tit{
+                order: -1;
+            }
+            .blog-cat-module .blog-cat-main {
+                max-width: var(--blog-cont-width);
+                margin: auto;
+            }
+
+            .blog-cat-module .blog-cat-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 60px;
+            }
+
+            .blog-cat-module .blog-cat-top .blog-cat-tit {
+                font-size: 50px;
+                font-weight: bold;
+                color: #444444;
+            }
+
+            .blog-cat-module .blog-cat-top a {
+                color: #FFFFFF;
+                font-size: 24px;
+                font-weight: 500;
+                padding: 8px 20px;
+                background-color: #FB5CDA;
+                border-radius: 50px;
+            }
+
+            /*  */
+            .blog-cat-swiper {
+                overflow: hidden;
+                /* padding-top: 10%;
+                margin-top: -10%; */
+            }
+
+            .blog-cat-swiper .swiper-slide {
+                width: calc(100% / 3 - 7px);
+                border-radius: 50px;
+                margin-right: 10px;
+                background-color: #FFC7F6;
+                aspect-ratio: 468 / 505;
+                overflow: hidden;
+            }
+
+            .blog-cat-swiper .swiper-slide a {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .blog-cat-swiper .swiper-slide span {
+                color: #444444;
+                font-size: 20px;
+                line-height: 1.5;
+                width: 80%;
+                margin: 0 auto;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: break-word;
+                margin-bottom: 10%;
+            }
+
+            .blog-cat-swiper .swiper-slide img {
+                width: 100%;
+                height: 64%;
+                object-fit: cover;
+                /* border-bottom-left-radius: 21px;
+                border-bottom-right-radius: 21px; */
+            }
+
+            .blog-cat-module .swiper-slide-unique {
+                position: relative;
+                height: 100%;
+                overflow: inherit;
+            }
+
+            .blog-cat-module .swiper-slide-unique img {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                height: auto;
+            }
+            .blog-cat-module:nth-child(even) .swiper-slide-unique img{
+                left: inherit;
+                right: 0;
+            }
+            @media (min-width: 769px) {
+                .blog-cat-swiper .swiper-slide span {
+                    height: 18%;
+                }
+            }
+            @media (max-width: 768px) {
+                .blog-cat-module{
+                    padding: 17vw 2vw 10vw;
+                }
+                .blog-cat-module .blog-cat-top{
+                    margin-bottom: 6vw;
+                }
+                .blog-cat-module .blog-cat-top a{
+                    font-size: 3vw;
+                }
+                .blog-cat-module .blog-cat-top .blog-cat-tit{
+                    font-size: 6vw;
+                }
+                .blog-cat-swiper .swiper-slide span{
+                    font-size: 2.5vw;
+                }
+                .blog-cat-swiper .swiper-slide {
+                    width: 45%;
+                    border-radius: 20px;
+                    margin-right: 10px;
+                }
+            }
+        </style>
+        <!-- 单个博客分类模块 -->
+                    <div class="blog-cat-module blog-cat-module01" data-cat-slug="sex-toy-guides" data-title="SEX TOY GUIDES" data-limit="3">
+                <div class="blog-cat-main">
+                    <div class="blog-cat-top">
+                        <a href="https://dev.beyourlover.com/sex-toy-guides/" class="blog-cat-link">
+                            MORE
+                        </a>
+                        <div class="blog-cat-tit">
+                            SEX TOY GUIDES		                </div>
+                    </div>
+                    <div class="blog-cat-swiper">
+                        <div class="swiper-wrapper">
+                                                                                        <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/lemon-sex-toy-vs-naughty-clock/">
+                                            <img src="https://img.beyourlover.com/2026/09/14053750/lemon-vs.-naughty-clock-300x205.png"
+                                                 alt="Lemon Sex Toy vs. Naughty Clock: Which One Is Right for You?"
+                                                 loading="lazy">
+                                                                                            <span>Lemon Sex Toy vs. Naughty Clock: Which One Is Right for You?</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/fatima-2-in-1-vibrator-review/">
+                                            <img src="https://img.beyourlover.com/2026/07/28081322/why-this-2-in-1vibrator-is-perfect-for-beginners-300x205.png"
+                                                 alt="Curious About Trying Your First Vibrator? Why These 2-in-1 Might Be Your Perfect Match"
+                                                 loading="lazy">
+                                                                                            <span>Curious About Trying Your First Vibrator? Why These 2-in-1 Might Be Your Perfect Match</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/best-oral-sex-toys/">
+                                            <img src="https://img.beyourlover.com/2026/07/16080313/best-oral-sex-toys-2026-300x205.png"
+                                                 alt="The 7 Best Oral Sex Toys That Are Tried, Tested, And Seriously Loved"
+                                                 loading="lazy">
+                                                                                            <span>The 7 Best Oral Sex Toys That Are Tried, Tested, And Seriously Loved</span>
+                                                                                    </a>
+                                    </div>
+                                                                            </div>
+                    </div>
+                </div>
+            </div>
+                    <div class="blog-cat-module blog-cat-module02" data-cat-slug="sex-positions" data-title="SEX POSITIONS" data-limit="3">
+                <div class="blog-cat-main">
+                    <div class="blog-cat-top">
+                        <a href="https://dev.beyourlover.com/sex-positions/" class="blog-cat-link">
+                            MORE
+                        </a>
+                        <div class="blog-cat-tit">
+                            SEX POSITIONS		                </div>
+                    </div>
+                    <div class="blog-cat-swiper">
+                        <div class="swiper-wrapper">
+                                                                                        <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/couch-sex-positions/">
+                                            <img src="https://img.beyourlover.com/2026/09/28065312/couch-sex-positions-3-300x205.png"
+                                                 alt="Too Tired for the Bedroom? These 10 Couch Sex Positions Are Built for Zero Cardio"
+                                                 loading="lazy">
+                                                                                            <span>Too Tired for the Bedroom? These 10 Couch Sex Positions Are Built for Zero Cardio</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/bdsm-positions/">
+                                            <img src="https://img.beyourlover.com/2026/09/24055142/bdsm-positions-300x205.png"
+                                                 alt="Liberated in Restraints: 10 Sex Positions You Can Enjoy in a BDSM Setting"
+                                                 loading="lazy">
+                                                                                            <span>Liberated in Restraints: 10 Sex Positions You Can Enjoy in a BDSM Setting</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/thigh-sex/">
+                                            <img src="https://img.beyourlover.com/2026/09/16055528/thigh-sex-300x205.png"
+                                                 alt="The Art of Thigh Sex: Warm, Close, and Why It Hits Different"
+                                                 loading="lazy">
+                                                                                            <span>The Art of Thigh Sex: Warm, Close, and Why It Hits Different</span>
+                                                                                    </a>
+                                    </div>
+                                                                            </div>
+                    </div>
+                </div>
+            </div>
+                    <div class="blog-cat-module blog-cat-module03" data-cat-slug="sex-tips-advice" data-title="SEX TIPS &amp; ADVICE" data-limit="3">
+                <div class="blog-cat-main">
+                    <div class="blog-cat-top">
+                        <a href="https://dev.beyourlover.com/sex-tips-advice/" class="blog-cat-link">
+                            MORE
+                        </a>
+                        <div class="blog-cat-tit">
+                            SEX TIPS &amp; ADVICE		                </div>
+                    </div>
+                    <div class="blog-cat-swiper">
+                        <div class="swiper-wrapper">
+                                                                                        <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/what-women-think-about-penis-size/">
+                                            <img src="https://img.beyourlover.com/2026/10/13090449/what-size-penis-do-women-prefer-300x205.png"
+                                                 alt="Big, Small, Somewhere in Between: What Women Think About Penis Size?"
+                                                 loading="lazy">
+                                                                                            <span>Big, Small, Somewhere in Between: What Women Think About Penis Size?</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/losing-erection-during-sex/">
+                                            <img src="https://img.beyourlover.com/2026/10/10063003/losing-erection-during-sex-300x205.png"
+                                                 alt="Losing Erection Mid-Sex Isn&#039;t the End of the Night - Here&#039;s How to Handle It"
+                                                 loading="lazy">
+                                                                                            <span>Losing Erection Mid-Sex Isn&#039;t the End of the Night - Here&#039;s How to Handle It</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/penis-weights/">
+                                            <img src="https://img.beyourlover.com/2026/10/09053527/penis-weights-300x205.png"
+                                                 alt="Penis Weights: What They Are, What They Don&#039;t Do, and How to Stay Safe"
+                                                 loading="lazy">
+                                                                                            <span>Penis Weights: What They Are, What They Don&#039;t Do, and How to Stay Safe</span>
+                                                                                    </a>
+                                    </div>
+                                                                            </div>
+                    </div>
+                </div>
+            </div>
+                    <div class="blog-cat-module blog-cat-module04" data-cat-slug="sexual-wellness" data-title="SEXUAL WELLNESS" data-limit="3">
+                <div class="blog-cat-main">
+                    <div class="blog-cat-top">
+                        <a href="https://dev.beyourlover.com/sexual-wellness/" class="blog-cat-link">
+                            MORE
+                        </a>
+                        <div class="blog-cat-tit">
+                            SEXUAL WELLNESS		                </div>
+                    </div>
+                    <div class="blog-cat-swiper">
+                        <div class="swiper-wrapper">
+                                                                                        <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/losing-erection-during-sex/">
+                                            <img src="https://img.beyourlover.com/2026/10/10063003/losing-erection-during-sex-300x205.png"
+                                                 alt="Losing Erection Mid-Sex Isn&#039;t the End of the Night - Here&#039;s How to Handle It"
+                                                 loading="lazy">
+                                                                                            <span>Losing Erection Mid-Sex Isn&#039;t the End of the Night - Here&#039;s How to Handle It</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/penis-weights/">
+                                            <img src="https://img.beyourlover.com/2026/10/09053527/penis-weights-300x205.png"
+                                                 alt="Penis Weights: What They Are, What They Don&#039;t Do, and How to Stay Safe"
+                                                 loading="lazy">
+                                                                                            <span>Penis Weights: What They Are, What They Don&#039;t Do, and How to Stay Safe</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/7-inch-penis/">
+                                            <img src="https://img.beyourlover.com/2026/10/08054109/7-inch-penis-300x205.png"
+                                                 alt="The Truth About a 7-Inch Penis: Yes, It’s Big, But Not the Whole Story"
+                                                 loading="lazy">
+                                                                                            <span>The Truth About a 7-Inch Penis: Yes, It’s Big, But Not the Whole Story</span>
+                                                                                    </a>
+                                    </div>
+                                                                            </div>
+                    </div>
+                </div>
+            </div>
+                    <div class="blog-cat-module blog-cat-module05" data-cat-slug="relationships" data-title="RELATIONSHIPS" data-limit="3">
+                <div class="blog-cat-main">
+                    <div class="blog-cat-top">
+                        <a href="https://dev.beyourlover.com/relationships/" class="blog-cat-link">
+                            MORE
+                        </a>
+                        <div class="blog-cat-tit">
+                            RELATIONSHIPS		                </div>
+                    </div>
+                    <div class="blog-cat-swiper">
+                        <div class="swiper-wrapper">
+                                                                                        <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/ethical-non-monogamy-guide/">
+                                            <img src="https://img.beyourlover.com/2026/09/17070818/what-is-ethical-non-monogamy-300x205.png"
+                                                 alt="What is Ethical Non-Monogamy? It’s Not Cheating, But an Extra Space for Love"
+                                                 loading="lazy">
+                                                                                            <span>What is Ethical Non-Monogamy? It’s Not Cheating, But an Extra Space for Love</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/do-women-prefer-a-bigger-penis/">
+                                            <img src="https://img.beyourlover.com/2026/08/24084746/do-women-really-prefer-biggy-300x205.png"
+                                                 alt="Do Women Prefer a Bigger Penis? The Truth You’ve Never Been Told"
+                                                 loading="lazy">
+                                                                                            <span>Do Women Prefer a Bigger Penis? The Truth You’ve Never Been Told</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/long-distance-sex/">
+                                            <img src="https://img.beyourlover.com/2026/07/22091054/long-distance-sex-tips-300x205.png"
+                                                 alt="Want a Long-Distance Sex That Actually Works? Here are Ideas, Tech, and Turn-Ons"
+                                                 loading="lazy">
+                                                                                            <span>Want a Long-Distance Sex That Actually Works? Here are Ideas, Tech, and Turn-Ons</span>
+                                                                                    </a>
+                                    </div>
+                                                                            </div>
+                    </div>
+                </div>
+            </div>
+                    <div class="blog-cat-module blog-cat-module06" data-cat-slug="news" data-title="NEWS" data-limit="3">
+                <div class="blog-cat-main">
+                    <div class="blog-cat-top">
+                        <a href="https://dev.beyourlover.com/news/" class="blog-cat-link">
+                            MORE
+                        </a>
+                        <div class="blog-cat-tit">
+                            NEWS		                </div>
+                    </div>
+                    <div class="blog-cat-swiper">
+                        <div class="swiper-wrapper">
+                                                                                        <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/beyourlover-release-minaka/">
+                                            <img src="https://img.beyourlover.com/2026/06/29035424/minaka-300x205.jpg"
+                                                 alt="Introducing MINAKA: The Thrusting and Sucking Detachable Vibrator That Knows Exactly What You Want"
+                                                 loading="lazy">
+                                                                                            <span>Introducing MINAKA: The Thrusting and Sucking Detachable Vibrator That Knows Exactly What You Want</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/beyourlover-launches-guitar-sex-toy/">
+                                            <img src="https://img.beyourlover.com/2026/04/30082954/modified_guitar_image-300x205.png"
+                                                 alt="GuiTar: Suction &amp; Vibration Toy That Knows How You Want to Play"
+                                                 loading="lazy">
+                                                                                            <span>GuiTar: Suction &amp; Vibration Toy That Knows How You Want to Play</span>
+                                                                                    </a>
+                                    </div>
+                                                                <div class="swiper-slide">
+                                        <a href="https://www.beyourlover.com/blog/beyourlover-release-moji-thrusting-dildo-machine/">
+                                            <img src="https://img.beyourlover.com/2026/04/22054034/moji-300x205.jpg"
+                                                 alt="BeYourLover Introduces Moji: The Attachable Thrusting Dildo That Does All the Work"
+                                                 loading="lazy">
+                                                                                            <span>BeYourLover Introduces Moji: The Attachable Thrusting Dildo That Does All the Work</span>
+                                                                                    </a>
+                                    </div>
+                                                                            </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- 简化后的Swiper初始化脚本 - 只负责轮播功能 -->
+        <script defer="defer">
+        (function() {
+            'use strict';
+
+            /**
+             * 初始化所有分类轮播
+             */
+            function initCategorySwipers() {
+                if (typeof Swiper === 'undefined') {
+                    // 如果Swiper库未加载，等待后重试
+                    setTimeout(initCategorySwipers, 200);
+                    return;
+                }
+
+                document.querySelectorAll('.blog-cat-module .blog-cat-swiper').forEach((container) => {
+                    // 避免重复初始化
+                    if (container.swiper) return;
+
+                    new Swiper(container, {
+                        slidesPerView: 'auto',
+                        spaceBetween: 15,
+                        speed: 500,
+                        grabCursor: true,
+                        // 响应式设置
+                        breakpoints: {
+                            320: {
+                                slidesPerView: 1.5,
+                                spaceBetween: 10
+                            },
+                            480: {
+                                slidesPerView: 2,
+                                spaceBetween: 15
+                            },
+                            768: {
+                                slidesPerView: 2.5,
+                                spaceBetween: 20
+                            },
+                            1024: {
+                                slidesPerView: 3,
+                                spaceBetween: 25
+                            }
+                        }
+                    });
+                });
+            }
+
+            // 在DOM加载完成后初始化
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initCategorySwipers);
+            } else {
+                initCategorySwipers();
+            }
+        })();
+        </script>
+
+
+
+</main><section class="byl-preview-end"><h2>More from BeYourLover</h2><p>Blog guides, category links, articles and membership sign-ups stay in the existing WordPress system. This is a static visual proof for layout approval; it does not send any forms or mutate content.</p><a href="https://dev.beyourlover.com/blog/">Current Dev Blog ↗</a></section>
+<div class="byl-preview-stamp">H2 design preview · NOT LIVE · no orders/payments</div></body></html>
