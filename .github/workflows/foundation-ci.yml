@@ -59,6 +59,11 @@ jobs:
         run: php -l theme/beyourlover-v3/inc/blog-product-card.php && php -l tools/dev/tests/blog-product-card-offline-smoke.php && php tools/dev/tests/blog-product-card-offline-smoke.php
       - name: Newsletter M3 offline theme and Core contract
         run: php -l theme/beyourlover-v3/page-newsletter.php && php -l tools/dev/tests/newsletter-m3-render-harness.php && node --check scripts/test_newsletter_m3_contract.js && node scripts/test_newsletter_m3_contract.js
+      - name: Business Partnerships B2 — Dev-only page and offline interaction safety
+        run: |
+          php -l theme/beyourlover-v3/page-business.php
+          node --check theme/beyourlover-v3/assets/js/business.js
+          node scripts/test_business_partnerships_b2_contract.js
       - name: Python syntax
         run: python -m py_compile scripts/*.py
       - name: Theme OS V1 module, SemVer and dependency validation
