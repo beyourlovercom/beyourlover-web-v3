@@ -1,15 +1,11 @@
 <?php
 /**
- * Blog WWW Parity V1 (H3) — public, read-only, opt-in design Canary.
- * Legacy /blog/ stays unchanged without ?byl_blog_v1_preview=1.
+ * Blog WWW Parity V1 — active Dev /blog/ route for Owner UAT.
+ * The dedicated Blog template replaces the legacy Page 126 output on Dev.
  * Uses real published WordPress posts/terms, never mutates DB, orders or mail.
  */
 declare(strict_types=1);
 defined('ABSPATH') || exit;
-if (!isset($_GET['byl_blog_v1_preview']) || (string) $_GET['byl_blog_v1_preview'] !== '1') {
-    require get_stylesheet_directory() . '/index.php';
-    return;
-}
 add_filter('body_class', static function ($classes) {
     $classes[] = 'byl-blog-parity-v1';
     return $classes;
@@ -148,6 +144,6 @@ get_header();
   <section class="byl-blogv1-about"><h2>Welcome to the BeYourLover Blog</h2><p>Explore helpful guides, thoughtful relationship advice and the latest stories. Posts and categories are served directly from WordPress.</p></section>
   <div class="byl-blogv1-dialog" data-dialog-wrap hidden><div class="byl-blogv1-backdrop" data-modal-close></div><section role="dialog" aria-modal="true" aria-labelledby="byl-blogv1-dialog-title" data-modal-content><button type="button" data-modal-close aria-label="Close article preview">×</button><div data-dialog-body></div></section></div>
   <script type="application/json" id="byl-blogv1-data"><?php echo wp_json_encode(array_values($all_posts), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
-  <div class="byl-blogv1-preview-note">B1–B4 Dev-only preview · real published posts · no checkout/order changes</div>
+  <div class="byl-blogv1-preview-note">B1–B4 Dev Owner UAT · real published posts · no checkout/order changes</div>
 </main>
 <?php get_footer(); ?>

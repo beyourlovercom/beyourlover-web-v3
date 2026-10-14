@@ -10,7 +10,7 @@ for(const file of ['page-blog.php','assets/css/blog-parity-v1.css','assets/js/bl
  assert(editor.includes(file),'editorial ownership '+file);
  assert(fs.existsSync(path.join(theme,file)),'file exists '+file);
 }
-assert(template.includes('$_GET[\'byl_blog_v1_preview\']') && template.includes("require get_stylesheet_directory() . '/index.php';"),'fail-closed legacy default /blog');
+assert(!template.includes('byl_blog_v1_preview') && !template.includes("require get_stylesheet_directory() . '/index.php';"),'Blog template active directly on Dev /blog/ for UAT');
 assert(template.includes('get_header();')&&template.includes('get_footer();'),'reuse V3 shell');
 assert(template.includes('new WP_Query([')&&template.includes("'post_status'=>'publish'")&&template.includes("'cat'=>(int) $term->term_id"),'published WordPress articles, scoped terms');
 assert(template.includes("get_term_by('slug'")&&template.includes('get_term_link($term)'),'real category permalinks');
