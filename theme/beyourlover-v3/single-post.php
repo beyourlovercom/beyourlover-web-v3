@@ -10,6 +10,7 @@ defined('ABSPATH') || exit;
 
 // Blog-only shortcode compatibility; never loads on Cart/Checkout or Pages.
 require_once get_stylesheet_directory().'/inc/blog-product-card.php';
+require_once get_stylesheet_directory().'/inc/blog-editorial-shell.php';
 
 add_action('wp_enqueue_scripts', static function (): void {
     $relative = '/assets/css/post-single.css';
@@ -31,7 +32,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     );
 }, 20);
 
-get_header();
+byl_blog_editorial_header();
 ?>
 <main id="main-content" class="byl-post-single" data-byl-post-template="default">
   <?php while (have_posts()) : the_post(); ?>
@@ -99,4 +100,4 @@ get_header();
     </div>
   <?php endwhile; ?>
 </main>
-<?php get_footer();
+<?php byl_blog_editorial_footer();

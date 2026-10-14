@@ -1,0 +1,55 @@
+/* Blog OS editorial category/post companion layout; always scoped to editorial. */
+.byl-blog-archive{background:#fff;color:#252025;font-family:Arial,"PingFang SC",sans-serif}
+.byl-blog-archive *{box-sizing:border-box}
+.byl-blog-archive a{text-decoration:none;color:inherit}
+.byl-blog-archive__heading{background:linear-gradient(130deg,#ffecf7,#ffe1f1);padding:46px 0 52px}
+.byl-blog-archive__crumb{display:flex;gap:9px;align-items:center;font-size:12px;color:#895070;margin-bottom:26px}
+.byl-blog-archive__heading h1{margin:0;font-size:clamp(28px,4vw,54px);font-weight:900;letter-spacing:-1px;text-transform:uppercase;line-height:1.06}
+.byl-blog-archive__description{font-size:14px;color:#685264;max-width:770px;line-height:1.8;margin-top:16px}
+.byl-blog-archive__content{padding-block:40px 75px}
+.byl-blog-archive__actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}
+.byl-blog-archive__count{color:#816e7b;font-size:12px}
+.byl-blog-archive__actions>a{color:#a93a72;font-size:12px;font-weight:700}
+.byl-blog-archive__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.byl-blog-archive__card{border:1px solid #f1e5ed;border-radius:11px;overflow:hidden;background:#fff;min-width:0}
+.byl-blog-archive__image{display:block;width:100%;aspect-ratio:1.48;overflow:hidden;background:linear-gradient(120deg,#ffd0ea,#c9a8da)}
+.byl-blog-archive__image img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s ease}
+.byl-blog-archive__card:hover .byl-blog-archive__image img{transform:scale(1.025)}
+.byl-blog-archive__image-fallback{height:100%;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;color:#9f466e;font-size:22px}
+.byl-blog-archive__card-info{padding:16px 17px 19px}
+.byl-blog-archive__card-info time{font-size:11px;color:#a18b9a}
+.byl-blog-archive__card-info h2{font-size:17px;line-height:1.38;font-weight:750;margin:8px 0 10px}
+.byl-blog-archive__card-info p{font-size:12px;line-height:1.7;color:#746873;margin:0 0 15px}
+.byl-blog-archive__more{font-size:12px;color:#a43b76!important;font-weight:700}
+.byl-blog-archive__pagination{margin-top:32px}
+.byl-blog-archive__pagination .nav-links{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap}
+.byl-blog-archive__pagination .page-numbers{padding:8px 11px;font-size:12px;color:#834b6b;border:1px solid #f0d4e5;border-radius:6px;min-width:30px;text-align:center}
+.byl-blog-archive__pagination .page-numbers.current{background:#ad407c;color:white;border-color:#ad407c}
+.byl-blog-archive__empty{padding:50px 0;color:#775f70}
+body.byl-blog-standalone .byl-post-single{background:#fff}
+body.byl-blog-standalone .byl-post-single__breadcrumb a{color:#9c3f73}
+body.byl-blog-standalone .byl-post-single__frame{max-width:1260px}
+body.byl-blog-standalone .byl-post-single__title{overflow-wrap:anywhere}
+body.byl-blog-standalone .byl-blogv1-header-search [data-blog-search-results]{
+ flex-basis:100%;width:100%;display:grid;gap:5px;background:#fff;padding:9px 12px;
+ border:1px solid #efcfdf;border-radius:7px;max-width:850px;
+}
+body.byl-blog-standalone [data-blog-search-results] a{
+ display:block;padding:6px;color:#773a60;font-size:13px
+}
+body.byl-blog-standalone [data-blog-search-results] a:hover{background:#ffedf7}
+body.byl-blog-standalone [data-blog-search-results] p{margin:6px;color:#8b7181;font-size:12px}
+@media(max-width:900px){.byl-blog-archive__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+@media(max-width:700px){
+ .byl-blog-archive__heading{padding:29px 0 34px}
+ .byl-blog-archive__crumb{margin-bottom:18px}
+ .byl-blog-archive__heading h1{font-size:29px}
+ .byl-blog-archive__content{padding-block:30px 56px}
+ .byl-blog-archive__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .byl-blog-archive__card-info{padding:9px}
+ .byl-blog-archive__card-info h2{font-size:12px;margin:5px 0 9px}
+ .byl-blog-archive__card-info p{display:none}
+ .byl-blog-archive__card-info time,.byl-blog-archive__more{font-size:10px}
+ .byl-blog-archive__actions{align-items:start}
+}
+@media(prefers-reduced-motion:reduce){.byl-blog-archive__image img{transition:none}}
