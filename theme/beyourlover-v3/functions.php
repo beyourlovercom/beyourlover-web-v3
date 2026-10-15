@@ -101,6 +101,9 @@ require_once get_stylesheet_directory().'/inc/theme-os-assets.php';
 
 require_once get_stylesheet_directory().'/inc/free-shipping-v2-policy.php';
 
+// H6.3-P: GET/HEAD-only legacy Privacy URL redirect; no content or DB writes.
+require_once get_stylesheet_directory().'/inc/privacy-policy-alias.php';
+
 /**
  * Free Shipping page URL compatibility.
  *
