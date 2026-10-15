@@ -2000,6 +2000,16 @@ $byl_v5_category_link = static function (string $slug): string {
 	</div>
 </div>	</footer>
 </div>
+<script id="byl-www-source-image-warmup">
+(function(){ "use strict";
+function warmImages(zone){zone.querySelectorAll("img[loading=lazy]").forEach(function(img){img.loading="eager";});}
+[".byl-www-content",".byl-www-footer-wrapper"].forEach(function(sel){
+var zone=document.querySelector(sel);if(!zone)return;
+if(!("IntersectionObserver" in window)){warmImages(zone);return;}
+var obs=new IntersectionObserver(function(entries){if(entries.some(function(e){return e.isIntersecting;})){warmImages(zone);obs.disconnect();}},{rootMargin:"1200px 0px",threshold:0});
+obs.observe(zone);
+});})();
+</script>
 <script id="byl-www-lower-native-slider">
 
 (function(){
