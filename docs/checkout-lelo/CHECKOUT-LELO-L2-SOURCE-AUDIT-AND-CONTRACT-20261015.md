@@ -77,6 +77,11 @@ Status: **L2 audit partially verified, design locked, live Woo/Dev configuration
 - [ ] Checkout Drawer compatible with G5 pay-for-order/order-pay and thank-you route fallback.
 - [ ] Owner confirm disputed country ID validation and US/EU tax disclosure truth conditions after logistics and tax review.
 
+## 4A. Public Dev read-only observations (2026-10-15)
+- From authorized **us-macmini** remote read-only HTTPS GET, `https://dev.beyourlover.com/checkout/` returned HTTP 200 **after redirect to** `https://dev.beyourlover.com/cart/` under a clean/no-item session. The returned page contains `data-byl-cart-drawer`; this **does not prove** Checkout Drawer behavior with items. No items were added and no request was submitted.
+- The public Dev theme asset `/wp-content/themes/beyourlover-v3/assets/js/checkout.js` returned HTTP 200, 28,733 decoded characters, containing the **four-stage array** `['address', 'delivery', 'payment', 'review']`, `const devPrecheck`, and `nativeButton.click()`. This confirms the legacy Checkout client bundle remains publicly served on Dev; **not a claim that the actual Checkout view executed the script**, since the empty-cart visit redirected.
+- **Necessary next observational gate:** a legitimately existing non-transactional Dev test Cart session or authorized isolated synthetic Woo fixture to view the actual loaded Checkout and gateway list. Never create a real order or payment just to obtain an image.
+
 ## 5. Gates / results
 - **Source audit**: main checked, concrete blockers identified: **PASS (read-only)**.
 - **L1 visual design**: Owner PASS recorded 2026-10-15.
