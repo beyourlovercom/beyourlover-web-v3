@@ -93,6 +93,13 @@ Status: **L2 audit partially verified, design locked, live Woo/Dev configuration
 - **Critical legacy test debt:** `scripts/test_checkout_progressive_ux_contract.py` explicitly asserts the old `address/delivery/payment/review` markup and JS array. L3 must replace its assertions with **Cart/Shipping/Payment** and native Woo submission/consent invariants. Existing green test ≠ new three-step compliance.
 - GitHub Foundation CI run [38752433575](https://github.com/beyourlovercom/beyourlover-web-v3/actions/runs/38752433575) shows **FAIL** because the job never started (GitHub account billing/payment/spend-limit annotation). **No hosted CI PASS** may be claimed; running offline baseline tests does not override this gate.
 
+## 4C. Follow-on L3 code branch (same day; independent Draft PR)
+- [Draft PR #119](https://github.com/beyourlovercom/beyourlover-web-v3/pull/119) HEAD `907d38ed32a73d1a8b57f29981f85ff73c4520d5` implements **source-only three-step Checkout (Shipping + Payment, Cart predecessor)**. It uses actual Woo Classic checkout, native Woo rates, #payment, #place_order and order review; Dev source/browser deploy remains pending.
+- No false Country Notices, Tax IDs, account creation, marketing opt-in, payment brands or fixed shipping SLA inserted. The Woo email field is reparented to the first Shipping account section (Woo still validates); guest/login and edit profile links use Woo routes. Optional apt/company collapsed; phone priority 85 before postal code.
+- Anonymous Dev Store API read-only GET: /wp-json/wc/store/v1/checkout **403**, /wp-json/wp/v2/settings **401**, /wp-json/wc/store/v1/cart **200 empty items, empty payment_methods, no shipping_rates**. Actual enabled gateways/shipping settings **remain unverified**, not "none configured".
+- PR #119 source-only contract, Checkout UX, promo-docs, secure-shell, Cart handoff, Dev legal PHP 9 assertions, Theme OS/PHP/Node and diff checks **PASS locally**. Foundation GitHub Action [run 38756945695](https://github.com/beyourlovercom/beyourlover-web-v3/actions/runs/38756945695) job **NOT STARTED** due account billing/spend-limit, so hosted CI **NOT PASS**.
+- Full Checkout Drawer overlay, real Woo/3DS fragments, production/legal Terms reconciliation and nation-specific country notice/tax ID/account-email work are **independent holds**, not L3 completed runtime claims.
+
 ## 5. Gates / results
 - **Source audit**: main checked, concrete blockers identified: **PASS (read-only)**.
 - **L1 visual design**: Owner PASS recorded 2026-10-15.
