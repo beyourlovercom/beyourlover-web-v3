@@ -82,6 +82,17 @@ Status: **L2 audit partially verified, design locked, live Woo/Dev configuration
 - The public Dev theme asset `/wp-content/themes/beyourlover-v3/assets/js/checkout.js` returned HTTP 200, 28,733 decoded characters, containing the **four-stage array** `['address', 'delivery', 'payment', 'review']`, `const devPrecheck`, and `nativeButton.click()`. This confirms the legacy Checkout client bundle remains publicly served on Dev; **not a claim that the actual Checkout view executed the script**, since the empty-cart visit redirected.
 - **Necessary next observational gate:** a legitimately existing non-transactional Dev test Cart session or authorized isolated synthetic Woo fixture to view the actual loaded Checkout and gateway list. Never create a real order or payment just to obtain an image.
 
+## 4B. Offline regression baseline on Draft PR head
+- Remote authorized us-macmini temp clone `/tmp/byl-checkout-l2-N8vDRO`, exact Draft HEAD `e47d21ed5f477986e056f7c4f0e83d9dd6bb88ed`.
+- `python3 scripts/test_checkout_progressive_ux_contract.py`: **PASS against existing four-step baseline**.
+- `node scripts/test_checkout_secure_shell.js`: **PASS**.
+- `node scripts/test_cart_checkout_handoff_c1c4.js`: **PASS**.
+- `php scripts/test_cart_checkout_terms_dev_contract.php`: **PASS**, 9 Dev-only consent assertions; demonstrates existing Dev terms behavior, **not Owner-approved consent UX**.
+- `python3 scripts/theme_os.py validate`: **exit 0**.
+- `php -l` for Classic checkout form and `inc/checkout.php`: **PASS**; `node --check assets/js/checkout.js`: **PASS**.
+- **Critical legacy test debt:** `scripts/test_checkout_progressive_ux_contract.py` explicitly asserts the old `address/delivery/payment/review` markup and JS array. L3 must replace its assertions with **Cart/Shipping/Payment** and native Woo submission/consent invariants. Existing green test ≠ new three-step compliance.
+- GitHub Foundation CI run [38752433575](https://github.com/beyourlovercom/beyourlover-web-v3/actions/runs/38752433575) shows **FAIL** because the job never started (GitHub account billing/payment/spend-limit annotation). **No hosted CI PASS** may be claimed; running offline baseline tests does not override this gate.
+
 ## 5. Gates / results
 - **Source audit**: main checked, concrete blockers identified: **PASS (read-only)**.
 - **L1 visual design**: Owner PASS recorded 2026-10-15.
