@@ -187,7 +187,8 @@
         "assets/css/page-simple.css",
         "page-terms-and-conditions.php",
         "page-newsletter.php",
-        "assets/css/newsletter.css"
+        "assets/css/newsletter.css",
+        "inc/privacy-policy-alias.php"
       ]
     },
     "support": {
