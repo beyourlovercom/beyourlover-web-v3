@@ -53,6 +53,8 @@ jobs:
           php tools/dev/tests/p71-payment-title-smoke.php
       - name: Default Page/Post template offline regression
         run: php -l tools/dev/tests/page-post-defaults-offline-smoke.php && php tools/dev/tests/page-post-defaults-offline-smoke.php
+      - name: Privacy Policy legacy typo 301 fail-closed contract
+        run: php -l tools/dev/tests/privacy-policy-alias-smoke.php && php tools/dev/tests/privacy-policy-alias-smoke.php
       - name: Blog TOC offline source and script syntax regression
         run: node --check theme/beyourlover-v3/assets/js/post-toc.js && node scripts/test_blog_toc_contract.js
       - name: Blog product-card legacy Woo shortcode offline regression
