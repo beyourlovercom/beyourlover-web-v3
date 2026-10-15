@@ -1,58 +1,400 @@
 <?php
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
+/**
+ * Temporary Dev-only V5 art-direction implementation. Owner explicitly authorized
+ * previewing the rejected V5 design on Dev; PR #109 remains Visual FAIL.
+ * No inline screenshot snapshots of WWW. Existing Dev lower PHP preserved below.
+ * Once actual WWW lower modules are ported faithfully, remove temporary legacy tail.
+ */
 get_header();
-$hero_products = byl_v3_showcase_products(3);
 $popular_products = byl_v3_home_products(4);
-$categories = array_filter([
-    byl_v3_home_category('sex-toys-for-women'),
-    byl_v3_home_category('sex-toys-for-men'),
-    byl_v3_home_category('sex-toys-for-couples'),
-]);
+$byl_v5_product_link = static function (string $slug): string {
+    $post = get_page_by_path($slug, OBJECT, 'product');
+    return $post instanceof WP_Post ? get_permalink($post) : home_url('/new-arrivals/');
+};
+$byl_v5_category_link = static function (string $slug): string {
+    $term = get_term_by('slug', $slug, 'product_cat');
+    if ($term instanceof WP_Term) {
+        $link = get_term_link($term);
+        if (!is_wp_error($link)) { return (string) $link; }
+    }
+    return home_url('/shop/');
+};
 ?>
-<main id="main-content" class="byl-home" data-byl-template="home-v1">
-  <section class="byl-home-hero">
-    <div class="byl-container byl-home-hero-grid">
-      <div class="byl-home-hero-copy" data-byl-motion="rise">
-        <p class="byl-eyebrow">BeYourLover®</p>
-        <h1>BeYourLover Sex Toys</h1>
-        <p class="byl-home-lede">Cute, original adult toys designed around intimacy, curiosity and pleasure — with a calmer way to discover what fits you.</p>
-        <div class="byl-home-actions">
-          <a class="byl-btn byl-btn-primary" href="<?php echo esc_url(home_url('/shop/')); ?>">Shop all</a>
-          <a class="byl-btn byl-btn-secondary" href="<?php echo esc_url(home_url('/best-sellers/')); ?>">Best sellers</a>
-        </div>
-      </div>
-      <div class="byl-home-hero-media" aria-label="Featured products">
-        <?php foreach ($hero_products as $i => $product): ?>
-          <a class="byl-home-hero-product byl-home-hero-product-<?php echo (int)$i + 1; ?>" href="<?php echo esc_url(get_permalink($product->get_id())); ?>">
-            <img src="<?php echo esc_url(byl_v3_product_image_url($product)); ?>" alt="<?php echo esc_attr($product->get_name()); ?>">
-            <span><?php echo esc_html($product->get_name()); ?></span>
-          </a>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </section>
+<style id="byl-home-v5-temp">
 
-  <section class="byl-home-section byl-home-categories">
-    <div class="byl-container">
-      <div class="byl-home-section-head">
-        <div><p class="byl-eyebrow">Discover</p><h2>What can you get from BeYourLover?</h2></div>
-        <p>Explore by who it is for, then narrow by the experience you want.</p>
-      </div>
-      <div class="byl-home-category-grid">
-        <?php foreach ($categories as $category): ?>
-          <a class="byl-home-category" href="<?php echo esc_url((string)$category['url']); ?>">
-            <div class="byl-home-category-media">
-              <?php if ($category['image'] !== ''): ?><img src="<?php echo esc_url($category['image']); ?>" alt=""><?php endif; ?>
-            </div>
-            <div><span><?php echo esc_html($category['count'].' products'); ?></span><h3><?php echo esc_html($category['name']); ?></h3></div>
-            <?php echo byl_v3_icon('arrow'); ?>
-          </a>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </section>
+.byl-v5-page{--ink:#322c2b;--ox:#763841;--oxdeep:#552833;--rose:#b97780;--muted:#746964;--ivory:#fbfaf7;--warm:#f2eae3;--line:#d8cfca;--sage:#abb5a6}
+.byl-v5-page,.byl-v5-page *{box-sizing:border-box}main.byl-v5-page{margin:0;background:#fff;color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}.byl-v5-page h1,.byl-v5-page h2,.byl-v5-page h3,.byl-v5-page p{margin-top:0}.byl-v5-page h1,.byl-v5-page h2,.byl-v5-page h3,.byl-v5-page .serif{font-family:Georgia,"Times New Roman",serif;font-weight:400}
+.original{position:relative;overflow:hidden;width:100%;background:white}
+.original img{display:block;position:absolute;left:0;top:0;max-width:none;width:1440px}
+.original img.mob{display:none}.orig-header{height:194px}
+.unchanged{height:8298px}.unchanged>img.desk{top:-2260px}
+.byl-v5-page button,.byl-v5-page a{font-family:inherit}
+.v4{background:var(--ivory)}
+.container{max-width:1370px;margin:auto;padding:0 48px}
+.hero{height:725px;position:relative;overflow:hidden;background:#f7f3ed}
+.hero .hero-copy{position:absolute;z-index:2;top:152px;left:max(64px,calc((100vw - 1270px)/2));max-width:600px}
+.eyebrow{font-size:11px;letter-spacing:3.5px;font-weight:700;color:#95606b;line-height:1.35}
+.hero .hero-copy .eyebrow{letter-spacing:3px}
+.hero h1{font-size:108px;line-height:.94;letter-spacing:-6px;margin:29px 0 25px;color:#503138}
+.hero h1 em{font-weight:400;color:#a96e77}
+.hero-copy p{font-size:15px;line-height:1.9;color:#655d59;max-width:420px;margin-bottom:28px}
+.cta{display:inline-flex;align-items:center;justify-content:space-between;gap:42px;padding:17px 25px;background:var(--oxdeep);color:#fff;font-size:12px;letter-spacing:.4px;text-decoration:none;min-width:244px}
+.hero-smallprint{position:absolute;bottom:45px;left:max(64px,calc((100vw - 1270px)/2));font-size:10px;letter-spacing:1.8px;color:#967a78;z-index:3}
+.hero-art{position:absolute;right:0;top:-4px;height:100%;width:57%;display:flex;align-items:center;justify-content:center}
+.hero-art svg{height:100%;max-height:730px;width:100%;overflow:visible}
+.hero .thin{position:absolute;top:0;left:50%;height:100%;width:1px;background:linear-gradient(transparent,#d1c0bd55,transparent)}
+.quick{background:#fefdfa;border-bottom:1px solid #e9e3df}
+.quick .container{padding-top:26px;padding-bottom:29px}
+.quick-heading{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid #dfd6d1;padding-bottom:13px;margin-bottom:7px}
+.quick-heading h2{font-size:24px;line-height:1.2;letter-spacing:-.5px;margin:0;color:#463538}
+.quick-heading .small{font-size:10px;color:#968782;letter-spacing:2.2px}
+.quick-list{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));align-items:start;gap:15px;padding-top:8px}
+.quick-item{color:#514148;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;min-width:0;justify-content:flex-end;padding:13px 0 4px;height:153px}
+.quick-item .art{width:118px;height:109px;display:flex;align-items:center;justify-content:center;transition:transform .2s ease}
+.quick-item .art img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.quick-item:hover .art,.quick-item:focus-visible .art{transform:translateY(-5px) scale(1.04)}
+.quick-item .name{font-size:10px;letter-spacing:1.7px;font-weight:700;text-align:center}
+.quick-item:after{content:"";display:block;position:absolute;bottom:-9px;left:50%;width:0;height:1px;background:#8e5160;transition:width .25s,left .25s}
+.quick-item:hover:after,.quick-item:focus-visible:after{left:25%;width:50%}
+.quick-swipe{display:none}
+.manifesto{background:#fff;position:relative;overflow:hidden}
+.manifesto .container{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:4%;padding-top:103px;padding-bottom:100px}
+.manifesto-art{height:420px;position:relative;border-left:1px solid #dec9c4;background:radial-gradient(circle at 60% 45%,#f3ded9 2%,#f9f6f2 68%)}
+.manifesto-art svg{width:100%;height:100%}
+.manifesto-copy{padding-right:60px}
+.manifesto-copy h2{font-size:66px;line-height:1.08;letter-spacing:-2.5px;margin:20px 0 22px;color:#573c3d}
+.manifesto-copy h2 i{font-family:Georgia,serif;color:#a46e79}
+.manifesto-copy p{font-size:14px;line-height:1.8;color:#746964;max-width:400px}
+.manifesto-rule{width:64px;height:1px;background:var(--ox);margin:26px 0}
+.manifesto .overprint{position:absolute;right:20px;bottom:-35px;font:italic 150px Georgia;color:#ead3d0;opacity:.45;pointer-events:none}
+.arrivals{background:#f7f6f3;padding:93px 0 105px}
+.arrivals-top{display:flex;justify-content:space-between;align-items:end;margin-bottom:44px}
+.arrivals h2{font-size:76px;line-height:.95;letter-spacing:-3px;color:#3f3635;margin:10px 0 0}
+.arrivals-top a{font-size:12px;color:#553c40;text-decoration:none;border-bottom:1px solid #7e595e;padding-bottom:10px}
+.gallery{display:grid;grid-template-columns:1.38fr 1fr 1fr 1fr;gap:15px;align-items:stretch}
+.gallery-main{background:#e6dbd3;min-height:505px;overflow:hidden;position:relative}
+.gallery-main::before{content:"";position:absolute;border-radius:50%;height:330px;width:520px;background:#f5ece5;top:30px;left:30px}
+.gallery-main img{position:absolute;z-index:1;top:10px;width:93%;height:80%;left:3%;object-fit:contain;mix-blend-mode:multiply}
+.gallery-main .new-name{position:absolute;z-index:2;bottom:38px;left:30px}
+.gallery-main .new-name h3{font-size:41px;color:#4d3438;margin:10px 0 0;letter-spacing:-1px}
+.gallery-main .new-name span{font-size:11px;letter-spacing:2px;color:#96636d;font-weight:700}
+.gallery-side{min-height:505px;display:flex;flex-direction:column;position:relative;border-bottom:1px solid #cfc5c1;padding-bottom:23px}
+.gallery-side .art{width:100%;height:392px;display:flex;align-items:center;justify-content:center;background:#eee8e2}
+.gallery-side:nth-of-type(3) .art{background:#e5e8e0}
+.gallery-side:nth-of-type(4) .art{background:#eadeda}
+.gallery-side img{display:block;width:97%;height:96%;object-fit:contain;mix-blend-mode:multiply}
+.gallery-side .meta{margin-top:19px;display:flex;align-items:end;justify-content:space-between;gap:8px}
+.gallery-side h3{font-size:21px;line-height:1.2;margin:0;color:#4e393d;letter-spacing:-.3px}
+.gallery-side small{display:block;margin-bottom:5px;font-size:10px;letter-spacing:1.2px;color:#857873}
+.gallery-side .angle{font-size:24px;color:#8a555f}
+.arrivals-note{display:flex;justify-content:space-between;font-size:10px;color:#9f8e89;margin-top:25px;letter-spacing:1.3px}
+.collection-intro{display:flex;justify-content:center;align-items:center;padding:60px 0;background:#fff;font-size:10px;color:#9c7d79;letter-spacing:4px}
+.ww-bottom{position:relative;overflow:hidden;width:100%;height:8298px;background:white}
+.ww-bottom>img{position:absolute;display:block;left:0;width:1440px;max-width:none;top:-2260px}
+.ww-bottom>img.mob{display:none}
+.editorial-overlay{position:absolute;left:30px;width:1380px;height:551px;overflow:hidden;z-index:2}
+.editorial-overlay.women{top:0;background:#f0e1db}
+.editorial-overlay.men{top:1119px;background:#ecede6}
+.editorial-overlay.couples{top:2238px;background:#553541;color:#fff}
+.overlay-shell{height:100%;display:grid;grid-template-columns:53% 47%;position:relative}
+.overlay-text{padding:95px 85px;position:relative;z-index:2}
+.overlay-text h2{font-size:82px;line-height:1;letter-spacing:-4px;margin:25px 0;color:#5e3841}
+.overlay-text .eyebrow{color:#946875}
+.overlay-text p{font-size:14px;line-height:1.75;color:#74625f;max-width:330px}
+.overlay-text .line{font-size:12px;color:#794754;display:inline-block;border-bottom:1px solid #925e69;padding-bottom:9px;margin-top:15px}
+.overlay-art{position:relative;overflow:hidden}
+.overlay-art svg{width:100%;height:100%}
+.editorial-overlay.men .overlay-shell{grid-template-columns:45% 55%}
+.editorial-overlay.men .overlay-text{padding:115px 70px 50px}
+.editorial-overlay.men h2{color:#515650}
+.editorial-overlay.men .eyebrow,.editorial-overlay.men .line{color:#606f68}
+.editorial-overlay.couples .overlay-shell{grid-template-columns:50% 50%}
+.editorial-overlay.couples .overlay-text{padding:95px 90px}
+.editorial-overlay.couples h2,.editorial-overlay.couples .eyebrow,.editorial-overlay.couples .line{color:#fff1eb}
+.editorial-overlay.couples p{color:#e8d3d8}
+.editorial-overlay.couples .line{border-color:#ebc7c7}
+@media(max-width:700px){
+ .original img.desk{display:none}.original img.mob{display:block;width:390px}
+ .orig-header{height:104px}
+ .container{padding-left:20px;padding-right:20px}
+ .hero{height:750px}
+ .hero .hero-copy{top:49px;left:23px;max-width:345px}
+ .hero h1{font-size:66px;letter-spacing:-3.5px;line-height:.99;margin:17px 0 16px}
+ .hero-copy p{font-size:12px;line-height:1.65;max-width:310px}
+ .eyebrow{font-size:9px;letter-spacing:2.1px}
+ .cta{padding:12px 16px;min-width:220px;font-size:11px;margin-top:5px}
+ .hero-art{top:320px;right:0;width:100%;height:428px;overflow:hidden}
+ .hero-art svg{height:115%;max-height:none;margin-left:15px;margin-top:0}
+ .hero-smallprint{bottom:11px;left:20px;font-size:7px;letter-spacing:1px}
+ .quick .container{padding:22px 0 23px}
+ .quick-heading{margin:0 20px 10px;padding-bottom:12px}
+ .quick-heading h2{font-size:22px}
+ .quick-heading .small{font-size:8px}
+ .quick-list{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:1px 18px 8px}
+ .quick-list::-webkit-scrollbar{display:none}
+ .quick-item{flex:0 0 82px;width:82px;height:119px;padding:4px 0 9px;scroll-snap-align:start;gap:4px}
+ .quick-item .art{width:80px;height:84px}
+ .quick-item .name{font-size:8px;letter-spacing:.6px}
+ .quick-swipe{display:flex;font-size:8px;letter-spacing:1.3px;color:#a08d8b;padding:0 20px;justify-content:space-between}
+ .manifesto .container{padding-top:45px;padding-bottom:48px;grid-template-columns:1fr;gap:20px}
+ .manifesto-copy{padding:0}
+ .manifesto-copy h2{font-size:45px;letter-spacing:-1.7px;margin:13px 0 12px}
+ .manifesto-copy p{font-size:12px}
+ .manifesto-rule{margin:15px 0}
+ .manifesto-art{height:255px}
+ .manifesto .overprint{font-size:60px;bottom:-14px}
+ .arrivals{padding:55px 0 65px}
+ .arrivals-top{margin-bottom:21px}
+ .arrivals h2{font-size:50px;letter-spacing:-2px}
+ .arrivals-top a{font-size:10px}
+ .gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .gallery-main{grid-column:span 2;min-height:340px}
+ .gallery-main::before{width:360px;height:260px;top:-25px;left:0}
+ .gallery-main img{height:76%;width:86%;left:7%;top:-7px}
+ .gallery-main .new-name{bottom:23px;left:22px}
+ .gallery-main .new-name h3{font-size:35px}
+ .gallery-side{min-height:300px;padding-bottom:12px}
+ .gallery-side .art{height:225px}
+ .gallery-side small{font-size:8px}
+ .gallery-side h3{font-size:16px}
+ .gallery-side .angle{font-size:18px}
+ .gallery-side:nth-last-child(1){display:flex;grid-column:span 2;min-height:250px}.gallery-side:nth-last-child(1) .art{height:190px}
+ .arrivals-note{font-size:8px}
+ .collection-intro{padding:39px 0;letter-spacing:2px}
+ .ww-bottom{height:7889px}
+ .ww-bottom>img.desk{display:none}
+ .ww-bottom>img.mob{display:block;width:390px;top:-1880px}
+ .editorial-overlay{left:10px;width:370px;height:223px}
+ .editorial-overlay.women{top:0}
+ .editorial-overlay.men{top:925px}
+ .editorial-overlay.couples{top:1849px}
+ .overlay-shell{grid-template-columns:52% 48%}
+ .overlay-text{padding:27px 14px}
+ .overlay-text h2{font-size:36px;letter-spacing:-1.8px;margin:9px 0 6px}
+ .overlay-text p{font-size:9px;line-height:1.45}
+ .overlay-text .line{font-size:9px;margin-top:4px;padding-bottom:4px}
+ .editorial-overlay.men .overlay-shell{grid-template-columns:52% 48%}
+ .editorial-overlay.men .overlay-text{padding:34px 15px}
+ .editorial-overlay.couples .overlay-shell{grid-template-columns:52% 48%}
+ .editorial-overlay.couples .overlay-text{padding:29px 14px}
+}
 
+/* HOMEPAGE H2 V5: sensuous, sophisticated, seductive; standalone static design only.
+   Never modify the actual WWW screenshot modules from Creator Signed Editions downward. */
+.v5-hero{height:715px!important;position:relative;background:#1b060a!important;color:#fff;overflow:hidden}
+.v5-hero-image{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.v5-hero-image img{width:100%;height:100%;object-fit:cover;object-position:82% 43%;filter:brightness(.76) contrast(1.16) saturate(.83) sepia(.05);transform:scale(1.06)}
+.v5-hero-veil{position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,0,6,.98) 0%,rgba(32,1,13,.94) 26%,rgba(38,4,17,.55) 49%,rgba(43,2,13,.08) 80%),linear-gradient(0deg,rgba(18,0,9,.68) 0%,transparent 42%)}
+.v5-hero-copy{position:absolute;z-index:3;left:max(62px,calc((100vw - 1320px)/2));top:145px;width:62%}
+.v5-overline{font-size:11px;font-weight:700;letter-spacing:4px;color:#f3c8bb;text-transform:uppercase}
+.v5-hero h1{font:400 118px/.94 Georgia,serif;letter-spacing:-5px;color:#fff5ec;margin:35px 0 29px;text-shadow:0 4px 22px rgba(0,0,0,.12)}
+.v5-hero h1 em{font-weight:400;color:#e8a2a5}
+.v5-hero-copy p{font-size:16px;line-height:1.85;color:#e1c3bf;letter-spacing:.1px;max-width:480px;margin:0 0 36px}
+.v5-cta{background:#f1e1d3;color:#4c1427;display:inline-flex;min-width:272px;align-items:center;justify-content:space-between;padding:18px 26px;font-size:12px;font-weight:800;letter-spacing:1.2px}
+.v5-hero-bottom{position:absolute;z-index:3;bottom:27px;left:max(62px,calc((100vw - 1320px)/2));right:40px;display:flex;justify-content:space-between;color:#d9aca9;font-size:9px;letter-spacing:2px}
+.quick{background:#fff6f0!important;border-bottom:1px solid #eddfd7}
+.quick .container{padding-top:30px;padding-bottom:33px}
+.quick-heading h2{color:#5b2b39;font-size:27px}
+.quick-heading .small{color:#ac797b}
+.quick-list{gap:15px}
+.quick-item .art img{filter:contrast(1.05) saturate(1.13);mix-blend-mode:multiply}
+.quick-item .name{color:#6d3c49}
+.v5-mood{background:#250910;min-height:550px;display:grid;grid-template-columns:52% 48%;color:#fff;overflow:hidden}
+.v5-mood-picture{position:relative;min-height:550px;overflow:hidden;background:#3e0f23}
+.v5-mood-picture img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;object-position:50% 50%;filter:saturate(.82) brightness(.79) contrast(1.13)}
+.v5-mood-picture:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 45%,#250910 100%)}
+.v5-mood-copy{padding:92px 70px 65px 38px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.v5-mood-copy .v5-overline{color:#da9aa2}
+.v5-mood-copy h2{font:400 75px/.98 Georgia,serif;letter-spacing:-3px;color:#fff7ef;margin:32px 0 21px}
+.v5-mood-copy h2 em{color:#d89a9f;font-weight:400}
+.v5-mood-copy p{font-size:14px;line-height:1.9;color:#d9b9b7;max-width:380px;margin:23px 0 23px}
+.v5-goldline{height:1px;width:72px;background:#d09889}
+.v5-textlink{color:#f5ded6;font-size:11px;font-weight:700;letter-spacing:1.6px;border-bottom:1px solid #b97e80;padding-bottom:7px}
+.v5-arrivals{background:#1b0b12!important;color:#fff;padding:100px 0 110px}
+.v5-arrivals-heading{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:44px}
+.v5-arrivals-heading h2{font:400 75px/1.03 Georgia,serif;color:#f8ebe3;letter-spacing:-3px;margin:15px 0 0}
+.v5-arrivals-heading h2 em{color:#d59da5;font-weight:400}
+.v5-view{font-size:11px;letter-spacing:1.4px;border-bottom:1px solid #a7797f;color:#e8b4b1;padding-bottom:10px}
+.v5-product-stage{display:grid;grid-template-columns:1.12fr 1fr;gap:20px;min-height:615px}
+.v5-star{background:radial-gradient(ellipse at 57% 49%,#ac717f 0%,#603343 45%,#381523 92%);overflow:hidden;position:relative;min-height:610px}
+.v5-star:before{content:"";position:absolute;inset:12% 12% 24%;border:1px solid rgba(231,187,170,.22);border-radius:50%;transform:rotate(-23deg)}
+.v5-star-img{position:absolute;inset:2% 7% 13%;overflow:hidden}
+.v5-star-img img{height:100%;width:100%;object-fit:contain;filter:drop-shadow(0px 40px 35px rgba(0,0,0,.45));mix-blend-mode:screen}
+.v5-star-info{position:absolute;bottom:26px;left:30px;right:27px;display:flex;align-items:baseline;gap:12px;justify-content:space-between}
+.v5-star-info span{font-size:10px;letter-spacing:1.3px;color:#f9d4c5}
+.v5-star-info h3{font:400 29px Georgia,serif;color:white;margin:0}
+.v5-other-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:17px}
+.v5-mini{position:relative;background:radial-gradient(ellipse at 50% 40%,#9b6577,#492134 68%,#301422);overflow:hidden;min-height:293px}
+.v5-mini:nth-child(2){background:radial-gradient(ellipse at 50% 42%,#9f637e,#422235 65%,#291120)}
+.v5-mini:nth-child(3){grid-column:span 2;background:radial-gradient(ellipse at 50% 43%,#767b79,#4b3342 62%,#25131b)}
+.v5-mini-photo{position:absolute;inset:10px 10px 45px}
+.v5-mini-photo img{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen;filter:drop-shadow(0 15px 14px rgba(0,0,0,.37))}
+.v5-mini-label{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:baseline;gap:12px;padding:11px 16px;background:linear-gradient(0deg,#1e0b14d9,transparent)}
+.v5-mini-label>span{font-size:10px;letter-spacing:1px;color:#eebbb4}
+.v5-mini-label h3{font:400 20px Georgia,serif;color:#fff5ee;margin:0;flex:1}
+.collection-intro{background:#300d19!important;color:#d6a5ac!important}
+.editorial-overlay{border-radius:0!important}
+.editorial-overlay.women{background:#4c172b!important;color:white!important}
+.editorial-overlay.men{background:#e7d0c5!important;color:#502937!important}
+.editorial-overlay.couples{background:#351019!important}
+.editorial-overlay.women .overlay-shell,.editorial-overlay.men .overlay-shell,.editorial-overlay.couples .overlay-shell{grid-template-columns:48% 52%}
+.editorial-overlay .overlay-text{padding:94px 67px}
+.editorial-overlay h2{font:400 71px/.99 Georgia,serif;letter-spacing:-2.8px;margin:25px 0 22px}
+.editorial-overlay.women h2,.editorial-overlay.women .overlay-text .eyebrow,.editorial-overlay.women p,.editorial-overlay.women .line{color:#f7e2de!important}
+.editorial-overlay.men h2,.editorial-overlay.men .overlay-text .eyebrow,.editorial-overlay.men p,.editorial-overlay.men .line{color:#532f3e!important}
+.editorial-overlay .overlay-text p{max-width:350px}
+.editorial-overlay .overlay-art img{width:100%;height:100%;object-fit:cover;object-position:50% 42%;filter:brightness(.83) saturate(.77)}
+.editorial-overlay.women .overlay-art{background:#ab657c}
+.editorial-overlay.women .overlay-art img{object-position:50% 40%}
+.editorial-overlay.men .overlay-art{background:#d2b9ad}
+.editorial-overlay.men .overlay-art img{object-position:50% 35%;filter:saturate(.75) sepia(.09)}
+.editorial-overlay.couples .overlay-art img{object-position:73% 48%;filter:brightness(.68) saturate(.84)}
+.editorial-overlay.couples .overlay-text{padding:94px 64px}
+@media(max-width:700px){
+ .v5-hero{height:705px!important}
+ .v5-hero-image img{object-position:65% 50%;height:100%;width:100%;transform:scale(1.02)}
+ .v5-hero-veil{background:linear-gradient(180deg,rgba(21,0,7,.96) 0%,rgba(33,0,12,.92) 26%,rgba(34,0,9,.51) 52%,rgba(18,0,7,.09) 80%,rgba(18,0,9,.54) 100%)}
+ .v5-hero-copy{left:21px;top:53px;width:calc(100% - 41px)}
+ .v5-overline{font-size:8px;letter-spacing:2.1px}
+ .v5-hero h1{font-size:64px;letter-spacing:-3px;line-height:.95;margin:20px 0 13px}
+ .v5-hero-copy p{font-size:11px;line-height:1.65;max-width:260px;margin-bottom:19px}
+ .v5-cta{font-size:9px;letter-spacing:.8px;min-width:235px;padding:12px 16px}
+ .v5-hero-bottom{left:21px;right:17px;bottom:14px;font-size:7px;letter-spacing:1.1px}
+ .quick .container{padding-top:24px;padding-bottom:20px}
+ .quick-heading h2{font-size:23px}
+ .quick-heading .small{font-size:8px}
+ .v5-mood{grid-template-columns:1fr;min-height:auto}
+ .v5-mood-picture{min-height:290px;height:290px;order:2}
+ .v5-mood-picture img{object-position:50% 35%}
+ .v5-mood-picture:after{background:linear-gradient(0deg,rgba(36,8,17,.17),rgba(36,8,17,.7))}
+ .v5-mood-copy{order:1;padding:51px 23px 33px}
+ .v5-mood-copy h2{font-size:51px;line-height:1;letter-spacing:-2px;margin:17px 0 14px}
+ .v5-mood-copy p{font-size:12px;margin:17px 0}
+ .v5-textlink{font-size:9px}
+ .v5-arrivals{padding:54px 0 60px}
+ .v5-arrivals-heading{margin-bottom:24px;gap:12px}
+ .v5-arrivals-heading h2{font-size:39px;letter-spacing:-1.6px;margin-top:9px}
+ .v5-view{font-size:8px;max-width:92px;line-height:1.6;text-align:right}
+ .v5-product-stage{grid-template-columns:1fr;gap:11px}
+ .v5-star{min-height:450px}
+ .v5-star-img{inset:2% 6% 13%}
+ .v5-star-info{left:17px;right:17px;bottom:18px}
+ .v5-star-info h3{font-size:23px}
+ .v5-star-info span{font-size:8px}
+ .v5-other-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto;gap:9px}
+ .v5-mini{min-height:221px}
+ .v5-mini:nth-child(3){min-height:232px}
+ .v5-mini-photo{inset:7px 7px 41px}
+ .v5-mini-label{padding:8px}
+ .v5-mini-label h3{font-size:13px}
+ .v5-mini-label>span{font-size:8px}
+ .collection-intro{font-size:8px;letter-spacing:1.4px}
+ .editorial-overlay .overlay-shell,.editorial-overlay.women .overlay-shell,.editorial-overlay.men .overlay-shell,.editorial-overlay.couples .overlay-shell{grid-template-columns:53% 47%}
+ .editorial-overlay .overlay-text,.editorial-overlay.women .overlay-text,.editorial-overlay.men .overlay-text,.editorial-overlay.couples .overlay-text{padding:23px 11px}
+ .editorial-overlay h2{font-size:33px;letter-spacing:-1.2px;margin:11px 0 9px}
+ .editorial-overlay .overlay-text p{font-size:8.5px}
+ .editorial-overlay .overlay-art img{object-position:57% center}
+ .editorial-overlay.couples .overlay-art img{object-position:70% center}
+ .editorial-overlay .line{font-size:8px}
+}
+
+
+
+/* Temporary standalone PHP implementation: real HTML links; no WWW screenshot elements. */
+.byl-v5-page{overflow:hidden;--ink:#322c2b}
+.byl-v5-page .v5-hero a.v5-cta,.byl-v5-page .v5-view,.byl-v5-page .v5-textlink{cursor:pointer;text-decoration:none}
+.byl-v5-page .v5-star,.byl-v5-page .v5-mini{display:block;text-decoration:none}
+.byl-v5-page .v5-view{color:#eac1bc}
+.byl-v5-categories{background:#fcf9f6;padding:38px max(20px,calc((100vw - 1440px)/2)) 0}
+.byl-v5-categories .editorial-overlay{position:relative!important;left:auto!important;top:auto!important;width:100%!important;max-width:1380px;margin:0 auto 48px;height:551px!important}
+.byl-v5-categories .editorial-overlay .overlay-shell{min-height:100%}
+.byl-v5-categories .editorial-overlay a.line{color:inherit;text-decoration:none}
+.byl-v5-page .byl-v5-live-products{padding:30px 0 68px}
+.byl-v5-page .byl-home-explore,.byl-v5-page .byl-home-products,.byl-v5-page .byl-home-support{position:relative}
+@media(max-width:700px){
+ .byl-v5-categories{padding:20px 10px 0}
+ .byl-v5-categories .editorial-overlay{height:223px!important;margin-bottom:22px}
+ .byl-v5-categories .overlay-text{padding:20px 12px!important}
+ .byl-v5-categories .editorial-overlay h2{font-size:33px;line-height:1;letter-spacing:-1.2px;margin:10px 0}
+ .byl-v5-categories .editorial-overlay .overlay-text p{font-size:9px;line-height:1.5}
+ .byl-v5-page .byl-v5-live-products{padding:28px 0 46px}
+}
+
+</style>
+<main id="main-content" class="byl-home byl-v5-page" data-byl-template="home-v5-temp" data-byl-git-source="v5-pr109">
+<div class="v4">
+
+<section class="hero v5-hero" id="v5-hero">
+  <div class="v5-hero-image"><img loading="eager" src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover sensual fashion illustration" loading="eager"></div>
+  <div class="v5-hero-veil"></div>
+  <div class="v5-hero-copy">
+    <span class="v5-overline">BEYOURLOVER &nbsp; / &nbsp; THE ART OF PLEASURE</span>
+    <h1>Give in<br>to <em>desire.</em></h1>
+    <p>There are pleasures worth losing yourself in.<br>Discover yours, beautifully.</p>
+    <a class="v5-cta" href="<?php echo esc_url(home_url('/shop/')); ?>">EXPLORE THE COLLECTION <span aria-hidden="true">↗</span></a>
+  </div>
+  <div class="v5-hero-bottom"><span>THE BEAUTY OF FEELING EVERYTHING</span><span>01 &nbsp; / &nbsp; 03</span></div>
+</section>
+<section class="quick" id="v4-quick" aria-label="Original eight BeYourLover product shortcuts">
+ <div class="container">
+  <div class="quick-heading"><h2>The icons of pleasure.</h2><span class="small">8 ORIGINALS &nbsp; · &nbsp; EXPLORE WHAT MOVES YOU</span></div>
+  <nav class="quick-list">
+   <a class="quick-item" href="/skullman/"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2025/07/21065415/skullman-banner-image1-300x300.webp" alt="Skullman"></span><span class="name">SKULLMAN</span></a>
+   <a class="quick-item" href="/beyourlover-fatima-green/"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2025/03/20052055/beyourlover-fatima.webp" alt="Fatima"></span><span class="name">FATIMA</span></a>
+   <a class="quick-item" href="/clock"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2025/02/07075510/new-clock-main05-300x300.png" alt="Clock"></span><span class="name">CLOCK</span></a>
+   <a class="quick-item" href="/beyourlover-magic-suitcase-green/"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2025/02/09054036/magic-suitcase-pink-banner-300x300.webp" alt="Suitcase"></span><span class="name">SUITCASE</span></a>
+   <a class="quick-item" href="/beyourlover-joy-cup-diamond-version/"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2025/03/20052056/beyourlover-joy-cup.webp" alt="Joy Cup"></span><span class="name">JOY CUP</span></a>
+   <a class="quick-item" href="/beyourlover-alggie/"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2025/03/20052053/beyourlover-earphone.webp" alt="Earpod"></span><span class="name">EARPOD</span></a>
+   <a class="quick-item" href="/m2/"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2025/11/23013116/M2-Masturbator-Main-Image0-1-300x300.png" alt="M2"></span><span class="name">M2</span></a>
+   <a class="quick-item" href="/lippy/"><span class="art"><img loading="lazy" src="https://img.beyourlover.com/2026/03/24092622/lippy-main-pictures-01-300x300.png" alt="Lippy"></span><span class="name">LIPPY</span></a>
+  </nav>
+  <div class="quick-swipe"><span>EXPLORE ALL EIGHT ICONS</span><span>←&nbsp;&nbsp;&nbsp;→</span></div>
+ </div>
+</section>
+<section class="v5-mood" aria-label="Seductive editorial story">
+  <div class="v5-mood-picture"><img loading="lazy" src="https://img.beyourlover.com/2026/06/01070211/influencers-instagram-29.jpg" alt="Original BeYourLover illustrated portrait" loading="eager"></div>
+  <div class="v5-mood-copy"><span class="v5-overline">THE PLEASURE IS YOURS</span><h2>Some things<br>are better<br><em>felt.</em></h2><span class="v5-goldline"></span>
+    <p>For curious minds, intimate moments and every delicious possibility in between.</p>
+    <a class="v5-textlink" href="<?php echo esc_url(home_url('/shop/')); ?>">DISCOVER YOUR WORLD &nbsp; ↗</a>
+  </div>
+</section>
+<section class="arrivals v5-arrivals" id="v4-arrivals">
+<div class="container">
+  <div class="v5-arrivals-heading"><div><span class="v5-overline">THE LATEST OBSESSIONS</span><h2>Meet your<br><em>new temptation.</em></h2></div><a class="v5-view" href="<?php echo esc_url(home_url('/new-arrivals/')); ?>">DISCOVER NEW ARRIVALS &nbsp; ↗</a></div>
+  <div class="v5-product-stage">
+    <a class="v5-star" href="<?php echo esc_url($byl_v5_product_link('tara-s2')); ?>">
+      <div class="v5-star-img"><img loading="lazy" src="https://img.beyourlover.com/2026/08/14100230/s2-main-pictures-01-1000x1000.png" alt="TARA S2 actual product photo"></div>
+      <div class="v5-star-info"><span>01 / THE OBJECT OF DESIRE</span><h3>TARA S2</h3><span>DISCOVER &nbsp; ↗</span></div>
+    </a>
+    <div class="v5-other-items">
+      <a class="v5-mini" href="<?php echo esc_url($byl_v5_product_link('minaka')); ?>"><div class="v5-mini-photo"><img loading="lazy" src="https://img.beyourlover.com/2026/06/16065328/minaka-main-pictures.png" alt="MINAKA actual product photo"></div><div class="v5-mini-label"><span>02</span><h3>MINAKA</h3><span>↗</span></div></a>
+      <a class="v5-mini" href="<?php echo esc_url($byl_v5_product_link('naughty-clock-pink')); ?>"><div class="v5-mini-photo"><img loading="lazy" src="https://img.beyourlover.com/2026/04/10042552/main-pictures-03-1.webp" alt="NAUGHTY CLOCK PINK actual product photo"></div><div class="v5-mini-label"><span>03</span><h3>CLOCK PINK</h3><span>↗</span></div></a>
+      <a class="v5-mini" href="<?php echo esc_url($byl_v5_product_link('naughty-clock-green')); ?>"><div class="v5-mini-photo"><img loading="lazy" src="https://img.beyourlover.com/2025/12/23013024/naughty-clock.png" alt="NAUGHTY CLOCK GREEN actual product photo"></div><div class="v5-mini-label"><span>04</span><h3>CLOCK GREEN</h3><span>↗</span></div></a>
+    </div>
+  </div>
+</div>
+</section><div class="collection-intro">UNLOCK YOUR NEXT DESIRE &nbsp; / &nbsp; THREE WORLDS TO DISCOVER</div>
+</div>
+<div class="byl-v5-categories" aria-label="BeYourLover collections">
+<section class="editorial-overlay women">
+  <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">FOR THE MOMENTS THAT MATTER</span><h2>Let your<br>senses lead.</h2><p>The most tempting discoveries begin with a little curiosity.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-women')); ?>">EXPLORE FOR HER &nbsp; ↗</a></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+ </section>
+ <section class="byl-v5-live-products byl-home-section" aria-label="Live featured products"><div class="byl-container"><div class="byl-product-grid">
+ <?php foreach ($popular_products as $product): echo byl_v3_product_card($product); endforeach; ?>
+ </div></div></section>
+ <section class="editorial-overlay men">
+  <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">UNAPOLOGETIC PLEASURE</span><h2>Make<br>your move.</h2><p>Bold in every detail. Irresistible by design.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-men')); ?>">EXPLORE FOR HIM &nbsp; ↗</a></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052543/influencers-instagram-6.webp" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+ </section>
+ <section class="editorial-overlay couples">
+  <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">A LITTLE CLOSER</span><h2>Closer.<br>Hotter.</h2><p>A spark worth following. Made for everything that happens next.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-couples')); ?>">EXPLORE TOGETHER &nbsp; ↗</a></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+ </section>
+</div>
+<!-- Existing Dev lower homepage retained until original WWW lower modules can be faithfully ported. -->
   <section class="byl-home-section byl-home-explore">
     <div class="byl-container">
       <div class="byl-home-section-head">
@@ -91,5 +433,6 @@ $categories = array_filter([
       <a class="byl-btn byl-btn-secondary" href="<?php echo esc_url(home_url('/customer-help/')); ?>">Customer help</a>
     </div>
   </section>
+
 </main>
 <?php get_footer();
