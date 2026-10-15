@@ -254,3 +254,49 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
 .byl-progressive-checkout [data-byl-terms-host] #byl-checkout-legal-panel :is(p,li,h2,h3,h4){
   overflow-wrap:anywhere;
 }
+
+
+/* LELO 3-Step Canonical V1 — Cart -> Shipping (rates and address) -> Payment.
+   Woo owns shipping/tax/FX totals, gateways, consent and submission. */
+.byl-checkout-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 22px;padding:12px 8px 17px;border-bottom:1px solid var(--byl-line);text-align:center}
+.byl-checkout-track>[data-byl-track]{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--byl-ink-3);font-weight:550;text-decoration:none;font-size:13px}
+.byl-checkout-track>[data-byl-track]>span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--byl-line);border-radius:50%;font-size:12px}
+.byl-checkout-track>[aria-current="step"]{color:var(--byl-brand);font-weight:700}
+.byl-checkout-track>[aria-current="step"]>span{background:var(--byl-brand);color:white;border-color:var(--byl-brand)}
+.byl-shipping-rate-section{margin-top:19px;border-top:1px solid var(--byl-line);padding-top:18px}
+.byl-shipping-rate-section>h2,.byl-payment-options-heading{margin:0 0 13px;font:600 17px/1.45 var(--byl-font)}
+.byl-delivery-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+.byl-delivery-rate{min-height:64px}
+.byl-payment-review{padding:16px 0;border-bottom:1px solid var(--byl-line)}
+.byl-payment-review .byl-review-details{margin:0}
+.byl-payment-review .byl-review-details>div{grid-template-columns:110px minmax(0,1fr) auto}
+.byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-grid{grid-template-columns:minmax(290px,.85fr) minmax(0,1.15fr)}
+.byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-summary{order:-1;position:static}
+.byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-stages{order:0}
+.byl-progressive-checkout [data-byl-terms-host]{margin-top:12px}
+.byl-progressive-checkout #shipping_phone-description{display:block!important;white-space:normal;line-height:1.55}
+@media(max-width:760px){
+ .byl-checkout-track{margin-bottom:12px;padding:9px 2px 14px}
+ .byl-checkout-track>[data-byl-track]{flex-direction:column;gap:4px;font-size:11px}
+ .byl-delivery-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .byl-delivery-rate{padding:12px 10px;gap:8px}
+ .byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-grid{display:flex;flex-direction:column}
+ .byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-stages{order:0}
+ .byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-summary{order:1}
+ .byl-progressive-checkout .byl-checkout-summary{order:1}
+ .byl-payment-review .byl-review-details>div{grid-template-columns:80px minmax(0,1fr) auto}
+}
+@media(max-width:360px){.byl-delivery-options{grid-template-columns:1fr}}
+
+/* Progressive guest/login entry and optional native Woo address fields. */
+.byl-account-entry{display:flex;justify-content:flex-end;margin:0 0 15px}
+.byl-account-entry a{color:var(--byl-ink);font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.byl-shipping-rate-section{margin-top:0}
+.byl-shipping-details-heading{margin:25px 0 14px;font:600 17px/1.45 var(--byl-font)}
+.byl-optional-address-trigger{grid-column:1/-1;justify-self:start;display:block;min-height:35px;padding:5px 0;border:0;background:transparent;color:var(--byl-brand);text-decoration:underline;text-underline-offset:2px;font-weight:600;font-size:12px;text-align:left;cursor:pointer}
+.byl-optional-address-trigger[hidden],.byl-progressive-checkout #billing_address_2_field[hidden],.byl-progressive-checkout #billing_company_field[hidden]{display:none!important}
+
+.byl-account-email-host{margin-bottom:20px}
+.byl-account-email-host .form-row{margin:0!important;width:100%!important}
+.byl-account-email-host .input-text{width:100%;min-height:48px}
+.byl-account-entry{margin-bottom:10px}

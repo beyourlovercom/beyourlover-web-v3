@@ -10,10 +10,14 @@ docs = (ROOT / "docs/S6-CHECKOUT-PROGRESSIVE-UX.md").read_text(encoding="utf-8")
 
 for marker in (
     'data-byl-progressive-checkout',
-    'data-byl-step="address"',
-    'data-byl-step="delivery"',
+    'data-byl-step="shipping"',
     'data-byl-step="payment"',
-    'data-byl-step="review"',
+    'data-byl-track="cart"',
+    'data-byl-track="shipping"',
+    'data-byl-track="payment"',
+    'data-byl-delivery-options',
+    'data-needs-shipping',
+    'data-byl-country-notices',
     'data-byl-payment-host',
     'data-byl-next',
     'byl-summary-card',
@@ -22,7 +26,7 @@ for marker in (
         raise SystemExit(f"Missing accepted Checkout V2 template marker: {marker}")
 
 for marker in (
-    "const steps = ['address', 'delivery', 'payment', 'review']",
+    "const steps = ['shipping', 'payment']",
     "function validateAddress()",
     "function deliveryOptions()",
     "function paymentConfigured()",
@@ -34,12 +38,12 @@ for marker in (
 
 for marker in (
     "unset($fields['billing']['billing_phone'])",
-    "unset($fields['billing']['billing_company'])",
+    "$fields['billing']['billing_company']['required'] = false",
     "unset($fields['shipping']['shipping_company'])",
     "['shipping_phone']",
     "'required' => true",
-    "'label' => 'Shipping phone'",
-    "Your number is used only to help the carrier deliver your order. We do not use it for marketing.",
+    "'label' => 'Phone'",
+    "We will only use this number in case we need to contact you regarding delivery purposes.",
     "'autocomplete' => 'tel'",
 ):
     if marker not in php:
@@ -140,10 +144,17 @@ for marker in (
         raise SystemExit(f"Order Summary toggle/ARIA contract missing: {marker}")
 
 # Payment cannot be marked complete when Woo requires payment but offers no gateway.
-if "if ((active === 'payment' || active === 'review') && !paymentConfigured())" not in js:
-    raise SystemExit("Payment step CTA must stay disabled without an eligible gateway")
 if "if (active === 'payment' && !paymentConfigured())" not in js:
-    raise SystemExit("Payment to Review transition must fail closed when no gateway exists")
+    raise SystemExit("Payment CTA must fail closed without an eligible gateway")
+if "function shippingReady()" not in js or "if (!validateAddress() || !shippingReady())" not in js:
+    raise SystemExit("Woo shipping rate and checkout field validation must gate payment")
+if "active !== 'payment'" not in js or "nativeButton.click()" not in js:
+    raise SystemExit("Only native Woo checkout on Payment may submit")
+for forbidden_stage in ('data-byl-step="address"', 'data-byl-step="delivery"', 'data-byl-step="review"'):
+    if forbidden_stage in form:
+        raise SystemExit(f"Superseded step visible in Canonical V1: {forbidden_stage}")
+if "'priority' => 85" not in php:
+    raise SystemExit("Shipping phone must precede postal code in canonical Woo field order")
 
 if "Latest main Checkout V2" not in docs or "one BYL promotion slot" not in docs:
     raise SystemExit("S6 docs must record latest-main ownership and the one-slot promotion integration")
@@ -195,26 +206,12 @@ for marker in (
     if marker not in css:
         raise SystemExit(f"PR40 unified consent visual contract missing: {marker}")
 
-# Dev-only Owner-requested default checks: user may uncheck either box, and
-# Woo updated_checkout must not silently restore a declined selection.
-# NOT a valid production opt-in for UK/EU or other affirmative-consent regimes.
-for marker in (
-    "window.location.hostname === 'dev.beyourlover.com'",
-    'const consentChoice = new Map()',
-    'if (!consentChoice.has(input.name)) consentChoice.set(input.name, true)',
-    'input.checked = consentChoice.get(input.name)',
-    "termsHost.addEventListener('change', event =>",
-    'consentChoice.set(event.target.name, event.target.checked)',
-    'syncConsentCheckboxes();',
-):
-    if marker not in js:
-        raise SystemExit(f"G3 Dev consent-default experiment contract missing: {marker}")
-# Shipping-rate selection legitimately checks a different input. Only prohibit
-# an unconditional Terms/review-consent assignment in the new sync helper.
-consent_region = js.split('function syncConsentCheckboxes() {', 1)[1].split("termsHost.addEventListener('change'", 1)[0]
-if "input.checked = true" in consent_region or "terms.checked = true" in js:
-    raise SystemExit("Consent sync must preserve explicit user opt-outs")
-if "window.location.hostname === 'www.beyourlover.com'" in js:
-    raise SystemExit("Precheck may not be enabled for WWW")
+# LELO payment baseline: never synthesize acceptance or opt-in in any environment.
+if "devPrecheck" in js or "syncConsentCheckboxes()" in js or "consentChoice" in js:
+    raise SystemExit("No Dev/WWW automatic Terms or marketing preselection permitted")
+if "terms.checked = true" in js or "consentInput.checked = true" in js:
+    raise SystemExit("Checkout may not synthesize a user's legal/marketing consent")
+if "const steps = ['address', 'delivery', 'payment', 'review']" in js:
+    raise SystemExit("Legacy four-step navigation may not be the new default")
 
-print("Checkout progressive UX contract check PASS")
+print("Checkout three-step progressive UX contract check PASS")

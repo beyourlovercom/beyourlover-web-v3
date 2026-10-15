@@ -4,29 +4,14 @@
   const root = document.querySelector('[data-byl-progressive-checkout]');
   if (!root || !root.querySelector('form.checkout')) return;
   const form = root.querySelector('form.checkout');
-  const steps = ['address', 'delivery', 'payment', 'review'];
+  const steps = ['shipping', 'payment'];
   const next = root.querySelector('[data-byl-next]');
   const error = root.querySelector('[data-byl-error]');
-  let active = 'address';
+  let active = 'shipping';
   let furthest = 0;
   let submitting = false;
   const notesHost = root.querySelector('[data-byl-notes-host]');
   const termsHost = root.querySelector('[data-byl-terms-host]');
-  // Dev-only UX experiment. Do not treat pre-selected checkboxes as valid
-  // marketing/privacy consent or propagate this behavior to Production.
-  const devPrecheck = window.location.hostname === 'dev.beyourlover.com';
-  const consentSelector = 'input[type="checkbox"][name="cr_customer_consent"], input[type="checkbox"][name="terms"]';
-  const consentChoice = new Map();
-  function syncConsentCheckboxes() {
-    if (!devPrecheck) return;
-    termsHost.querySelectorAll(consentSelector).forEach(input => {
-      if (!consentChoice.has(input.name)) consentChoice.set(input.name, true);
-      input.checked = consentChoice.get(input.name);
-    });
-  }
-  termsHost.addEventListener('change', event => {
-    if (event.target.matches(consentSelector)) consentChoice.set(event.target.name, event.target.checked);
-  });
   const paymentHost = root.querySelector('[data-byl-payment-host]');
   const deliveryHost = root.querySelector('[data-byl-delivery-options]');
   const summary = root.querySelector('.byl-summary-card');
@@ -68,7 +53,42 @@
     const label = root.querySelector('#shipping_phone_field > label');
     if (!label) return;
     const text = Array.from(label.childNodes).find(node => node.nodeType === 3);
-    if (text) text.nodeValue = 'Shipping phone ';
+    if (text) text.nodeValue = 'Phone ';
+  }
+  function mountWooAccountEmail() {
+    // Reparent Woo's real email field instead of inventing a parallel email input.
+    const host = root.querySelector('[data-byl-account-email-host]');
+    const field = root.querySelector('#billing_email_field');
+    if (host && field && field.parentElement !== host) host.appendChild(field);
+  }
+  function wireOptionalAddressFields() {
+    // Progressive disclosure only. Never hide an already populated address.
+    [
+      ['billing_address_2_field', '+ Add apt, suite, floor or other (optional)'],
+      ['billing_company_field', '+ Add organization (optional)'],
+    ].forEach(([id, title]) => {
+      const row = root.querySelector('#' + id);
+      if (!row || row.dataset.bylOptionalWired === '1') return;
+      const input = row.querySelector('input, textarea, select');
+      if (!input) return;
+      row.dataset.bylOptionalWired = '1';
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'byl-optional-address-trigger';
+      trigger.textContent = title;
+      trigger.setAttribute('aria-controls', id);
+      const expanded = String(input.value || '').trim().length > 0;
+      row.hidden = !expanded;
+      trigger.hidden = expanded;
+      trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      row.parentElement.insertBefore(trigger, row);
+      trigger.addEventListener('click', () => {
+        row.hidden = false;
+        trigger.hidden = true;
+        trigger.setAttribute('aria-expanded', 'true');
+        input.focus({preventScroll: false});
+      });
+    });
   }
   function syncPhoneDescription() {
     const description = root.querySelector('#shipping_phone-description');
@@ -231,8 +251,6 @@
       }
     }
     wireLegalAccordion();
-    // Mount/re-mount must preserve a customer's deliberate opt-out.
-    syncConsentCheckboxes();
     const reviewInvite = termsHost.querySelector('.cr-customer-consent .woocommerce-terms-and-conditions-checkbox-text');
     if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation with gift card rewards.';
     const notes = document.querySelector('.woocommerce-additional-fields');
@@ -302,16 +320,14 @@
     review('delivery', shippingLabel());
     review('payment', paymentLabel());
     updateShippingSummary();
-    const addressSummary = root.querySelector('[data-byl-step-summary="address"]');
-    const deliverySummary = root.querySelector('[data-byl-step-summary="delivery"]');
+    const shippingSummary = root.querySelector('[data-byl-step-summary="shipping"]');
     const paymentSummary = root.querySelector('[data-byl-step-summary="payment"]');
-    if (addressSummary && name && address) addressSummary.textContent = name + ' · ' + address;
-    if (deliverySummary && selectedShipping()) deliverySummary.textContent = shippingLabel();
+    if (shippingSummary && name && address) shippingSummary.textContent = name + ' · ' + address;
     if (paymentSummary) paymentSummary.textContent = paymentLabel();
   }
   function validateAddress() {
     let firstInvalid = null;
-    root.querySelectorAll('.byl-checkout-billing .validate-required').forEach(wrapper => {
+    root.querySelectorAll('.byl-checkout-billing .validate-required, [data-byl-account-email-host] .validate-required').forEach(wrapper => {
       const input = wrapper.querySelector('input:not([type=hidden]), select, textarea');
       if (!input || input.disabled) return;
       const empty = !String(input.value || '').trim();
@@ -326,9 +342,12 @@
     }
     return true;
   }
+  function shippingReady() {
+    return root.dataset.needsShipping !== '1' || !!selectedShipping();
+  }
   function updateAction() {
-    const labels = { address:'Continue to Delivery', delivery:'Continue to Payment', payment:'Continue to Review', review:'Place Order' };
-    const processingPayment = submitting && active === 'review';
+    const labels = { shipping:'Continue to Payment', payment:root.dataset.needsPayment === '1' ? 'Pay Now' : 'Place Order' };
+    const processingPayment = submitting && active === 'payment';
     next.innerHTML = '';
     next.appendChild(document.createTextNode((processingPayment ? 'Processing payment' : labels[active]) + ' '));
     const arrow = document.createElement('span');
@@ -343,7 +362,7 @@
       next.setAttribute('aria-busy', 'true');
     } else {
       next.removeAttribute('aria-busy');
-      if ((active === 'payment' || active === 'review') && !paymentConfigured()) {
+      if (active === 'payment' && !paymentConfigured()) {
         next.disabled = true;
         message('No payment method is available. Please try again later.');
       } else {
@@ -358,6 +377,13 @@
     const index = steps.indexOf(step);
     if (index < 0 || index > furthest) return;
     active = step;
+    root.dataset.bylCurrentStep = step;
+    const pageHeading = root.querySelector('[data-byl-checkout-heading]');
+    if (pageHeading) pageHeading.textContent = step === 'shipping' ? 'Shipping' : 'Payment';
+    root.querySelectorAll('[data-byl-track]').forEach(item => {
+      if (item.dataset.bylTrack === step) item.setAttribute('aria-current', 'step');
+      else item.removeAttribute('aria-current');
+    });
     root.querySelectorAll('[data-byl-step]').forEach(section => {
       const name = section.dataset.bylStep;
       const number = steps.indexOf(name);
@@ -369,8 +395,10 @@
     });
     message('');
     mountNative();
+    mountWooAccountEmail();
     relabelPhone();
     syncPhoneDescription();
+    wireOptionalAddressFields();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -379,41 +407,43 @@
   }
   next.addEventListener('click', () => {
     if (submitting) return;
-    if (active === 'address' && !validateAddress()) return;
-    if (active === 'delivery' && !selectedShipping()) {
-      message('Please select an available delivery method.');
+    if (active === 'shipping') {
+      if (!validateAddress()) return;
+      if (!shippingReady()) {
+        message('Please select an available delivery method for your address.');
+        return;
+      }
+      furthest = 1;
+      setStep('payment');
+      $('body').trigger('update_checkout'); // Woo recalculates totals and gateway eligibility.
       return;
     }
-    // Never mark Payment complete unless Woo has an eligible selected gateway.
-    if (active === 'payment' && !paymentConfigured()) {
+    if (active !== 'payment') return;
+    if (!paymentConfigured()) {
       message('Select an available payment method to continue.');
       return;
     }
-    if (active === 'review') {
-      if (!paymentConfigured()) {
-        message('A real payment gateway must be configured before an order can be placed.');
-        return;
-      }
-      const nativeButton = document.getElementById('place_order');
-      if (!nativeButton) {
-        message('WooCommerce payment confirmation is unavailable.');
-        return;
-      }
-      submitting = true;
-      updateAction();
-      nativeButton.click(); // Native Woo validation, nonce and gateway callback remain authoritative.
+    if (!validateAddress() || !shippingReady()) {
+      message('Please review the required shipping information.');
+      furthest = 1;
+      setStep('shipping');
       return;
     }
-    furthest = Math.max(furthest, steps.indexOf(active) + 1);
-    setStep(steps[steps.indexOf(active) + 1]);
-    if (active === 'delivery') $('body').trigger('update_checkout');
+    const nativeButton = document.getElementById('place_order');
+    if (!nativeButton) {
+      message('WooCommerce payment confirmation is unavailable.');
+      return;
+    }
+    submitting = true;
+    updateAction();
+    nativeButton.click(); // Native Woo validation, nonce and gateway callback remain authoritative.
   });
   root.addEventListener('click', e => {
     const edit = e.target.closest('[data-byl-open-step]');
     if (edit) { e.preventDefault(); setStep(edit.dataset.bylOpenStep); }
   });
   form.addEventListener('submit', e => {
-    if (active !== 'review' || !paymentConfigured() || !validateAddress() || !selectedShipping()) {
+    if (active !== 'payment' || !paymentConfigured() || !validateAddress() || !shippingReady()) {
       e.preventDefault();
       e.stopImmediatePropagation();
       message('Complete all checkout steps before placing your order.');
@@ -599,8 +629,10 @@
   form.addEventListener('change', updateDetails);
   $(document.body).on('updated_checkout', () => {
     mountNative();
+    mountWooAccountEmail();
     relabelPhone();
     syncPhoneDescription();
+    wireOptionalAddressFields();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -621,5 +653,5 @@
   root.classList.add('is-enhanced');
   mountNative();
   fetchPromotion();
-  setStep('address');
+  setStep('shipping');
 })(jQuery);
