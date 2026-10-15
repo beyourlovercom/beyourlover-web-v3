@@ -1811,7 +1811,7 @@ if ($byl_footer_newsletter_ready
 			</div>
 			<div class="footer__copyright">
 				<ul class="policies">
-					<li><a href="/privacy-policies" rel="nofollow">Privacy Policy</a></li>
+					<li><a href="/privacy-policies/" rel="nofollow">Privacy Policy</a></li>
 					<li><a href="/terms-and-conditions" rel="nofollow">T&amp;C</a></li>
 					<li><a href="/cookies-policies" rel="nofollow">Cookie Policy</a></li>
 				</ul>
