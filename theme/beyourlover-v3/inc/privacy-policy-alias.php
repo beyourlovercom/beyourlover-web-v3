@@ -47,6 +47,11 @@ function byl_v3_privacy_alias_redirect(): void {
         || $page->post_name !== 'privacy-policies') {
         return;
     }
+    // WordPress core privacy-page ownership must not point elsewhere.
+    $privacy_page_id = (int)get_option('wp_page_for_privacy_policy', 0);
+    if ($privacy_page_id > 0 && $privacy_page_id !== (int)$page->ID) {
+        return;
+    }
 
     // Never forward query strings or referer data. Do not infer a slug.
     $destination = home_url('/privacy-policies/');
@@ -57,7 +62,7 @@ function byl_v3_privacy_alias_redirect(): void {
         || !hash_equals(strtolower((string)$base['host']), strtolower((string)$target['host']))
         || !hash_equals(strtolower((string)$base['scheme']), strtolower((string)$target['scheme']))
         || ($target['path'] ?? '') !== '/privacy-policies/'
-        || isset($target['user'], $target['pass'])
+        || isset($target['user']) || isset($target['pass'])
         || isset($target['query'], $target['fragment'])
         || headers_sent()) {
         return;
