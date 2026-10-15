@@ -15,6 +15,7 @@ $GLOBALS['byl_test_flags'] = [];
 $GLOBALS['byl_test_page'] = null;
 
 class WP_Post {
+    public int $ID = 7271;
     public string $post_status;
     public string $post_name;
     public function __construct(string $status, string $slug) {
@@ -31,6 +32,10 @@ function wp_doing_cron(): bool { return !empty($GLOBALS['byl_test_flags']['cron'
 function get_page_by_path($path, $output = null, $type = null) {
     if ($path !== 'privacy-policies' || $type !== 'page') { throw new RuntimeException('Unexpected Page query'); }
     return $GLOBALS['byl_test_page'];
+}
+function get_option(string $key, $default = 0) {
+    if ($key !== 'wp_page_for_privacy_policy') { throw new RuntimeException('Unexpected option'); }
+    return $GLOBALS['byl_test_flags']['privacy_page_id'] ?? 7271;
 }
 function home_url(string $path = '/'): string { return 'https://dev.beyourlover.com' . $path; }
 function wp_parse_url(string $url) { return parse_url($url); }
@@ -68,6 +73,7 @@ if ($case !== '') {
     if ($case === 'unpublished') { $page = new WP_Post('draft', 'privacy-policies'); }
     if ($case === 'wrong_slug') { $page = new WP_Post('publish', 'privacy-polices'); }
     if ($case === 'missing_page') { $page = null; }
+    if ($case === 'wrong_privacy_option') { $GLOBALS['byl_test_flags']['privacy_page_id'] = 9999; }
     if (in_array($case, ['admin', 'ajax', 'cron'], true)) {
         $GLOBALS['byl_test_flags'][$case] = true;
     }
@@ -117,6 +123,7 @@ $cases = [
     'unpublished' => false,
     'wrong_slug' => false,
     'missing_page' => false,
+    'wrong_privacy_option' => false,
     'cart' => false,
     'checkout' => false,
     'rest_path' => false,
@@ -143,5 +150,5 @@ foreach ($cases as $key => $redirect) {
 }
 
 echo "BYL_PRIVACY_ALIAS_LITERAL_MATCH=14/14_PASS\n";
-echo "BYL_PRIVACY_ALIAS_EXECUTION=20/20_PASS\n";
+echo "BYL_PRIVACY_ALIAS_EXECUTION=21/21_PASS\n";
 echo "BYL_PRIVACY_ALIAS_NO_NETWORK_NO_DB_NO_WOO=PASS\n";
