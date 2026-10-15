@@ -1204,7 +1204,7 @@ $byl_v5_category_link = static function (string $slug): string {
                         <img src="https://img.beyourlover.com/2026/06/16070501/redman-img07.png" alt="Customer testimonial by solostella_sg - BeYourLover" width="400" height="400" loading="eager" fetchpriority="high" decoding="async">
                     </a>
                     <div class="txt1">
-                        "Hey please, can you tell what time is it?" Sure! Look here, this clock shows you the hour, bu
+                        "Hey please, can you tell what time is it?" Sure! Look here, this clock shows you the hour, but
                         it's really helpful for something else too 🤭💖
                     </div>
                     <div class="txt2">@solostella_sg</div>
@@ -1586,7 +1586,7 @@ $byl_v5_category_link = static function (string $slug): string {
 			<div class="guarantee-item">
 				<img src="https://www.beyourlover.com/wp-content/uploads/2025/02/payment-security02.svg" alt="guarantee-icon">
 				<div class="txt1">
-					Secure Checkou
+					Secure Checkout
 				</div>
 			</div>
 			<div class="guarantee-item">
@@ -1604,7 +1604,7 @@ $byl_v5_category_link = static function (string $slug): string {
 			<div class="guarantee-item">
 				<img src="https://www.beyourlover.com/wp-content/uploads/2025/02/Do-you-need-help.svg" alt="guarantee-icon">
 				<div class="txt1">
-					Secure Checkou
+					Secure Checkout
 				</div>
 			</div>
 		</div>
@@ -1801,7 +1801,7 @@ $byl_v5_category_link = static function (string $slug): string {
 								</div>
 								<div class="module4-txt2">
 									BeYourLover offers a wide range of discreet luxury adult toys for both men and women. With
-									innovative &amp; thoughtful designs, our products are sure to give you the high-quality enjoymen
+									innovative &amp; thoughtful designs, our products are sure to give you the high-quality enjoyment
 									that you deserve.
 									As a global award winning adult toys brand, BeYourLover is aims to provide a premium sexual
 									lifestyle for you with high quality &amp; innovative products.
