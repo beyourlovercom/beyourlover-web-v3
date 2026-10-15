@@ -1123,6 +1123,20 @@ $byl_v5_category_link = static function (string $slug): string {
 .byl-www-footer-wrapper .byl-www-newsletter-fields input{background:#fff;color:#777;border:1px solid #ddd;min-width:140px;min-height:42px;padding:11px 14px;flex:1;border-radius:0}
 .byl-www-footer-wrapper .byl-www-newsletter-fields button{border:0;background:#9b3749;color:#fff;font-size:12px;padding:13px 18px;opacity:1;cursor:default}
 .byl-www-footer-wrapper .byl-www-newsletter-preview{max-width:435px}
+/* Core controls submission; Theme owns appearance only. Never hide marketing consent. */
+.byl-www-footer-wrapper .byl-www-newsletter-integrated{max-width:435px}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated .yby-shortcode-subscribe__title,
+.byl-www-footer-wrapper .byl-www-newsletter-integrated .yby-shortcode-subscribe__subtitle,
+.byl-www-footer-wrapper .byl-www-newsletter-integrated .yby-shortcode-subscribe__image{display:none}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract]{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;margin:0}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract] input[type=email]{grid-column:1;min-width:0;width:100%;border:1px solid #ddd;border-radius:0;background:#fff;color:#555;padding:11px 14px;min-height:42px}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract] button[type=submit]{grid-column:2;background:#9b3749;border:0;border-radius:0;color:#fff;padding:13px 18px;min-height:42px}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract] .yby-newsletter-consent{grid-column:1/-1;display:flex;gap:7px;align-items:flex-start;font-size:11px;line-height:1.45}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract] .yby-newsletter-consent input{width:15px;min-width:15px;height:15px;margin:1px 0 0}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract] .yby-newsletter-honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract] [data-yby-subscribe-status]{grid-column:1/-1;margin:0;font-size:11px;line-height:1.5}
+@media(max-width:390px){.byl-www-footer-wrapper .byl-www-newsletter-integrated form[data-yby-subscribe-contract] button[type=submit]{padding:12px 11px;font-size:11px}}
+
 .byl-www-footer-wrapper .byl-www-static-currency{font-size:12px}
 @media(max-width:768px){
 .byl-www-content{padding:0 10px}
@@ -1619,7 +1633,30 @@ $byl_v5_category_link = static function (string $slug): string {
 				<div class="footer-email-txt1">JOIN BEYOURLOVER CLUB</div>
 				<div class="footer-email-txt2">Sign up to receive 15% off your first order and exclusive access to our best offers.</div>
 			</div>
-			<div class="wpforms-container byl-www-newsletter-preview"><div class="byl-www-newsletter-fields"><input type="email" placeholder="Email Address" readonly="" aria-label="Email Address"><button type="button" disabled="">SUBSCRIBE</button></div></div>  <!-- .wpforms-container -->		</div>
+			<!-- BYL H6.3-N: Core-owned newsletter form, fail-closed until API, outbound and mail transport gates are genuinely ready. -->
+<?php
+$byl_footer_newsletter_ready =
+    class_exists('YBY_Newsletter_REST_Controller')
+    && is_callable(['YBY_Newsletter_REST_Controller', 'subscribe_ready'])
+    && function_exists('shortcode_exists')
+    && shortcode_exists('yby_subscribe')
+    && YBY_Newsletter_REST_Controller::subscribe_ready();
+$byl_footer_newsletter_html = $byl_footer_newsletter_ready
+    ? do_shortcode('[yby_subscribe button_label="SUBSCRIBE" class="byl-www-footer-core-form"]')
+    : '';
+if ($byl_footer_newsletter_ready
+    && is_string($byl_footer_newsletter_html)
+    && str_contains($byl_footer_newsletter_html, 'data-yby-subscribe-contract')
+    && str_contains($byl_footer_newsletter_html, 'marketing_consent')) :
+?>
+<div class="wpforms-container byl-www-newsletter-integrated" data-byl-footer-newsletter="andy-core"><?php
+    // Andy Core shortcode escapes its own fields and owns the consent/API contract.
+    echo $byl_footer_newsletter_html;
+?></div>
+<?php else : ?>
+<div class="wpforms-container byl-www-newsletter-preview"><div class="byl-www-newsletter-fields"><input type="email" placeholder="Email Address" readonly="" aria-label="Email Address"><button type="button" disabled="">SUBSCRIBE</button></div></div>
+<?php endif; ?>
+<!-- /BYL H6.3-N -->  <!-- .wpforms-container -->		</div>
 
 		<div class="footer-model04">
 			<div class="footer-class-list">
