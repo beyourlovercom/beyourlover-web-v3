@@ -1654,11 +1654,11 @@ $byl_v5_category_link = static function (string $slug): string {
 					<div class="txt1">
 						Company
 					</div>
-					<a href="https://www.beyourlover.com/about-us/">About Us</a>
-					<a href="https://www.beyourlover.com/contact-us/">Contact Us</a>
-					<a href="https://www.beyourlover.com/affiliates/">Affiliates</a>
-					<a href="https://www.beyourlover.com/shop/">Shop</a>
-					<a href="https://www.beyourlover.com/blog/">Blog</a>
+					<a href="/about-us/">About Us</a>
+					<a href="/contact-us/">Contact Us</a>
+					<a href="/affiliates/">Affiliates</a>
+					<a href="/shop/">Shop</a>
+					<a href="/blog/">Blog</a>
 				</div>
 				<div class="footer-class-item">
 					<div class="txt1">
