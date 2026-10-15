@@ -88,8 +88,14 @@ for marker in (
 if ".woocommerce-form-login-toggle" in css:
     raise SystemExit("Returning customer login must remain available")
 
-if "document.getElementById('payment')" not in js or "paymentHost.appendChild(payment)" not in js:
-    raise SystemExit("The complete native #payment container must be moved intact")
+if "review.querySelector('#payment')" not in js or "paymentHost.appendChild(payment)" not in js:
+    raise SystemExit("Woo updated_checkout payment node must be moved intact and refreshed")
+if "if (fresh && mounted && mounted !== fresh) mounted.remove()" not in js:
+    raise SystemExit("Woo native payment refresh must replace stale gateway nodes")
+if "function wooShippingGroups()" not in js or "function chosenShippingRates()" not in js:
+    raise SystemExit("Woo one hidden-rate and multiple package groups must be handled")
+if "chosenShippingRates().length === wooShippingGroups().size" not in js:
+    raise SystemExit("Every Woo shipping package must have a selected native rate")
 for forbidden in ("apple-pay", "google-pay", "payment-request", "express-payment"):
     if forbidden in js.lower() or forbidden in css.lower():
         raise SystemExit(f"Checkout must not hide or hard-code wallet UI: {forbidden}")

@@ -26,3 +26,12 @@ Date: 2026-10-15 | linked Issue #89 / Docs Draft PR #118 / E2E #87
 5. GitHub Actions Foundation CI billing restriction may stop runner; local tests DO NOT count as hosted CI PASS.
 
 No main merge, Dev/WWW deploy, cart/order/payment/customer/DB/mail writes or READY device restart.
+
+## L3-02: 2026-10-15 isolated payment and shipping fragment hardening
+Actual source-driven mocked DOM regression uncovered **two copies of the native payment container** after a Woo updated_checkout fragment refresh. In the prior code, document.getElementById('payment') returned the old node moved outside order_review rather than Woo's newly rendered payment/gateway node. A stale payment method and duplicate place_order could remain.
+- The theme adapter now prefers fresh payment markup **inside Woo #order_review**, removes the stale mounted native payment node and replaces old Terms/Privacy with Woo's fresh Terms fields, without checking them on the user's behalf.
+- The source-backed minimal mock fixture and portable DOM test are in scripts/fixtures/checkout-lelo-woo-classic-mock.html and scripts/test_checkout_lelo_dom_refresh.cjs. Mock uses **example.invalid**, no customer details, no network, no order or charges.
+- Woo **one shipping rate** may be rendered as a hidden native input with no :checked property; it is now recognized as chosen, and displayed read-only. **Multi-package** shipping now requires one native selected rate per package; Payment CTA fails closed until every required package is selected.
+- G5 isolated anti-duplicate submission test has been updated for the two Checkout panels (Cart is step one). Seven scenarios PASS, including repeated click, long 3DS wait, provider failure retry, missing gateway/native button, pending navigation, and Enter key. No real payment.
+- Manual isolated dynamic test dependencies (not committed to the plugin/site): Node 18+ and jsdom@26.1.0 + jquery@3.7.1. Example run: npm install --prefix /tmp/checkout-lelo-dom-tests --no-save --no-audit --no-fund jsdom@26.1.0 jquery@3.7.1; NODE_PATH=/tmp/checkout-lelo-dom-tests/node_modules node scripts/test_checkout_lelo_dom_refresh.cjs. This manual test is not a substitute for CI or actual Dev Woo checkout.
+- This hardening does **not** prove that a live payment gateway's JS/3DS or Checkout Drawer iframe/overlay works in Dev. Actual mounted gateway + rate fragment UAT still HOLD, as do country rules, Auto Account/Mail OS and production consent/legal review.

@@ -300,3 +300,9 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
 .byl-account-email-host .form-row{margin:0!important;width:100%!important}
 .byl-account-email-host .input-text{width:100%;min-height:48px}
 .byl-account-entry{margin-bottom:10px}
+
+/* Native Woo shipping package contract: even single hidden-rate destinations count. */
+.byl-delivery-package{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.byl-delivery-package-title{grid-column:1/-1;font:600 12px/1.5 var(--byl-font);color:var(--byl-ink-2)}
+.byl-delivery-rate:disabled{cursor:default;opacity:1}
+@media(max-width:375px){.byl-delivery-package{grid-template-columns:1fr}}

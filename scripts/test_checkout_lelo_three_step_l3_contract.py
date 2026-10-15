@@ -31,7 +31,13 @@ assert "[data-byl-account-email-host] .validate-required" in script
 assert "data-byl-marketing-optin-slot hidden" in form
 assert "const steps = ['shipping', 'payment']" in script
 assert "nativeButton.click()" in script
+assert "review.querySelector('#payment')" in script
+assert "if (fresh && mounted && mounted !== fresh) mounted.remove()" in script
+assert "if (fresh && oldTerms) oldTerms.remove()" in script
 assert "function shippingReady()" in script
+assert "function wooShippingGroups()" in script and "function chosenShippingRates()" in script
+assert "only.type === 'hidden'" in script
+assert "chosenShippingRates().length === wooShippingGroups().size" in script
 assert "if (active !== 'payment' || !paymentConfigured()" in script
 assert "function wireOptionalAddressFields()" in script
 assert "billing_address_2_field" in script and "billing_company_field" in script

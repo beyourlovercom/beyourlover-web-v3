@@ -27,14 +27,35 @@
     error.textContent = value || '';
     error.hidden = !value;
   }
+  function wooShippingGroups() {
+    // Woo can return exactly one hidden rate instead of a checked radio.
+    // Multi-package carts require ONE selected rate per native package name.
+    const groups = new Map();
+    root.querySelectorAll('#order_review input[name^="shipping_method"]').forEach(input => {
+      if (!input.name) return;
+      if (!groups.has(input.name)) groups.set(input.name, []);
+      groups.get(input.name).push(input);
+    });
+    return groups;
+  }
+  function chosenShippingRates() {
+    return Array.from(wooShippingGroups().values()).map(options => {
+      const checked = options.find(input => input.checked && String(input.value || '').trim());
+      if (checked) return checked;
+      const only = options.length === 1 ? options[0] : null;
+      return only && only.type === 'hidden' && String(only.value || '').trim() ? only : null;
+    }).filter(Boolean);
+  }
   function selectedShipping() {
-    return document.querySelector('input[name^="shipping_method"]:checked');
+    return chosenShippingRates()[0] || null;
   }
   function shippingLabel() {
-    const input = selectedShipping();
-    if (!input) return 'Awaiting delivery selection';
-    const label = document.querySelector('label[for="' + CSS.escape(input.id) + '"]');
-    return label ? label.textContent.replace(/\s+/g, ' ').trim() : input.value;
+    const choices = chosenShippingRates();
+    if (!choices.length) return 'Awaiting delivery selection';
+    return choices.map(input => {
+      const label = input.id && document.querySelector('label[for="' + CSS.escape(input.id) + '"]');
+      return label ? label.textContent.replace(/\s+/g, ' ').trim() : input.value;
+    }).join(' · ');
   }
   function selectedGateway() {
     return document.querySelector('#payment input[name="payment_method"]:checked');
@@ -184,11 +205,25 @@
     });
   }
   function mountNative() {
-    const payment = document.getElementById('payment');
+    // Woo refreshes order_review on address/shipping/coupon changes. When the
+    // native #payment fragment is regenerated, it MUST replace our previous
+    // moved fragment; document.getElementById would otherwise return the stale
+    // moved node and leave duplicate #payment / #place_order controls.
+    const review = root.querySelector('#order_review');
+    const fresh = review && review.querySelector('#payment');
+    const mounted = paymentHost.querySelector('#payment');
+    const payment = fresh || mounted || root.querySelector('#payment');
+    if (fresh && mounted && mounted !== fresh) mounted.remove();
     if (payment && payment.parentElement !== paymentHost) paymentHost.appendChild(payment);
-    const terms = document.querySelector('.woocommerce-terms-and-conditions-wrapper');
+
+    // Terms/Privacy are also Woo-owned. Prefer the refreshed terms from the
+    // new payment fragment; otherwise we risk submitting stale legal fields.
+    const oldTerms = termsHost.querySelector('.woocommerce-terms-and-conditions-wrapper');
+    if (fresh && oldTerms) oldTerms.remove();
+    const terms = (fresh ? payment && payment.querySelector('.woocommerce-terms-and-conditions-wrapper') : null)
+      || (fresh ? null : oldTerms || (payment && payment.querySelector('.woocommerce-terms-and-conditions-wrapper')));
     if (terms && terms.parentElement !== termsHost) termsHost.appendChild(terms);
-    // Woo fragments can reinsert the same terms block on updated_checkout.
+    // Fail closed: never retain a discarded Terms checkbox from an old gateway.
     const blocks = Array.from(termsHost.querySelectorAll('.woocommerce-terms-and-conditions-wrapper'));
     blocks.slice(1).forEach(block => block.remove());
     const privacy = termsHost.querySelector('.woocommerce-privacy-policy-text p');
@@ -258,37 +293,51 @@
   }
   function deliveryOptions() {
     deliveryHost.replaceChildren();
-    const native = Array.from(document.querySelectorAll('#order_review input[name^="shipping_method"]'));
-    if (!native.length) {
+    const groups = wooShippingGroups();
+    if (!groups.size) {
       const p = document.createElement('p');
       p.className = 'byl-step-hint';
       p.textContent = 'Enter your delivery address to see available shipping methods.';
       deliveryHost.appendChild(p);
       return;
     }
-    native.forEach(input => {
-      const label = document.querySelector('label[for="' + CSS.escape(input.id) + '"]');
-      const title = label ? label.textContent.replace(/\s+/g, ' ').trim() : input.value;
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'byl-delivery-rate' + (input.checked ? ' is-selected' : '');
-      button.setAttribute('aria-pressed', input.checked ? 'true' : 'false');
-      const radio = document.createElement('span');
-      radio.className = 'byl-delivery-radio';
-      radio.setAttribute('aria-hidden', 'true');
-      const description = document.createElement('span');
-      description.className = 'byl-delivery-label';
-      const strong = document.createElement('strong');
-      strong.textContent = title;
-      description.appendChild(strong);
-      button.append(radio, description);
-      button.addEventListener('click', () => {
-        input.checked = true;
-        input.dispatchEvent(new Event('change', {bubbles: true}));
-        deliveryOptions();
-        updateDetails();
+    Array.from(groups.entries()).forEach(([packageKey, options], groupIndex) => {
+      const pack = document.createElement('div');
+      pack.className = 'byl-delivery-package';
+      if (groups.size > 1) {
+        const title = document.createElement('strong');
+        title.className = 'byl-delivery-package-title';
+        title.textContent = 'Package ' + (groupIndex + 1);
+        pack.appendChild(title);
+      }
+      options.forEach(input => {
+        const label = input.id && document.querySelector('label[for="' + CSS.escape(input.id) + '"]');
+        const title = label ? label.textContent.replace(/\s+/g, ' ').trim() : input.value;
+        const autoSelected = input.type === 'hidden' && options.length === 1 && !!String(input.value || '').trim();
+        const selected = input.checked || autoSelected;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.disabled = input.type === 'hidden'; // Woo already chose its only possible rate.
+        button.className = 'byl-delivery-rate' + (selected ? ' is-selected' : '');
+        button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        const radio = document.createElement('span');
+        radio.className = 'byl-delivery-radio';
+        radio.setAttribute('aria-hidden', 'true');
+        const description = document.createElement('span');
+        description.className = 'byl-delivery-label';
+        const strong = document.createElement('strong');
+        strong.textContent = title;
+        description.appendChild(strong);
+        button.append(radio, description);
+        if (input.type !== 'hidden') button.addEventListener('click', () => {
+          input.checked = true;
+          input.dispatchEvent(new Event('change', {bubbles: true}));
+          deliveryOptions();
+          updateDetails();
+        });
+        pack.appendChild(button);
       });
-      deliveryHost.appendChild(button);
+      deliveryHost.appendChild(pack);
     });
   }
   function review(target, val) {
@@ -343,7 +392,7 @@
     return true;
   }
   function shippingReady() {
-    return root.dataset.needsShipping !== '1' || !!selectedShipping();
+    return root.dataset.needsShipping !== '1' || (wooShippingGroups().size > 0 && chosenShippingRates().length === wooShippingGroups().size);
   }
   function updateAction() {
     const labels = { shipping:'Continue to Payment', payment:root.dataset.needsPayment === '1' ? 'Pay Now' : 'Place Order' };
@@ -365,6 +414,9 @@
       if (active === 'payment' && !paymentConfigured()) {
         next.disabled = true;
         message('No payment method is available. Please try again later.');
+      } else if (active === 'payment' && !shippingReady()) {
+        next.disabled = true;
+        message('Please return to Shipping and choose an available delivery method.');
       } else {
         next.disabled = false;
       }
