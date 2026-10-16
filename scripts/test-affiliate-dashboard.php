@@ -47,6 +47,7 @@ function esc_attr($s) { return esc_html($s); }
 function esc_url($s) { return esc_html($s); }
 function wp_logout_url($path='') { return home_url('/logout/'); }
 function wc_get_page_permalink($type) { return home_url('/my-account/'); }
+function byl_v3_account_url() { return home_url('/my-account/'); }
 function wp_kses_post($html) { return strip_tags((string)$html,'<table><thead><tbody><tr><td><th>'); }
 function shortcode_exists($name) { return $name==='affiliate_coupons'; }
 function do_shortcode($code) { return '<table><tr><td>REALCODE</td></tr></table>'; }
