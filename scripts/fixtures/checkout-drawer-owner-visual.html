@@ -113,9 +113,23 @@ document.querySelector('[data-byl-checkout-heading]').textContent=step==='shippi
 document.querySelector('[data-byl-checkout-drawer-back]').textContent=step==='shipping'?'‹ Your Cart':'‹ Shipping';
 document.querySelectorAll('[data-byl-step]').forEach(el=>el.classList.toggle('is-active',el.dataset.bylStep===step));
 document.querySelectorAll('[data-byl-track]').forEach(el=>el.getAttribute('data-byl-track')===step?el.setAttribute('aria-current','step'):el.removeAttribute('aria-current'));
+const stageTrack=document.querySelector('.byl-checkout-track');
+const previewBack=document.querySelector('.byl-checkout-drawer-back');
+if(step==='payment')stageTrack.insertAdjacentElement('afterend',previewBack);
+else document.querySelector('.byl-checkout-heading').insertAdjacentElement('afterend',previewBack);
 document.querySelector('[data-byl-next]').textContent=step==='shipping'?'CONTINUE TO PAYMENT':'PAY NOW';
 const summary=document.querySelector('.byl-summary-card');
 const mobile=innerWidth<=760;summary.classList.toggle('is-open',!mobile);
+const previewSummaryToggle=document.querySelector('.byl-summary-toggle');
+const previewSummaryHeader=document.createElement('div');
+previewSummaryHeader.className='byl-drawer-summary-head';
+previewSummaryToggle.parentNode.insertBefore(previewSummaryHeader,previewSummaryToggle);
+previewSummaryHeader.appendChild(previewSummaryToggle);
+const previewEdit=document.createElement('button');
+previewEdit.className='byl-drawer-edit-cart';
+previewEdit.type='button';
+previewEdit.textContent='Edit';
+previewSummaryHeader.appendChild(previewEdit);
 const title=document.querySelector('.byl-summary-toggle strong');title.textContent=mobile?'Order total':'Your Cart';
 if(mobile){const d=document.createElement('span');d.textContent='See details';d.style.cssText='margin-left:8px;color:#8e092d;font-size:11px;text-decoration:underline';document.querySelector('.byl-summary-toggle').insertBefore(d,document.querySelector('.byl-summary-total'))}
 document.querySelector('[data-byl-summary-toggle]').addEventListener('click',()=>{summary.classList.toggle('is-open')});

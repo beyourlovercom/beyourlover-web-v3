@@ -22,6 +22,15 @@ Cart → Shipping → Payment ONLY. BYL original burgundy, black typography, Pin
 - The separate user-approved PR #119 three-step fields, phone-before-ZIP, email input without helper, optional apt/organization, native shipping rate selection are reused. No fake shipping price/SLA or provider logo.
 - Dev-only capability is checked by Woo checkout context, staging environment, dev.beyourlover.com host, and exact opt-in query. Order Pay/Thank You excluded. WWW gets no Drawer activation.
 
+## 2026-10-16 Owner screenshot discrepancy sweep (native code, no Dev rollout)
+Inspected original archived Owner PASS Shipping Mobile and composite Payment Mobile+Desktop assets, not generic reference images:
+- Payment back-link is **below** 3-step icon tracker and underlined with separator; Shipping "Your Cart" is **above** tracker. Prior local prototype had Payment back link above tracker; source and static DOM tests now enforce correct per-step placement.
+- Desktop has **YOUR CART (count)** plus a separate **Edit** action at the left summary header; hide its compact total at the top because native Woo order-total table already appears below. Mobile instead shows **Order total / See details / Woo total** in fixed footer above one CTA. Source updated to regroup the existing Woo toggle without duplicating or recalculating values.
+- PC Payment has **Order total / See details** card directly above **PAY NOW**; previous candidate pushed the CTA to bottom of 900px modal. CSS corrected to follow this card, with Playwright assertion.
+- Payment methods have a subtle trailing chevron; added CSS pseudo decoration rather than fabricating payment method availability or labels. Provider-specific cards and 3DS remain owned by Woo and need actual Dev validation.
+- The Owner Shipping graphic shows optional marketing offer, save-address choice, a Tax ID and tax/duties notice. All require matching server-side consent/customs/identity rules; these remain **unimplemented** in actual Woo, despite being present in the synthetic visual reference. No fake checkbox, tax claim, or tax ID input was inserted solely to match screenshot pixels.
+- The mock fixture is not real Woo DOM and does **not** prove pixel-perfect parity with the original image (which includes an iPhone bezel and synthetic values). The only valid final fidelity check is iPhone14/M320/M390/PC1440 actual Dev capture, side-by-side after separately approved Canary.
+
 ## Exactness gates — NOT all completed
 | Requirement | Source / local fixture | Actual Dev Owner PASS |
 |---|---|---|

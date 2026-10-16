@@ -47,7 +47,15 @@ if(!executable || !fs.existsSync(executable)) throw Error('Set BYL_CHROME_BIN to
       paymentStepVisible:visible('[data-byl-step="payment"]>.byl-step-body'),
       totalTitle:document.querySelector('.byl-summary-toggle strong').textContent,
       ctaCount:document.querySelectorAll('[data-byl-next]').length,
-      nativeFormCount:document.querySelectorAll('form.checkout').length
+      nativeFormCount:document.querySelectorAll('form.checkout').length,
+      track:bounding('.byl-checkout-track'),
+      back:bounding('.byl-checkout-drawer-back'),
+      paymentCardCount:document.querySelectorAll('[data-byl-step="payment"] #payment li').length,
+      visibleBottomCTA:(()=>{
+        const node=document.querySelector('[data-byl-next]');
+        const rect=node.getBoundingClientRect();
+        return rect.height>0 && rect.bottom<=innerHeight;
+      })()
     };
    });
    assert.equal(offsite,0,v.label+': unexpected network access');
@@ -55,6 +63,11 @@ if(!executable || !fs.existsSync(executable)) throw Error('Set BYL_CHROME_BIN to
    assert.equal(state.scrollWidth,v.width,v.label+': horizontal overflow');
    assert.equal(state.ctaCount,1,v.label+': duplicate CTA');
    assert.equal(state.nativeFormCount,1,v.label+': duplicate Woo form');
+   assert.equal(state.visibleBottomCTA,true,v.label+': fixed CTA not visible');
+   assert(v.step==='payment'
+     ? state.back.y >= state.track.y+state.track.height-1
+     : state.back.y+state.back.height <= state.track.y+1,
+     v.label+': Shipping and Payment back-link placement violates Owner PASS reference');
    assert.equal(state.shippingStepVisible,v.step==='shipping',v.label+': wrong visible shipping state');
    assert.equal(state.paymentStepVisible,v.step==='payment',v.label+': wrong visible payment state');
    if(v.width<=760){
@@ -70,6 +83,8 @@ if(!executable || !fs.existsSync(executable)) throw Error('Set BYL_CHROME_BIN to
      assert.equal(Math.round(state.panel.x+state.panel.width),v.width,'PC Drawer must touch right screen edge');
      assert.equal(Math.round(state.panel.width),1010,'Desktop drawer mirrors existing Cart width');
      assert.equal(state.totalTitle,'Your Cart');
+     assert(state.footer.y < v.height-90,'Desktop Pay Now must follow order-total card, not float to drawer bottom');
+
    }
    const filename=path.join(outfile,'LOCAL-FIXTURE-'+v.label+'.png');
    await page.screenshot({path:filename,animations:'disabled'});

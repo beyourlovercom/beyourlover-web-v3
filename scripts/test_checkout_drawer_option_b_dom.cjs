@@ -19,7 +19,10 @@ const html='<!doctype html><html><body>'+
 '<button type="button" data-byl-open-step="shipping">Edit shipping</button>'+
 '<button type="button" data-byl-open-step="payment">Edit payment</button>'+
 '<div id="payment"><input type="radio" name="payment_method" value="fixture"></div>'+
-'</div><aside class="byl-checkout-summary">Woo summary</aside></form>'+
+'<div data-byl-drawer-payment-total><strong data-byl-drawer-payment-total-amount></strong><button type="button" data-byl-drawer-payment-total-details>See details</button></div>'+
+'</div><aside class="byl-checkout-summary"><div class="byl-summary-card">'+
+'<button type="button" data-byl-summary-toggle><strong>Order Summary</strong><span class="byl-summary-total">$25.00</span></button>'+
+'<div class="byl-summary-body">Woo summary</div></div></aside></form>'+
 '</div></div></section></div></body></html>';
 const dom=new JSDOM(html,{
   url:'https://dev.beyourlover.com/checkout/?byl_checkout_drawer=1',
@@ -46,10 +49,23 @@ assert.equal(d.querySelectorAll('form.checkout').length,1,'Only one native Woo f
 assert.equal(d.querySelectorAll('#payment').length,1,'No duplicated gateway');
 assert.equal(d.activeElement,close,'Close initially focused');
 assert.equal(back.textContent,'‹ Your Cart');
+const summaryHead=d.querySelector('.byl-drawer-summary-head');
+assert.ok(summaryHead,'Desktop summary header exists');
+assert.equal(summaryHead.querySelectorAll('.byl-drawer-edit-cart').length,1,'Exactly one Edit your cart control');
+assert.equal(d.querySelector('[data-byl-drawer-payment-total-amount]').textContent,'$25.00','Payment amount mirrors native Woo summary');
+assert.equal(back.previousElementSibling,d.querySelector('.byl-checkout-heading'),'Shipping back must precede progress as Owner PASS');
+
 checkout.dataset.bylCurrentStep='payment';
 const finish=async()=>{
  await new Promise(resolve=>setTimeout(resolve,0));
+ const wooTotal=d.querySelector('.byl-summary-total');
+ wooTotal.textContent='$29.00';
+ await new Promise(resolve=>setTimeout(resolve,0));
+ assert.equal(d.querySelector('[data-byl-drawer-payment-total-amount]').textContent,'$29.00',
+   'Woo fragment updates must refresh the display-only Payment total');
  assert.equal(back.textContent,'‹ Shipping','Back label follows internal Payment state');
+ assert.equal(back.previousElementSibling,d.querySelector('.byl-checkout-track'),'Payment back must follow progress as Owner PASS');
+
  assert.equal(shell.dataset.bylDrawerStep,'payment');
  back.click();
  assert.equal(delegatedShipping,1,'Payment back delegates to existing native Woo Shipping step');

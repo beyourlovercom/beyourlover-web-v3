@@ -69,7 +69,7 @@ body.byl-checkout-drawer-mode .byl-checkout-heading h1{
 }
 body.byl-checkout-drawer-mode .byl-checkout-heading>span{display:none;}
 body.byl-checkout-drawer-mode .byl-checkout-drawer-back{
-  margin:0 0 14px;padding:2px 0;border:0;background:none;font:600 13px inherit;
+  margin:0 0 14px;padding:2px 0;border:0;background:none;font-size:13px;font-family:inherit;font-weight:600;line-height:1.45;
   color:#1a1820;text-decoration:underline;text-underline-offset:2px;cursor:pointer;
 }
 body.byl-checkout-drawer-mode .byl-checkout-track{
@@ -197,7 +197,7 @@ body.byl-checkout-drawer-mode .byl-summary-product{margin:8px 0 12px;gap:12px;gr
 body.byl-checkout-drawer-mode .byl-summary-product .byl-summary-image{width:52px;height:58px;border-radius:4px;}
 body.byl-checkout-drawer-mode .byl-summary-product strong{font-size:12px;}
 body.byl-checkout-drawer-mode .byl-summary-total{font-size:13px!important;color:#1d161a!important;}
-body.byl-checkout-drawer-mode .byl-checkout-action-bar{margin:auto 0 0!important;position:static!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;}
+body.byl-checkout-drawer-mode .byl-checkout-action-bar{margin:12px 0 0!important;position:static!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;}
 body.byl-checkout-drawer-mode .byl-checkout-next{
   background:var(--byl-drawer-wine)!important;min-height:52px;border-radius:6px!important;
   color:#fff!important;letter-spacing:.11em;text-transform:uppercase;font-size:13px!important;
@@ -316,4 +316,59 @@ body.byl-checkout-drawer-mode .byl-drawer-payment-total-details{
 }
 @media(max-width:760px){
   body.byl-checkout-drawer-mode .byl-drawer-payment-total{display:none!important;}
+}
+
+/* Owner visual precision: desktop summary heading + separate Edit, mobile
+   fixed order total only. Native Woo order review retains all real figures. */
+body.byl-checkout-drawer-mode .byl-drawer-summary-head {
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle {
+  width:auto!important;flex:1;min-width:0;
+}
+body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle strong {
+  text-transform:uppercase;letter-spacing:-.012em;font-size:14px!important;
+}
+body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle .byl-summary-total,
+body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle .byl-summary-chevron {
+  display:none!important;
+}
+body.byl-checkout-drawer-mode .byl-drawer-edit-cart {
+  flex:0 0 auto;border:0;background:none;padding:5px 0;color:#211b20;
+  font-size:12px;font-weight:600;text-decoration:underline;cursor:pointer;
+}
+body.byl-checkout-drawer-mode .byl-drawer-edit-cart:hover {color:var(--byl-drawer-wine);}
+body.byl-checkout-drawer-mode .byl-checkout-step[data-byl-step="payment"] .byl-step-hint {
+  display:none!important; /* no distracting synthetic gateway explainer */
+}
+@media(max-width:760px) {
+  body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle strong {
+    text-transform:none;letter-spacing:normal;font-size:12px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle .byl-summary-total,
+  body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle .byl-summary-chevron{
+    display:inline!important;
+  }
+  body.byl-checkout-drawer-mode .byl-drawer-edit-cart {display:none!important;}
+}
+
+/* Owner PASS Payment: divider belongs AFTER "‹ Shipping", not above it.
+   Shipping uses "‹ Your Cart" BEFORE the progress indicators. */
+body.byl-checkout-drawer-mode .byl-checkout-track{border-bottom:0!important;}
+body.byl-checkout-drawer-mode [data-byl-drawer-step="payment"] .byl-checkout-drawer-back{
+  display:block;width:100%;text-align:left;border-bottom:1px solid var(--byl-drawer-line);
+  padding:5px 0 14px!important;margin:0 0 22px!important;text-decoration:underline;
+}
+body.byl-checkout-drawer-mode #payment .wc_payment_methods>li{position:relative;}
+body.byl-checkout-drawer-mode #payment .wc_payment_methods>li:after{
+  content:'›';position:absolute;top:50%;right:14px;transform:translateY(-50%);
+  pointer-events:none;color:#6f676d;font-size:20px;line-height:1;
+}
+body.byl-checkout-drawer-mode #payment .wc_payment_methods>li>label{
+  padding-right:10px;width:calc(100% - 38px);
+}
+@media(max-width:760px) {
+  body.byl-checkout-drawer-mode [data-byl-drawer-step="payment"] .byl-checkout-drawer-back{
+    margin:0 0 16px!important;padding:5px 0 12px!important;
+  }
 }

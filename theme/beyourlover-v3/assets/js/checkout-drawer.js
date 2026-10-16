@@ -52,6 +52,22 @@
   details.className = 'byl-drawer-see-details';
   details.textContent = 'See details';
   if (summaryToggle && summaryAmount) summaryToggle.insertBefore(details, summaryAmount);
+  // Desktop Owner PASS shows "YOUR CART (n)" on the left with one Edit action,
+  // not a second sticky total beside that heading. Preserve the native Woo
+  // summary toggle and totals; only regroup their existing presentation.
+  if (summaryToggle) {
+    const headerRow = document.createElement('div');
+    headerRow.className = 'byl-drawer-summary-head';
+    summaryToggle.parentNode.insertBefore(headerRow, summaryToggle);
+    headerRow.appendChild(summaryToggle);
+    const editCart = document.createElement('button');
+    editCart.type = 'button';
+    editCart.className = 'byl-drawer-edit-cart';
+    editCart.textContent = 'Edit';
+    editCart.setAttribute('aria-label', 'Edit your cart');
+    headerRow.appendChild(editCart);
+    editCart.addEventListener('click', () => exitDrawer());
+  }
   // Display-only echo of Woo computed summary total; no arithmetic.
   const paymentTotalAmount = checkout.querySelector('[data-byl-drawer-payment-total-amount]');
   const paymentTotalDetails = checkout.querySelector('[data-byl-drawer-payment-total-details]');
@@ -82,7 +98,7 @@
   back.className = 'byl-checkout-drawer-back';
   back.dataset.bylCheckoutDrawerBack = '';
   back.textContent = '‹ Your Cart';
-  heading.insertAdjacentElement('afterend', back);
+  heading.insertAdjacentElement('afterend', back); // Shipping: back precedes progress.
 
   function closingDestination() {
     return previousUrl || fallbackUrl;
@@ -120,6 +136,11 @@
     const title = heading.querySelector('[data-byl-checkout-heading]');
     if (title) title.textContent = payment ? 'Payment' : 'Shipping';
     back.textContent = payment ? '‹ Shipping' : '‹ Your Cart';
+    // Exact Owner Shipping/Payment image differences:
+    // Shipping: title -> Your Cart -> 3 icons;
+    // Payment: title -> 3 icons -> Shipping -> gateway list.
+    if (payment) track.insertAdjacentElement('afterend', back);
+    else heading.insertAdjacentElement('afterend', back);
     shell.dataset.bylDrawerStep = payment ? 'payment' : 'shipping';
     // Ensure the scrolling panel starts at the header after a phase change,
     // without scrolling the document or jumping to a different route.
