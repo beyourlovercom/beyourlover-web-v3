@@ -417,6 +417,35 @@
         });
         pack.appendChild(button);
       });
+      // A Woo-configured amount-gated Free shipping method can exist in the
+      // active zone while being unavailable below its real minimum. The source
+      // row comes from the Woo-refreshable order-review fragment, not a
+      // hardcoded price list. It must never be clickable or set an input.
+      const match = /^shipping_method\\[(\\d+)\\]$/.exec(packageKey);
+      const lockedSource = match && Array.from(
+        root.querySelectorAll('#order_review .byl-locked-free-rate-source')
+      ).find(node => node.dataset.bylPackageIndex === match[1]);
+      const threshold = lockedSource && lockedSource.dataset.bylFreeThreshold;
+      const freeExists = options.some(input => String(input.value || '').startsWith('free_shipping:'));
+      if (threshold && !freeExists) {
+        const locked = document.createElement('div');
+        locked.className = 'byl-delivery-rate is-locked';
+        locked.setAttribute('role', 'note');
+        locked.setAttribute('aria-disabled', 'true');
+        const ring = document.createElement('span');
+        ring.className = 'byl-delivery-radio';
+        ring.setAttribute('aria-hidden', 'true');
+        const label = document.createElement('span');
+        label.className = 'byl-delivery-label';
+        const title = document.createElement('strong');
+        title.textContent = 'Free shipping';
+        const explanation = document.createElement('small');
+        explanation.className = 'byl-delivery-eligibility';
+        explanation.textContent = 'Available from ' + threshold + ' eligible subtotal';
+        label.append(title, explanation);
+        locked.append(ring, label);
+        pack.appendChild(locked);
+      }
       deliveryHost.appendChild(pack);
     });
   }
