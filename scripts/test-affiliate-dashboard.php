@@ -87,6 +87,7 @@ ob_start(); include dirname(__DIR__).'/theme/beyourlover-v3/template-affiliate-d
 $assert(str_contains($render,'Hi, Emma') && str_contains($render,'USD 550.00'),'active user sees own real mock metrics');
 if (in_array('--preview', $argv, true)) { file_put_contents(dirname(__DIR__).'/affiliate-preview.html', $render); }
 $assert(!str_contains($render,'9000') && !str_contains($render,'10000'),'cross-affiliate values do not render');
+$assert(str_contains($render,'Dev test data only'),'Dev local affiliate stats are clearly labeled');
 $assert(str_contains($render,'REALCODE'),'assigned coupon shortcode is used');
 $_GET['byl_ref_page']='2';
 $_GET['byl_pay_page']='2';

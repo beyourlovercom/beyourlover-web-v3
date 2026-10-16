@@ -64,6 +64,9 @@ get_header();
             <div class="byl-affiliate-rail-quote"><em>Empower Pleasure.<br>Share Confidence.</em><p>BeYourLover CREATOR COMMUNITY</p></div>
         </aside>
         <div class="byl-affiliate-main">
+            <?php if (wp_parse_url(home_url('/'), PHP_URL_HOST) === 'dev.beyourlover.com' && empty($aff['remote_readonly'])) : ?>
+                <p role="status" class="byl-affiliate-footnote">Dev test data only — this account uses local AffiliateWP records. WWW historical commissions and payouts are not connected yet.</p>
+            <?php endif; ?>
             <section class="byl-affiliate-hero" id="overview" aria-labelledby="byl-affiliate-title">
                 <div class="byl-affiliate-hero-text">
                     <p class="byl-affiliate-eyebrow">YOUR CREATOR SPACE</p>
