@@ -36,7 +36,8 @@ ok(form.count('data-byl-step="shipping"')==1 and form.count('data-byl-step="paym
 ok("data-byl-track=\"cart\"" in form and "data-byl-track=\"shipping\"" in form and "data-byl-track=\"payment\"" in form, "3-stage cart / shipping / payment progress")
 for extra in ('data-byl-step="address"','data-byl-step="delivery"','data-byl-step="review"'):
     ok(extra not in form, "no extra stage "+extra)
-ok("const steps = ['shipping', 'payment']" in js and "setStep('shipping')" in js, "2-step JS matches Woo template")
+ok("const steps = ['shipping', 'payment']" in js and "setStep('shipping', {scroll:false})" in js, "2-step JS matches Woo template without initial scroll jump")
+ok("function setStep(step, {scroll = true} = {})" in js and "if (heading && scroll) heading.scrollIntoView(" in js, "only user-driven step changes may scroll")
 ok("nativeButton.click()" in js and "function paymentConfigured()" in js, "Woo native payment submission retained")
 ok("if (active === 'payment' && !paymentConfigured())" in js, "no payment gateway fail-closed")
 ok("$(document.body).on('checkout_error'" in js or "$(document.body).on('checkout_error'," in js, "native Woo payment error recovery")

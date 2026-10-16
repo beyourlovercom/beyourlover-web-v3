@@ -452,7 +452,7 @@
       }
     }
   }
-  function setStep(step) {
+  function setStep(step, {scroll = true} = {}) {
     // Never re-enable the checkout CTA by navigating to another step
     // while native WooPayments / 3DS authentication is in progress.
     if (submitting) return;
@@ -485,7 +485,7 @@
     updateDetails();
     updateAction();
     const heading = root.querySelector('[data-byl-step="' + step + '"]');
-    if (heading) heading.scrollIntoView({block:'start',behavior:'auto'});
+    if (heading && scroll) heading.scrollIntoView({block:'start',behavior:'auto'});
   }
   next.addEventListener('click', () => {
     if (submitting) return;
@@ -735,5 +735,6 @@
   root.classList.add('is-enhanced');
   mountNative();
   fetchPromotion();
-  setStep('shipping');
+  // Initial render starts at the page header; user-driven step changes may scroll.
+  setStep('shipping', {scroll:false});
 })(jQuery);
