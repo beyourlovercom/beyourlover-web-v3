@@ -118,7 +118,7 @@
     // The same DOM/keyboard order must match the Owner reference at both
     // desktop and mobile widths. Move existing Woo wrappers ONLY, never clone
     // country/state/tax inputs or replace a live Woo SelectWoo control.
-    const host = root.querySelector('.byl-checkout-billing .woocommerce-billing-fields__field-wrapper');
+    const host = document.getElementById('billing_first_name_field')?.parentElement;
     if (!host) return;
     const known = {
       billing_country_field: 10,
