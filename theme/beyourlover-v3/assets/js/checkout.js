@@ -421,7 +421,7 @@
       // active zone while being unavailable below its real minimum. The source
       // row comes from the Woo-refreshable order-review fragment, not a
       // hardcoded price list. It must never be clickable or set an input.
-      const match = /^shipping_method\\[(\\d+)\\]$/.exec(packageKey);
+      const match = /^shipping_method\[(\d+)\]$/.exec(packageKey);
       const lockedSource = match && Array.from(
         root.querySelectorAll('#order_review .byl-locked-free-rate-source')
       ).find(node => node.dataset.bylPackageIndex === match[1]);
