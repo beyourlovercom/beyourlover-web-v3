@@ -16,6 +16,8 @@
   const deliveryHost = root.querySelector('[data-byl-delivery-options]');
   const summary = root.querySelector('.byl-summary-card');
   const summaryToggle = root.querySelector('[data-byl-summary-toggle]');
+  const mobileSummaryToggle = root.querySelector('[data-byl-mobile-summary-toggle]');
+  const mobileSummaryTotal = root.querySelector('[data-byl-mobile-total]');
   const promoConfig = window.BYLShippingPromotionCheckout || {};
   const promotion = { data: null, editing: false, busy: false, cartToken: '' };
 
@@ -340,7 +342,13 @@
       }
       options.forEach(input => {
         const label = input.id && document.querySelector('label[for="' + CSS.escape(input.id) + '"]');
-        const title = label ? label.textContent.replace(/\s+/g, ' ').trim() : input.value;
+         const fullLabel = label ? label.textContent.replace(/\s+/g, ' ').trim() : input.value;
+         // The native Woo label and price remain the single pricing source.
+         // Never synthesize rates, delivery windows or guaranteed transit times.
+         const priceNode = label && label.querySelector('.woocommerce-Price-amount');
+         const realPrice = priceNode ? priceNode.textContent.replace(/\s+/g, ' ').trim() : '';
+         const title = realPrice ? fullLabel.replace(realPrice, '').replace(/:\s*$/, '').trim() : fullLabel;
+         const visiblePrice = realPrice || (/^Free shipping$/i.test(title) ? 'Free' : '');
         const autoSelected = input.type === 'hidden' && options.length === 1 && !!String(input.value || '').trim();
         const selected = input.checked || autoSelected;
         const button = document.createElement('button');
@@ -357,6 +365,12 @@
         strong.textContent = title;
         description.appendChild(strong);
         button.append(radio, description);
+         if (visiblePrice) {
+           const cost = document.createElement('span');
+           cost.className = 'byl-delivery-price';
+           cost.textContent = visiblePrice;
+           button.appendChild(cost);
+         }
         if (input.type !== 'hidden') button.addEventListener('click', () => {
           input.checked = true;
           input.dispatchEvent(new Event('change', {bubbles: true}));
@@ -397,6 +411,8 @@
     review('delivery', shippingLabel());
     review('payment', paymentLabel());
     updateShippingSummary();
+    const nativeTotal = root.querySelector('.byl-summary-total');
+    if (nativeTotal && mobileSummaryTotal) mobileSummaryTotal.textContent = nativeTotal.textContent;
     const shippingSummary = root.querySelector('[data-byl-step-summary="shipping"]');
     const paymentSummary = root.querySelector('[data-byl-step-summary="payment"]');
     if (shippingSummary && name && address) shippingSummary.textContent = name + ' · ' + address;
@@ -727,9 +743,15 @@
   });
   if (summaryToggle) summaryToggle.addEventListener('click', () => {
     const open = !summary.classList.contains('is-open');
-    summary.classList.toggle('is-open',open);
-    summaryToggle.setAttribute('aria-expanded',open?'true':'false');
+    summary.classList.toggle('is-open', open);
+    summaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (mobileSummaryToggle) mobileSummaryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
+  if (mobileSummaryToggle) {
+    mobileSummaryToggle.addEventListener('click', () => {
+      if (summaryToggle) summaryToggle.click();
+    });
+  }
   summary.classList.toggle('is-open', !window.matchMedia('(max-width: 760px)').matches);
   summaryToggle.setAttribute('aria-expanded', summary.classList.contains('is-open') ? 'true' : 'false');
   root.classList.add('is-enhanced');
