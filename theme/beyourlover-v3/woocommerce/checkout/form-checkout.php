@@ -11,9 +11,9 @@ $cart = WC()->cart;
 <div class="byl-progressive-checkout" data-byl-progressive-checkout data-needs-payment="<?php echo esc_attr($cart && $cart->needs_payment() ? '1' : '0'); ?>" data-needs-shipping="<?php echo esc_attr($cart && $cart->needs_shipping() ? '1' : '0'); ?>" data-byl-current-step="shipping">
   <header class="byl-checkout-heading"><h1 data-byl-checkout-heading>Shipping</h1><span>Secure checkout</span></header>
   <nav class="byl-checkout-track" aria-label="Checkout steps">
-    <a href="<?php echo esc_url(wc_get_cart_url()); ?>" data-byl-track="cart"><span aria-hidden="true">1</span>Cart</a>
-    <span data-byl-track="shipping" aria-current="step"><span aria-hidden="true">2</span>Shipping</span>
-    <span data-byl-track="payment"><span aria-hidden="true">3</span>Payment</span>
+    <a href="<?php echo esc_url(wc_get_cart_url()); ?>" data-byl-track="cart"><span aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3h2l2.4 11H19l2-8H6.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg></span>Cart</a>
+    <span data-byl-track="shipping" aria-current="step"><span aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg></span>Shipping</span>
+    <span data-byl-track="payment"><span aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 10h20" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span>Payment</span>
   </nav>
   <form name="checkout" method="post" class="checkout woocommerce-checkout byl-checkout-form" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Checkout', 'woocommerce'); ?>">
     <div class="byl-checkout-grid">

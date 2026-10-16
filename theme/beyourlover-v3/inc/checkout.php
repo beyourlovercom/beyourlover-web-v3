@@ -73,3 +73,24 @@ add_filter('woocommerce_get_terms_and_conditions_checkbox_text', static function
     // so only when dev opt-in is active can a checkbox-less order be valid.
     return byl_v3_dev_checkout_terms_handoff_enabled() ? '' : $text;
 }, 20);
+
+/**
+ * Option B: render one native Woo Classic Checkout form in a real visual
+ * drawer on the secure checkout route. This is intentionally Dev/staging only.
+ * No iframe, AJAX payment-form cloning, payment/session alteration or WWW flag.
+ */
+function byl_v3_checkout_drawer_enabled(): bool {
+    if (is_admin() || !function_exists('is_checkout') || !is_checkout()) { return false; }
+    if (!function_exists('wp_get_environment_type') || wp_get_environment_type() !== 'staging') { return false; }
+    if ((string) wp_parse_url(home_url('/'), PHP_URL_HOST) !== 'dev.beyourlover.com') { return false; }
+    if (!isset($_GET['byl_checkout_drawer'])
+        || (string) wp_unslash($_GET['byl_checkout_drawer']) !== '1') { return false; }
+    if ((function_exists('is_order_received_page') && is_order_received_page())
+        || (function_exists('is_checkout_pay_page') && is_checkout_pay_page())
+        || (function_exists('is_wc_endpoint_url') && is_wc_endpoint_url('order-pay'))) { return false; }
+    return true;
+}
+add_filter('body_class', static function (array $classes): array {
+    if (byl_v3_checkout_drawer_enabled()) { $classes[] = 'byl-checkout-drawer-mode'; }
+    return $classes;
+});

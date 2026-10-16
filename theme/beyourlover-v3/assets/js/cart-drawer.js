@@ -386,6 +386,18 @@
     else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
   });
   window.BYL_Cart_Drawer_Preview={open,close,refresh:()=>update('',null)};
+  // Resume the existing Cart Drawer after a secure native Checkout Drawer
+  // closes/back-navigates to the originating page. A short-lived flag stores
+  // no customer/cart data and is immediately consumed. Handles BFCache too.
+  function resumeCheckoutReturn() {
+    try {
+      if (window.sessionStorage.getItem('byl-checkout-return-cart-open') !== '1') return;
+      window.sessionStorage.removeItem('byl-checkout-return-cart-open');
+      open();
+    } catch (_) { /* Storage might be unavailable; /cart/ remains fallback. */ }
+  }
+  if (typeof window.addEventListener === 'function') window.addEventListener('pageshow', resumeCheckoutReturn);
+  resumeCheckoutReturn();
   // Ordinary Dev visitors start with a closed Drawer. Only the explicit
   // Dev visual-preview URL auto-opens; the header cart icon opens on demand.
   if (new URL(window.location.href).searchParams.get('byl_cart_drawer_preview') === '1') {

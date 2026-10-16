@@ -395,6 +395,8 @@
     return root.dataset.needsShipping !== '1' || (wooShippingGroups().size > 0 && chosenShippingRates().length === wooShippingGroups().size);
   }
   function updateAction() {
+    // Guard manual Drawer exits during a native Woo payment/3DS attempt.
+    root.dataset.bylSubmitting = submitting ? '1' : '0';
     const labels = { shipping:'Continue to Payment', payment:root.dataset.needsPayment === '1' ? 'Pay Now' : 'Place Order' };
     const processingPayment = submitting && active === 'payment';
     next.innerHTML = '';

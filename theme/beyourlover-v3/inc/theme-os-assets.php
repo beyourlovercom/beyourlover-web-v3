@@ -60,6 +60,19 @@ add_action('wp_enqueue_scripts', static function (): void {
             'nonce' => function_exists('wp_create_nonce') ? wp_create_nonce('wc_store_api') : '',
         ]);
         wp_script_add_data('byl-v3-checkout', 'strategy', 'defer');
+        // Dev-only native route Checkout Drawer. The Woo checkout shortcode
+        // remains rendered exactly once; no iframe, gateway clone or order write.
+        if (function_exists('byl_v3_checkout_drawer_enabled') && byl_v3_checkout_drawer_enabled()) {
+            wp_enqueue_style('byl-v3-checkout-drawer', $uri.'/assets/css/checkout-drawer.css',
+                ['byl-v3-checkout-shell'], $v('assets/css/checkout-drawer.css'));
+            wp_enqueue_script('byl-v3-checkout-drawer', $uri.'/assets/js/checkout-drawer.js',
+                ['byl-v3-checkout'], $v('assets/js/checkout-drawer.js'), true);
+            wp_localize_script('byl-v3-checkout-drawer', 'BYLCheckoutDrawerConfig', [
+                'fallbackUrl' => function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url('/cart/'),
+                'checkoutUrl' => function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/'),
+            ]);
+            wp_script_add_data('byl-v3-checkout-drawer', 'strategy', 'defer');
+        }
     }
     // CSS-only Order Pay treatment follows Checkout styles; no gateway changes.
     if (function_exists('is_checkout_pay_page') && is_checkout_pay_page()) {

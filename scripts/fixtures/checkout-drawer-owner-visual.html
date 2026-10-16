@@ -1,0 +1,119 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BYL Checkout Drawer V1 — local illustrative Owner visual fixture</title>
+<style>
+:root{--byl-line:#e7e3e5;--byl-surface:#fff;--byl-ink:#161319;--byl-ink-2:#39343b;--byl-ink-3:#7f7980;--byl-gutter:22px;--byl-font:-apple-system,BlinkMacSystemFont,"PingFang SC",Arial,sans-serif;--byl-brand:#8e092d;--byl-brand-soft:#fff3f5;--byl-brand-hover:#670e29;--byl-danger:#a00029;}
+*{box-sizing:border-box}html,body{margin:0}button,input,select{font:inherit}.preview-flag{position:fixed;top:0;left:0;z-index:11;font-size:9px;letter-spacing:.05em;color:#fff;background:#322229;padding:4px 7px;pointer-events:none}
+.byl-progressive-checkout .woocommerce-billing-fields__field-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.byl-progressive-checkout .form-row-wide{grid-column:1/-1}
+.woocommerce-checkout-review-order-table{width:100%;border-collapse:collapse}
+#payment li{list-style:none}
+.fake-thumbnails{height:40px;width:42px;background:linear-gradient(140deg,#e9ccd3,#f9edef);border-radius:5px;}
+.fake-brand{font-size:12px;color:#87314b;letter-spacing:.035em;}
+</style>
+<link rel="stylesheet" href="../../theme/beyourlover-v3/assets/css/checkout.css">
+<link rel="stylesheet" href="../../theme/beyourlover-v3/assets/css/checkout-shell.css">
+<link rel="stylesheet" href="../../theme/beyourlover-v3/assets/css/checkout-drawer.css">
+</head><body class="byl-secure-checkout-shell woocommerce-checkout byl-checkout-drawer-mode">
+<div class="preview-flag">LOCAL OWNER VISUAL FIXTURE · SAMPLE VALUES · NO NETWORK, CART, ORDER OR PAYMENT</div>
+<div class="byl-checkout-drawer-root is-ready" data-byl-checkout-drawer-root data-byl-drawer-step="payment">
+ <div class="byl-checkout-drawer-scrim"></div>
+ <section class="byl-checkout-drawer-panel" role="dialog" aria-label="Secure checkout" tabindex="-1" data-byl-checkout-drawer-panel>
+  <button type="button" class="byl-checkout-drawer-close" data-byl-checkout-drawer-close aria-label="Close checkout"><span aria-hidden="true">×</span></button>
+  <div class="byl-checkout-drawer-scroll" data-byl-checkout-drawer-scroll>
+   <main id="main-content" class="byl-content byl-commerce-content">
+    <div class="byl-progressive-checkout is-enhanced" data-byl-progressive-checkout data-needs-payment="1" data-needs-shipping="1" data-byl-current-step="payment">
+     <form class="checkout woocommerce-checkout byl-checkout-form" onsubmit="return false">
+      <div class="byl-checkout-grid">
+       <div class="byl-checkout-stages">
+        <header class="byl-checkout-heading"><h1 data-byl-checkout-heading>Payment</h1></header>
+        <button class="byl-checkout-drawer-back" data-byl-checkout-drawer-back>‹ Shipping</button>
+        <nav class="byl-checkout-track" aria-label="Checkout steps">
+          <a data-byl-track="cart" href="#"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3h2l2.4 11H19l2-8H6.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg></span>Cart</a>
+          <span data-byl-track="shipping"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg></span>Shipping</span>
+          <span data-byl-track="payment" aria-current="step"><span><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2 10h20" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span>Payment</span>
+        </nav>
+        <section class="byl-checkout-step" data-byl-step="shipping"><div class="byl-step-body">
+           <div class="byl-account-entry"><a href="#" onclick="return false">Log in or create an account</a></div>
+           <div data-byl-account-email-host class="byl-account-email-host"><div class="form-row validate-required" id="billing_email_field"><label>Email Address <span class="required">*</span></label><input class="input-text" placeholder="Email Address" value=""></div></div>
+           <div class="byl-shipping-rate-section"><h2>Choose your shipping option</h2>
+             <div class="byl-delivery-options"><div class="byl-delivery-package">
+               <button type="button" class="byl-delivery-rate is-selected"><span class="byl-delivery-radio"></span><span class="byl-delivery-label"><strong>Express</strong><small>2–3 days</small></span><strong>$15.00</strong></button>
+               <button type="button" class="byl-delivery-rate"><span class="byl-delivery-radio"></span><span class="byl-delivery-label"><strong>Regular</strong><small>8–12 days</small></span><strong>Free</strong></button>
+             </div></div>
+           </div>
+           <h2 class="byl-shipping-details-heading">Add shipping details</h2>
+           <div id="customer_details" class="byl-checkout-billing"><div class="woocommerce-billing-fields"><div class="woocommerce-billing-fields__field-wrapper">
+             <div class="form-row form-row-wide" id="billing_country_field"><label>Country / Region <span class="required">*</span></label><select><option>Mexico</option></select></div>
+             <div class="form-row form-row-first" id="billing_first_name_field"><label>First name <span class="required">*</span></label><input class="input-text" value="Mandy"></div>
+             <div class="form-row form-row-last" id="billing_last_name_field"><label>Last name <span class="required">*</span></label><input class="input-text" value="Sva"></div>
+             <div class="form-row form-row-wide" id="billing_address_1_field"><label>Street address <span class="required">*</span></label><input class="input-text" value="Av. Paseo de la Reforma 296"></div>
+             <div class="form-row form-row-wide"><button type="button" class="byl-optional-address-trigger">+ Add apt, suite, floor or other (optional)</button></div>
+             <div class="form-row form-row-first" id="billing_city_field"><label>City <span class="required">*</span></label><input class="input-text" value="Mexico City"></div>
+             <div class="form-row form-row-last" id="billing_state_field"><label>State / Region <span class="required">*</span></label><select><option>Ciudad de México</option></select></div>
+             <div class="form-row form-row-wide" id="shipping_phone_field"><label>Phone <span class="required">*</span></label><input class="input-text" value="+52 55 1234 5678"><p id="shipping_phone-description">We will only use this number in case we need to contact you regarding delivery purposes.</p></div>
+             <div class="form-row form-row-wide" id="billing_postcode_field"><label>Postal code <span class="required">*</span></label><input class="input-text" value="06600"></div>
+             <div class="form-row form-row-wide"><label>RFC Tax ID <span class="required">*</span></label><input class="input-text" value="SAVM8900101ABC"></div>
+             <div class="form-row form-row-wide"><button type="button" class="byl-optional-address-trigger">+ Add organization (optional)</button></div>
+           </div></div></div>
+           <p style="font-size:11px;color:#777">Estimated shipping, duties and taxes are shown for illustration only.</p>
+        </div></section>
+        <section class="byl-checkout-step is-active" data-byl-step="payment"><div class="byl-step-body">
+           <h2 class="byl-payment-options-heading">Choose a payment method</h2>
+           <div data-byl-payment-host><div id="payment"><ul class="wc_payment_methods payment_methods methods">
+             <li><input type="radio" name="payment_method" checked><label>Credit or debit card <span class="fake-brand">VISA　MASTERCARD　AMEX</span></label></li>
+             <li><input type="radio" name="payment_method"><label>Pay with PayPal <span class="fake-brand">PayPal</span></label></li>
+             <li><input type="radio" name="payment_method"><label>Pay with Alipay <span class="fake-brand">Alipay</span></label></li>
+             <li><input type="radio" name="payment_method"><label>Pay with Google Pay <span class="fake-brand">G Pay</span></label></li>
+           </ul></div></div>
+        </div></section>
+        <div class="byl-checkout-action-bar"><p data-byl-error hidden></p><button class="byl-checkout-next" type="button" data-byl-next>PAY NOW</button></div>
+       </div>
+       <aside class="byl-checkout-summary"><div class="byl-summary-card is-open">
+        <button type="button" class="byl-summary-toggle" data-byl-summary-toggle><strong>Order total</strong><span>(5)</span><span class="byl-summary-total">JPY 75,100</span><span class="byl-summary-chevron">⌄</span></button>
+        <div class="byl-summary-body"><div class="byl-summary-products">
+          <div class="byl-summary-product"><div class="fake-thumbnails"></div><div><strong>MONA™ 2</strong><small>G-spot Vibrators · Qty 1</small></div><span>JPY 21,000</span></div>
+          <div class="byl-summary-product"><div class="fake-thumbnails"></div><div><strong>Personal Moisturizer</strong><small>Lubricants · Qty 1</small></div><span>JPY 3,000</span></div>
+          <div class="byl-summary-product"><div class="fake-thumbnails"></div><div><strong>SORAYA Beads™</strong><small>Qty 1</small></div><span>JPY 24,800</span></div>
+          <div class="byl-summary-product"><div class="fake-thumbnails"></div><div><strong>SORAYA Beads™</strong><small>Qty 1</small></div><span>JPY 24,800</span></div>
+          <div class="byl-summary-product"><div class="fake-thumbnails"></div><div><strong>MIA™ 3</strong><small>Qty 1</small></div><span>JPY 0</span></div>
+        </div>
+        <div class="byl-payment-review"><dl class="byl-review-details">
+          <div><dt>Contact</dt><dd>sample@example.invalid</dd><button type="button">Edit</button></div>
+          <div><dt>Shipping Address</dt><dd>Mandy Sva
+81 Roland Avenue
+US</dd><button type="button">Edit</button></div>
+          <div><dt>Billing details</dt><dd>Same as shipping</dd></div>
+        </dl></div>
+        <div id="order_review"><table class="woocommerce-checkout-review-order-table shop_table"><tfoot>
+         <tr><th>Subtotal</th><td>JPY 92,000</td></tr>
+         <tr><th>Discount</th><td>− JPY 18,400</td></tr>
+         <tr class="woocommerce-shipping-totals"><th>Shipping</th><td>JPY 1,500</td></tr>
+         <tr class="order-total"><th>Order total</th><td><span class="woocommerce-Price-amount">JPY 75,100</span></td></tr>
+        </tfoot></table></div>
+        </div></div>
+       </aside>
+      </div>
+     </form>
+    </div>
+   </main>
+  </div>
+ </section>
+</div>
+<script>
+const step=new URLSearchParams(location.search).get('step')==='shipping'?'shipping':'payment';
+const root=document.querySelector('[data-byl-progressive-checkout]');
+root.dataset.bylCurrentStep=step;
+document.querySelector('[data-byl-checkout-drawer-root]').dataset.bylDrawerStep=step;
+document.querySelector('[data-byl-checkout-heading]').textContent=step==='shipping'?'Shipping':'Payment';
+document.querySelector('[data-byl-checkout-drawer-back]').textContent=step==='shipping'?'‹ Your Cart':'‹ Shipping';
+document.querySelectorAll('[data-byl-step]').forEach(el=>el.classList.toggle('is-active',el.dataset.bylStep===step));
+document.querySelectorAll('[data-byl-track]').forEach(el=>el.getAttribute('data-byl-track')===step?el.setAttribute('aria-current','step'):el.removeAttribute('aria-current'));
+document.querySelector('[data-byl-next]').textContent=step==='shipping'?'CONTINUE TO PAYMENT':'PAY NOW';
+const summary=document.querySelector('.byl-summary-card');
+const mobile=innerWidth<=760;summary.classList.toggle('is-open',!mobile);
+const title=document.querySelector('.byl-summary-toggle strong');title.textContent=mobile?'Order total':'Your Cart';
+if(mobile){const d=document.createElement('span');d.textContent='See details';d.style.cssText='margin-left:8px;color:#8e092d;font-size:11px;text-decoration:underline';document.querySelector('.byl-summary-toggle').insertBefore(d,document.querySelector('.byl-summary-total'))}
+document.querySelector('[data-byl-summary-toggle]').addEventListener('click',()=>{summary.classList.toggle('is-open')});
+</script>
+</body></html>

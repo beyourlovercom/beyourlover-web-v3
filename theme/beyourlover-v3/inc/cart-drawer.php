@@ -34,7 +34,7 @@ add_action('wp_enqueue_scripts', static function (): void {
         'cartApi' => esc_url_raw(rest_url('wc/store/v1/cart')),
         'nonce' => wp_create_nonce('wc_store_api'),
         'cartUrl' => function_exists('wc_get_cart_url') ? wc_get_cart_url() : home_url('/cart/'),
-        'checkoutUrl' => function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/'),
+        'checkoutUrl' => add_query_arg('byl_checkout_drawer', '1', function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/')),
         'giftEnabled' => false,
         // Marketing/notification policy cannot be enabled via request parameters or JS.
         // The owner must separately approve an Andy Commerce-backed config contract.
@@ -296,7 +296,7 @@ add_action('wp_footer', static function (): void {
           </div>
           <footer class="byl-drawer__footer" data-drawer-footer hidden>
             <div class="byl-drawer__total"><strong>Order total</strong><strong data-drawer-footer-total></strong></div>
-            <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/')); ?>" data-drawer-checkout>SECURE CHECKOUT →</a>
+            <a href="<?php echo esc_url(add_query_arg('byl_checkout_drawer', '1', function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/'))); ?>" data-drawer-checkout>SECURE CHECKOUT →</a>
           </footer>
         </div>
       </section>
