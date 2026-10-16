@@ -24,7 +24,7 @@ $nav = [
     ['Account Details','account','♙'],
 ];
 $metrics = $active ? [
-    ['Total Earnings', $account->earnings ?? null, true, 'All-time recorded by AffiliateWP'],
+    ['Paid Earnings', $account->earnings ?? null, true, 'All-time recorded by AffiliateWP'],
     ['Unpaid Commission', $account->unpaid_earnings ?? null, true, 'Subject to approval and payout rules'],
     ['Total Visits', $account->visits ?? null, false, 'AffiliateWP tracked visits'],
     ['Total Referrals', $account->referrals ?? null, false, 'AffiliateWP recorded referrals'],
@@ -87,9 +87,14 @@ get_header();
                     <?php
                     $bars = array_reverse(array_slice($referrals, 0, 10));
                     $max = 0.0;
-                    foreach ($bars as $entry) { $max = max($max, is_numeric($entry->amount ?? null) ? (float) $entry->amount : 0.0); }
+                    $chart_currencies = [];
+                    foreach ($bars as $entry) {
+                        $max = max($max, is_numeric($entry->amount ?? null) ? (float) $entry->amount : 0.0);
+                        $chart_currencies[] = strtoupper((string) ($entry->currency ?? $currency));
+                    }
+                    $chart_comparable = count(array_unique($chart_currencies)) <= 1;
                     ?>
-                    <?php if ($bars && $max > 0) : ?>
+                    <?php if ($bars && $max > 0 && $chart_comparable) : ?>
                         <p class="byl-affiliate-muted">Commission amounts in your latest <?php echo esc_html((string) count($bars)); ?> referrals, not a revenue forecast.</p>
                         <div class="byl-affiliate-chart" role="img" aria-label="Recent referral commissions: <?php echo esc_attr((string) count($bars)); ?> records">
                             <?php foreach ($bars as $entry):
@@ -101,7 +106,7 @@ get_header();
                         </div>
                         <p class="byl-affiliate-chart-caption">Each bar represents one recent referral; values and statuses come from AffiliateWP.</p>
                     <?php else : ?>
-                        <div class="byl-affiliate-empty-chart"><span aria-hidden="true">↗</span><p>No recorded commission amounts yet.</p><small>Performance will appear as tracked referrals arrive.</small></div>
+                        <div class="byl-affiliate-empty-chart"><span aria-hidden="true">↗</span><p><?php echo $chart_comparable ? 'No recorded commission amounts yet.' : 'Multiple currencies cannot be compared on one chart.'; ?></p><small>Only comparable AffiliateWP amounts are plotted.</small></div>
                     <?php endif; ?>
                 </section>
                 <section class="byl-affiliate-card byl-affiliate-sharing" id="sharing" aria-labelledby="byl-sharing-title">
@@ -115,7 +120,14 @@ get_header();
                     <?php else : ?>
                         <div class="byl-affiliate-link-missing">Your verified referral link is currently unavailable. Please contact your affiliate manager.</div>
                     <?php endif; ?>
-                    <p class="byl-affiliate-coupon-note">Your dedicated promotional code is managed by your affiliate team. No example code is shown as an active coupon.</p>
+                    <?php
+                    $coupon_html = shortcode_exists('affiliate_coupons') ? trim((string) do_shortcode('[affiliate_coupons]')) : '';
+                    ?>
+                    <?php if ($coupon_html !== ''): ?>
+                        <div class="byl-affiliate-assigned-coupons"><h3>Your assigned promo codes</h3><?php echo wp_kses_post($coupon_html); ?></div>
+                    <?php else: ?>
+                        <p class="byl-affiliate-coupon-note">Your verified promotional codes will appear here when assigned through AffiliateWP. No sample code is shown.</p>
+                    <?php endif; ?>
                 </section>
                 <section class="byl-affiliate-card byl-affiliate-referrals" id="referrals" aria-labelledby="byl-referrals-title">
                     <div class="byl-affiliate-card-top"><h2 id="byl-referrals-title">Recent Referral Orders</h2><span class="byl-affiliate-tag">Latest <?php echo esc_html((string) count($referrals)); ?></span></div>
