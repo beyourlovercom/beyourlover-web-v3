@@ -32,6 +32,17 @@ add_action('wp_enqueue_scripts', static function (): void {
         ['byl-v3-cart-focus'], (string) filemtime($path));
 }, 26);
 
+/**
+ * Dev Cart page shows recommendations exactly once, in the canonical bottom slot.
+ * Woo's native cross-sells run inside cart_collaterals before cart_totals;
+ * keeping that callback nests another recommendation grid inside Cart totals.
+ * Do not suppress any totals, checkout controls, coupons, or other Woo hooks.
+ */
+add_action('wp', static function (): void {
+    if (!byl_v3_cart_empty_page_parity_enabled()) { return; }
+    remove_action('woocommerce_cart_collaterals', 'woocommerce_cross_sell_display', 10);
+}, 20);
+
 /** Enqueue only with both explicitly enabled Dev preview gates. */
 add_action('wp_enqueue_scripts', static function (): void {
     if (!byl_v3_notification_cart_bridge_enabled()) { return; }

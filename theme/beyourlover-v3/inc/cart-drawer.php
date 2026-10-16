@@ -103,7 +103,8 @@ function byl_v3_cart_drawer_monthly_best_seller_ids(): array {
     return is_array($ids) ? array_values(array_filter(array_map('intval', $ids))) : [];
 }
 
-function byl_v3_cart_drawer_recommendations(): array {
+function byl_v3_cart_drawer_recommendations(int $limit = 3): array {
+    $limit = max(1, min($limit, 4));
     $recent = isset($_COOKIE['woocommerce_recently_viewed']) && is_string($_COOKIE['woocommerce_recently_viewed'])
         ? byl_v3_cart_drawer_recent_ids(wp_unslash($_COOKIE['woocommerce_recently_viewed']))
         : [];
@@ -114,7 +115,7 @@ function byl_v3_cart_drawer_recommendations(): array {
         if (!$product) { continue; }
         $result[] = $product;
         $seen[$id] = true;
-        if (count($result) === 3) { return $result; }
+        if (count($result) >= $limit) { return $result; }
     }
     // A short history is filled by 30-day best sellers, never duplicate IDs.
     foreach (byl_v3_cart_drawer_monthly_best_seller_ids() as $id) {
@@ -123,7 +124,7 @@ function byl_v3_cart_drawer_recommendations(): array {
         if (!$product) { continue; }
         $result[] = $product;
         $seen[$id] = true;
-        if (count($result) === 3) { return $result; }
+        if (count($result) >= $limit) { return $result; }
     }
     // A store may have fewer than three paid 30-day sellers (Dev currently
     // has one). Fill remaining positions with eligible catalog picks, ordered
@@ -142,7 +143,7 @@ function byl_v3_cart_drawer_recommendations(): array {
                 if (!$product) { continue; }
                 $result[] = $product;
                 $seen[$id] = true;
-                if (count($result) === 3) { break; }
+                if (count($result) >= $limit) { break; }
             }
         }
     }
