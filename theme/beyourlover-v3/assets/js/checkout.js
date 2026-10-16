@@ -348,7 +348,7 @@
          const priceNode = label && label.querySelector('.woocommerce-Price-amount');
          const realPrice = priceNode ? priceNode.textContent.replace(/\s+/g, ' ').trim() : '';
          const title = realPrice ? fullLabel.replace(realPrice, '').replace(/:\s*$/, '').trim() : fullLabel;
-         const visiblePrice = realPrice || (/^Free shipping$/i.test(title) ? 'Free' : '');
+         const visiblePrice = realPrice; // Do not double-label Woo's native 'Free shipping'.
         const autoSelected = input.type === 'hidden' && options.length === 1 && !!String(input.value || '').trim();
         const selected = input.checked || autoSelected;
         const button = document.createElement('button');
