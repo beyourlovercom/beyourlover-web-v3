@@ -7,6 +7,7 @@
  */
 declare(strict_types=1);
 defined('ABSPATH') || exit;
+require_once __DIR__.'/affiliate-remote-bridge.php';
 
 function byl_v3_affiliate_route(): bool {
     if (is_admin() || (function_exists('wp_doing_ajax') && wp_doing_ajax())) { return false; }
@@ -41,10 +42,16 @@ add_action('wp_enqueue_scripts', static function (): void {
 }, 30);
 /** Active creators signing in through WooCommerce are sent to their own workspace. */
 add_filter('woocommerce_login_redirect', static function ($redirect, $user) {
-    if (!$user instanceof WP_User || user_can($user, 'manage_options') || !function_exists('affwp_get_affiliate_id')) { return $redirect; }
-    $id = (int) affwp_get_affiliate_id((int) $user->ID);
-    return $id > 0 && function_exists('affwp_get_affiliate_status') && affwp_get_affiliate_status($id) === 'active'
-        ? home_url('/my-affiliate/') : $redirect;
+    if (!$user instanceof WP_User || user_can($user, 'manage_options')) { return $redirect; }
+    if (function_exists('affwp_get_affiliate_id')) {
+        $id = (int) affwp_get_affiliate_id((int) $user->ID);
+        if ($id > 0 && function_exists('affwp_get_affiliate_status') && affwp_get_affiliate_status($id) === 'active') {
+            return home_url('/my-affiliate/');
+        }
+    }
+    // Remote-bound creators may land here only after trusted binding proof.
+    return defined('BYL_CREATOR_REMOTE_ENABLED') && BYL_CREATOR_REMOTE_ENABLED === true &&
+        byl_v3_creator_verified_binding($user) ? home_url('/my-affiliate/') : $redirect;
 }, 20, 2);
 /**
  * Separate bounded read-only page cursors for historical records. Never take
@@ -71,7 +78,8 @@ function byl_v3_affiliate_snapshot(): array {
     if (!$user instanceof WP_User || !$user->exists()) { return $view; }
     $view['state'] = 'unavailable';
     if (!function_exists('affwp_get_affiliate_id') || !function_exists('affwp_get_affiliate_status') || !function_exists('affiliate_wp')) {
-        return $view;
+        $remote = byl_v3_creator_remote_snapshot($user);
+        return $remote ?? $view;
     }
     $id = (int) affwp_get_affiliate_id((int) $user->ID);
     if ($id <= 0 || affwp_get_affiliate_status($id) !== 'active') { return $view; }
