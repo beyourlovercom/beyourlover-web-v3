@@ -38,6 +38,8 @@ function wp_remote_get($url,$opts) {
     if (!hash_equals($expected,$headers['X-BYL-Creator-Signature'])) { throw new RuntimeException('Signature mismatch'); }
     return $GLOBALS['mock_response'];
 }
+$bridgeSource = file_get_contents(dirname(__DIR__).'/theme/beyourlover-v3/inc/affiliate-remote-bridge.php');
+if (strpos($bridgeSource, '"GET\n"') === false) { throw new RuntimeException('FAIL signed canonical linefeeds must be PHP escapes, not physical source newlines'); }
 require dirname(__DIR__).'/theme/beyourlover-v3/inc/affiliate-remote-bridge.php';
 function check($cond,$message) { if (!$cond) { throw new RuntimeException('FAIL '.$message); } echo 'PASS '.$message."
 "; }

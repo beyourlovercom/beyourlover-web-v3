@@ -45,11 +45,7 @@ function byl_v3_creator_remote_snapshot(WP_User $user): ?array {
     $path = '/wp-json/andy-core/v1/creator/history?'.http_build_query($args, '', '&', PHP_QUERY_RFC3986);
     $ts = (string) time();
     try { $nonce = bin2hex(random_bytes(16)); } catch (Throwable $e) { return null; }
-    $sig = hash_hmac('sha256', "GET
-".$path."
-".$ts."
-".$nonce."
-".BYL_CREATOR_REMOTE_KEY_ID, BYL_CREATOR_REMOTE_SIGN_KEY);
+    $sig = hash_hmac('sha256', "GET\n".$path."\n".$ts."\n".$nonce."\n".BYL_CREATOR_REMOTE_KEY_ID, BYL_CREATOR_REMOTE_SIGN_KEY);
     $response = wp_remote_get('https://www.beyourlover.com'.$path, [
         'timeout'=>7, 'redirection'=>0, 'sslverify'=>true, 'reject_unsafe_urls'=>true,
         'headers'=>[
