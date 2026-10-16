@@ -1,0 +1,17 @@
+/* Dev only: full cart page shares its empty-state visual contract with Cart Drawer V2. */
+body.woocommerce-cart .byl-cart-runtime .woocommerce:has(.byl-cart-empty-parity){display:block!important;max-width:760px;margin-inline:auto}
+body.woocommerce-cart .byl-cart-runtime .woocommerce:has(.byl-cart-empty-parity)>.wc-empty-cart-message,
+body.woocommerce-cart .byl-cart-runtime .woocommerce:has(.byl-cart-empty-parity)>.return-to-shop{display:none!important}
+body.woocommerce-cart .byl-cart-runtime .byl-cart-empty-parity{padding:65px 16px 45px;text-align:center;border-bottom:1px solid #e8e0e4;background:#fff}
+body.woocommerce-cart .byl-cart-empty-parity .byl-drawer__empty-icon svg{display:block;width:48px;height:48px;color:var(--byl-brand,#96314d);margin:0 auto 12px}
+body.woocommerce-cart .byl-cart-empty-parity h2{font-size:21px;font-weight:700;color:#171417;margin:0 0 9px}
+body.woocommerce-cart .byl-cart-empty-parity p{font-size:13px;color:#72656d;max-width:310px;margin:0 auto 24px}
+body.woocommerce-cart .byl-cart-empty-parity .byl-drawer__browse{display:inline-block;padding:12px 25px;background:#1c171a;color:white!important;font-size:12px;font-weight:750;letter-spacing:.6px;text-decoration:none}
+body.woocommerce-cart .byl-cart-empty-parity__recommendations{margin:24px 0;padding:20px 16px;border-top:2px solid #21191e}
+body.woocommerce-cart .byl-cart-empty-parity__recommendations h3{font-size:14px;font-weight:720;text-transform:uppercase;margin:0 0 8px}
+body.woocommerce-cart .byl-cart-empty-parity__items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+body.woocommerce-cart .byl-cart-empty-parity__product{display:flex;gap:10px;min-width:0;font-size:12px;align-items:center}
+body.woocommerce-cart .byl-cart-empty-parity__product a{color:#171417;font-weight:650;text-decoration:none}
+body.woocommerce-cart .byl-cart-empty-parity__image{flex:0 0 65px;width:65px;height:80px;background:#faf7f9;display:grid;place-items:center}
+body.woocommerce-cart .byl-cart-empty-parity__image img{max-height:100%;max-width:100%;object-fit:contain}
+@media(max-width:650px){body.woocommerce-cart:has(.byl-cart-empty-parity) .byl-cart-heading{display:none}body.woocommerce-cart:has(.byl-cart-empty-parity) .byl-cart-page{padding-top:14px}body.woocommerce-cart .byl-cart-empty-parity__items{grid-template-columns:1fr}body.woocommerce-cart .byl-cart-empty-parity__product{border-bottom:1px solid #e8e0e4;padding:10px 0}body.woocommerce-cart .byl-cart-empty-parity__recommendations{padding-inline:4px}}
