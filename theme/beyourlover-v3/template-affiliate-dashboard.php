@@ -32,7 +32,7 @@ $metrics = $active ? [
 $referrals = $aff['referrals'];
 $payouts = $aff['payouts'];
 $referral_url = $aff['referral_url'];
-$visual = 'https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp';
+$visual = get_stylesheet_directory_uri().'/assets/images/affiliate-hero.jpg';
 $sign_in = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
 get_header();
 ?>
@@ -94,7 +94,7 @@ get_header();
                     }
                     $chart_comparable = count(array_unique($chart_currencies)) <= 1;
                     ?>
-                    <?php if ($bars && $max > 0 && $chart_comparable) : ?>
+                    <?php if (count($bars) >= 3 && $max > 0 && $chart_comparable) : ?>
                         <p class="byl-affiliate-muted">Commission amounts in your latest <?php echo esc_html((string) count($bars)); ?> referrals, not a revenue forecast.</p>
                         <div class="byl-affiliate-chart" role="img" aria-label="Recent referral commissions: <?php echo esc_attr((string) count($bars)); ?> records">
                             <?php foreach ($bars as $entry):
@@ -106,7 +106,7 @@ get_header();
                         </div>
                         <p class="byl-affiliate-chart-caption">Each bar represents one recent referral; values and statuses come from AffiliateWP.</p>
                     <?php else : ?>
-                        <div class="byl-affiliate-empty-chart"><span aria-hidden="true">↗</span><p><?php echo $chart_comparable ? 'No recorded commission amounts yet.' : 'Multiple currencies cannot be compared on one chart.'; ?></p><small>Only comparable AffiliateWP amounts are plotted.</small></div>
+                        <div class="byl-affiliate-empty-chart"><span aria-hidden="true">↗</span><p><?php echo $chart_comparable ? 'More referral history is needed for a meaningful trend chart.' : 'Multiple currencies cannot be compared on one chart.'; ?></p><small>Only comparable AffiliateWP amounts are plotted.</small></div>
                     <?php endif; ?>
                 </section>
                 <section class="byl-affiliate-card byl-affiliate-sharing" id="sharing" aria-labelledby="byl-sharing-title">
