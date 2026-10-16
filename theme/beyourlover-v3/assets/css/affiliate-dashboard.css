@@ -156,3 +156,6 @@
  .byl-affiliate-stat strong{font-size:17px;letter-spacing:-.02em}
 }
 @media(prefers-reduced-motion:reduce){.byl-affiliate *{scroll-behavior:auto!important;transition:none!important}}
+
+/* M390 owner concept parity: keep text clear of hero photography and cards inside viewport. */
+@media(max-width:660px){.byl-affiliate-hero-text{width:67%;}.byl-affiliate-hero-image{width:41%;object-position:50% 45%;}.byl-affiliate-hero:after{right:36%;width:21%;}.byl-affiliate-hero-description{max-width:205px;}.byl-affiliate-stat,.byl-affiliate-stat>div{min-width:0;}.byl-affiliate-stat strong{white-space:normal;overflow-wrap:anywhere;}.byl-affiliate-copy-row input{flex:1;width:0;}}
