@@ -35,6 +35,7 @@ function byl_v3_creator_remote_snapshot(WP_User $user): ?array {
     $binding = byl_v3_creator_verified_binding($user);
     if (!$binding) { return null; }
     $args = [
+        'dev_user_id'=>(int)$user->ID,
         'affiliate_id'=>$binding['affiliate_id'],
         'wp_user_id'=>$binding['www_user_id'],
         'ref_page'=>byl_v3_affiliate_page_number('byl_ref_page'),

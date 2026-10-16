@@ -23,7 +23,7 @@ function wp_remote_retrieve_response_code($response) { return $response['status'
 function wp_remote_retrieve_body($response) { return json_encode($response['payload'] ?? []); }
 function wp_remote_get($url,$opts) {
     $GLOBALS['calls']++;
-    if (strpos($url,'https://www.beyourlover.com/wp-json/andy-core/v1/creator/history?') !== 0) {
+    if (strpos($url,'https://www.beyourlover.com/wp-json/andy-core/v1/creator/history?dev_user_id=21&') !== 0) {
         throw new RuntimeException('Unsafe host');
     }
     if ($opts['redirection'] !== 0 || !$opts['sslverify'] ||
