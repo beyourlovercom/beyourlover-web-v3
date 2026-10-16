@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Isolated Woo Native Country Select — no real cart/payment</title>
+<style>
+html,body{margin:0;min-height:100%;font-family:Arial,sans-serif}
+.byl-checkout-drawer-root{position:fixed;inset:0;z-index:1200;display:flex;justify-content:flex-end;}
+.byl-checkout-drawer-scrim{position:absolute;inset:0;background:#171015cc;border:0;}
+.byl-checkout-drawer-panel{position:relative;width:min(1010px,78vw);height:100dvh;isolation:isolate;background:white;overflow:hidden}
+.byl-checkout-drawer-scroll{height:100%;overflow-y:auto;overscroll-behavior:contain;}
+.byl-checkout-billing{padding:75px 48px}
+.woocommerce-billing-fields__field-wrapper{max-width:440px}
+.form-row{margin:20px 0}
+.form-row label{display:block;margin:0 0 6px;font-size:13px}
+.form-row select,.form-row input{width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid #ccc}
+.select2-container{max-width:100%;font-size:14px}
+#status{margin:12px 0;color:#555}
+@media(max-width:760px){.byl-checkout-drawer-panel{width:100vw}.byl-checkout-billing{padding:55px 24px}}
+</style>
+</head>
+<body class="byl-checkout-drawer-mode woocommerce-checkout">
+<div class="byl-checkout-drawer-root" data-byl-checkout-drawer-root>
+ <button class="byl-checkout-drawer-scrim" aria-label="Scrim" type="button"></button>
+ <section class="byl-checkout-drawer-panel" data-byl-checkout-drawer-panel>
+  <div class="byl-checkout-drawer-scroll">
+   <form class="checkout woocommerce-checkout" onsubmit="return false">
+   <main class="byl-progressive-checkout">
+    <div class="woocommerce-billing-fields">
+     <div class="byl-checkout-billing">
+     <div class="woocommerce-billing-fields__field-wrapper">
+      <div class="form-row validate-required" id="billing_country_field">
+       <label for="billing_country">Country / Region</label>
+       <select name="billing_country" id="billing_country" class="country_select country_to_state" aria-required="true">
+        <option value="US" selected>United States (US)</option>
+        <option value="DE">Germany</option>
+        <option value="CN">China</option>
+       </select>
+      </div>
+      <div class="form-row validate-required" id="billing_state_field">
+       <label for="billing_state">State / Province</label>
+       <select name="billing_state" id="billing_state" class="state_select" aria-required="true">
+         <option value="CA" selected>California</option><option value="NY">New York</option>
+       </select>
+      </div>
+     </div>
+     </div>
+    </div>
+    <div id="status">Fixture only — no Woo cart data</div>
+   </main>
+   </form>
+  </div>
+ </section>
+</div>
+</body>
+</html>
