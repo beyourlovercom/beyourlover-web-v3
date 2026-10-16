@@ -52,7 +52,7 @@ function wp_kses_post($html) { return strip_tags((string)$html,'<table><thead><t
 function shortcode_exists($name) { return $name==='affiliate_coupons'; }
 function do_shortcode($code) { return '<table><tr><td>REALCODE</td></tr></table>'; }
 function mysql2date($format,$value) { return date($format,strtotime($value)); }
-function get_header() { echo '<!doctype html><html><head><title>Preview</title><link rel="stylesheet" href="/theme/beyourlover-v3/assets/css/affiliate-dashboard.css"></head><body><header style="padding:16px 3%;background:#fff"><strong style="font:24px Georgia,serif;color:#81152a">BeYourLover</strong></header>'; }
+function get_header() { $css=file_get_contents(dirname(__DIR__).'/theme/beyourlover-v3/assets/css/affiliate-dashboard.css'); echo '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local synthetic UAT preview</title><style>'. $css .'</style></head><body style="margin:0;background:#fff"><header style="padding:16px 3%;background:#fff"><strong style="font:24px Georgia,serif;color:#81152a">BeYourLover</strong></header>'; }
 function get_footer() { echo '</body></html>'; }
 function user_can($u,$cap) { return false; }
 require dirname(__DIR__).'/theme/beyourlover-v3/inc/affiliate-dashboard.php';
@@ -73,6 +73,7 @@ $assert($active['referral_url']==='https://dev.beyourlover.com/?ref=7','tracked 
 $assert(byl_v3_affiliate_money(19.5,'USD')==='USD 19.50','currency label is explicit');
 ob_start(); include dirname(__DIR__).'/theme/beyourlover-v3/template-affiliate-dashboard.php'; $render=ob_get_clean();
 $assert(str_contains($render,'Hi, Emma') && str_contains($render,'USD 550.00'),'active user sees own real mock metrics');
+if (in_array('--preview', $argv, true)) { file_put_contents(dirname(__DIR__).'/affiliate-preview.html', $render); }
 $assert(!str_contains($render,'9000') && !str_contains($render,'10000'),'cross-affiliate values do not render');
 $assert(str_contains($render,'REALCODE'),'assigned coupon shortcode is used');
 $GLOBALS['byl_user']=new WP_User(0);
