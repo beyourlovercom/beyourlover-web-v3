@@ -47,6 +47,7 @@ function wp_get_current_user() { return $GLOBALS['byl_user']; }
 function affwp_get_currency() { return 'USD'; }
 function affwp_get_affiliate_id($id=0) { return $id === 21 ? 7 : 0; }
 function affwp_get_affiliate_status($id) { return $id === 7 ? 'active' : 'inactive'; }
+function affwp_get_affiliate($id) { return $id === 7 ? (object)['affiliate_id'=>7,'user_id'=>21,'earnings'=>550,'unpaid_earnings'=>125,'visits'=>8,'referrals'=>2] : false; }
 function affwp_get_affiliate_referral_url($args=[]) { return 'https://dev.beyourlover.com/?ref=7'; }
 function affiliate_wp() { static $db; if (!$db) { $db=new BYL_Mock_DB(); } return (object)['affiliates'=>$db,'referrals'=>$db,'payouts'=>$db,'creatives'=>$db]; }
 function wp_http_validate_url($url) { return filter_var($url,FILTER_VALIDATE_URL) ? $url : false; }

@@ -77,17 +77,25 @@ function byl_v3_affiliate_snapshot(): array {
     ];
     if (!$user instanceof WP_User || !$user->exists()) { return $view; }
     $view['state'] = 'unavailable';
+    // Once a verified WWW bridge is explicitly enabled it is the ONLY data
+    // source. Never silently fall back to Dev's own sandbox commissions.
+    if (defined('BYL_CREATOR_REMOTE_ENABLED') && BYL_CREATOR_REMOTE_ENABLED === true) {
+        return byl_v3_creator_remote_snapshot($user) ?? $view;
+    }
     if (!function_exists('affwp_get_affiliate_id') || !function_exists('affwp_get_affiliate_status') || !function_exists('affiliate_wp')) {
-        $remote = byl_v3_creator_remote_snapshot($user);
-        return $remote ?? $view;
+        return $view;
     }
     $id = (int) affwp_get_affiliate_id((int) $user->ID);
     if ($id <= 0 || affwp_get_affiliate_status($id) !== 'active') { return $view; }
     $engine = affiliate_wp();
-    if (!is_object($engine) || !isset($engine->affiliates) || !is_object($engine->affiliates) || !method_exists($engine->affiliates, 'get_affiliate')) {
+    if (!is_object($engine) || !isset($engine->affiliates) || !is_object($engine->affiliates)) {
         return $view;
     }
-    $account = $engine->affiliates->get_affiliate($id);
+    // AffiliateWP 2.35+ exposes affwp_get_affiliate(); the DB instance does
+    // not guarantee get_affiliate(). Keep older mock/plugin compatibility.
+    $account = function_exists('affwp_get_affiliate')
+        ? affwp_get_affiliate($id)
+        : (method_exists($engine->affiliates, 'get_affiliate') ? $engine->affiliates->get_affiliate($id) : null);
     if (!is_object($account) || (isset($account->user_id) && (int) $account->user_id !== (int) $user->ID)) { return $view; }
     $view['state'] = 'active';
     $view['id'] = $id;
