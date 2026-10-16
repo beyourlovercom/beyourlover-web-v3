@@ -36,6 +36,8 @@ function add_filter($key,$fn,$p=10,$a=1) { $GLOBALS['byl_hooks'][$key][]=$fn; }
 function add_action($key,$fn,$p=10,$a=1) { add_filter($key,$fn,$p,$a); }
 function is_admin(): bool { return false; }
 function wp_doing_ajax(): bool { return false; }
+$GLOBALS['byl_is_affiliate_page'] = true;
+function is_page($slug): bool { return $slug === 'my-affiliate' && $GLOBALS['byl_is_affiliate_page']; }
 function wp_parse_url($url,$part=-1) { return parse_url($url,$part); }
 function untrailingslashit($s) { return rtrim($s,'/'); }
 function get_stylesheet_directory() { return dirname(__DIR__).'/theme/beyourlover-v3'; }
@@ -66,14 +68,15 @@ function user_can($u,$cap) { return false; }
 require dirname(__DIR__).'/theme/beyourlover-v3/inc/affiliate-dashboard.php';
 $assert = static function(bool $ok, string $message): void { if(!$ok) { throw new RuntimeException('FAIL '.$message); } echo 'PASS '.$message."\n"; };
 $_SERVER['REQUEST_METHOD']='GET'; $_SERVER['REQUEST_URI']='/my-affiliate/';
-$assert(byl_v3_affiliate_route(),'exact GET dashboard route');
+$assert(byl_v3_affiliate_route(),'real WP Page GET dashboard route');
 $_SERVER['REQUEST_METHOD']='POST';
 $assert(!byl_v3_affiliate_route(),'POST route disallowed');
-$_SERVER['REQUEST_METHOD']='GET'; $_SERVER['REQUEST_URI']='/my-affiliate-evil/';
-$assert(!byl_v3_affiliate_route(),'lookalike route disallowed');
-$_SERVER['REQUEST_URI']='/my-affiliate/';
-$q=new WP_Query();
-$assert($GLOBALS['byl_hooks']['pre_handle_404'][0](false,$q)===true && !$q->is_404,'virtual route clears 404');
+$_SERVER['REQUEST_METHOD']='GET';
+$GLOBALS['byl_is_affiliate_page']=false;
+$assert(!byl_v3_affiliate_route(),'non-affiliate WP Page disallowed');
+$GLOBALS['byl_is_affiliate_page']=true;
+$assert(!isset($GLOBALS['byl_hooks']['pre_handle_404']),'no virtual 404 or permalink override');
+$assert(str_ends_with($GLOBALS['byl_hooks']['template_include'][0]('default.php'),'template-affiliate-dashboard.php'),'native page resolves existing dashboard template');
 $active=byl_v3_affiliate_snapshot();
 $assert($active['state']==='active' && $active['id']===7,'active affiliate detected from current user');
 $assert(count($active['referrals'])===1 && count($active['payouts'])===1,'other affiliate records rejected');

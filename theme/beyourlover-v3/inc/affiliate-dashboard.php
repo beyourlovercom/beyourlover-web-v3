@@ -2,7 +2,8 @@
 /**
  * BeYourLover Affiliate Dashboard V1.
  * Read-only AffiliateWP presentation. No new identity, commission, payout,
- * attribution, coupon or transaction engine. No WordPress Page DB write.
+ * attribution, coupon or transaction engine. Uses the real Dev WP Page
+ * with post_name my-affiliate (no virtual 404 override).
  */
 declare(strict_types=1);
 defined('ABSPATH') || exit;
@@ -10,14 +11,10 @@ defined('ABSPATH') || exit;
 function byl_v3_affiliate_route(): bool {
     if (is_admin() || (function_exists('wp_doing_ajax') && wp_doing_ajax())) { return false; }
     if (!in_array(strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')), ['GET', 'HEAD'], true)) { return false; }
-    $path = wp_parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
-    return is_string($path) && untrailingslashit($path) === '/my-affiliate';
+    // Native WordPress Page ID 39938 in Dev is the route authority.
+    // Use the slug rather than a hard-coded ID so future cutover can map it.
+    return function_exists('is_page') && is_page('my-affiliate');
 }
-add_filter('pre_handle_404', static function ($preempt, $query) {
-    if (!byl_v3_affiliate_route()) { return $preempt; }
-    if ($query instanceof WP_Query) { $query->is_404 = false; }
-    return true;
-}, 10, 2);
 add_filter('template_include', static function (string $template): string {
     return byl_v3_affiliate_route() ? get_stylesheet_directory().'/template-affiliate-dashboard.php' : $template;
 }, 30);
