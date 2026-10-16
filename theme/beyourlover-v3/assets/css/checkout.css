@@ -657,3 +657,40 @@ body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.s
  .byl-progressive-checkout .form-row[id*="rfc"],.byl-progressive-checkout .form-row[id*="vat"],
  .byl-progressive-checkout .form-row[id*="cpf"]{grid-column:1/-1!important;order:100}
 }
+
+/* Standard Checkout — unavailable free delivery is informative, NOT a Woo rate.
+   Show alongside the real paid rate only when the active Woo zone advertises
+   a configured minimum and Woo omits the free rate from its rate list. */
+.byl-delivery-rate.is-locked {
+  cursor:default!important;
+  opacity:1!important;
+  border:1px dashed #d8cbd0!important;
+  background:#fbf9fa!important;
+  box-shadow:none!important;
+  color:#60595e!important;
+}
+.byl-delivery-rate.is-locked .byl-delivery-radio {
+  border-color:#b7adb2!important;
+  background:#fff!important;
+}
+.byl-delivery-rate.is-locked .byl-delivery-label {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.byl-delivery-rate.is-locked .byl-delivery-label strong {
+  color:#4e474c!important;
+}
+.byl-delivery-eligibility {
+  font:400 11px/1.4 var(--byl-font, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif);
+  color:#7b6670;
+  overflow-wrap:anywhere;
+}
+@media(max-width:760px) {
+  .byl-delivery-rate.is-locked {
+    min-height:55px!important;
+    padding:8px 9px!important;
+  }
+  .byl-delivery-eligibility{font-size:10px}
+}
