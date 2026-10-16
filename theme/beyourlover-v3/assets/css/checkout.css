@@ -624,3 +624,36 @@ body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.s
     padding:0!important;border:1px solid #e7e3e5!important;border-radius:10px!important;background:#fff!important
   }
 }
+
+/* Canonical Owner reference — desktop/native field order parity.
+   The input wrappers are in the SAME DOM sequence as mobile and reference.
+   Never change the Woo country/state AJAX or the hidden payment values. */
+@media(min-width:761px) {
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper{
+   display:grid!important;
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   column-gap:14px!important;
+   row-gap:13px!important
+ }
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row,
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.byl-optional-address-trigger{
+   grid-column:1/-1!important;
+   min-width:0!important;
+   width:100%!important
+ }
+ .byl-progressive-checkout #billing_country_field{grid-column:1/-1!important;order:10}
+ .byl-progressive-checkout #billing_first_name_field{grid-column:1!important;order:20}
+ .byl-progressive-checkout #billing_last_name_field{grid-column:2!important;order:30}
+ .byl-progressive-checkout #billing_address_1_field{grid-column:1/-1!important;order:40}
+ .byl-progressive-checkout [data-byl-optional-for="billing_address_2_field"]{order:50!important}
+ .byl-progressive-checkout #billing_address_2_field{order:51!important}
+ .byl-progressive-checkout #billing_city_field{grid-column:1!important;order:60}
+ .byl-progressive-checkout #billing_state_field{grid-column:2!important;order:70}
+ .byl-progressive-checkout #shipping_phone_field{grid-column:1/-1!important;order:80}
+ .byl-progressive-checkout #billing_postcode_field{grid-column:1/-1!important;order:90}
+ .byl-progressive-checkout #billing_company_field{grid-column:1/-1!important;order:120}
+ .byl-progressive-checkout [data-byl-optional-for="billing_company_field"]{order:119!important}
+ .byl-progressive-checkout .form-row[id*="tax"],.byl-progressive-checkout .form-row[id*="tin"],
+ .byl-progressive-checkout .form-row[id*="rfc"],.byl-progressive-checkout .form-row[id*="vat"],
+ .byl-progressive-checkout .form-row[id*="cpf"]{grid-column:1/-1!important;order:100}
+}
