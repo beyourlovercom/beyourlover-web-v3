@@ -9,7 +9,12 @@ if (!$checkout->is_registration_enabled() && $checkout->is_registration_required
 $cart = WC()->cart;
 ?>
 <div class="byl-progressive-checkout" data-byl-progressive-checkout data-needs-payment="<?php echo esc_attr($cart && $cart->needs_payment() ? '1' : '0'); ?>" data-needs-shipping="<?php echo esc_attr($cart && $cart->needs_shipping() ? '1' : '0'); ?>" data-byl-current-step="shipping">
-  <header class="byl-checkout-heading"><h1 data-byl-checkout-heading>Shipping</h1><span>Secure checkout</span></header>
+  <header class="byl-checkout-heading">
+    <h1 data-byl-checkout-heading>Shipping</h1>
+    <span class="byl-checkout-security">Secure checkout</span>
+    <a class="byl-checkout-mobile-close" href="<?php echo esc_url(wc_get_cart_url()); ?>" aria-label="Close checkout and return to cart">&times;</a>
+  </header>
+  <div class="byl-checkout-return"><a href="<?php echo esc_url(wc_get_cart_url()); ?>"><span aria-hidden="true">&#8249;</span> Your Cart (<?php echo esc_html($cart ? (string) $cart->get_cart_contents_count() : '0'); ?>)</a></div>
   <nav class="byl-checkout-track" aria-label="Checkout steps">
     <a href="<?php echo esc_url(wc_get_cart_url()); ?>" data-byl-track="cart"><span aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3h2l2.4 11H19l2-8H6.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.5" fill="currentColor"/><circle cx="18" cy="20" r="1.5" fill="currentColor"/></svg></span>Cart</a>
     <span data-byl-track="shipping" aria-current="step"><span aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22s7-7.2 7-12a7 7 0 0 0-14 0c0 4.8 7 12 7 12Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg></span>Shipping</span>
@@ -25,7 +30,8 @@ $cart = WC()->cart;
         <section class="byl-checkout-step is-active" data-byl-step="shipping" aria-labelledby="byl-heading-shipping">
           <button type="button" class="byl-step-toggle" data-byl-open-step="shipping" aria-expanded="true"><span class="byl-step-number">2</span><span class="byl-step-heading"><strong id="byl-heading-shipping">Shipping</strong><small data-byl-step-summary="shipping">Contact, delivery option and address</small></span><span class="byl-step-edit">Edit</span></button>
           <div class="byl-step-body">
-            <div class="byl-account-entry">
+            <div class="byl-contact-card" aria-label="Your email and account">
+              <div class="byl-account-entry">
               <?php if (is_user_logged_in()) : ?>
                 <a href="<?php echo esc_url(wc_get_account_endpoint_url('edit-account')); ?>">Edit your profile</a>
               <?php else : ?>
@@ -33,16 +39,27 @@ $cart = WC()->cart;
               <?php endif; ?>
             </div>
             <div class="byl-account-email-host" data-byl-account-email-host></div>
-            <div data-byl-marketing-optin-slot hidden></div>
-            <div class="byl-shipping-rate-section" aria-labelledby="byl-delivery-choice-heading">
+              <div data-byl-marketing-optin-slot hidden></div>
+            </div>
+            <div class="byl-choice-card">
+              <div class="byl-shipping-rate-section" aria-labelledby="byl-delivery-choice-heading">
               <h2 id="byl-delivery-choice-heading">Choose your shipping option</h2>
               <div class="byl-delivery-options" data-byl-delivery-options aria-live="polite"></div>
-              <p class="byl-step-hint">Available delivery options are calculated from your shipping address below.</p>
+              <p class="byl-step-hint">Available delivery options depend on your destination.</p>
+              </div>
             </div>
-            <h2 class="byl-shipping-details-heading">Add shipping details</h2>
-            <div id="customer_details"><div class="byl-checkout-billing"><?php do_action('woocommerce_checkout_billing'); ?></div><div class="byl-checkout-shipping"><?php do_action('woocommerce_checkout_shipping'); ?></div></div>
-            <div data-byl-notes-host></div>
-            <div data-byl-country-notices hidden></div>
+            <div class="byl-address-card">
+              <h2 class="byl-shipping-details-heading">Add shipping details</h2>
+              <div id="customer_details"><div class="byl-checkout-billing"><?php do_action('woocommerce_checkout_billing'); ?></div><div class="byl-checkout-shipping"><?php do_action('woocommerce_checkout_shipping'); ?></div></div>
+              <div data-byl-notes-host></div>
+              <div data-byl-country-notices hidden></div>
+              <div class="byl-duties-note" role="note">
+                <span class="byl-duties-icon" aria-hidden="true">i</span>
+                <div><strong>Estimated shipping, duties and taxes</strong>
+                  <p>Shipping charges and any applicable duties or taxes depend on your destination. Charges not included at checkout may be assessed by local authorities.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
         <?php do_action('woocommerce_checkout_after_customer_details'); endif; ?>
@@ -55,9 +72,16 @@ $cart = WC()->cart;
             <div data-byl-terms-host></div>
           </div>
         </section>
-        <div class="byl-checkout-action-bar"><p class="byl-checkout-error" data-byl-error role="alert" hidden></p><button type="button" class="byl-checkout-next" data-byl-next>Continue to Payment <span aria-hidden="true">→</span></button></div>
+        <div class="byl-checkout-action-bar">
+          <p class="byl-checkout-error" data-byl-error role="alert" hidden></p>
+          <button class="byl-mobile-order-toggle" type="button" data-byl-mobile-summary-toggle aria-expanded="false" aria-controls="byl-checkout-summary-panel">
+            <strong>Order total (<?php echo esc_html($cart ? (string) $cart->get_cart_contents_count() : '0'); ?>)</strong>
+            <span class="byl-mobile-see-details">See details <span aria-hidden="true">&#8964;</span></span>
+            <span class="byl-mobile-total" data-byl-mobile-total><?php echo wp_kses_post($cart ? $cart->get_total() : ''); ?></span>
+          </button>
+          <button type="button" class="byl-checkout-next" data-byl-next>Continue to Payment <span aria-hidden="true">→</span></button></div>
       </div>
-      <aside class="byl-checkout-summary" aria-label="Order summary">
+      <aside class="byl-checkout-summary" id="byl-checkout-summary-panel" aria-label="Order summary">
         <div class="byl-summary-card">
           <button type="button" class="byl-summary-toggle" data-byl-summary-toggle aria-expanded="true"><strong>Order Summary</strong><span> (<?php echo esc_html($cart ? (string) $cart->get_cart_contents_count() : '0'); ?> items)</span><span class="byl-summary-total"><?php echo wp_kses_post($cart ? $cart->get_total() : ""); ?></span><span class="byl-summary-chevron" aria-hidden="true">⌄</span></button>
           <div class="byl-summary-body" data-byl-summary-body>
