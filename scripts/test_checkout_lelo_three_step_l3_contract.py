@@ -21,7 +21,10 @@ for obsolete in ('data-byl-step="address"', 'data-byl-step="delivery"',
     assert obsolete not in form, obsolete
 assert form.index('data-byl-delivery-options') < form.index('id="customer_details"')
 assert form.index('data-byl-payment-host') < form.index('data-byl-terms-host')
-assert form.index('data-byl-payment-host') < form.index('data-byl-notes-host')
+# Owner: Woo real order notes belong in the optional Shipping accordion, never Payment.
+assert form.index('data-byl-notes-host') < form.index('data-byl-step="payment"')
+assert form.count('data-byl-notes-host') == 1
+assert "wireOptionalDeliveryNote()" in script
 assert "data-byl-country-notices hidden" in form
 assert "Log in or create an account" in form and "Edit your profile" in form
 assert form.index('data-byl-account-email-host') < form.index('data-byl-delivery-options')
@@ -41,11 +44,15 @@ assert "chosenShippingRates().length === wooShippingGroups().size" in script
 assert "if (active !== 'payment' || !paymentConfigured()" in script
 assert "function wireOptionalAddressFields()" in script
 assert "billing_address_2_field" in script and "billing_company_field" in script
+assert "trigger.dataset.bylOptionalFor = id" in script
+assert "'billing_country' => 5" in fields
+assert "'billing_postcode' => 85" in fields
+assert "data-byl-payment-express-host" in form
 assert "input.checked = true" in script
 for forbidden in ("devPrecheck", "syncConsentCheckboxes", "consentChoice",
                   "terms.checked = true", "consentInput.checked = true"):
     assert forbidden not in script, forbidden
-for required in ("'priority' => 85", "'label' => 'Phone'",
+for required in ("'priority' => 70", "'label' => 'Phone'",
                  "We will only use this number in case we need to contact you regarding delivery purposes.",
                  "['billing_company']['required'] = false"):
     assert required in fields, required

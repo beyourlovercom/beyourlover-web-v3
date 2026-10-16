@@ -56,4 +56,27 @@ assert "height:100dvh" in f["css"],"Drawer edge-to-edge"
 assert "position:fixed!important" in f["css"],"Mobile CTA needs one fixed component"
 assert "top:auto!important;height:auto!important" in f["css"],"Fixed mobile summary cannot stretch across viewport"
 assert "body.byl-checkout-drawer-mode" in f["css"]
+# Actual Owner screenshot FAIL #1: shipping country/phone/ZIP chronology
+assert "'billing_country' => 5" in f["checkout"]
+assert "'billing_postcode' => 85" in f["checkout"]
+assert "'priority' => 70" in f["checkout"] and "'shipping_phone'" in f["checkout"]
+for s in ("#billing_country_field", "#billing_first_name_field", "#billing_last_name_field",
+          "#billing_address_1_field", "#billing_city_field", "#billing_state_field",
+          "#shipping_phone_field", "#billing_postcode_field",
+          '[data-byl-optional-for="billing_address_2_field"]',
+          '[data-byl-optional-for="billing_company_field"]'):
+ assert s in f["css"],s
+assert "trigger.dataset.bylOptionalFor = id" in f["native"]
+# Actual Owner screenshot FAIL #2: Express wallets from native registered
+# Woo checkout before_customer_details must run once, on Payment in Dev Drawer,
+# and once at original position on /checkout/ fallback, not both.
+assert f["form"].count("do_action('woocommerce_checkout_before_customer_details')") == 2
+assert "if (!function_exists('byl_v3_checkout_drawer_enabled') || !byl_v3_checkout_drawer_enabled())" in f["form"]
+assert 'data-byl-payment-express-host' in f["form"]
+assert f["form"].index('data-byl-payment-express-host') > f["form"].index('data-byl-step="payment"')
+# Actual Owner screenshot FAIL #3: No extra optional note area on Payment.
+assert f["form"].count('data-byl-notes-host') == 1
+assert f["form"].index('data-byl-notes-host') < f["form"].index('data-byl-step="payment"')
+assert "wireOptionalDeliveryNote()" in f["native"]
+
 print("CHECKOUT_DRAWER_OPTION_B_STATIC_GATE_PASS: exact owner 3-step shell, route-safe single Woo checkout, staging-only, no iframe/DB/order gateway writes")

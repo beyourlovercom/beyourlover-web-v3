@@ -32,6 +32,26 @@ if(!executable || !fs.existsSync(executable)) throw Error('Set BYL_CHROME_BIN to
    page.on('pageerror',e=>errors.push(e.message));
    page.on('request',request=>{if(!request.url().startsWith('file://'))offsite++});
    await page.goto(pathToFileURL(html).href+'?step='+v.step,{waitUntil:'load'});
+   // Reproduce the real Owner FAIL screenshot's Woo-generated DOM sequence:
+   // optional links wrongly ahead of country and phone after ZIP. The scoped
+   // grid must visually repair the order without cloning native Woo fields.
+   if (v.step === 'shipping') await page.evaluate(() => {
+     const wrap=document.querySelector('.woocommerce-billing-fields__field-wrapper');
+     const first=wrap.querySelector('#billing_first_name_field');
+     const country=wrap.querySelector('#billing_country_field');
+     const phone=wrap.querySelector('#shipping_phone_field');
+     const postcode=wrap.querySelector('#billing_postcode_field');
+     // Actual Woo JS inserts optional disclosure triggers as direct grid
+     // children, not as nested Woo .form-row wrappers.
+     const apt=wrap.querySelector('[data-byl-optional-for="billing_address_2_field"]');
+     const org=wrap.querySelector('[data-byl-optional-for="billing_company_field"]');
+     apt.parentElement.replaceWith(apt);
+     org.parentElement.replaceWith(org);
+     wrap.insertBefore(apt,first);
+     wrap.insertBefore(org,first);
+     wrap.insertBefore(country,postcode);
+     postcode.insertAdjacentElement('afterend',phone);
+   });
    const state=await page.evaluate(()=>{
     const bounding=sel=>{
       const r=document.querySelector(sel).getBoundingClientRect();
@@ -48,6 +68,19 @@ if(!executable || !fs.existsSync(executable)) throw Error('Set BYL_CHROME_BIN to
       totalTitle:document.querySelector('.byl-summary-toggle strong').textContent,
       ctaCount:document.querySelectorAll('[data-byl-next]').length,
       nativeFormCount:document.querySelectorAll('form.checkout').length,
+      billingFields: (()=>{
+        const rect=id=>document.querySelector(id)?.getBoundingClientRect().top??null;
+        return {
+          country:rect('#billing_country_field'),
+          firstName:rect('#billing_first_name_field'),
+          street:rect('#billing_address_1_field'),
+          apt:rect('[data-byl-optional-for="billing_address_2_field"]'),
+          city:rect('#billing_city_field'),
+          phone:rect('#shipping_phone_field'),
+          zip:rect('#billing_postcode_field'),
+          organization:rect('[data-byl-optional-for="billing_company_field"]')
+        };
+      })(),
       track:bounding('.byl-checkout-track'),
       back:bounding('.byl-checkout-drawer-back'),
       paymentCardCount:document.querySelectorAll('[data-byl-step="payment"] #payment li').length,
@@ -69,6 +102,15 @@ if(!executable || !fs.existsSync(executable)) throw Error('Set BYL_CHROME_BIN to
      : state.back.y+state.back.height <= state.track.y+1,
      v.label+': Shipping and Payment back-link placement violates Owner PASS reference');
    assert.equal(state.shippingStepVisible,v.step==='shipping',v.label+': wrong visible shipping state');
+   if(v.step==='shipping'){
+     const f=state.billingFields;
+     console.log('OWNER_BILLING_LAYOUT',v.label,JSON.stringify(f));
+     assert(f.country<f.firstName, 'Owner FAIL: Country must come before first name');
+     assert(f.firstName<f.street && f.street<f.apt, 'Owner FAIL: address then apt optional');
+     assert(f.apt<f.city && f.city<f.phone, 'Owner FAIL: optional field before city then phone');
+     assert(f.phone<f.zip, 'Owner FAIL: Phone must be BEFORE ZIP as locked Owner PASS');
+     assert(f.zip<f.organization, 'Owner FAIL: company disclosure must follow ZIP');
+   }
    assert.equal(state.paymentStepVisible,v.step==='payment',v.label+': wrong visible payment state');
    if(v.width<=760){
      assert.equal(state.panel.width,v.width,'Mobile panel edge-to-edge');

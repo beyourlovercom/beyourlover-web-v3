@@ -97,6 +97,7 @@
       trigger.type = 'button';
       trigger.className = 'byl-optional-address-trigger';
       trigger.textContent = title;
+      trigger.dataset.bylOptionalFor = id;
       trigger.setAttribute('aria-controls', id);
       const expanded = String(input.value || '').trim().length > 0;
       row.hidden = !expanded;
@@ -110,6 +111,32 @@
         input.focus({preventScroll: false});
       });
     });
+  }
+  function wireOptionalDeliveryNote() {
+    // Woo owns this real optional field. Never clone it, remove the name or
+    // invent a new data contract merely for visual presentation.
+    const notes = root.querySelector('[data-byl-notes-host] .woocommerce-additional-fields');
+    if (!notes || notes.dataset.bylDeliveryNoteWired === '1') return;
+    const input = notes.querySelector('#order_comments, textarea[name="order_comments"]');
+    if (!input) return;
+    const host = notes.parentElement;
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'byl-optional-address-trigger byl-optional-delivery-note';
+    trigger.textContent = '+ Add delivery note (optional)';
+    trigger.setAttribute('aria-controls', input.id || 'order_comments');
+    const populated = !!String(input.value || '').trim();
+    trigger.hidden = populated;
+    notes.hidden = !populated;
+    trigger.setAttribute('aria-expanded', populated ? 'true' : 'false');
+    host.insertBefore(trigger, notes);
+    trigger.addEventListener('click', () => {
+      notes.hidden = false;
+      trigger.hidden = true;
+      trigger.setAttribute('aria-expanded', 'true');
+      input.focus({preventScroll:false});
+    });
+    notes.dataset.bylDeliveryNoteWired = '1';
   }
   function syncPhoneDescription() {
     const description = root.querySelector('#shipping_phone-description');
@@ -290,6 +317,7 @@
     if (reviewInvite) reviewInvite.textContent = 'Send me an optional review invitation with gift card rewards.';
     const notes = document.querySelector('.woocommerce-additional-fields');
     if (notes && notes.parentElement !== notesHost) notesHost.appendChild(notes);
+    wireOptionalDeliveryNote();
   }
   function deliveryOptions() {
     deliveryHost.replaceChildren();

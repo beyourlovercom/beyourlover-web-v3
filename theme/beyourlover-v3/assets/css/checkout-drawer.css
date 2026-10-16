@@ -372,3 +372,124 @@ body.byl-checkout-drawer-mode #payment .wc_payment_methods>li>label{
     margin:0 0 16px!important;padding:5px 0 12px!important;
   }
 }
+
+/* Owner UAT 2026-10-16 P0: Shipping native Woo field visual chronology.
+   Native inputs/validation remain unchanged; priority PHP is the server-side
+   source and grid order prevents country/phone jumps in CSS at 320/390/PC. */
+body.byl-checkout-drawer-mode .byl-checkout-billing .woocommerce-billing-fields__field-wrapper {
+  display:grid!important;
+  grid-template-columns:repeat(6,minmax(0,1fr))!important;
+  align-content:start;column-gap:12px;row-gap:13px;
+}
+body.byl-checkout-drawer-mode .byl-checkout-billing .woocommerce-billing-fields__field-wrapper>.form-row {
+  order:80;
+  min-width:0;
+  margin:0!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_country_field {
+  order:10!important;grid-column:1/-1!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_first_name_field {
+  order:20!important;grid-column:1/span 3!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_last_name_field {
+  order:30!important;grid-column:4/span 3!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_address_1_field {
+  order:40!important;grid-column:1/-1!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>[data-byl-optional-for="billing_address_2_field"]{
+  order:45!important;grid-column:1/-1!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_address_2_field{
+  order:46!important;grid-column:1/-1!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_city_field {
+  order:55!important;grid-column:1/span 3!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_state_field {
+  order:60!important;grid-column:4/span 3!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#shipping_phone_field {
+  order:70!important;grid-column:1/-1!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_postcode_field {
+  order:85!important;grid-column:1/-1!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>[data-byl-optional-for="billing_company_field"]{
+  order:110!important;grid-column:1/-1!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_company_field {
+  order:111!important;grid-column:1/-1!important;
+}
+/* Actual Woo delivery note is offered in Shipping, not shown as a large
+   Additional information/textarea in the focused Payment step. */
+body.byl-checkout-drawer-mode [data-byl-notes-host]{
+  margin:8px 0 15px;padding:0;
+}
+body.byl-checkout-drawer-mode [data-byl-notes-host] .woocommerce-additional-fields[hidden],
+body.byl-checkout-drawer-mode [data-byl-notes-host] .byl-optional-delivery-note[hidden]{display:none!important;}
+body.byl-checkout-drawer-mode [data-byl-notes-host] .woocommerce-additional-fields h3 {
+  display:none!important;
+}
+body.byl-checkout-drawer-mode [data-byl-notes-host] textarea{
+  min-height:78px;resize:vertical;
+}
+body.byl-checkout-drawer-mode [data-byl-notes-host] .byl-optional-delivery-note{
+  font-size:12px;color:var(--byl-drawer-wine);padding:7px 0!important;
+}
+/* Three registered provider-owned express checkout hook callbacks render
+   inside Payment ONLY in the Dev drawer. This retains their own buttons
+   and validation. Do NOT hide or simulate a provider as a radio gateway. */
+body.byl-checkout-drawer-mode [data-byl-payment-express-host]{
+  width:100%;margin:0 0 22px;
+}
+body.byl-checkout-drawer-mode [data-byl-payment-express-host]:empty{display:none!important;}
+body.byl-checkout-drawer-mode [data-byl-payment-express-host] :is(
+  .wcpay-express-checkout-wrapper,
+  .wc-block-components-express-payment,
+  .wc-payment-request-wrapper
+){max-width:100%;}
+/* Woo's own unavailable-method notice remains visible, but must not create a
+   giant grey fake payment row or duplicate our disabled PAY NOW explanation. */
+body.byl-checkout-drawer-mode #payment .woocommerce-info,
+body.byl-checkout-drawer-mode #payment .woocommerce-notice,
+body.byl-checkout-drawer-mode #payment .woocommerce-notice--info {
+  font-size:12px!important;line-height:1.5!important;
+  padding:12px 14px!important;margin:0 0 8px!important;
+  background:#faf8f9!important;color:#534c52!important;
+  border:1px solid #eee8eb!important;border-radius:6px!important;
+  box-shadow:none!important;
+}
+body.byl-checkout-drawer-mode #payment:has(.woocommerce-info) {
+  padding:0!important;border:0!important;background:transparent!important;
+}
+@media(max-width:375px){
+  body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_first_name_field,
+  body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_last_name_field,
+  body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_city_field,
+  body.byl-checkout-drawer-mode .woocommerce-billing-fields__field-wrapper>#billing_state_field{
+    grid-column:1/-1!important;
+  }
+}
+
+/* Owner Payment PC reference: Shipping/Billing section, not four extra edit rows
+   or a redundant "Payment not configured" item on the summary side. */
+body.byl-checkout-drawer-mode .byl-drawer-review-heading {
+  font-size:13px;font-weight:750;letter-spacing:.005em;line-height:1.4;
+  margin:0 0 13px;color:#201b21;
+}
+body.byl-checkout-drawer-mode .byl-payment-review {
+  border-top:2px solid #232025;border-bottom:2px solid #232025;
+  margin:20px 0;padding:17px 0!important;
+}
+body.byl-checkout-drawer-mode .byl-payment-review .byl-review-details>div:has([data-byl-review="payment"]) {
+  display:none!important;
+}
+/* Coupon editing is already available in Cart/Shipping; keep Pay Now focused. */
+body.byl-checkout-drawer-mode .byl-progressive-checkout[data-byl-current-step="payment"] .byl-summary-promo {
+  display:none!important;
+}
+@media(max-width:760px) {
+  body.byl-checkout-drawer-mode .byl-payment-review {display:none!important;}
+}

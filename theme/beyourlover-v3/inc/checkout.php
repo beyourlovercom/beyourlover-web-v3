@@ -21,12 +21,31 @@ add_filter('woocommerce_checkout_fields', static function (array $fields): array
         $fields['billing']['billing_email']['class'] = ['form-row-wide'];
     }
 
+    // Owner-locked Shipping sequence. Woo field priorities control native
+    // server markup; the scoped Drawer CSS is the defensive visual fallback.
+    // The original email stays a real Woo field and is reparented above rates.
+    // Never clone a second field or override Woo validation / country data.
+    foreach ([
+        'billing_country' => 5,
+        'billing_first_name' => 10,
+        'billing_last_name' => 20,
+        'billing_address_1' => 40,
+        'billing_address_2' => 45,
+        'billing_city' => 55,
+        'billing_state' => 60,
+        'billing_postcode' => 85,
+    ] as $id => $priority) {
+        if (isset($fields['billing'][$id])) {
+            $fields['billing'][$id]['priority'] = $priority;
+        }
+    }
+
     $fields['billing']['shipping_phone'] = [
         'type' => 'tel',
         'label' => 'Phone',
         'description' => 'We will only use this number in case we need to contact you regarding delivery purposes.',
         'required' => true,
-        'priority' => 85,
+        'priority' => 70,
         'class' => ['form-row-wide'],
         'autocomplete' => 'tel',
         'validate' => ['phone'],

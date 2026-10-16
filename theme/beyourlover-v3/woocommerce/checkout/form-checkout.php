@@ -18,7 +18,13 @@ $cart = WC()->cart;
   <form name="checkout" method="post" class="checkout woocommerce-checkout byl-checkout-form" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Checkout', 'woocommerce'); ?>">
     <div class="byl-checkout-grid">
       <div class="byl-checkout-stages">
-        <?php if ($checkout->get_checkout_fields()) : do_action('woocommerce_checkout_before_customer_details'); ?>
+        <?php if ($checkout->get_checkout_fields()) :
+          // Woo express providers registered here: WCPay, PayPal, pay buttons.
+          // Dev-only Drawer moves their server-rendered host into Payment.
+          if (!function_exists('byl_v3_checkout_drawer_enabled') || !byl_v3_checkout_drawer_enabled()) {
+              do_action('woocommerce_checkout_before_customer_details');
+          }
+        ?>
         <section class="byl-checkout-step is-active" data-byl-step="shipping" aria-labelledby="byl-heading-shipping">
           <button type="button" class="byl-step-toggle" data-byl-open-step="shipping" aria-expanded="true"><span class="byl-step-number">2</span><span class="byl-step-heading"><strong id="byl-heading-shipping">Shipping</strong><small data-byl-step-summary="shipping">Contact, delivery option and address</small></span><span class="byl-step-edit">Edit</span></button>
           <div class="byl-step-body">
@@ -38,6 +44,7 @@ $cart = WC()->cart;
             </div>
             <h2 class="byl-shipping-details-heading">Add shipping details</h2>
             <div id="customer_details"><div class="byl-checkout-billing"><?php do_action('woocommerce_checkout_billing'); ?></div><div class="byl-checkout-shipping"><?php do_action('woocommerce_checkout_shipping'); ?></div></div>
+            <div data-byl-notes-host></div>
             <div data-byl-country-notices hidden></div>
           </div>
         </section>
@@ -46,9 +53,13 @@ $cart = WC()->cart;
           <button type="button" class="byl-step-toggle" data-byl-open-step="payment" aria-expanded="false"><span class="byl-step-number">3</span><span class="byl-step-heading"><strong id="byl-heading-payment">Payment</strong><small data-byl-step-summary="payment">Secure and encrypted</small></span><span class="byl-step-edit">Edit</span></button>
           <div class="byl-step-body">
             <h2 class="byl-payment-options-heading">Choose a payment option</h2>
+            <?php if (function_exists('byl_v3_checkout_drawer_enabled') && byl_v3_checkout_drawer_enabled()) : ?>
+            <div class="byl-payment-express-host" data-byl-payment-express-host aria-label="Express payment options">
+              <?php do_action('woocommerce_checkout_before_customer_details'); ?>
+            </div>
+            <?php endif; ?>
             <div data-byl-payment-host></div>
             <p class="byl-step-hint">Available payment methods are provided securely by WooCommerce and your chosen payment provider.</p>
-            <div data-byl-notes-host></div>
             <div data-byl-terms-host></div>
             <?php if (function_exists('byl_v3_checkout_drawer_enabled') && byl_v3_checkout_drawer_enabled()) : ?>
             <div class="byl-drawer-payment-total" data-byl-drawer-payment-total aria-label="Final order total">
@@ -70,7 +81,11 @@ $cart = WC()->cart;
                 if (!$product instanceof WC_Product || !$product->exists()) { continue; }
               ?><div class="byl-summary-product"><div class="byl-summary-image"><?php echo wp_kses_post($product->get_image('woocommerce_thumbnail')); ?></div><div><strong><?php echo esc_html($product->get_name()); ?></strong><small>Qty: <?php echo esc_html((string) $line['quantity']); ?></small></div><span><?php echo wp_kses_post($cart->get_product_subtotal($product, $line['quantity'])); ?></span></div><?php endforeach; endif; ?>
             </div>
-            <div class="byl-payment-review" aria-label="Shipping and billing details"><dl class="byl-review-details">
+            <div class="byl-payment-review" aria-label="Shipping and billing details">
+              <?php if (function_exists('byl_v3_checkout_drawer_enabled') && byl_v3_checkout_drawer_enabled()) : ?>
+              <h3 class="byl-drawer-review-heading">SHIPPING AND BILLING DETAILS</h3>
+              <?php endif; ?>
+              <dl class="byl-review-details">
             <div><dt>Contact</dt><dd data-byl-review="contact"></dd><button type="button" data-byl-open-step="shipping">Edit</button></div>
             <div><dt>Shipping Address</dt><dd data-byl-review="address"></dd><button type="button" data-byl-open-step="shipping">Edit</button></div>
             <div><dt>Delivery</dt><dd data-byl-review="delivery"></dd><button type="button" data-byl-open-step="shipping">Edit</button></div>
