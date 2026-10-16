@@ -16,11 +16,18 @@ class WP_Query { public bool $is_404 = true; }
 class BYL_Mock_DB {
     public function get_affiliate(int $id) { return $id === 7 ? (object)['user_id'=>21,'earnings'=>550,'unpaid_earnings'=>92,'visits'=>83,'referrals'=>4] : null; }
     public function get_referrals(array $args): array {
-        if ($args['affiliate_id'] !== 7) { throw new RuntimeException('wrong affiliate filter'); }
+        if ($args['affiliate_id'] !== 7 || $args['number'] !== 13) { throw new RuntimeException('wrong referral query'); }
+        if ($args['offset'] === 12) {
+            return [(object)['affiliate_id'=>7,'referral_id'=>81,'date'=>'2026-09-01 12:00:00','amount'=>11,'status'=>'paid','currency'=>'USD']];
+        }
         return [(object)['affiliate_id'=>7,'referral_id'=>88,'date'=>'2026-10-01 12:00:00','amount'=>19,'status'=>'paid','currency'=>'USD'],
             (object)['affiliate_id'=>9,'referral_id'=>99,'date'=>'2026-10-01 12:00:00','amount'=>9000,'status'=>'paid','currency'=>'USD']];
     }
-    public function get_payouts(array $args): array { return [(object)['affiliate_id'=>7,'date'=>'2026-09-01 00:00:00','amount'=>50,'status'=>'paid'],(object)['affiliate_id'=>9,'amount'=>10000]]; }
+    public function get_payouts(array $args): array {
+        if ($args['affiliate_id'] !== 7 || $args['number'] !== 5) { throw new RuntimeException('wrong payout query'); }
+        if ($args['offset'] === 4) { return [(object)['affiliate_id'=>7,'date'=>'2026-08-01 00:00:00','amount'=>25,'status'=>'paid']]; }
+        return [(object)['affiliate_id'=>7,'date'=>'2026-09-01 00:00:00','amount'=>50,'status'=>'paid'],(object)['affiliate_id'=>9,'amount'=>10000]];
+    }
     public function get_creatives(array $args): array { return []; }
 }
 $GLOBALS['byl_user'] = new WP_User(21,'Emma');
@@ -45,6 +52,7 @@ function number_format_i18n($value,$decimals=0) { return number_format((float)$v
 function esc_html($s) { return htmlspecialchars((string)$s,ENT_QUOTES,'UTF-8'); }
 function esc_attr($s) { return esc_html($s); }
 function esc_url($s) { return esc_html($s); }
+function add_query_arg($key,$value,$url) { return $url.'?'.rawurlencode($key).'='.rawurlencode((string)$value); }
 function wp_logout_url($path='') { return home_url('/logout/'); }
 function wc_get_page_permalink($type) { return home_url('/my-account/'); }
 function byl_v3_account_url() { return home_url('/my-account/'); }
@@ -76,6 +84,18 @@ $assert(str_contains($render,'Hi, Emma') && str_contains($render,'USD 550.00'),'
 if (in_array('--preview', $argv, true)) { file_put_contents(dirname(__DIR__).'/affiliate-preview.html', $render); }
 $assert(!str_contains($render,'9000') && !str_contains($render,'10000'),'cross-affiliate values do not render');
 $assert(str_contains($render,'REALCODE'),'assigned coupon shortcode is used');
+$_GET['byl_ref_page']='2';
+$_GET['byl_pay_page']='2';
+$older=byl_v3_affiliate_snapshot();
+$assert($older['referral_page']===2 && $older['payout_page']===2,'historical page cursors stay independent');
+$assert(count($older['referrals'])===1 && $older['referrals'][0]->referral_id===81,'historical referrals are fetched with scoped offset');
+$assert(count($older['payouts'])===1 && (float)$older['payouts'][0]->amount===25.0,'historical payouts are fetched with scoped offset');
+ob_start(); include dirname(__DIR__).'/theme/beyourlover-v3/template-affiliate-dashboard.php'; $older_render=ob_get_clean();
+$assert(str_contains($older_render,'Newer referrals') && str_contains($older_render,'Newer payouts'),'history links render only when applicable');
+$assert(!str_contains($older_render,'9000') && !str_contains($older_render,'10000'),'historical pages do not expose other affiliates');
+$_GET['byl_ref_page']=['7']; $_GET['byl_pay_page']='evil';
+$assert(byl_v3_affiliate_page_number('byl_ref_page')===1 && byl_v3_affiliate_page_number('byl_pay_page')===1,'malformed history cursors fail closed');
+unset($_GET['byl_ref_page'],$_GET['byl_pay_page']);
 $GLOBALS['byl_user']=new WP_User(0);
 $guest=byl_v3_affiliate_snapshot();
 $assert($guest['state']==='guest' && !$guest['referrals'],'guest has no private records');

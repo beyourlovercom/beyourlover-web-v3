@@ -159,3 +159,8 @@
 
 /* M390 owner concept parity: keep text clear of hero photography and cards inside viewport. */
 @media(max-width:660px){.byl-affiliate-hero-text{width:67%;}.byl-affiliate-hero-image{width:41%;object-position:50% 45%;}.byl-affiliate-hero:after{right:36%;width:21%;}.byl-affiliate-hero-description{max-width:205px;}.byl-affiliate-stat,.byl-affiliate-stat>div{min-width:0;}.byl-affiliate-stat strong{white-space:normal;overflow-wrap:anywhere;}.byl-affiliate-copy-row input{flex:1;width:0;}}
+
+/* Historic AffiliateWP records: compact, touch-friendly, native GET navigation. */
+.byl-affiliate-history-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:14px 0 4px;font-size:13px;color:#6e6868}
+.byl-affiliate-history-nav a{color:#84152a;text-decoration:underline;text-underline-offset:3px;min-height:36px;display:inline-flex;align-items:center}
+.byl-affiliate-history-nav a:focus-visible{outline:2px solid #84152a;outline-offset:3px}

@@ -49,12 +49,26 @@ add_filter('woocommerce_login_redirect', static function ($redirect, $user) {
     return $id > 0 && function_exists('affwp_get_affiliate_status') && affwp_get_affiliate_status($id) === 'active'
         ? home_url('/my-affiliate/') : $redirect;
 }, 20, 2);
+/**
+ * Separate bounded read-only page cursors for historical records. Never take
+ * an affiliate ID from the URL: the authenticated AffiliateWP identity wins.
+ */
+function byl_v3_affiliate_page_number(string $key): int {
+    $raw = $_GET[$key] ?? '1';
+    if (!is_string($raw) && !is_int($raw)) { return 1; }
+    $value = (string) $raw;
+    if (!preg_match('/^[0-9]{1,5}$/D', $value)) { return 1; }
+    return min(1000, max(1, (int) $value));
+}
+
 /** Read only. Never accept a viewer-selected affiliate ID. */
 function byl_v3_affiliate_snapshot(): array {
     $user = wp_get_current_user();
     $view = [
         'state' => 'guest', 'user' => $user, 'id' => 0, 'account' => null,
         'referrals' => [], 'payouts' => [], 'creatives' => [], 'referral_url' => '',
+        'referral_page' => 1, 'payout_page' => 1,
+        'more_referrals' => false, 'more_payouts' => false,
         'currency' => function_exists('affwp_get_currency') ? (string) affwp_get_currency() : '',
     ];
     if (!$user instanceof WP_User || !$user->exists()) { return $view; }
@@ -79,22 +93,36 @@ function byl_v3_affiliate_snapshot(): array {
             $view['referral_url'] = $url;
         }
     }
+    $view['referral_page'] = byl_v3_affiliate_page_number('byl_ref_page');
+    $view['payout_page'] = byl_v3_affiliate_page_number('byl_pay_page');
     if (isset($engine->referrals) && is_object($engine->referrals) && method_exists($engine->referrals, 'get_referrals')) {
+        $limit = 12;
         $items = $engine->referrals->get_referrals([
-            'affiliate_id' => $id, 'number' => 12, 'orderby' => 'date', 'order' => 'DESC',
+            'affiliate_id' => $id, 'number' => $limit + 1,
+            'offset' => ($view['referral_page'] - 1) * $limit,
+            'orderby' => 'date', 'order' => 'DESC',
         ]);
         if (is_array($items)) {
-            $view['referrals'] = array_values(array_filter($items, static function ($entry) use ($id): bool {
+            $owned = array_values(array_filter($items, static function ($entry) use ($id): bool {
                 return is_object($entry) && isset($entry->affiliate_id) && (int) $entry->affiliate_id === $id;
             }));
+            $view['more_referrals'] = count($owned) > $limit;
+            $view['referrals'] = array_slice($owned, 0, $limit);
         }
     }
     if (isset($engine->payouts) && is_object($engine->payouts) && method_exists($engine->payouts, 'get_payouts')) {
-        $items = $engine->payouts->get_payouts(['affiliate_id' => $id, 'number' => 4, 'orderby' => 'date', 'order' => 'DESC']);
+        $limit = 4;
+        $items = $engine->payouts->get_payouts([
+            'affiliate_id' => $id, 'number' => $limit + 1,
+            'offset' => ($view['payout_page'] - 1) * $limit,
+            'orderby' => 'date', 'order' => 'DESC',
+        ]);
         if (is_array($items)) {
-            $view['payouts'] = array_values(array_filter($items, static function ($entry) use ($id): bool {
+            $owned = array_values(array_filter($items, static function ($entry) use ($id): bool {
                 return is_object($entry) && isset($entry->affiliate_id) && (int) $entry->affiliate_id === $id;
             }));
+            $view['more_payouts'] = count($owned) > $limit;
+            $view['payouts'] = array_slice($owned, 0, $limit);
         }
     }
     if (isset($engine->creatives) && is_object($engine->creatives) && method_exists($engine->creatives, 'get_creatives')) {

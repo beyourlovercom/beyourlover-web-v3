@@ -144,7 +144,12 @@ get_header();
                     <?php else: ?>
                         <p class="byl-affiliate-empty">No referrals have been recorded for this affiliate yet.</p>
                     <?php endif; ?>
-                    <p class="byl-affiliate-footnote">Showing your most recent referrals only. Referral details are private to your own account.</p>
+                    <div class="byl-affiliate-history-nav" aria-label="Referral history navigation">
+                        <?php if ($aff['referral_page'] > 1): ?><a href="<?php echo esc_url(add_query_arg('byl_ref_page', $aff['referral_page'] - 1, home_url('/my-affiliate/')).'#referrals'); ?>">← Newer referrals</a><?php endif; ?>
+                        <span>History page <?php echo esc_html((string) $aff['referral_page']); ?></span>
+                        <?php if ($aff['more_referrals']): ?><a href="<?php echo esc_url(add_query_arg('byl_ref_page', $aff['referral_page'] + 1, home_url('/my-affiliate/')).'#referrals'); ?>">Older referrals →</a><?php endif; ?>
+                    </div>
+                    <p class="byl-affiliate-footnote">AffiliateWP historical records are retrieved page by page for your own account only.</p>
                 </section>
                 <section class="byl-affiliate-card byl-affiliate-payouts" id="payouts" aria-labelledby="byl-payouts-title">
                     <div class="byl-affiliate-card-top"><h2 id="byl-payouts-title">Payouts</h2><span class="byl-affiliate-tag">From AffiliateWP</span></div>
@@ -157,6 +162,11 @@ get_header();
                         <?php endforeach; ?>
                         </ul>
                     <?php else: ?><p class="byl-affiliate-empty">No payout records are available.</p><?php endif; ?>
+                    <div class="byl-affiliate-history-nav" aria-label="Payout history navigation">
+                        <?php if ($aff['payout_page'] > 1): ?><a href="<?php echo esc_url(add_query_arg('byl_pay_page', $aff['payout_page'] - 1, home_url('/my-affiliate/')).'#payouts'); ?>">← Newer payouts</a><?php endif; ?>
+                        <span>History page <?php echo esc_html((string) $aff['payout_page']); ?></span>
+                        <?php if ($aff['more_payouts']): ?><a href="<?php echo esc_url(add_query_arg('byl_pay_page', $aff['payout_page'] + 1, home_url('/my-affiliate/')).'#payouts'); ?>">Older payouts →</a><?php endif; ?>
+                    </div>
                     <p class="byl-affiliate-footnote">Payout dates are not estimated or promised by this dashboard.</p>
                 </section>
                 <section class="byl-affiliate-card byl-affiliate-creatives" id="creatives" aria-labelledby="byl-creatives-title">
@@ -181,6 +191,7 @@ get_header();
                     <p>Manage your shopping profile, reach the team about a commission or update payout details through the program's approved process.</p>
                     <div class="byl-affiliate-support-links">
                         <a href="<?php echo esc_url(byl_v3_account_url()); ?>">My Shopping Account <span aria-hidden="true">↗</span></a>
+                        <a href="<?php echo esc_url(home_url('/affiliate-area/')); ?>">Existing AffiliateWP settings &amp; payout preferences <span aria-hidden="true">↗</span></a>
                         <a href="<?php echo esc_url(home_url('/customer-help/')); ?>">Contact Support <span aria-hidden="true">↗</span></a>
                     </div>
                 </section>
