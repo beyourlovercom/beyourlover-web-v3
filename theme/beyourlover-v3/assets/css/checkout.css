@@ -610,3 +610,17 @@ body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.s
   .byl-delivery-rate>.byl-delivery-price{grid-column:2!important;grid-row:2!important;
     justify-self:start!important;margin:0!important;font-size:12px!important}
 }
+
+/* Reference Fidelity V1 payment return gate: hide Shipping body after Next,
+   but preserve the native Woo Shipping step-toggle to return and edit. */
+@media(max-width:760px){
+  .byl-progressive-checkout.is-enhanced .byl-checkout-step[data-byl-step="shipping"]:not(.is-active)>.byl-step-body{
+    display:none!important
+  }
+  .byl-progressive-checkout.is-enhanced .byl-checkout-step[data-byl-step="shipping"]:not(.is-active)>.byl-step-toggle{
+    display:flex!important;min-height:58px!important;padding:12px 14px!important
+  }
+  .byl-progressive-checkout.is-enhanced .byl-checkout-step[data-byl-step="shipping"]:not(.is-active){
+    padding:0!important;border:1px solid #e7e3e5!important;border-radius:10px!important;background:#fff!important
+  }
+}
