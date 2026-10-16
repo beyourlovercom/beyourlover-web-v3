@@ -300,3 +300,20 @@ body.byl-checkout-drawer-mode .byl-drawer-see-details{display:none}
     text-decoration:underline;text-underline-offset:3px;font-size:11px!important;margin-left:8px;
   }
 }
+
+/* Owner Payment PASS — display-only readout from the native Woo total. */
+body.byl-checkout-drawer-mode .byl-drawer-payment-total{
+  background:#faf7f8;border:0;border-radius:8px;margin:34px 0 12px;padding:18px 20px;
+}
+body.byl-checkout-drawer-mode .byl-drawer-payment-total-line{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  color:#171219;font-weight:700;font-size:15px;
+}
+body.byl-checkout-drawer-mode [data-byl-drawer-payment-total-amount]{font-size:16px;font-weight:750;}
+body.byl-checkout-drawer-mode .byl-drawer-payment-total-details{
+  padding:8px 0 0;border:0;background:none;text-decoration:underline;text-underline-offset:2px;
+  color:#51494e;font-size:12px;cursor:pointer;
+}
+@media(max-width:760px){
+  body.byl-checkout-drawer-mode .byl-drawer-payment-total{display:none!important;}
+}

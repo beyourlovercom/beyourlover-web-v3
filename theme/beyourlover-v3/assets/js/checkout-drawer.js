@@ -52,6 +52,23 @@
   details.className = 'byl-drawer-see-details';
   details.textContent = 'See details';
   if (summaryToggle && summaryAmount) summaryToggle.insertBefore(details, summaryAmount);
+  // Display-only echo of Woo computed summary total; no arithmetic.
+  const paymentTotalAmount = checkout.querySelector('[data-byl-drawer-payment-total-amount]');
+  const paymentTotalDetails = checkout.querySelector('[data-byl-drawer-payment-total-details]');
+  function refreshPaymentTotal() {
+    if (paymentTotalAmount && summaryAmount) paymentTotalAmount.textContent = summaryAmount.textContent;
+  }
+  if (paymentTotalDetails && summaryToggle) paymentTotalDetails.addEventListener('click', () => {
+    summaryToggle.click();
+    const summary = summaryToggle.closest('.byl-summary-card');
+    if (summary && summary.classList.contains('is-open')) summary.scrollIntoView({block:'nearest',behavior:'auto'});
+  });
+  if (summaryAmount && paymentTotalAmount) {
+    const amountObserver = new MutationObserver(refreshPaymentTotal);
+    amountObserver.observe(summaryAmount, {childList:true,characterData:true,subtree:true});
+    window.addEventListener('pagehide', () => amountObserver.disconnect(), {once:true});
+  }
+  refreshPaymentTotal();
   function updateResponsiveSummaryLabel() {
     const mobile = window.matchMedia('(max-width:760px)').matches;
     if (summaryTitle) summaryTitle.textContent = mobile ? 'Order total' : 'Your Cart';

@@ -50,6 +50,10 @@ $cart = WC()->cart;
             <p class="byl-step-hint">Available payment methods are provided securely by WooCommerce and your chosen payment provider.</p>
             <div data-byl-notes-host></div>
             <div data-byl-terms-host></div>
+            <div class="byl-drawer-payment-total" data-byl-drawer-payment-total aria-label="Final order total">
+              <div class="byl-drawer-payment-total-line"><strong>Order total</strong><strong data-byl-drawer-payment-total-amount></strong></div>
+              <button type="button" class="byl-drawer-payment-total-details" data-byl-drawer-payment-total-details aria-controls="order_review">See details <span aria-hidden="true">⌄</span></button>
+            </div>
           </div>
         </section>
         <div class="byl-checkout-action-bar"><p class="byl-checkout-error" data-byl-error role="alert" hidden></p><button type="button" class="byl-checkout-next" data-byl-next>Continue to Payment <span aria-hidden="true">→</span></button></div>
