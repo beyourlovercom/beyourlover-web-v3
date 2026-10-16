@@ -38,5 +38,8 @@ for token in ['Checkout Shipping Reference Fidelity V1','body.woocommerce-checko
               '.byl-checkout-action-bar',
               '.byl-mobile-order-toggle','.byl-checkout-summary:has(.byl-summary-card.is-open)']:
  chk(token in css,'missing reference CSS token: '+token)
+chk('Reference Fidelity V1 payment return gate' in css,'Payment back-to-Shipping rule')
+chk('.byl-checkout-step[data-byl-step="shipping"]:not(.is-active)>.byl-step-body' in css,'Shipping body collapses when Payment active')
+chk('.byl-checkout-step[data-byl-step="shipping"]:not(.is-active)>.byl-step-toggle' in css,'Shipping edit toggle returns on Payment')
 chk('woocommerce_checkout' not in js.lower() or 'place_order' in js,'JS Woo native submit retained')
 print('PASS Checkout Shipping Reference Fidelity V1: %d source-only checks, zero orders/payments' % checks)
