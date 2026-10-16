@@ -40,8 +40,8 @@ get_header();
 <?php if (!$active) : ?>
     <section class="byl-affiliate-gate" aria-labelledby="byl-affiliate-gate-title">
         <p class="byl-affiliate-eyebrow">BeYourLover Creator Community</p>
-        <h1 id="byl-affiliate-gate-title"><?php echo $aff['state'] === 'guest' ? 'Your creator space awaits.' : 'Affiliate access is not available.'; ?></h1>
-        <p><?php echo $aff['state'] === 'guest' ? 'Sign in with your approved affiliate account to view commissions, referral links and payouts.' : 'This account does not have an active AffiliateWP profile. Your shopping account is still available.'; ?></p>
+        <h1 id="byl-affiliate-gate-title"><?php echo $aff['state'] === 'guest' ? 'Your creator space awaits.' : 'Creator access is pending verification.'; ?></h1>
+        <p><?php echo $aff['state'] === 'guest' ? 'Sign in with your approved affiliate account to view commissions, referral links and payouts.' : 'We cannot verify this sign-in for the new creator dashboard yet. Your existing AffiliateWP account and historical commissions remain unchanged. Please contact your affiliate manager for access.'; ?></p>
         <a class="byl-affiliate-button" href="<?php echo esc_url($sign_in); ?>"><?php echo $aff['state'] === 'guest' ? 'Sign In' : 'Go to My Account'; ?> <span aria-hidden="true">→</span></a>
     </section>
 <?php else : ?>
