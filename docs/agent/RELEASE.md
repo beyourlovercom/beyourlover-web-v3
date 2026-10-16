@@ -11,6 +11,12 @@
 - Inventory, fulfillment, ERP payment status and order export/sync parity are reconciled.
 - Version every plugin/theme and deploy from reproducible Git commits. Record hashes, dependency versions, DB schemas and rollback instructions.
 
+## Native-First Dual UAT release prerequisite
+- Before **page closure**, record approved design baseline, **Functional LIVE DEV PASS**, post-polish functional regressions and **Owner Visual PASS** as distinct evidence under [Native-First Development & Dual UAT V1](NATIVE-FIRST-DUAL-UAT-V1.md).
+- For an interactive Checkout control, current [54-case Issue #125](https://github.com/beyourlovercom/beyourlover-web-v3/issues/125) governs required native clicks, field/rate/tax/amount state, errors and mobile/desktop; a mocked or static result cannot satisfy an untested live behavior.
+- Payment/order steps blocked by missing sandbox or authorization remain **BLOCKED**, not PASS. No live payment or order creation merely to pass a screenshot test; use separately authorized payment/G5 Canary and end-to-end gates.
+- A CSS or Drawer UI release requires retesting affected native controls (not only page screenshots), including Woo SelectWoo Country/State and provider-owned popups when relevant. This policy does **not** grant any Dev/WWW deployment or merge approval.
+
 ## WWW cutover gate (Owner explicit approval required)
 1. Identify actual WWW hosting and deployment access; do not infer it from the Dev SSH alias.
 2. Back up current WWW files, database, DNS/Cloudflare/configuration, secrets references and restore point; verify restore procedure.

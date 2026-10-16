@@ -1,5 +1,17 @@
 # Risk-based testing and Owner UAT
 
+## Mandatory Native-First Development & Dual UAT V1
+
+Root [AGENTS.md](../../AGENTS.md) makes [Native-First Development & Dual UAT V1](NATIVE-FIRST-DUAL-UAT-V1.md) the **top-level completion contract** for interactive BYL Website work. Risk-based test *selection* continues to apply; risk-based testing is not permission to omit native function acceptance.
+
+- Start from an Owner-approved, **frozen visual baseline** (for materially new UI obtain proposal PASS first), then map every in-scope interactive control to the existing native owner, field/API, event lifecycle, state, validation and fallback.
+- **Functional first:** inventory controls; fix P0/P1 native failures; prove actual click/touch/keyboard/input, state changes and errors before visual-detail polish. A CSS-only patch can break a Woo SelectWoo dropdown or gateway iframe and therefore needs affected interaction regression.
+- **Visual second:** calibrate the real working Dev page to the approved design. After each materially interactive CSS/JS/layout change, repeat affected native control checks.
+- **Dual UAT for closure:** Functional **LIVE DEV PASS** and **Owner Visual PASS** are separate required records, alongside Design Baseline PASS; all three must be grounded in the same compatible source/deployed code. A mocked/browser fixture PASS is only **ISOLATED PASS**, not live evidence.
+- Track **UNTESTED / SOURCE-ONLY / ISOLATED PASS / LIVE DEV PASS / FAIL / BLOCKED** per case. An unavailable Woo gateway or unauthorized payment attempt stays BLOCKED and does not become PASS through an attractive mock.
+- At Checkout, use the [54-control Issue #125](https://github.com/beyourlovercom/beyourlover-web-v3/issues/125) (Cart 10 / Shipping 22 / Payment 12 / cross-flow 10); complete page-level functional/visual/regression loops before overall cross-flow E2E. Read/write and payment authorization rules remain unchanged.
+- Scale control inventories to the nature of Pages, Blog, PDP and policy content; never impose checkout payment cases on non-transactional pages.
+
 ## Do not prescribe one command for every task
 Select tests by impacted behavior, then ensure meaningful coverage. Faster models do not justify skipping regression or fabricating evidence.
 

@@ -63,6 +63,8 @@ jobs:
         run: php -l theme/beyourlover-v3/page-newsletter.php && php -l tools/dev/tests/newsletter-m3-render-harness.php && node --check scripts/test_newsletter_m3_contract.js && node scripts/test_newsletter_m3_contract.js
       - name: Python syntax
         run: python -m py_compile scripts/*.py
+      - name: BYL Native-First Development & Dual UAT V1 governance
+        run: python3 scripts/test_native_first_dual_uat_governance.py
       - name: Theme OS V1 module, SemVer and dependency validation
         run: python3 scripts/theme_os.py validate
       - name: Theme OS V1 fail-closed contracts

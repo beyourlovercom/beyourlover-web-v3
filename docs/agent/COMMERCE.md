@@ -2,12 +2,17 @@
 
 ## Cart and Checkout
 - Cart and Checkout are separate UI/PR/UAT workstreams; shared behavior belongs in Andy Commerce policy, not duplicated theme JavaScript.
-- Apple-style progressive Checkout on one URL: **Shipping Address → Delivery Method → Payment → Review**.
+- Owner-frozen **three customer-facing steps: Cart → Shipping → Payment** (Cart Drawer, then Checkout Drawer on its native secure URL; the existing route handoff may involve one safe navigation until separately improved). **Delivery methods belong inside Shipping**, and order-review details/confirmation belong inside Payment; do not add separate Delivery or Review steps without new Owner approval.
 - Completed stages show compact summaries and Edit; desktop uses bounded two-column layout; mobile shows one persistent bottom primary CTA respecting safe areas.
 - Shipping-only: no pickup option. Shipping phone required for carrier use; avoid a duplicated billing-phone field. Validate correctly on both client and Woo server.
 - One promo code per order. The UI and backend must agree; prevent misleading multiple-code stacking or stale totals.
 - Woo shipping zones and actual methods determine displayed options and totals. Andy Commerce supplies promotion/free-shipping policy; do not hardcode thresholds into theme.
 - Apple Pay/Google Pay only on Cart/Checkout when eligible, never automatically on Product pages.
+
+## Native controls and double acceptance
+- **[Native-First Development & Dual UAT V1](NATIVE-FIRST-DUAL-UAT-V1.md)** controls work order: approved design baseline → native Woo field/Store API/gateway ownership and per-control Functional UAT → visual polish → affected functionality regression → Functional PASS **and** Owner Visual PASS.
+- Cart/Shipping/Payment controls must retain Woo native form/session, country→state SelectWoo interaction, shipping rate/tax recalculation and checkout validation. A DOM field existing or a CSS screenshot looking correct is **not** a proof of clickability or correct native events.
+- Track Woo gateway availability and provider activation separately from visual polishing; do not represent mock payment buttons, sample shipping promises or fabricated amounts as real checkout capabilities.
 
 ## Payments
 - Normal Checkout presents only one ordinary Card option; providers are transaction rails, not competing duplicate UI.
