@@ -108,5 +108,5 @@ $GLOBALS['byl_user']=new WP_User(35,'Customer');
 $none=byl_v3_affiliate_snapshot();
 $assert($none['state']==='unavailable','ordinary customer is denied affiliate data');
 ob_start(); include dirname(__DIR__).'/theme/beyourlover-v3/template-affiliate-dashboard.php'; $render=ob_get_clean();
-$assert(str_contains($render,'not available') && !str_contains($render,'USD 550.00'),'customer sees safe fallback');
+$assert(str_contains($render,'pending verification') && !str_contains($render,'USD 550.00'),'customer sees safe fallback');
 echo "AFFILIATE_DASHBOARD_CONTRACT_PASS\n";
