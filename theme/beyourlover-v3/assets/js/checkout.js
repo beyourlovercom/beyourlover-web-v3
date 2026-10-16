@@ -114,6 +114,44 @@
       });
     });
   }
+  function alignShippingAddressFields() {
+    // The same DOM/keyboard order must match the Owner reference at both
+    // desktop and mobile widths. Move existing Woo wrappers ONLY, never clone
+    // country/state/tax inputs or replace a live Woo SelectWoo control.
+    const host = document.getElementById('billing_first_name_field')?.parentElement;
+    if (!host) return;
+    const known = {
+      billing_country_field: 10,
+      billing_first_name_field: 20,
+      billing_last_name_field: 30,
+      billing_address_1_field: 40,
+      billing_address_2_field: 51,
+      billing_city_field: 60,
+      billing_state_field: 70,
+      shipping_phone_field: 80,
+      billing_postcode_field: 90,
+      billing_company_field: 120,
+    };
+    const position = node => {
+      if (node.dataset.bylOptionalFor === 'billing_address_2_field') return 50;
+      if (node.dataset.bylOptionalFor === 'billing_company_field') return 119;
+      if (Object.prototype.hasOwnProperty.call(known, node.id)) return known[node.id];
+      // Conditional real tax/RFC/VAT/TIN fields from other Woo extensions, if
+      // present, belong AFTER Postal code and BEFORE optional Organization.
+      const key = (node.id || '') + ' ' + (node.querySelector('input,select,textarea')?.name || '');
+      if (/(?:tax|tin|rfc|vat|cpf|fiscal|customs)/i.test(key)) return 100;
+      return 110;
+    };
+    const current = Array.from(host.children);
+    const desired = current.map((node, index) => ({node, index, priority: position(node)}))
+      .sort((a, b) => a.priority - b.priority || a.index - b.index)
+      .map(entry => entry.node);
+    if (current.some((node, index) => node !== desired[index])) {
+      // Only rearrange on a real mismatch. Reparenting on every Woo AJAX
+      // update would steal field focus and cause the reported lag.
+      desired.forEach(node => host.appendChild(node));
+    }
+  }
   function wireOptionalDeliveryNote() {
     // Woo owns this real optional field. Never clone it, remove the name or
     // invent a new data contract merely for visual presentation.
@@ -497,6 +535,7 @@
     relabelPhone();
     syncPhoneDescription();
     wireOptionalAddressFields();
+    alignShippingAddressFields();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -731,6 +770,7 @@
     relabelPhone();
     syncPhoneDescription();
     wireOptionalAddressFields();
+    alignShippingAddressFields();
     deliveryOptions();
     updateDetails();
     updateAction();
