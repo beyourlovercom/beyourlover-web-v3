@@ -141,9 +141,11 @@
         "assets/css/checkout.css",
         "assets/css/checkout-shell.css",
         "assets/css/checkout-drawer.css",
+        "assets/css/checkout-visual-v2.css",
         "assets/css/order-pay.css",
         "assets/js/checkout.js",
-        "assets/js/checkout-drawer.js"
+        "assets/js/checkout-drawer.js",
+        "assets/js/checkout-visual-v2.js"
       ]
     },
     "postpurchase": {

@@ -1,0 +1,359 @@
+/* BYL Checkout Visual Polish V2 — independent Track A.
+ * Strict visual-only layer over the Owner-approved native Checkout Drawer.
+ * NO gateways, payment state, Woo totals, checkout consent or cart mutations.
+ * Reference: Shipping-Owner-PASS-Mobile + Payment-Owner-PASS-Mobile-Desktop.
+ */
+body.byl-checkout-drawer-mode {
+  --byl-v2-wine:#890c2e;
+  --byl-v2-text:#1c171b;
+  --byl-v2-soft:#f9f6f7;
+  --byl-v2-border:#e9e2e5;
+  -webkit-font-smoothing:antialiased;
+}
+/* WP admin bar belongs behind this immersive Dev-only drawer, not over its
+   close control / top progress. Do not alter normal dashboard or /checkout/. */
+body.admin-bar.byl-checkout-drawer-mode #wpadminbar {
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+body.byl-checkout-drawer-mode .byl-checkout-drawer-panel {
+  background:#fff;
+}
+body.byl-checkout-drawer-mode .byl-checkout-drawer-close {
+  top:13px;right:15px;width:42px;height:42px;
+  font-size:32px;color:var(--byl-v2-text);z-index:30;
+}
+body.byl-checkout-drawer-mode .byl-checkout-drawer-close:hover {
+  background:#f8f1f3;
+}
+body.byl-checkout-drawer-mode .byl-checkout-drawer-close:focus-visible,
+body.byl-checkout-drawer-mode .byl-checkout-next:focus-visible,
+body.byl-checkout-drawer-mode .byl-delivery-rate:focus-visible,
+body.byl-checkout-drawer-mode .byl-drawer-edit-cart:focus-visible {
+  outline:2px solid var(--byl-v2-wine)!important;
+  outline-offset:3px!important;
+}
+body.byl-checkout-drawer-mode .byl-checkout-summary {
+  background:#faf8f9!important;
+  border-right:1px solid #ebe5e8!important;
+  padding:24px 27px 28px!important;
+}
+body.byl-checkout-drawer-mode .byl-checkout-stages {
+  padding:25px 31px 34px 34px;
+}
+body.byl-checkout-drawer-mode .byl-checkout-heading h1 {
+  font-size:27px!important;
+  letter-spacing:-.035em!important;
+  font-weight:740!important;
+}
+body.byl-checkout-drawer-mode .byl-checkout-track {
+  margin-top:12px;
+  margin-bottom:19px;
+  padding-top:7px;
+  padding-bottom:15px;
+}
+body.byl-checkout-drawer-mode .byl-checkout-track>[data-byl-track] {
+  font-size:11.5px;letter-spacing:.01em;
+}
+body.byl-checkout-drawer-mode .byl-checkout-track>[data-byl-track]>span {
+  width:31px;height:31px;
+}
+body.byl-checkout-drawer-mode [data-byl-drawer-step="payment"] .byl-checkout-drawer-back {
+  margin-bottom:28px!important;
+}
+body.byl-checkout-drawer-mode .byl-account-entry {
+  min-height:21px;margin:0 0 10px;
+}
+body.byl-checkout-drawer-mode .byl-account-entry--signed-in {
+  min-height:0;margin:0 0 5px;
+}
+body.byl-checkout-drawer-mode .byl-account-entry--signed-in a {
+  font-size:11px!important;
+  color:#898087!important;
+  font-weight:500!important;
+  text-decoration:none;
+}
+body.byl-checkout-drawer-mode .byl-account-entry--signed-in a:hover {
+  color:var(--byl-v2-wine)!important;text-decoration:underline;
+}
+body.byl-checkout-drawer-mode .byl-account-email-host {
+  margin-bottom:16px;
+}
+body.byl-checkout-drawer-mode .byl-account-email-host input {
+  min-height:49px!important;border-radius:5px!important;
+}
+body.byl-checkout-drawer-mode .byl-shipping-rate-section,
+body.byl-checkout-drawer-mode #customer_details {
+  border:1px solid var(--byl-v2-border);
+  border-radius:10px;
+  padding:16px!important;
+  box-shadow:none;
+}
+body.byl-checkout-drawer-mode .byl-shipping-rate-section h2,
+body.byl-checkout-drawer-mode .byl-shipping-details-heading,
+body.byl-checkout-drawer-mode .byl-payment-options-heading {
+  color:var(--byl-v2-text);
+  font-size:18px!important;font-weight:720!important;
+}
+body.byl-checkout-drawer-mode .byl-shipping-rate-section .byl-step-hint {
+  font-size:11px;line-height:1.4;color:#878086;
+}
+body.byl-checkout-drawer-mode .byl-delivery-package {
+  gap:10px;
+}
+body.byl-checkout-drawer-mode .byl-delivery-rate {
+  min-height:68px!important;
+  border-radius:6px;
+  padding:12px 13px!important;
+  transition:border-color .12s ease, background .12s ease;
+}
+body.byl-checkout-drawer-mode .byl-delivery-rate.is-selected {
+  border-color:var(--byl-v2-wine)!important;
+  background:#fdf5f7!important;
+}
+body.byl-checkout-drawer-mode .byl-delivery-label strong {
+  font-size:12px;line-height:1.35;
+}
+body.byl-checkout-drawer-mode .byl-delivery-radio {
+  width:20px;height:20px;flex-basis:20px;
+}
+body.byl-checkout-drawer-mode .byl-progressive-checkout .form-row label {
+  color:#262127!important;font-size:12px!important;font-weight:580!important;
+}
+body.byl-checkout-drawer-mode .byl-progressive-checkout :is(.input-text,select,.select2-selection) {
+  border-radius:5px!important;
+  border-color:#ddd5d9!important;
+  min-height:45px;
+  font-size:13px!important;
+  color:#262127!important;
+}
+body.byl-checkout-drawer-mode .byl-progressive-checkout :is(.input-text,select,.select2-selection):focus-visible {
+  outline:2px solid #f5dce4!important;
+  outline-offset:1px!important;
+  border-color:var(--byl-v2-wine)!important;
+}
+body.byl-checkout-drawer-mode .woocommerce-invalid :is(.input-text,select) {
+  border-color:#b32447!important;
+}
+body.byl-checkout-drawer-mode .byl-optional-address-trigger,
+body.byl-checkout-drawer-mode .byl-optional-delivery-note {
+  font-size:11.5px!important;
+  font-weight:550!important;
+  color:#7e334b!important;
+  min-height:25px;
+  text-decoration:underline!important;
+  text-underline-offset:3px;
+  padding:3px 0!important;
+}
+body.byl-checkout-drawer-mode .byl-progressive-checkout #shipping_phone-description {
+  font-size:10.5px!important;
+  color:#80777e!important;
+  line-height:1.5!important;
+}
+body.byl-checkout-drawer-mode .byl-drawer-summary-head {
+  padding-bottom:13px;
+  border-bottom:1px solid #e5dde0;
+}
+body.byl-checkout-drawer-mode .byl-drawer-summary-head .byl-summary-toggle strong {
+  font-size:13px!important;
+}
+body.byl-checkout-drawer-mode .byl-summary-body {
+  padding-top:16px;
+}
+body.byl-checkout-drawer-mode .byl-summary-products {
+  padding-bottom:18px;
+  border-bottom:1px solid #ded7db;
+}
+body.byl-checkout-drawer-mode .byl-summary-product {
+  grid-template-columns:51px minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;margin:7px 0 10px;
+}
+body.byl-checkout-drawer-mode .byl-summary-product .byl-summary-image {
+  width:49px;height:52px;border-radius:4px;
+}
+body.byl-checkout-drawer-mode .byl-summary-product strong {
+  font-size:12px;line-height:1.38;
+}
+body.byl-checkout-drawer-mode .byl-summary-product>span {
+  font-size:11.5px;white-space:nowrap;
+}
+body.byl-checkout-drawer-mode .byl-payment-review {
+  margin:17px 0!important;
+  padding:16px 0!important;
+}
+body.byl-checkout-drawer-mode .byl-review-details>div {
+  display:grid;
+  grid-template-columns:92px minmax(0,1fr) auto;
+  align-items:start;
+  gap:9px;
+  padding:12px 0;
+}
+body.byl-checkout-drawer-mode .byl-review-details dt {
+  font-size:11.5px;font-weight:620;
+}
+body.byl-checkout-drawer-mode .byl-review-details dd {
+  line-height:1.48;font-size:11.5px;
+}
+body.byl-checkout-drawer-mode .byl-review-details button {
+  color:#823047;font-size:11.5px;
+}
+body.byl-checkout-drawer-mode .byl-summary-promo {
+  border-bottom:1px solid #e8e1e4;
+}
+body.byl-checkout-drawer-mode .byl-summary-promo[data-byl-visual-rate="not-available"] .byl-promo-title {
+  color:#4c4349;
+}
+body.byl-checkout-drawer-mode .byl-summary-promo .byl-promo-message {
+  font-size:11px;line-height:1.5;
+}
+body.byl-checkout-drawer-mode .byl-summary-card #order_review .order-total th,
+body.byl-checkout-drawer-mode .byl-summary-card #order_review .order-total td {
+  font-size:16px!important;font-weight:750!important;
+}
+body.byl-checkout-drawer-mode .byl-summary-trust {
+  font-size:10.5px;color:#8c8489;padding-top:18px;
+}
+/* Do not style or impersonate gateway-owned Express buttons. Consistent
+   container spacing only, preserving each provider's native wallet DOM. */
+body.byl-checkout-drawer-mode [data-byl-payment-express-host] {
+  margin:5px 0 22px!important;
+  display:flow-root;
+  overflow:visible;
+}
+body.byl-checkout-drawer-mode [data-byl-payment-express-host] > * {
+  max-width:100%;
+}
+body.byl-checkout-drawer-mode [data-byl-payment-express-host] :is(
+ .wcpay-express-checkout-wrapper,.wc-payment-request-wrapper,.wc-ppcp-express-buttons,
+ .wc-block-components-express-payment
+){
+  max-width:100%;
+  margin-inline:auto;
+}
+body.byl-checkout-drawer-mode [data-byl-payment-express-host] :is(button,iframe) {
+  max-width:100%;
+}
+body.byl-checkout-drawer-mode #payment .wc_payment_methods>li {
+  padding:16px 17px!important;
+  min-height:62px;
+  border-radius:7px!important;
+  border-color:#e9e3e6!important;
+  margin-bottom:9px!important;
+}
+body.byl-checkout-drawer-mode #payment .wc_payment_methods>li:has(input[name="payment_method"]:checked) {
+  border-color:var(--byl-v2-wine)!important;
+}
+body.byl-checkout-drawer-mode .byl-drawer-payment-total {
+  margin:23px 0 12px;
+  border-radius:10px;
+  background:#f9f7f8;
+  padding:18px 19px;
+}
+body.byl-checkout-drawer-mode .byl-drawer-payment-total-line {
+  font-size:14px;
+}
+body.byl-checkout-drawer-mode .byl-drawer-payment-total-details {
+  padding-top:9px;
+  color:#676068;
+}
+body.byl-checkout-drawer-mode .byl-checkout-action-bar {
+  margin:10px 0 0!important;
+}
+body.byl-checkout-drawer-mode .byl-checkout-next {
+  min-height:51px;
+  border-radius:7px!important;
+  letter-spacing:.12em;
+  font-weight:700;
+}
+body.byl-checkout-drawer-mode .byl-checkout-next:disabled {
+  opacity:.55;
+}
+/* Only redundant BYL-generated availability text can be hidden, and only
+   while the equivalent native Woo notice remains readable. Never hide a
+   checkout error from a provider, legal, or address validation. */
+body.byl-checkout-drawer-mode .byl-checkout-error[data-byl-v2-duplicate="1"] {
+  display:none!important;
+}
+@media(max-width:760px) {
+  body.byl-checkout-drawer-mode .byl-checkout-drawer-panel {
+    min-height:100dvh;
+  }
+  body.byl-checkout-drawer-mode .byl-checkout-drawer-close {
+    top:calc(13px + env(safe-area-inset-top));
+    right:11px;
+  }
+  body.byl-checkout-drawer-mode .byl-checkout-stages {
+    padding:calc(20px + env(safe-area-inset-top)) 15px calc(160px + env(safe-area-inset-bottom))!important;
+  }
+  body.byl-checkout-drawer-mode .byl-checkout-heading h1 {
+    font-size:25px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-checkout-track {
+    margin:6px 0 15px;
+  }
+  body.byl-checkout-drawer-mode .byl-shipping-rate-section,
+  body.byl-checkout-drawer-mode #customer_details {
+    padding:12px!important;
+    border-radius:9px;
+  }
+  body.byl-checkout-drawer-mode .byl-shipping-rate-section h2,
+  body.byl-checkout-drawer-mode .byl-shipping-details-heading,
+  body.byl-checkout-drawer-mode .byl-payment-options-heading {
+    font-size:17px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-account-email-host input {
+    min-height:50px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-delivery-package {
+    gap:8px;
+  }
+  body.byl-checkout-drawer-mode .byl-delivery-rate {
+    padding:10px!important;
+    min-height:65px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-checkout-summary {
+    padding:9px 15px 8px!important;
+    border-right:0!important;
+  }
+  body.byl-checkout-drawer-mode .byl-drawer-summary-head {
+    padding:0!important;border:0!important;
+  }
+  body.byl-checkout-drawer-mode .byl-summary-toggle {
+    min-height:27px;
+  }
+  body.byl-checkout-drawer-mode .byl-summary-total {
+    font-size:13px!important;
+    color:var(--byl-v2-text)!important;
+    font-weight:740!important;
+  }
+  body.byl-checkout-drawer-mode .byl-summary-body {
+    padding:14px 15px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-checkout-next {
+    min-height:49px!important;
+    font-size:13px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-payment-options-heading {
+    margin:19px 0 17px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-drawer-payment-total {
+    display:none!important;
+  }
+  body.byl-checkout-drawer-mode .byl-checkout-track>[data-byl-track] {
+    font-size:11px;
+  }
+}
+@media(max-width:375px) {
+  body.byl-checkout-drawer-mode .byl-checkout-stages {
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+  body.byl-checkout-drawer-mode .byl-delivery-rate {
+    padding:9px!important;
+    gap:7px!important;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  body.byl-checkout-drawer-mode .byl-delivery-rate {transition:none!important;}
+}

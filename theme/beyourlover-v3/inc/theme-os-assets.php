@@ -72,6 +72,15 @@ add_action('wp_enqueue_scripts', static function (): void {
                 'checkoutUrl' => function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/checkout/'),
             ]);
             wp_script_add_data('byl-v3-checkout-drawer', 'strategy', 'defer');
+            // Visual-only Owner V2 layer. Keep payment/checkout providers,
+            // Woo billing rules and Cart Drawer source untouched (Track B).
+            wp_enqueue_style('byl-v3-checkout-visual-v2',
+                $uri.'/assets/css/checkout-visual-v2.css',
+                ['byl-v3-checkout-drawer'], $v('assets/css/checkout-visual-v2.css'));
+            wp_enqueue_script('byl-v3-checkout-visual-v2',
+                $uri.'/assets/js/checkout-visual-v2.js',
+                ['byl-v3-checkout-drawer'], $v('assets/js/checkout-visual-v2.js'), true);
+            wp_script_add_data('byl-v3-checkout-visual-v2', 'strategy', 'defer');
         }
     }
     // CSS-only Order Pay treatment follows Checkout styles; no gateway changes.

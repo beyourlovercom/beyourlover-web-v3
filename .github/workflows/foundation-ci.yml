@@ -124,6 +124,8 @@ jobs:
         run: python scripts/test_checkout_progressive_ux_contract.py
       - name: Checkout Option B native Drawer static governance contract
         run: python3 scripts/test_checkout_drawer_option_b_contract.py
+      - name: Checkout Visual Polish V2 Owner-safe source contract
+        run: python3 scripts/test_checkout_visual_v2_contract.py && node --check theme/beyourlover-v3/assets/js/checkout-visual-v2.js
       - name: Notification UX V1 opt-in dispatcher regression
         run: php -l theme/beyourlover-v3/notification-preview-v1.php && node --check theme/beyourlover-v3/assets/js/notification.js && node --check theme/beyourlover-v3/assets/js/notification-preview.js && node --check theme/beyourlover-v3/assets/js/notification-surfaces.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js
       - name: Blog P1 #97 scoped legacy inline JavaScript entity regression

@@ -159,8 +159,10 @@ if "active !== 'payment'" not in js or "nativeButton.click()" not in js:
 for forbidden_stage in ('data-byl-step="address"', 'data-byl-step="delivery"', 'data-byl-step="review"'):
     if forbidden_stage in form:
         raise SystemExit(f"Superseded step visible in Canonical V1: {forbidden_stage}")
-if "'priority' => 85" not in php:
-    raise SystemExit("Shipping phone must precede postal code in canonical Woo field order")
+# Owner 2026-10-16 final Shipping precedence: Phone 70, ZIP 85.
+# The old test expected Phone=85 and was stale after PR120 field repair.
+if "'priority' => 70" not in php or "'billing_postcode' => 85" not in php:
+    raise SystemExit("Shipping Phone=70 must precede ZIP=85 in canonical Woo field order")
 
 if "Latest main Checkout V2" not in docs or "one BYL promotion slot" not in docs:
     raise SystemExit("S6 docs must record latest-main ownership and the one-slot promotion integration")
