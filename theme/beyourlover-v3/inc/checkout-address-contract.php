@@ -80,35 +80,36 @@ add_action('woocommerce_after_checkout_validation', static function (array $data
     if (!byl_v3_checkout_separate_billing($data)) return;
     $invoice = byl_v3_address_from_checkout($data, 'byl_invoice_');
 
+    $countries = WC()->countries;
+    $country = $invoice['country'];
+    $allowed = $countries->get_allowed_countries();
+    if ($country === '' || !isset($allowed[$country])) {
+        $errors->add('byl_invoice_country_invalid',
+            __('Select a valid billing country.', 'beyourlover-v3'));
+        return;
+    }
+    // Woo core country locale is the ONLY authority for required/optional
+    // address fields. Germany's state can be optional; UAE has no postcode.
+    $native = $countries->get_address_fields($country, 'billing_');
     foreach (['first_name'=>'First name', 'last_name'=>'Last name',
-        'country'=>'Country / Region', 'address_1'=>'Street address',
-        'city'=>'City', 'postcode'=>'Postal code'] as $key => $label) {
-        if ($invoice[$key] === '') {
+        'address_1'=>'Street address', 'city'=>'City',
+        'state'=>'State / Region', 'postcode'=>'Postal code'] as $key => $label) {
+        $required = !empty($native['billing_' . $key]['required']);
+        if ($required && $invoice[$key] === '') {
             $errors->add('byl_invoice_' . $key . '_required',
                 sprintf(__('Billing %s is required.', 'beyourlover-v3'), $label));
         }
     }
-
-    $countries = WC()->countries;
-    if ($invoice['country'] !== '') {
-        $allowed = $countries->get_allowed_countries();
-        if (!isset($allowed[$invoice['country']])) {
-            $errors->add('byl_invoice_country_invalid',
-                __('Select a valid billing country.', 'beyourlover-v3'));
-            return;
-        }
-        $states = $countries->get_states($invoice['country']);
-        if (is_array($states) && $states) {
-            if (!$invoice['state'] || !isset($states[$invoice['state']])) {
-                $errors->add('byl_invoice_state_invalid',
-                    __('Select a valid billing state / region.', 'beyourlover-v3'));
-            }
-        }
-        if ($invoice['postcode'] !== ''
-            && !WC_Validation::is_postcode($invoice['postcode'], $invoice['country'])) {
-            $errors->add('byl_invoice_postcode_invalid',
-                __('Enter a valid billing postal code.', 'beyourlover-v3'));
-        }
+    $states = $countries->get_states($country);
+    if ($invoice['state'] !== '' && is_array($states) && $states
+        && !isset($states[$invoice['state']])) {
+        $errors->add('byl_invoice_state_invalid',
+            __('Select a valid billing state / region.', 'beyourlover-v3'));
+    }
+    if ($invoice['postcode'] !== ''
+        && !WC_Validation::is_postcode($invoice['postcode'], $country)) {
+        $errors->add('byl_invoice_postcode_invalid',
+            __('Enter a valid billing postal code.', 'beyourlover-v3'));
     }
 }, 20, 2);
 
