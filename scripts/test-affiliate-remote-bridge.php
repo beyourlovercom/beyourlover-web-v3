@@ -66,6 +66,35 @@ array_pop($GLOBALS['mock_response']['payload']['data']['referrals']);
 $GLOBALS['mock_response']['payload']['data']['wp_user_id']=56;
 check(byl_v3_creator_remote_snapshot($user)===null,'wrong WWW owner identity denied');
 $GLOBALS['mock_response']['payload']['data']['wp_user_id']=55;
+$GLOBALS['mock_response']['payload']['data']['payouts'][]=['affiliate_id'=>100,'amount'=>'9999','status'=>'paid'];
+check(byl_v3_creator_remote_snapshot($user)===null,'cross-affiliate injected payout fails whole snapshot');
+array_pop($GLOBALS['mock_response']['payload']['data']['payouts']);
+$GLOBALS['mock_response']['payload']['data']['affiliate_id']=100;
+check(byl_v3_creator_remote_snapshot($user)===null,'wrong top-level affiliate identity denied');
+$GLOBALS['mock_response']['payload']['data']['affiliate_id']=99;
+$GLOBALS['mock_response']['payload']['data']['status']='inactive';
+check(byl_v3_creator_remote_snapshot($user)===null,'inactive WWW affiliate cannot receive history');
+$GLOBALS['mock_response']['payload']['data']['status']='active';
+$GLOBALS['mock_response']['payload']['data']['currency']='INVALID';
+check(byl_v3_creator_remote_snapshot($user)===null,'invalid WWW currency denies entire financial snapshot');
+$GLOBALS['mock_response']['payload']['data']['currency']='USD';
+$GLOBALS['mock_response']['payload']['data']['referral_url']='https://untrusted.example.net/?ref=99';
+$invalidLink=byl_v3_creator_remote_snapshot($user);
+check(is_array($invalidLink) && $invalidLink['referral_url']==='','foreign referral host suppressed; never used as public link');
+$GLOBALS['mock_response']['payload']['data']['referral_url']='https://www.beyourlover.com/?ref=99';
+$GLOBALS['mock_response']['status']=401;
+check(byl_v3_creator_remote_snapshot($user)===null,'WWW unauthorized response fails closed');
+$GLOBALS['mock_response']['status']=200;
+$existingCount=count($GLOBALS['mock_response']['payload']['data']['referrals']);
+for($j=0;$j<12;$j++) {
+    $GLOBALS['mock_response']['payload']['data']['referrals'][]=[
+        'affiliate_id'=>99,'referral_id'=>100+$j,'amount'=>'1.00','status'=>'paid'
+    ];
+}
+check(byl_v3_creator_remote_snapshot($user)===null,'oversized remote referral payload rejected before rendering');
+$GLOBALS['mock_response']['payload']['data']['referrals']=array_slice(
+    $GLOBALS['mock_response']['payload']['data']['referrals'],0,$existingCount
+);
 $GLOBALS['mapping'][21]['affiliate_id']=100;
 $calls=$GLOBALS['calls'];
 check(byl_v3_creator_remote_snapshot($user)===null && $GLOBALS['calls']===$calls,'tampered binding proof fails before network');
