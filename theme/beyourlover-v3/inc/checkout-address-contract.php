@@ -26,6 +26,24 @@ function byl_v3_address_from_checkout(array $data, string $prefix): array {
     return $out;
 }
 
+/**
+ * Once the shopper has explicitly saved shipping and billing independently,
+ * the next Checkout must prefill the Shipping screen from the *shipping*
+ * account address, not Woo's usual billing account address. Do not affect
+ * POST repopulation, guest checkout or tax/RFC/contact values.
+ */
+add_filter('woocommerce_checkout_get_value', static function ($value, $key) {
+    if ($value !== null || !is_user_logged_in() || !is_string($key)) return $value;
+    if (!preg_match('/^billing_(first_name|last_name|company|country|address_1|address_2|city|state|postcode)$/', $key, $m)) {
+        return $value;
+    }
+    $customer = new WC_Customer(get_current_user_id(), true);
+    $getter = 'get_shipping_' . $m[1];
+    if (!is_callable([$customer, $getter])) return $value;
+    $saved = (string) $customer->{$getter}();
+    return $saved !== '' ? $saved : $value;
+}, 30, 2);
+
 /** Distinct invoice fields are never trusted merely because JS showed them. */
 function byl_v3_checkout_separate_billing(array $data): bool {
     return isset($data['byl_use_shipping_for_billing'])
