@@ -61,6 +61,18 @@ jobs:
         run: php -l theme/beyourlover-v3/inc/blog-product-card.php && php -l tools/dev/tests/blog-product-card-offline-smoke.php && php tools/dev/tests/blog-product-card-offline-smoke.php
       - name: Newsletter M3 offline theme and Core contract
         run: php -l theme/beyourlover-v3/page-newsletter.php && php -l tools/dev/tests/newsletter-m3-render-harness.php && node --check scripts/test_newsletter_m3_contract.js && node scripts/test_newsletter_m3_contract.js
+      - name: Business Partnerships B2 — Dev-only page and offline interaction safety
+        run: |
+          php -l theme/beyourlover-v3/page-business.php
+          node --check theme/beyourlover-v3/assets/js/business.js
+          node scripts/test_business_partnerships_b2_contract.js
+      - name: Business B2 Dev-only 3-file candidate — deterministic offline gate
+        run: |
+          python3 -m unittest discover -s tools/dev -p test_business_b2_candidate.py -v
+          python3 tools/dev/business_b2_candidate.py build --source . --exact-sha "$(git rev-parse HEAD)" --out "$RUNNER_TEMP/business-b2-a"
+          python3 tools/dev/business_b2_candidate.py build --source . --exact-sha "$(git rev-parse HEAD)" --out "$RUNNER_TEMP/business-b2-b"
+          cmp "$RUNNER_TEMP/business-b2-a/byl-business-b2-dev-only-THREE-FILES.zip" "$RUNNER_TEMP/business-b2-b/byl-business-b2-dev-only-THREE-FILES.zip"
+          python3 tools/dev/business_b2_candidate.py verify --out "$RUNNER_TEMP/business-b2-a"
       - name: Python syntax
         run: python -m py_compile scripts/*.py
       - name: BYL Native-First Development & Dual UAT V1 governance

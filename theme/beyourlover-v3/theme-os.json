@@ -224,6 +224,19 @@
         "assets/css/notification-woo-adapter.css",
         "assets/js/notification-cart-bridge.js"
       ]
+    },
+    "business": {
+      "depends_on": [
+        "foundation",
+        "shell",
+        "pages"
+      ],
+      "kind": "presentation",
+      "files": [
+        "page-business.php",
+        "assets/css/business.css",
+        "assets/js/business.js"
+      ]
     }
   }
 }
