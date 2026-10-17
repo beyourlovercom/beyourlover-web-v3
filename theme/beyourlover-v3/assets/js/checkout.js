@@ -565,6 +565,7 @@
     syncPhoneDescription();
     wireOptionalAddressFields();
     alignShippingAddressFields();
+    syncMexicoRFCField();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -791,6 +792,42 @@
     }
   }
 
+  // This is one genuine Woo field, registered and server-validated in PHP.
+  // Its identifier is never sent to browser storage or analytics.
+  function syncMexicoRFCField() {
+    const taxField = root.querySelector('#billing_rfc_tax_id_field');
+    const country = root.querySelector('#billing_country');
+    if (!taxField || !country) return;
+    const enabled = country.value === 'MX';
+    taxField.classList.toggle('is-country-active', enabled);
+    taxField.hidden = !enabled;
+    taxField.setAttribute('aria-hidden', enabled ? 'false' : 'true');
+    const input = taxField.querySelector('#billing_rfc_tax_id');
+    if (input) {
+      input.disabled = !enabled;
+      input.required = enabled;
+      if (!enabled && input.value) input.value = '';
+      input.setAttribute('aria-required', enabled ? 'true' : 'false');
+    }
+    const label = taxField.querySelector('label');
+    if (label) {
+      let marker = label.querySelector('[data-byl-country-required]');
+      if (enabled && !marker) {
+        marker = document.createElement('abbr');
+        marker.className = 'required';
+        marker.setAttribute('title', 'required');
+        marker.dataset.bylCountryRequired = '1';
+        marker.textContent = ' *';
+        label.appendChild(marker);
+      } else if (!enabled && marker) {
+        marker.remove();
+      }
+      const optional = label.querySelector('.optional');
+      if (optional) optional.hidden = enabled;
+    }
+  }
+
+  $(document).on('change', '#billing_country', syncMexicoRFCField);
   form.addEventListener('input', updateDetails);
   form.addEventListener('change', updateDetails);
   $(document.body).on('updated_checkout', () => {
@@ -803,6 +840,7 @@
     syncPhoneDescription();
     wireOptionalAddressFields();
     alignShippingAddressFields();
+    syncMexicoRFCField();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -857,6 +895,7 @@
   }
   root.classList.add('is-enhanced');
   mountNative();
+  syncMexicoRFCField();
   fetchPromotion();
   // Initial render starts at the page header; user-driven step changes may scroll.
   setStep('shipping', {scroll:false});

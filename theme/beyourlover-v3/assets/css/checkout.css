@@ -694,3 +694,27 @@ body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.s
   }
   .byl-delivery-eligibility{font-size:10px}
 }
+
+/* Mexico customs RFC V1: one genuine Woo field, not a decorative input.
+   Controlled by native billing country and validated server-side. */
+.byl-progressive-checkout #billing_rfc_tax_id_field:not(.is-country-active){
+  display:none!important;
+}
+.byl-progressive-checkout #billing_rfc_tax_id_field.is-country-active{
+  display:block!important;
+  grid-column:1/-1!important;
+  clear:both!important;
+  width:100%!important;
+  min-width:0;
+}
+.byl-progressive-checkout #billing_rfc_tax_id_field .description{
+  font-size:11px;
+  line-height:1.45;
+  color:#6d6269;
+}
+@media(max-width:760px){
+  .byl-progressive-checkout #billing_rfc_tax_id_field.is-country-active{order:10!important}
+}
+@media(min-width:761px){
+  .byl-progressive-checkout #billing_rfc_tax_id_field.is-country-active{order:100!important}
+}
