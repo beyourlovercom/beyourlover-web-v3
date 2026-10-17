@@ -864,6 +864,57 @@
       locale = raw && JSON.parse(String(raw).replace(/&quot;/g, '"'));
     } catch (_e) { return; }
     if (!locale || !locale.default) return;
+
+    // Woo's core country-select.js only rewrites #billing_state and
+    // #shipping_state. Our separately named invoice state is intentionally
+    // outside that selector, so build its country list from Woo's ORIGINAL
+    // localized countries map, not a hardcoded country/region directory.
+    const stateRow = root.querySelector('#byl_invoice_state_field');
+    let stateInput = root.querySelector('#byl_invoice_state');
+    try {
+      const rawStates = window.wc_country_select_params && window.wc_country_select_params.countries;
+      const countries = rawStates && JSON.parse(String(rawStates).replace(/&quot;/g, '"'));
+      const states = countries && countries[countryEl.value];
+      if (stateRow && stateInput && states && typeof states === 'object'
+          && Object.keys(states).length) {
+        const previous = stateInput.value;
+        if (stateInput.tagName !== 'SELECT') {
+          const select = document.createElement('select');
+          select.id = 'byl_invoice_state';
+          select.name = 'byl_invoice_state';
+          select.className = 'state_select input-text';
+          select.setAttribute('autocomplete', 'address-level1');
+          stateInput.replaceWith(select);
+          stateInput = select;
+          delete stateRow.dataset.bylInvoiceStatesCountry;
+        }
+        if (stateRow.dataset.bylInvoiceStatesCountry !== countryEl.value) {
+          const empty = new Option('Choose state / region', '');
+          const options = [empty];
+          Object.keys(states).forEach(code => {
+            options.push(new Option(states[code], code));
+          });
+          stateInput.replaceChildren(...options);
+          stateInput.value = Object.prototype.hasOwnProperty.call(states, previous)
+            ? previous : '';
+          stateRow.dataset.bylInvoiceStatesCountry = countryEl.value;
+        }
+      } else {
+        if (stateRow && stateInput && stateInput.tagName === 'SELECT') {
+          const field = document.createElement('input');
+          field.type = 'text';
+          field.id = 'byl_invoice_state';
+          field.name = 'byl_invoice_state';
+          field.className = 'input-text';
+          field.setAttribute('autocomplete', 'address-level1');
+          stateInput.replaceWith(field);
+          delete stateRow.dataset.bylInvoiceStatesCountry;
+        }
+      }
+    } catch (_error) {
+      // Never replace real Woo data with invented state values when its
+      // localization is unavailable. Server validation remains authoritative.
+    }
     const chosen = locale[countryEl.value] || {};
     for (const key of ['state','postcode']) {
       const row = root.querySelector('#byl_invoice_' + key + '_field');
