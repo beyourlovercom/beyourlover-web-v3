@@ -27,6 +27,12 @@ chk('priceNode' in js and 'woocommerce-Price-amount' in js,'Woo-native shipping 
 chk('realPrice' in js and "cost.textContent = visiblePrice" in js,'rate price only from native label')
 chk("input.dispatchEvent(new Event('change', {bubbles: true}))" in js,'Woo rate changed via native field')
 chk("mobileSummaryToggle.addEventListener" in js,'mobile summary is interactive')
+chk('class="byl-mobile-chevron"' in tpl and '&#8964;' not in tpl,
+    'mobile summary uses SVG chevron, not baseline-shifted font glyph')
+chk('.byl-mobile-see-details{display:inline-flex;align-items:center;' in css,
+    'see-details text and chevron center-aligned')
+chk('.byl-mobile-order-toggle[aria-expanded="true"] .byl-mobile-chevron{transform:rotate(180deg)}' in css,
+    'mobile summary chevron rotates with accessible expanded state')
 chk('if (nativeTotal && mobileSummaryTotal)' in js,'footer total reflects native Woo recalculation')
 chk('byl_progressive_checkout_drawer' not in tpl.lower() and 'byl_checkout_drawer' not in tpl,'no checkout drawer')
 for token in ['Checkout Shipping Reference Fidelity V1','body.woocommerce-checkout.byl-secure-checkout-shell .byl-secure-header',
