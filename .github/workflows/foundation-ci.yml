@@ -132,3 +132,16 @@ jobs:
         run: node scripts/test_compact_persistent_notice_v1.js
       - name: N6 isolated Woo Notice and Cart response regression
         run: php -l theme/beyourlover-v3/inc/cart-drawer.php && php -l theme/beyourlover-v3/inc/notification-cart.php && php -l theme/beyourlover-v3/inc/notification-cart-empty.php && node --check theme/beyourlover-v3/assets/js/notification-cart-bridge.js && node scripts/test_notification_cart_n6.js
+
+      - name: Creator Dashboard native route, privacy and real-data isolation contracts
+        run: |
+          php -l theme/beyourlover-v3/inc/affiliate-dashboard.php
+          php -l theme/beyourlover-v3/inc/affiliate-remote-bridge.php
+          php -l theme/beyourlover-v3/template-affiliate-dashboard.php
+          php -l scripts/test-affiliate-dashboard.php
+          php scripts/test-affiliate-dashboard.php
+      - name: Creator signed read-only history cross-identity and HMAC regression
+        run: |
+          php -l scripts/test-affiliate-remote-bridge.php
+          php scripts/test-affiliate-remote-bridge.php
+          node --check theme/beyourlover-v3/assets/js/affiliate-dashboard.js
