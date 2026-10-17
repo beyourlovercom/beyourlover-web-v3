@@ -474,6 +474,12 @@
     const address = [field('billing_address_1'), field('billing_address_2'), field('billing_city'), field('billing_state'), field('billing_postcode'), field('billing_country')].filter(Boolean).join(', ');
     const contact = [field('billing_email'), field('shipping_phone')].filter(Boolean).join(' · ');
     review('address', [name, address].filter(Boolean).join(' · '));
+    const sameBilling = root.querySelector('#byl_use_shipping_for_billing');
+    const invoiceBilling = ['first_name','last_name','address_1','city','state','postcode','country']
+      .map(key => field('byl_invoice_' + key)).filter(Boolean).join(', ');
+    review('billing', sameBilling && !sameBilling.checked
+      ? (invoiceBilling || 'Enter your separate billing address')
+      : 'Same as shipping address');
     review('contact', contact);
     review('delivery', shippingLabel());
     review('payment', paymentLabel());
@@ -499,6 +505,24 @@
       message('Please complete the required shipping and contact information.');
       firstInvalid.focus({preventScroll:false});
       return false;
+    }
+    // Separate billing is a second real address, not just a visual section.
+    // Block progression before Woo/native payment submission when incomplete.
+    const invoiceBox = root.querySelector('[data-byl-invoice-address]');
+    if (invoiceBox && !invoiceBox.hidden) {
+      const billingFieldset = invoiceBox.querySelector('fieldset');
+      const invalid = Array.from(invoiceBox.querySelectorAll('.validate-required')).find(wrapper => {
+        if (wrapper.hidden || getComputedStyle(wrapper).display === 'none') return false;
+        const input = wrapper.querySelector('input:not([type="hidden"]), select, textarea');
+        return !!(input && !input.disabled &&
+          (!String(input.value || '').trim() || (input.validity && !input.validity.valid)));
+      });
+      if (!billingFieldset || billingFieldset.disabled || invalid) {
+        message('Please complete the separate billing address.');
+        const first = invalid && invalid.querySelector('input:not([type="hidden"]), select, textarea');
+        if (first) first.focus({preventScroll:false});
+        return false;
+      }
     }
     return true;
   }
@@ -566,6 +590,7 @@
     wireOptionalAddressFields();
     alignShippingAddressFields();
     syncMexicoRFCField();
+    syncBillingAddressChoice();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -827,6 +852,30 @@
     }
   }
 
+  // Optional account saving never writes any address from the browser.
+  // Woo Checkout's server-side customer-update gate owns persistence.
+  function syncBillingAddressChoice() {
+    const useShipping = root.querySelector('#byl_use_shipping_for_billing');
+    const section = root.querySelector('[data-byl-invoice-address]');
+    const fields = section && section.querySelector('[data-byl-invoice-fields]');
+    if (!useShipping || !section || !fields) return;
+    const separate = !useShipping.checked;
+    section.hidden = !separate;
+    fields.disabled = !separate;
+    useShipping.setAttribute('aria-expanded', separate ? 'true' : 'false');
+    if (separate && section.dataset.bylInvoiceInitialized !== '1') {
+      section.dataset.bylInvoiceInitialized = '1';
+      const country = section.querySelector('#byl_invoice_country');
+      // Re-use Woo's native country→state list, never a cloned selector.
+      if (country && window.jQuery) window.jQuery(country).trigger('change');
+    }
+    updateDetails();
+  }
+  const useShippingForBilling = root.querySelector('#byl_use_shipping_for_billing');
+  if (useShippingForBilling) {
+    useShippingForBilling.addEventListener('change', syncBillingAddressChoice);
+    syncBillingAddressChoice();
+  }
   $(document).on('change', '#billing_country', syncMexicoRFCField);
   form.addEventListener('input', updateDetails);
   form.addEventListener('change', updateDetails);
@@ -841,6 +890,7 @@
     wireOptionalAddressFields();
     alignShippingAddressFields();
     syncMexicoRFCField();
+    syncBillingAddressChoice();
     deliveryOptions();
     updateDetails();
     updateAction();
