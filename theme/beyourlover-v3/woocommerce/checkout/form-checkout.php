@@ -116,11 +116,11 @@ $cart = WC()->cart;
                       'first_name' => ['type'=>'text', 'label'=>'First name', 'required'=>true, 'class'=>['form-row-first']],
                       'last_name' => ['type'=>'text', 'label'=>'Last name', 'required'=>true, 'class'=>['form-row-last']],
                       'address_1' => ['type'=>'text', 'label'=>'Street address', 'required'=>true, 'class'=>['form-row-wide']],
-                      'address_2' => ['type'=>'text', 'label'=>'Apartment, suite, floor (optional)', 'required'=>false, 'class'=>['form-row-wide']],
+                      'address_2' => ['type'=>'text', 'label'=>'Apartment, suite, floor', 'required'=>false, 'class'=>['form-row-wide']],
                       'city' => ['type'=>'text', 'label'=>'City', 'required'=>true, 'class'=>['form-row-first']],
                       'state' => ['type'=>'state', 'label'=>'State / Region', 'required'=>true, 'class'=>['form-row-last']],
                       'postcode' => ['type'=>'text', 'label'=>'Postal code', 'required'=>true, 'class'=>['form-row-wide']],
-                      'company' => ['type'=>'text', 'label'=>'Organization (optional)', 'required'=>false, 'class'=>['form-row-wide']],
+                      'company' => ['type'=>'text', 'label'=>'Organization', 'required'=>false, 'class'=>['form-row-wide']],
                     ];
                     foreach ($byl_invoice_fields as $key => $field) {
                         $get = 'get_billing_' . $key;
