@@ -1,0 +1,337 @@
+[
+  {
+    "width": 1440,
+    "title": "BYL Homepage V3 — Premium Quick Category Bar + WWW Lower Exact",
+    "viewport": 1440,
+    "height": 10842,
+    "overflow": 0,
+    "quickY": 814,
+    "quickHeight": 345,
+    "links": [
+      {
+        "name": "SKULLMAN",
+        "href": "/skullman/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/08/21084335/home-skullman-icon.webp",
+        "cardWidth": 155
+      },
+      {
+        "name": "FATIMA",
+        "href": "/beyourlover-fatima-green/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052055/beyourlover-fatima.webp",
+        "cardWidth": 155
+      },
+      {
+        "name": "CLOCK",
+        "href": "/clock",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052101/beyourlover-naughty-clock.webp",
+        "cardWidth": 155
+      },
+      {
+        "name": "SUITCASE",
+        "href": "/beyourlover-magic-suitcase-green/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/05/21022512/icon-magic-suitcase.webp",
+        "cardWidth": 155
+      },
+      {
+        "name": "JOY CUP",
+        "href": "/beyourlover-joy-cup-diamond-version/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052056/beyourlover-joy-cup.webp",
+        "cardWidth": 155
+      },
+      {
+        "name": "EARPOD",
+        "href": "/beyourlover-alggie/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052053/beyourlover-earphone.webp",
+        "cardWidth": 155
+      },
+      {
+        "name": "M2",
+        "href": "/m2/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/11/22100605/Ellipse-101.webp",
+        "cardWidth": 155
+      },
+      {
+        "name": "LIPPY",
+        "href": "/lippy/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2026/07/28084930/home-class-lippy.png",
+        "cardWidth": 155
+      }
+    ],
+    "trackOverflow": 0,
+    "trackScrollSnap": "none",
+    "originalFrom": "www-exact-bottom",
+    "originalSrc": "file:///tmp/byl-home-v2-www-audit-20261013/www-loaded-1440.jpeg",
+    "originalTop": 2544,
+    "sourceImgs": [
+      {
+        "src": "www-loaded-1440.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "www-loaded-390.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "influencers-instagram-29.jpg",
+        "loaded": true
+      },
+      {
+        "src": "home-skullman-icon.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-fatima.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-naughty-clock.webp",
+        "loaded": true
+      },
+      {
+        "src": "icon-magic-suitcase.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-joy-cup.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-earphone.webp",
+        "loaded": true
+      },
+      {
+        "src": "Ellipse-101.webp",
+        "loaded": true
+      },
+      {
+        "src": "home-class-lippy.png",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-women.webp",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-couples.webp",
+        "loaded": true
+      },
+      {
+        "src": "s2-main-pictures-01-1000x1000.png",
+        "loaded": true
+      },
+      {
+        "src": "minaka-main-pictures.png",
+        "loaded": true
+      },
+      {
+        "src": "main-pictures-03-1.webp",
+        "loaded": true
+      },
+      {
+        "src": "naughty-clock.png",
+        "loaded": true
+      },
+      {
+        "src": "www-loaded-1440.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "www-loaded-390.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-women.webp",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-men.webp",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-couples.webp",
+        "loaded": true
+      }
+    ],
+    "pass": true,
+    "errors": [],
+    "linkCheck": true,
+    "artLoaded": true,
+    "bottomSourcePreserved": true
+  },
+  {
+    "width": 390,
+    "title": "BYL Homepage V3 — Premium Quick Category Bar + WWW Lower Exact",
+    "viewport": 390,
+    "height": 10396,
+    "overflow": 0,
+    "quickY": 834,
+    "quickHeight": 231,
+    "links": [
+      {
+        "name": "SKULLMAN",
+        "href": "/skullman/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/08/21084335/home-skullman-icon.webp",
+        "cardWidth": 84
+      },
+      {
+        "name": "FATIMA",
+        "href": "/beyourlover-fatima-green/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052055/beyourlover-fatima.webp",
+        "cardWidth": 84
+      },
+      {
+        "name": "CLOCK",
+        "href": "/clock",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052101/beyourlover-naughty-clock.webp",
+        "cardWidth": 84
+      },
+      {
+        "name": "SUITCASE",
+        "href": "/beyourlover-magic-suitcase-green/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/05/21022512/icon-magic-suitcase.webp",
+        "cardWidth": 84
+      },
+      {
+        "name": "JOY CUP",
+        "href": "/beyourlover-joy-cup-diamond-version/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052056/beyourlover-joy-cup.webp",
+        "cardWidth": 84
+      },
+      {
+        "name": "EARPOD",
+        "href": "/beyourlover-alggie/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/03/20052053/beyourlover-earphone.webp",
+        "cardWidth": 84
+      },
+      {
+        "name": "M2",
+        "href": "/m2/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2025/11/22100605/Ellipse-101.webp",
+        "cardWidth": 84
+      },
+      {
+        "name": "LIPPY",
+        "href": "/lippy/",
+        "imgLoaded": true,
+        "imgSrc": "https://img.beyourlover.com/2026/07/28084930/home-class-lippy.png",
+        "cardWidth": 84
+      }
+    ],
+    "trackOverflow": 377,
+    "trackScrollSnap": "x mandatory",
+    "originalFrom": "www-exact-bottom",
+    "originalSrc": "file:///tmp/byl-home-v2-www-audit-20261013/www-loaded-1440.jpeg",
+    "originalTop": 2507,
+    "sourceImgs": [
+      {
+        "src": "www-loaded-1440.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "www-loaded-390.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "influencers-instagram-29.jpg",
+        "loaded": true
+      },
+      {
+        "src": "home-skullman-icon.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-fatima.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-naughty-clock.webp",
+        "loaded": true
+      },
+      {
+        "src": "icon-magic-suitcase.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-joy-cup.webp",
+        "loaded": true
+      },
+      {
+        "src": "beyourlover-earphone.webp",
+        "loaded": true
+      },
+      {
+        "src": "Ellipse-101.webp",
+        "loaded": true
+      },
+      {
+        "src": "home-class-lippy.png",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-women.webp",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-couples.webp",
+        "loaded": true
+      },
+      {
+        "src": "s2-main-pictures-01-1000x1000.png",
+        "loaded": true
+      },
+      {
+        "src": "minaka-main-pictures.png",
+        "loaded": true
+      },
+      {
+        "src": "main-pictures-03-1.webp",
+        "loaded": true
+      },
+      {
+        "src": "naughty-clock.png",
+        "loaded": true
+      },
+      {
+        "src": "www-loaded-1440.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "www-loaded-390.jpeg",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-women.webp",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-men.webp",
+        "loaded": true
+      },
+      {
+        "src": "sex-toys-for-couples.webp",
+        "loaded": true
+      }
+    ],
+    "mobileLastItemsAccessible": true,
+    "pass": true,
+    "errors": [],
+    "linkCheck": true,
+    "artLoaded": true,
+    "bottomSourcePreserved": true
+  }
+]

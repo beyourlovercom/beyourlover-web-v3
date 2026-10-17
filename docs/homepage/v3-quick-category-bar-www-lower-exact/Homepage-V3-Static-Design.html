@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BYL Homepage V3 — Premium Quick Category Bar + WWW Lower Exact</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:#fff;overflow-x:hidden;font-family:Arial,sans-serif;color:#391b28}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.035em}
+.original{position:relative;overflow:hidden;width:100%;background:#fff}.original img{position:absolute;display:block;left:0;top:0;width:1440px;max-width:none}
+.original img.mob{display:none}.source-header{height:194px}.source-category{height:231px}.source-category img{top:-757px}
+.exact-www-lower{height:8298px;position:relative;overflow:hidden}.exact-www-lower>img.desk{top:-2260px}
+.v2{--wine:#611624;--rose:#bb7581;--cream:#fff8f2;--muted:#8f6871;background:var(--cream);max-width:100%}
+.eyebrow{font-size:12px;text-transform:uppercase;color:#9a5363;letter-spacing:3px;font-weight:700}
+.hero{height:620px;background:linear-gradient(115deg,#fff9f3 16%,#f5e1d9 70%,#dfc5bd);position:relative;overflow:hidden}
+.hero:before{content:"";width:430px;height:430px;position:absolute;right:160px;top:-260px;border:2px solid #e8bbc4;border-radius:50%}
+.hero-copy{position:absolute;left:75px;top:112px;z-index:2;width:52%}.hero-copy h1{font-size:88px;line-height:.98;color:var(--wine);margin:19px 0 23px}.hero-copy p{font-size:16px;color:#70525a;line-height:1.7;max-width:470px}
+.pill{display:inline-block;border-radius:36px;background:var(--wine);color:#fff;padding:16px 32px;margin-top:16px;font-size:13px;font-weight:600}
+.trust{display:flex;gap:27px;font-size:11px;color:#794753;margin-top:45px}.trust span{border-right:1px solid #d8aeb6;padding-right:24px}.trust span:last-child{border:0}
+.hero-art{position:absolute;width:51%;height:550px;right:27px;top:30px;border-radius:46% 6% 6% 40%;background:#e9cdbf;overflow:hidden;box-shadow:0 18px 80px #892c3c1f}
+.hero-art img{width:100%;height:100%;object-fit:cover;object-position:67% center;filter:saturate(.65) sepia(.07)}
+.hero-art:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#fff2e255,transparent 53%)}
+.hero-script{font:italic 29px Georgia,serif;position:absolute;right:50px;top:75px;color:#69223c;transform:rotate(-9deg);z-index:3;opacity:.95}
+.campaign{padding:69px 45px 67px;background:#fff9f5}.section-head{margin:0 auto 30px;max-width:1270px;display:flex;justify-content:space-between;align-items:end;gap:20px}
+.section-head h2{font-size:49px;line-height:1.07;margin:8px 0 0;color:var(--wine)}.section-head p{font-size:13px;color:var(--muted);max-width:340px;line-height:1.6}
+.campaign-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px;max-width:1350px;margin:auto}
+.story{height:343px;overflow:hidden;border-radius:16px;display:grid;grid-template-columns:53% 47%;background:#f1d6d1}
+.story:nth-child(2){background:#eed3da}.story-copy{padding:45px 25px 15px 35px;position:relative;z-index:2}
+.story h3{font-size:44px;line-height:1.03;color:var(--wine);margin:18px 0}.story p{font-size:12px;line-height:1.6;color:#744b57}
+.text-cta{font-size:12px;color:#732438;border-bottom:1px solid #a77b80;display:inline-block;margin-top:10px;padding-bottom:5px;font-weight:600}
+.story-pic{height:100%;position:relative;overflow:hidden}.story-pic img{position:absolute;width:220%;height:100%;object-fit:cover;object-position:0 50%;max-width:none;left:0;filter:saturate(.66)}
+.arrivals{padding:70px 51px 80px;background:#fffdfb}.arrivals .section-head{align-items:end}.arrivals .section-head h2{font-size:60px}.arrivals .section-head .view{font-size:12px;color:var(--wine);border-bottom:1px solid #bb8088;padding-bottom:7px}
+.product-grid{max-width:1338px;margin:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}
+.product{border:1px solid #f1e4de;border-radius:16px;overflow:hidden;background:#fcf6f2}.product-img{position:relative;height:307px;background:radial-gradient(circle at 50% 75%,#fff,#f1dcd6)}
+.product-img img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.tag{position:absolute;top:13px;left:13px;border-radius:18px;background:#fffbf7d9;border:1px solid #ead0d7;color:#7d3b4d;font-size:10px;font-weight:700;letter-spacing:1px;padding:8px 11px;z-index:1}
+.product-text{padding:18px}.product-text small{text-transform:uppercase;color:#99747e;font-size:10px;letter-spacing:1px}
+.product-text h3{font-size:24px;min-height:49px;color:#522432;margin:10px 0 16px}.product-footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#763347}
+.round-arrow{width:33px;height:33px;border:1px solid #975969;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:16px}
+.transition{height:52px;display:flex;align-items:center;justify-content:center;background:#fff9f6;color:#a06f7b;font-size:10px;letter-spacing:3px}
+.cover-banner{position:absolute;left:30px;width:1380px;height:551px;overflow:hidden;z-index:2;background:#f7e3df;border-radius:13px}
+.b1{top:0}.b2{top:1119px}.b3{top:2238px}
+.cover-inner{display:grid;grid-template-columns:51% 49%;height:100%}.cover-copy{background:radial-gradient(circle at 0% 80%,#fff9f2,#eed5ce);padding:80px 72px}
+.cover-copy h2{font-size:74px;line-height:1;color:var(--wine);margin:18px 0}.cover-copy p{font-size:15px;line-height:1.7;color:#714a56;max-width:450px}
+.cover-art{overflow:hidden;position:relative}.cover-art img{width:220%;max-width:none;height:100%;object-fit:cover;object-position:0 50%;position:absolute;left:0;filter:saturate(.72)}
+@media(max-width:700px){
+.original img.desk{display:none}.original img.mob{display:block;width:390px}
+.source-header{height:104px}.source-category{height:191px}.source-category img{top:-675px}
+.exact-www-lower{height:7889px}.exact-www-lower>img.mob{top:-1880px}
+.hero{height:730px}.hero-copy{left:20px;top:40px;width:350px}.eyebrow{font-size:9px;letter-spacing:1.7px}
+.hero-copy h1{font-size:52px;margin:14px 0}.hero-copy p{font-size:12px;line-height:1.65;max-width:320px}
+.pill{font-size:11px;padding:13px 22px;margin-top:14px}.trust{gap:7px;font-size:8px;margin-top:22px}.trust span{padding-right:8px}
+.hero-art{top:316px;left:10px;right:auto;width:370px;height:375px;border-radius:47% 47% 11% 11%}
+.hero-script{right:21px;top:328px;font-size:18px}
+.campaign{padding:35px 13px 38px}.section-head{margin-bottom:19px}.section-head h2{font-size:34px}.section-head p{display:none}
+.campaign-grid{grid-template-columns:1fr;gap:12px}.story{height:210px;border-radius:13px}.story-copy{padding:25px 13px}
+.story h3{font-size:31px;margin:10px 0}.story p{font-size:9px}.text-cta{font-size:9px;margin-top:7px}
+.arrivals{padding:39px 13px 45px}.arrivals .section-head h2{font-size:42px}.arrivals .section-head .view{font-size:10px}
+.product-grid{grid-template-columns:1fr 1fr;gap:9px}.product-img{height:182px}.tag{top:8px;left:8px;font-size:8px;padding:6px}
+.product-text{padding:12px}.product-text small{font-size:8px}.product-text h3{font-size:18px;min-height:45px;margin:7px 0 12px}
+.product-footer{font-size:9px}.round-arrow{width:26px;height:26px;font-size:12px}
+.transition{height:41px;font-size:8px}
+.cover-banner{left:10px;width:370px;height:223px;border-radius:9px}
+.b1{top:0}.b2{top:925px}.b3{top:1849px}
+.cover-copy{padding:29px 13px}.cover-copy h2{font-size:31px;margin:9px 0}.cover-copy p{font-size:9px;line-height:1.5}.cover-copy .text-cta{font-size:8px;margin-top:8px}
+}
+
+/* H2 static Homepage V3 concept: only the eight QUICK source links redesigned.
+ * Existing WWW creator/social/blog/trust/footer continue unchanged raster. */
+.v3-quick{padding:34px 48px 42px;background:linear-gradient(180deg,#fffefc 0%,#fff8f5 100%);border-top:1px solid #f3e1e0;border-bottom:1px solid #efdfdc;overflow:hidden}
+.v3-quick-inner{max-width:1320px;margin:0 auto}
+.v3-quick-title{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:21px}
+.v3-micro{display:block;color:#a46b76;font-size:10px;font-family:Arial,sans-serif;font-weight:700;letter-spacing:2.6px}
+.v3-quick-title h2{font:400 39px/1.07 Georgia,serif;letter-spacing:-1.2px;margin:8px 0 0;color:#631e2f}
+.v3-quick-hint{color:#96626f;font:500 11px Arial,sans-serif;white-space:nowrap}
+.v3-quick-arrow{margin-left:11px;border:1px solid #ddb6bf;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center}
+.v3-quick-track{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:12px}
+.v3-icon-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;height:185px;text-decoration:none;border:1px solid #efdedc;border-radius:15px;background:radial-gradient(circle at 54% 38%,#fff 7%,#fff5f0 77%,#f7e3df 120%);box-shadow:0 7px 26px rgba(99,34,48,.045);color:#5e2a38;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.v3-icon-card:hover,.v3-icon-card:focus-visible{border-color:#bd8594;box-shadow:0 12px 28px rgba(111,38,54,.11);transform:translateY(-3px)}
+.v3-card-index{position:absolute;top:12px;left:12px;font-size:9px;font-weight:700;letter-spacing:1px;color:#bd929b}
+.v3-card-art{width:103px;height:112px;display:flex;align-items:center;justify-content:center;margin:6px 0 0}
+.v3-card-art img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;filter:saturate(.77) contrast(.97)}
+.v3-card-name{font:700 11px Arial,sans-serif;letter-spacing:1px;text-align:center;color:#6f3343;margin-top:10px}
+.v3-mini-arrow{display:block;position:absolute;bottom:11px;right:11px;font:12px Arial,sans-serif;color:#a56f7c;opacity:.8}
+.v3-mobile-scrollhint{display:none}
+@media(max-width:700px){
+ .v3-quick{padding:20px 0 14px}
+ .v3-quick-inner{width:100%}
+ .v3-quick-title{margin:0 16px 14px}
+ .v3-micro{font-size:8px;letter-spacing:1.7px}
+ .v3-quick-title h2{font-size:27px;letter-spacing:-.7px;margin-top:5px}
+ .v3-quick-hint{font-size:9px}.v3-quick-arrow{width:20px;height:20px;margin-left:3px}
+ .v3-quick-track{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 16px 10px;overscroll-behavior-x:contain}
+ .v3-quick-track::-webkit-scrollbar{display:none}
+ .v3-icon-card{flex:0 0 84px;width:84px;height:118px;border-radius:12px;scroll-snap-align:start;box-shadow:0 4px 12px rgba(91,33,50,.045)}
+ .v3-card-index{top:6px;left:8px;font-size:7px}
+ .v3-card-art{width:72px;height:73px;margin:4px 0 0}
+ .v3-card-name{font-size:8px;letter-spacing:.35px;margin-top:7px}
+ .v3-mini-arrow{font-size:9px;bottom:6px;right:5px}
+ .v3-mobile-scrollhint{display:flex;margin:1px 16px 0;align-items:center;justify-content:space-between;font-size:8px;letter-spacing:1px;color:#9a6d79;font-weight:700}
+ .v3-pagination{color:#c88f9e;letter-spacing:2px}
+}
+@media(prefers-reduced-motion:reduce){.v3-icon-card{transition:none}}
+</style></head><body>
+<div class="original source-header" data-preserved-source="www-header">
+ <img class="desk" src="WWW-Original-PC1440-Source.jpeg" alt="">
+ <img class="mob" src="WWW-Original-M390-Source.jpeg" alt="">
+</div>
+<div class="v2">
+ <section class="hero">
+  <div class="hero-copy"><span class="eyebrow">BeYourLover · Designed for the way you feel</span>
+   <h1>More You.<br>More Pleasure.</h1>
+   <p>Beautifully original. Thoughtfully personal. Meet a world of possibilities made for real connection and everyday discovery.</p>
+   <span class="pill">Explore the Collection ↗</span>
+   <div class="trust"><span>✧ Original Design</span><span>♡ Body-First</span><span>⌁ Discreet by Nature</span></div>
+  </div>
+  <div class="hero-art"><img src="https://img.beyourlover.com/2026/06/01070211/influencers-instagram-29.jpg" alt="Existing BeYourLover original illustrated art"></div>
+  <span class="hero-script">A little more you.</span>
+ </section>
+</div>
+<section class="v3-quick" aria-label="BeYourLover quick product links: 8 original products" data-design-area="quick-category-bar-v3">
+<div class="v3-quick-inner"><div class="v3-quick-title"><div><span class="v3-micro">DISCOVER THE ICONS</span><h2>Find your signature.</h2></div><span class="v3-quick-hint">8 Originals <span class="v3-quick-arrow">↗</span></span></div>
+<nav class="v3-quick-track" aria-label="Explore all eight original quick links">
+<a class="v3-icon-card" href="/skullman/" aria-label="Shop SKULLMAN" data-www-link="/skullman/"><span class="v3-card-index">01</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2025/08/21084335/home-skullman-icon.webp" alt="SKULLMAN original BeYourLover icon" loading="eager"></span><span class="v3-card-name">SKULLMAN</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+<a class="v3-icon-card" href="/beyourlover-fatima-green/" aria-label="Shop FATIMA" data-www-link="/beyourlover-fatima-green/"><span class="v3-card-index">02</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2025/03/20052055/beyourlover-fatima.webp" alt="FATIMA original BeYourLover icon" loading="eager"></span><span class="v3-card-name">FATIMA</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+<a class="v3-icon-card" href="/clock" aria-label="Shop CLOCK" data-www-link="/clock"><span class="v3-card-index">03</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2025/03/20052101/beyourlover-naughty-clock.webp" alt="CLOCK original BeYourLover icon" loading="eager"></span><span class="v3-card-name">CLOCK</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+<a class="v3-icon-card" href="/beyourlover-magic-suitcase-green/" aria-label="Shop SUITCASE" data-www-link="/beyourlover-magic-suitcase-green/"><span class="v3-card-index">04</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2025/05/21022512/icon-magic-suitcase.webp" alt="SUITCASE original BeYourLover icon" loading="eager"></span><span class="v3-card-name">SUITCASE</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+<a class="v3-icon-card" href="/beyourlover-joy-cup-diamond-version/" aria-label="Shop JOY CUP" data-www-link="/beyourlover-joy-cup-diamond-version/"><span class="v3-card-index">05</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2025/03/20052056/beyourlover-joy-cup.webp" alt="JOY CUP original BeYourLover icon" loading="eager"></span><span class="v3-card-name">JOY CUP</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+<a class="v3-icon-card" href="/beyourlover-alggie/" aria-label="Shop EARPOD" data-www-link="/beyourlover-alggie/"><span class="v3-card-index">06</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2025/03/20052053/beyourlover-earphone.webp" alt="EARPOD original BeYourLover icon" loading="eager"></span><span class="v3-card-name">EARPOD</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+<a class="v3-icon-card" href="/m2/" aria-label="Shop M2" data-www-link="/m2/"><span class="v3-card-index">07</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2025/11/22100605/Ellipse-101.webp" alt="M2 original BeYourLover icon" loading="eager"></span><span class="v3-card-name">M2</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+<a class="v3-icon-card" href="/lippy/" aria-label="Shop LIPPY" data-www-link="/lippy/"><span class="v3-card-index">08</span><span class="v3-card-art"><img src="https://img.beyourlover.com/2026/07/28084930/home-class-lippy.png" alt="LIPPY original BeYourLover icon" loading="eager"></span><span class="v3-card-name">LIPPY</span><span class="v3-mini-arrow" aria-hidden="true">↗</span></a>
+</nav><div class="v3-mobile-scrollhint"><span>← SWIPE TO EXPLORE ALL 8 →</span><span class="v3-pagination" aria-hidden="true">━ ━ ━ ━ ━</span></div></div></section>
+<div class="v2">
+ <section class="campaign">
+  <div class="section-head"><div><span class="eyebrow">Originality is our signature</span><h2>Designed to feel different.</h2></div><p>Illustrated stories with a more refined sense of desire, discovery and connection.</p></div>
+  <div class="campaign-grid">
+   <article class="story"><div class="story-copy"><span class="eyebrow">Made for your rhythm</span><h3>Beautifully<br>yourself.</h3><p>Find the freedom to explore your own kind of pleasure.</p><span class="text-cta">Discover for yourself ↗</span></div><div class="story-pic"><img src="https://img.beyourlover.com/2025/02/20020556/sex-toys-for-women.webp"></div></article>
+   <article class="story"><div class="story-copy"><span class="eyebrow">The art of closeness</span><h3>Better<br>together.</h3><p>Closer moments, consciously imagined.</p><span class="text-cta">Discover for couples ↗</span></div><div class="story-pic"><img src="https://img.beyourlover.com/2025/02/20020545/sex-toys-for-couples.webp"></div></article>
+  </div>
+ </section>
+ <section class="arrivals">
+  <div class="section-head"><div><span class="eyebrow">The latest in original design</span><h2>New Arrivals.</h2></div><span class="view">View all ↗</span></div>
+  <div class="product-grid">
+   <article class="product"><div class="product-img"><span class="tag">NEW</span><img src="https://img.beyourlover.com/2026/08/14100230/s2-main-pictures-01-1000x1000.png"></div><div class="product-text"><small>New edit</small><h3>TARA S2</h3><div class="product-footer"><span>Explore the design</span><span class="round-arrow">↗</span></div></div></article>
+   <article class="product"><div class="product-img"><span class="tag">NEW</span><img src="https://img.beyourlover.com/2026/06/16065328/minaka-main-pictures.png"></div><div class="product-text"><small>New edit</small><h3>MINAKA</h3><div class="product-footer"><span>Explore the design</span><span class="round-arrow">↗</span></div></div></article>
+   <article class="product"><div class="product-img"><span class="tag">NEW COLOR</span><img src="https://img.beyourlover.com/2026/04/10042552/main-pictures-03-1.webp"></div><div class="product-text"><small>Original collection</small><h3>NAUGHTY CLOCK<br>PINK</h3><div class="product-footer"><span>Explore the design</span><span class="round-arrow">↗</span></div></div></article>
+   <article class="product"><div class="product-img"><span class="tag">NEW COLOR</span><img src="https://img.beyourlover.com/2025/12/23013024/naughty-clock.png"></div><div class="product-text"><small>Original collection</small><h3>NAUGHTY CLOCK<br>GREEN</h3><div class="product-footer"><span>Explore the design</span><span class="round-arrow">↗</span></div></div></article>
+  </div>
+ </section>
+ <div class="transition">DISCOVER BY DESIRE ✧</div>
+</div>
+<div class="original exact-www-lower" data-preserved-source="www-exact-bottom">
+ <img class="desk" src="WWW-Original-PC1440-Source.jpeg" alt="Exact WWW screenshot below new arrivals">
+ <img class="mob" src="WWW-Original-M390-Source.jpeg" alt="Exact WWW screenshot below new arrivals">
+ <section class="cover-banner b1"><div class="cover-inner"><div class="cover-copy"><span class="eyebrow">A world made for you</span><h2>Your own<br>kind of joy.</h2><p>Explore pleasure on your terms, with beautiful original design.</p><span class="text-cta">Discover for yourself ↗</span></div><div class="cover-art"><img src="https://img.beyourlover.com/2025/02/20020556/sex-toys-for-women.webp"></div></div></section>
+ <section class="cover-banner b2"><div class="cover-inner"><div class="cover-copy"><span class="eyebrow">Reimagine the everyday</span><h2>Discover<br>your rhythm.</h2><p>Thoughtful design meets a more personal experience.</p><span class="text-cta">Discover for him ↗</span></div><div class="cover-art"><img src="https://img.beyourlover.com/2025/02/20020538/sex-toys-for-men.webp"></div></div></section>
+ <section class="cover-banner b3"><div class="cover-inner"><div class="cover-copy"><span class="eyebrow">Made for connection</span><h2>Closer<br>is better.</h2><p>More meaningful moments. Beautifully explored together.</p><span class="text-cta">Discover for couples ↗</span></div><div class="cover-art"><img src="https://img.beyourlover.com/2025/02/20020545/sex-toys-for-couples.webp"></div></div></section>
+</div>
+</body></html>
