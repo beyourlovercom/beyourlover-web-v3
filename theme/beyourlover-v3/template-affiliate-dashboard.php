@@ -32,7 +32,7 @@ $metrics = $active ? [
 $referrals = $aff['referrals'];
 $payouts = $aff['payouts'];
 $referral_url = $aff['referral_url'];
-$visual = get_stylesheet_directory_uri().'/assets/images/affiliate-hero.jpg';
+$visual = get_stylesheet_directory_uri().'/assets/images/affiliate-hero-creator-v1.webp';
 $sign_in = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/my-account/');
 get_header();
 ?>
