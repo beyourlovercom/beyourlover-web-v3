@@ -114,6 +114,8 @@ jobs:
         run: node scripts/test_g5_submission_lock.js
       - name: Migration IDs
         run: python scripts/check_migration_ids.py
+      - name: First-party plugin architecture guard
+        run: python scripts/check_first_party_plugin_architecture.py
       - name: Shipping promotion contract
         run: python scripts/test_shipping_promotion_contract.py
       - name: Shipping promotion runtime contract

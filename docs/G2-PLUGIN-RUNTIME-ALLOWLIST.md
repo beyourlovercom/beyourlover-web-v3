@@ -9,7 +9,7 @@ V3 does not inherit the legacy WordPress plugin set by default. Every plugin mus
 ## CORE / REQUIRED
 
 - `woocommerce` — commerce data and order engine.
-- `byl-platform` — first-party V3 platform and migration runner.
+- `andy-commerce` — the approved first-party B2C/Woo logic owner; `yby-core` (Andy Core) is the generic foundation.
 - Advanced Media Offloader / selected R2 offloader — canonical `img.beyourlover.com` media delivery.
 - Rank Math or the exact selected SEO engine — preserve V3.0 SEO identity contract.
 - AffiliateWP — affiliate/referral/commission source of truth where those flows are required.
@@ -66,4 +66,12 @@ Local/staging safety overrides remain mandatory: no real payment capture, no rea
 
 ## Current G2 Decision
 
-The G2 runtime baseline is WooCommerce + BYL Platform with only explicitly required compatibility plugins retained. Legacy plugin presence in the production-derived database does not grant runtime authority. G8, G9, and G11 may narrow this list further; they may not silently broaden it.
+Historical G2 started from WooCommerce + BYL Platform. Current approved target is WooCommerce + Andy Core + Andy Commerce; BYL Platform is transitional only until its Dev migration/UAT gate passes. Legacy plugin presence in the production-derived database does not grant runtime authority. G8, G9, and G11 may narrow this list further; they may not silently broaden it.
+
+## Owner-approved BYL Platform retirement (2026-10-09)
+
+`platform/byl-platform` is frozen for rollback only: do not add new code or
+new plugin headers. Code migration target is Andy Commerce 1.0.1 in YBY-Core
+PR #67. Preserve historical migration ledger and BYL49 Store API contract.
+No deactivation or file deletion before Dev backup, exact-package verification,
+side-by-side smoke, safe Dev deactivation, and Owner UAT PASS. No WWW deploy.

@@ -4,6 +4,7 @@
 ## Mission and source of truth
 - Build **the complete new website** on `https://dev.beyourlover.com`; tune theme, plugins, content, integrations and business flows together until full Owner UAT passes.
 - **GitHub is the only code source of truth.** Work on a scoped branch/worktree; no untracked or direct Dev-only source fixes. Record exact commit SHA for deployed code.
+- **First-party plugin limit:** Andy Core (generic) + Andy Commerce (B2C) only. BYL Platform is legacy/frozen for rollback; no new independent business plugin or feature work inside it without explicit Owner architecture approval. BYL V3 Theme is presentation, not a plugin.
 - `localdev.beyourlover.com` is an optional isolation/risk sandbox, not a compulsory gate for every BYL change.
 - Current `www.beyourlover.com` is the live legacy store. **Never** deploy, mutate, retire a plugin, change routing/DNS or migrate data there without a separate explicit Owner authorization.
 - Launch is a **full Dev-to-WWW cutover project**, not incremental feature deployment onto old WWW. Cutover needs its own plan, data delta synchronization, payment/SEO/ERP checks and tested rollback.
