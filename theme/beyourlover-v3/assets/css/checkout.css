@@ -826,3 +826,123 @@ body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.s
   .byl-invoice-address fieldset{grid-template-columns:1fr}
   .byl-invoice-address .form-row-first,.byl-invoice-address .form-row-last{grid-column:1/-1}
 }
+
+/* Checkout Owner reference — Mobile Fidelity V2 preview.
+ * Visual only. Does not change Woo fields, rates, order, country AJAX.
+ * Extends existing CSS; all rules gated to native mobile Checkout.
+ */
+@media(max-width:760px) {
+  body.woocommerce-checkout #main-content.byl-commerce-content{
+    padding-top:13px!important;
+  }
+  .byl-checkout-heading{margin-bottom:1px!important}
+  .byl-checkout-heading h1{font-size:25px!important;line-height:1.2!important}
+  .byl-checkout-mobile-close{width:34px;height:34px;flex-basis:34px;font-size:31px}
+  .byl-checkout-return{margin-bottom:2px!important}
+  .byl-checkout-return a{font-size:13px}
+  .byl-checkout-track{
+    min-height:67px!important;margin-bottom:8px!important;
+    padding:0 5px 0!important;
+  }
+  .byl-checkout-track>[data-byl-track]{
+    min-height:62px!important;gap:3px!important;
+  }
+  .byl-checkout-track>[data-byl-track]>span{height:31px!important;flex-basis:31px!important}
+  .byl-contact-card,.byl-choice-card,.byl-address-card{
+    border-color:#e6e0e4!important;border-radius:10px!important;
+    box-shadow:none!important;
+  }
+  .byl-contact-card{padding-top:10px!important;padding-bottom:11px!important}
+  .byl-account-entry{margin-bottom:9px!important}
+  /* Reference: Email label lives INSIDE its outlined field, above the value. */
+  .byl-contact-card #billing_email_field{
+    position:relative!important;min-height:0!important;
+  }
+  .byl-contact-card #billing_email_field>label{
+    position:absolute!important;top:5px!important;left:11px!important;
+    z-index:1;pointer-events:none!important;
+    margin:0!important;line-height:1.2!important;
+    font-size:10.5px!important;color:#454046!important;
+    background:transparent!important;
+  }
+  .byl-contact-card #billing_email{
+    min-height:51px!important;height:51px!important;
+    padding:20px 11px 5px!important;
+    font-size:13px!important;border-color:#d7d2d6!important;
+    border-radius:5px!important;
+  }
+  .byl-contact-card #billing_email::placeholder{
+    color:#a39da2;opacity:1;
+  }
+  .byl-checkout-marketing-optin{margin-top:8px!important}
+  .byl-shipping-rate-section>h2,.byl-shipping-details-heading{
+    font-size:18px!important;line-height:1.25!important;
+  }
+  .byl-address-card{padding:11px 12px 14px!important}
+  /* Reference: Country label INSIDE the country selector border. */
+  .byl-address-card #billing_country_field{
+    position:relative!important;z-index:auto;
+  }
+  .byl-address-card #billing_country_field>label{
+    position:absolute!important;left:11px!important;top:5px!important;
+    z-index:2;pointer-events:none!important;margin:0!important;
+    line-height:1.15!important;font-size:10.5px!important;
+    color:#4a4249!important;
+  }
+  .byl-address-card #billing_country_field .select2-selection--single{
+    height:53px!important;min-height:53px!important;
+    padding:16px 29px 3px 11px!important;
+    display:flex!important;align-items:center!important;
+  }
+  .byl-address-card #billing_country_field .select2-selection__rendered{
+    line-height:30px!important;font-size:13px!important;
+  }
+  .byl-address-card #billing_country_field .select2-selection__arrow{
+    height:51px!important;top:0!important;
+  }
+  .byl-address-card #billing_country_field>select{
+    height:53px!important;min-height:53px!important;
+    padding:18px 28px 4px 11px!important;font-size:13px!important;
+  }
+  .byl-address-card .woocommerce-billing-fields__field-wrapper{
+    row-gap:9px!important;
+  }
+  .byl-address-card .form-row label{
+    color:#343039!important;letter-spacing:0;
+  }
+  .byl-address-card .input-text,.byl-address-card select{
+    border-color:#ded9de!important;
+  }
+  .byl-duties-note{background:#fdf0e7!important}
+  /* Match reference: single anchored CTA without a trailing arrow. */
+  .byl-checkout-next>span[aria-hidden="true"]{display:none!important}
+  .byl-checkout-action-bar{
+    border-radius:12px 12px 0 0!important;
+    padding-left:12px!important;padding-right:12px!important;
+  }
+  .byl-mobile-order-toggle{
+    gap:8px!important;
+  }
+}
+/* V3 spacing correction after pixel-position audit of Owner phone reference. */
+@media(max-width:760px){
+  .byl-checkout-return{margin-bottom:-6px!important}
+  .byl-checkout-track{
+    min-height:56px!important;
+    margin-bottom:4px!important;
+  }
+  .byl-checkout-track>[data-byl-track]{min-height:54px!important}
+  .byl-choice-card{padding-top:8px!important;padding-bottom:8px!important}
+  .byl-delivery-rate{min-height:52px!important}
+  .byl-contact-card{padding-top:8px!important;padding-bottom:9px!important}
+  .byl-account-entry{margin-bottom:5px!important}
+}
+/* WooPayments may render an unfinished express-payment iframe with only an
+   orphan OR separator at 320px. While provider declares aria-busy=true,
+   hide that unfinished block, not a ready/available express wallet.
+   Provider controls, amount and payment submit are unchanged. */
+@media(max-width:760px) {
+ .byl-progressive-checkout .wcpay-express-checkout-wrapper:has(#wcpay-express-checkout-element[aria-busy="true"]) {
+   display:none!important;
+ }
+}
