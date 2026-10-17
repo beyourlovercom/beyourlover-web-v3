@@ -794,6 +794,9 @@
   form.addEventListener('input', updateDetails);
   form.addEventListener('change', updateDetails);
   $(document.body).on('updated_checkout', () => {
+    // The initial Woo review AJAX is no longer needed to fix the first-paint
+    // field order; allow the normal post-AJAX hook to keep owning later updates.
+    stopInitialOrderObserver();
     mountNative();
     mountWooAccountEmail();
     relabelPhone();
@@ -823,9 +826,39 @@
   }
   summary.classList.toggle('is-open', !window.matchMedia('(max-width: 760px)').matches);
   summaryToggle.setAttribute('aria-expanded', summary.classList.contains('is-open') ? 'true' : 'false');
+  // Native Woo Country/State initialization can reparent direct form rows
+  // *after* our first synchronous Shipping render and *before* the first
+  // update_order_review response. The previous code waited for that AJAX
+  // callback (occasionally 600ms+) to repair the DOM/tab order.
+  //
+  // A short-lived direct-child observer re-aligns after Woo's initial DOM
+  // mutations, without waiting on network and without polling/rebuilding any
+  // SelectWoo input. It is disconnected on first Woo update OR window load.
+  let initialOrderObserver = null;
+  function stopInitialOrderObserver() {
+    if (!initialOrderObserver) return;
+    initialOrderObserver.disconnect();
+    initialOrderObserver = null;
+  }
+  function watchInitialFieldOrder() {
+    const host = document.getElementById('billing_first_name_field')?.parentElement;
+    if (!host || typeof MutationObserver === 'undefined') return;
+    initialOrderObserver = new MutationObserver(() => {
+      // alignShippingAddressFields() is idempotent and only writes on mismatch.
+      // A second observer callback from its own appendChild operations is a
+      // no-op. No listener is left active during the user's form interaction.
+      alignShippingAddressFields();
+    });
+    initialOrderObserver.observe(host, {childList:true});
+    window.addEventListener('load', () => {
+      alignShippingAddressFields();
+      stopInitialOrderObserver();
+    }, {once:true});
+  }
   root.classList.add('is-enhanced');
   mountNative();
   fetchPromotion();
   // Initial render starts at the page header; user-driven step changes may scroll.
   setStep('shipping', {scroll:false});
+  watchInitialFieldOrder();
 })(jQuery);
