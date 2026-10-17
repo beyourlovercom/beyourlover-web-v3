@@ -5,21 +5,47 @@ defined('ABSPATH') || exit;
 add_filter('woocommerce_checkout_fields', static function (array $fields): array {
     unset($fields['billing']['billing_phone']);
     unset($fields['shipping']['shipping_phone']);
-    // Personal purchases: do not collect company names at Checkout.
-    unset($fields['billing']['billing_company']);
+    // Personal checkout: shipping company is suppressed; billing organization is optional.
+    // The organization field is optional and collapsed by the Theme.
+    // It remains a real Woo field (not a fake front-end input).
     unset($fields['shipping']['shipping_company']);
+    if (isset($fields['billing']['billing_company'])) {
+        $fields['billing']['billing_company']['required'] = false;
+        $fields['billing']['billing_company']['priority'] = 110;
+        $fields['billing']['billing_company']['class'] = ['form-row-wide'];
+    }
 
     if (isset($fields['billing']['billing_email'])) {
         $fields['billing']['billing_email']['priority'] = 1;
+        $fields['billing']['billing_email']['label'] = 'Email Address';
         $fields['billing']['billing_email']['class'] = ['form-row-wide'];
+    }
+
+    // Owner-locked Shipping sequence. Woo field priorities control native
+    // server markup; Woo native field order is authoritative for standard Checkout.
+    // The original email stays a real Woo field and is reparented above rates.
+    // Never clone a second field or override Woo validation / country data.
+    foreach ([
+        'billing_country' => 5,
+        'billing_first_name' => 10,
+        'billing_last_name' => 20,
+        'billing_address_1' => 40,
+        'billing_address_2' => 45,
+        'billing_city' => 55,
+        'billing_state' => 60,
+        'billing_postcode' => 85,
+    ] as $id => $priority) {
+        if (isset($fields['billing'][$id])) {
+            $fields['billing'][$id]['priority'] = $priority;
+        }
     }
 
     $fields['billing']['shipping_phone'] = [
         'type' => 'tel',
-        'label' => 'Shipping phone',
-        'description' => 'Your number is used only to help the carrier deliver your order. We do not use it for marketing.',
+        'label' => 'Phone',
+        'description' => 'We will only use this number in case we need to contact you regarding delivery purposes.',
         'required' => true,
-        'priority' => 115,
+        'priority' => 70,
         'class' => ['form-row-wide'],
         'autocomplete' => 'tel',
         'validate' => ['phone'],
@@ -36,8 +62,8 @@ add_action('wp', static function (): void {
 
 add_filter('woocommerce_form_field_args', static function (array $args, string $key): array {
     if ($key === 'shipping_phone') {
-        $args['label'] = 'Shipping phone';
-        $args['description'] = 'Your number is used only to help the carrier deliver your order. We do not use it for marketing.';
+        $args['label'] = 'Phone';
+        $args['description'] = 'We will only use this number in case we need to contact you regarding delivery purposes.';
     }
     return $args;
 }, 99999, 2);
