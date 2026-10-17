@@ -203,6 +203,27 @@
         "assets/css/track-order.css"
       ]
     },
+    "creator": {
+      "depends_on": ["foundation", "shell", "pages"],
+      "kind": "presentation",
+      "files": [
+        "template-affiliate-dashboard.php",
+        "inc/affiliate-dashboard.php",
+        "inc/affiliate-remote-bridge.php",
+        "assets/css/affiliate-dashboard.css",
+        "assets/js/affiliate-dashboard.js",
+        "assets/images/affiliate-hero-creator-v1.webp",
+        "assets/images/creator-v2-avatar.webp",
+        "assets/images/creator-v2-creative-confidence.webp",
+        "assets/images/creator-v2-creative-lifestyle.webp",
+        "assets/images/creator-v2-creative-message.webp",
+        "assets/images/creator-v2-creative-product.webp",
+        "assets/images/creator-v2-hero-photo.webp",
+        "assets/images/creator-v2-promo-product.webp",
+        "assets/images/creator-v2-sidebar-poster.webp",
+        "assets/images/creator-v2-support.webp"
+      ]
+    },
     "notification": {
       "depends_on": [
         "foundation",
