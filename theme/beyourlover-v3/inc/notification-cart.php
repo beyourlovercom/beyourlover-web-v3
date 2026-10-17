@@ -17,6 +17,32 @@ function byl_v3_notification_cart_bridge_enabled(): bool {
         && (string) wp_unslash($_GET['byl_notification_bridge']) === '1';
 }
 
+/** Dev-only empty cart presentation; separate from N6 notification preview. */
+function byl_v3_cart_empty_page_parity_enabled(): bool {
+    return function_exists('is_cart') && is_cart()
+        && function_exists('byl_v3_cart_drawer_runtime_enabled')
+        && byl_v3_cart_drawer_runtime_enabled();
+}
+
+add_action('wp_enqueue_scripts', static function (): void {
+    if (!byl_v3_cart_empty_page_parity_enabled()) { return; }
+    $path = get_stylesheet_directory().'/assets/css/cart-empty-parity.css';
+    wp_enqueue_style('byl-v3-cart-empty-parity',
+        get_stylesheet_directory_uri().'/assets/css/cart-empty-parity.css',
+        ['byl-v3-cart-focus'], (string) filemtime($path));
+}, 26);
+
+/**
+ * Dev Cart page shows recommendations exactly once, in the canonical bottom slot.
+ * Woo's native cross-sells run inside cart_collaterals before cart_totals;
+ * keeping that callback nests another recommendation grid inside Cart totals.
+ * Do not suppress any totals, checkout controls, coupons, or other Woo hooks.
+ */
+add_action('wp', static function (): void {
+    if (!byl_v3_cart_empty_page_parity_enabled()) { return; }
+    remove_action('woocommerce_cart_collaterals', 'woocommerce_cross_sell_display', 10);
+}, 20);
+
 /** Enqueue only with both explicitly enabled Dev preview gates. */
 add_action('wp_enqueue_scripts', static function (): void {
     if (!byl_v3_notification_cart_bridge_enabled()) { return; }
@@ -53,7 +79,7 @@ add_filter('body_class', static function (array $classes): array {
 add_filter('woocommerce_locate_template', static function (
     string $located, string $template_name, string $template_path
 ): string {
-    if ($template_name !== 'cart/cart-empty.php' || !byl_v3_notification_cart_bridge_enabled()) {
+    if ($template_name !== 'cart/cart-empty.php' || !byl_v3_cart_empty_page_parity_enabled()) {
         return $located;
     }
     $candidate = get_stylesheet_directory().'/inc/notification-cart-empty.php';
