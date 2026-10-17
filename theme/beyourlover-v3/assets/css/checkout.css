@@ -718,3 +718,74 @@ body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.s
 @media(min-width:761px){
   .byl-progressive-checkout #billing_rfc_tax_id_field.is-country-active{order:100!important}
 }
+
+/* Checkout optional marketing consent. This is NOT a Woo order option.
+   Andy Core Newsletter double-opt-in readiness controls availability. */
+.byl-checkout-marketing-optin {
+  margin-top:11px;
+  width:100%;
+}
+.byl-checkout-marketing-label {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0;
+  font-size:13px;
+  line-height:1.5;
+  color:#1d1d1f;
+  cursor:pointer;
+}
+.byl-checkout-marketing-label input[type="checkbox"] {
+  appearance:none;
+  -webkit-appearance:none;
+  display:block;
+  flex:0 0 18px;
+  width:18px;
+  height:18px;
+  border:1.5px solid #4c4549;
+  border-radius:2px;
+  background:#fff;
+  margin:0;
+  padding:0;
+  position:relative;
+  accent-color:#93002c;
+  cursor:pointer;
+}
+.byl-checkout-marketing-label input[type="checkbox"]:checked {
+  border-color:#93002c;
+  background:#93002c;
+}
+.byl-checkout-marketing-label input[type="checkbox"]:checked::after {
+  content:"";
+  position:absolute;
+  left:5px;
+  top:1px;
+  width:5px;
+  height:10px;
+  border:solid #fff;
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+.byl-checkout-marketing-label input[type="checkbox"]:focus-visible {
+  outline:2px solid #93002c;
+  outline-offset:3px;
+}
+.byl-checkout-marketing-label input[type="checkbox"]:disabled {
+  opacity:.48;
+  cursor:not-allowed;
+}
+.byl-checkout-marketing-label:has(input:disabled) {
+  color:#6f696d;
+  cursor:not-allowed;
+}
+.byl-checkout-marketing-status {
+  margin:4px 0 0 28px;
+  font-size:11px;
+  line-height:1.45;
+  color:#71666c;
+}
+.byl-checkout-marketing-status:empty{display:none}
+@media(max-width:760px){
+  .byl-checkout-marketing-optin{margin-top:8px}
+  .byl-checkout-marketing-label{font-size:12px}
+}
