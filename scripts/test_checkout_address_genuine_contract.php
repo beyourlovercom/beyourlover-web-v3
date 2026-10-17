@@ -21,8 +21,18 @@ class WC_Validation {
   public static function is_postcode($p,$c){return strlen((string)$p)>2 && (bool) preg_match('/^[A-Za-z0-9 -]+$/',(string)$p);}
 }
 class WC_Countries {
-  public function get_allowed_countries(){return ['US'=>'United States','MX'=>'Mexico','DE'=>'Germany'];}
-  public function get_states($c){return $c==='US'?['CA'=>'California','NY'=>'New York']:[];}
+  public function get_allowed_countries(){return ['US'=>'United States','MX'=>'Mexico','DE'=>'Germany','AE'=>'United Arab Emirates'];}
+  public function get_states($c){return $c==='US'?['CA'=>'California','NY'=>'New York']:($c==='DE'?['BY'=>'Bavaria']:[]);}
+  public function get_address_fields($country,$prefix){
+    $fields=[];
+    foreach(['first_name','last_name','country','address_1','address_2','company','city','state','postcode'] as $key) {
+      $required=in_array($key,['first_name','last_name','country','address_1','city','state','postcode'],true);
+      if($country==='DE' && $key==='state')$required=false;
+      if($country==='AE' && ($key==='state'||$key==='postcode'))$required=false;
+      $fields[$prefix.$key]=['required'=>$required,'hidden'=>$country==='AE' && $key==='postcode'];
+    }
+    return $fields;
+  }
 }
 function WC(){return (object)['countries'=>new WC_Countries()];}
 class WC_Order {
@@ -122,6 +132,16 @@ ok(isset($errors->list['byl_invoice_state_invalid']),'invalid province blocked')
 $_POST['byl_invoice_state']='CA';$_POST['byl_invoice_postcode']='!!';
 $data=$post($ship);$errors=new ErrorBag();$validate($data,$errors);
 ok(isset($errors->list['byl_invoice_postcode_invalid']),'postcode validator invoked');
+$_POST['byl_invoice_country']='DE';
+$_POST['byl_invoice_state']='';
+$_POST['byl_invoice_postcode']='10115';
+$data=$post($ship);$errors=new ErrorBag();$validate($data,$errors);
+ok(!isset($errors->list['byl_invoice_state_required']),'DE state optional per real Woo locale');
+$_POST['byl_invoice_country']='AE';$_POST['byl_invoice_postcode']='';$_POST['byl_invoice_state']='';
+$data=$post($ship);$errors=new ErrorBag();$validate($data,$errors);
+ok(!isset($errors->list['byl_invoice_postcode_required']),'AE postcode optional per real Woo locale');
+ok(!isset($errors->list['byl_invoice_state_required']),'AE state optional per real Woo locale');
+
 $GLOBALS['shipping_saved']=['shipping_address_1'=>'Saved shipping street','shipping_country'=>'MX','billing_country'=>'US'];
 ok($prefill(null,'billing_address_1')==='Saved shipping street','shipping prefills from real account shipping');
 ok($prefill(null,'billing_country')==='MX','delivery country not invoice country');
