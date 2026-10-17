@@ -122,6 +122,8 @@ jobs:
         run: python scripts/test_checkout_shipping_promotion_docs.py
       - name: Cart promotion UX contract
         run: python scripts/test_cart_promotion_ux_contract.py
+      - name: G5 checkout submission-lock offline regression
+        run: node scripts/test_g5_submission_lock.js
       - name: Checkout progressive UX contract
         run: python scripts/test_checkout_progressive_ux_contract.py
       - name: Notification UX V1 opt-in dispatcher regression
