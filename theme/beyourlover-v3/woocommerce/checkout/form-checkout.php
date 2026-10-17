@@ -39,7 +39,31 @@ $cart = WC()->cart;
               <?php endif; ?>
             </div>
             <div class="byl-account-email-host" data-byl-account-email-host></div>
-              <div data-byl-marketing-optin-slot hidden></div>
+              <?php
+                // Checkout opt-in is completely independent of the Woo order.
+                // Andy Core requires code+site gates, transport readiness and
+                // a confirmation email before a subscriber is confirmed.
+                $byl_newsletter_ready = class_exists('YBY_Newsletter_REST_Controller')
+                    && is_callable(['YBY_Newsletter_REST_Controller', 'subscribe_ready'])
+                    && YBY_Newsletter_REST_Controller::subscribe_ready();
+                $byl_newsletter_policy = $byl_newsletter_ready
+                    ? YBY_Newsletter_REST_Controller::policy_version() : '';
+              ?>
+              <div class="byl-checkout-marketing-optin"
+                   data-byl-checkout-newsletter
+                   data-byl-newsletter-ready="<?php echo $byl_newsletter_ready ? '1' : '0'; ?>"
+                   data-byl-newsletter-endpoint="<?php echo esc_url(rest_url('andy-core/v1/newsletter/subscribe')); ?>"
+                   data-byl-newsletter-policy="<?php echo esc_attr($byl_newsletter_policy); ?>">
+                <label class="byl-checkout-marketing-label">
+                  <input type="checkbox" data-byl-newsletter-consent value="1" <?php disabled(!$byl_newsletter_ready); ?>>
+                  <span>Notify me of exclusive offers</span>
+                </label>
+                <p class="byl-checkout-marketing-status" data-byl-newsletter-status role="status" aria-live="polite"><?php
+                  if (!$byl_newsletter_ready) {
+                      echo esc_html__('Email offers are not available yet.', 'beyourlover-v3');
+                  }
+                ?></p>
+              </div>
             </div>
             <div class="byl-choice-card">
               <div class="byl-shipping-rate-section" aria-labelledby="byl-delivery-choice-heading">
