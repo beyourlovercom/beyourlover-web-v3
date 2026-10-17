@@ -53,8 +53,17 @@ async function flush(){await new Promise(r=>setTimeout(r,0))}
   check(s.calls[0].options.referrerPolicy,'no-referrer','no leaking referrer');
   check(s.status.textContent.includes('not subscribed yet'),true,'pending != subscribed');
   check(s.consent.disabled,false,'input unlocked');
+  // An email change AFTER a pending confirmation needs renewed consent.
+  s.email.value='qa+different@example.test';await s.email.emit('input');await flush();
+  check(s.consent.checked,false,'email change revokes old checkbox consent');
+  check(s.status.textContent.includes('Check the box again'),true,'renewed consent guidance');
+  await s.email.emit('blur');await flush();
+  check(s.calls.length,1,'blur must NOT subscribe a different email automatically');
+  s.consent.checked=true;await s.consent.emit('change');await flush();
+  check(s.calls.length,2,'explicit second check permits new pending confirmation');
+  check(s.calls[1].data.email,'qa+different@example.test','request targets newly approved email');
   s.consent.checked=false;await s.consent.emit('change');
-  check(s.calls.length,1,'uncheck does not resubmit');
+  check(s.calls.length,2,'uncheck does not resubmit');
 
   s=await session({response:503});
   s.email.value='qa+fail@example.test';s.consent.checked=true;await s.consent.emit('change');await flush();
