@@ -92,7 +92,15 @@
           throw new Error('SUBSCRIBE_NOT_READY');
         }
         lastRequestedEmail = address;
-        announce('Check your inbox to confirm email offers. You are not subscribed yet.');
+        // Email may change while an async confirmation request is in flight.
+        // Never imply the *new* email was requested, or reuse earlier consent
+        // to request confirmation for it.
+        if (normalizedEmail() !== address) {
+          consent.checked = false;
+          announce('Email changed. Check the box again to request offers for the new address.');
+        } else {
+          announce('Check your inbox to confirm email offers. You are not subscribed yet.');
+        }
       } catch (_error) {
         if (consent.checked) {
           // No false positives and never hold up Woo Checkout.
@@ -121,10 +129,13 @@
       if (consent.checked && !inFlight) requestPendingConfirmation();
     });
     email.addEventListener('input', () => {
-      // Never imply a request for a different email was already accepted.
+      // First opt-in may precede typing an email; preserve that intent until
+      // initial blur. After a pending request for one specific email, a changed
+      // address needs a new explicit checkbox action, not an automatic POST.
       if (consent.checked && lastRequestedEmail
           && String(email.value || '').trim() !== lastRequestedEmail) {
-        announce('Check the email address before requesting offers.');
+        consent.checked = false;
+        announce('Email changed. Check the box again to request offers for the new address.');
       }
     });
   }
