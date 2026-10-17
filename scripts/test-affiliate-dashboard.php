@@ -41,7 +41,12 @@ function is_page($slug): bool { return $slug === 'my-affiliate' && $GLOBALS['byl
 function wp_parse_url($url,$part=-1) { return parse_url($url,$part); }
 function untrailingslashit($s) { return rtrim($s,'/'); }
 function get_stylesheet_directory() { return dirname(__DIR__).'/theme/beyourlover-v3'; }
-function get_stylesheet_directory_uri() { return '/theme/beyourlover-v3'; }
+function get_stylesheet_directory_uri() {
+    if (in_array('--preview', $_SERVER['argv'] ?? [], true)) {
+        return 'file://' . dirname(__DIR__) . '/theme/beyourlover-v3';
+    }
+    return '/theme/beyourlover-v3';
+}
 function home_url($path='/') { return 'https://dev.beyourlover.com'.$path; }
 function wp_get_current_user() { return $GLOBALS['byl_user']; }
 function affwp_get_currency() { return 'USD'; }
@@ -63,7 +68,7 @@ function wp_kses_post($html) { return strip_tags((string)$html,'<table><thead><t
 function shortcode_exists($name) { return $name==='affiliate_coupons'; }
 function do_shortcode($code) { return '<table><tr><td>REALCODE</td></tr></table>'; }
 function mysql2date($format,$value) { return date($format,strtotime($value)); }
-function get_header() { $css=file_get_contents(dirname(__DIR__).'/theme/beyourlover-v3/assets/css/affiliate-dashboard.css'); echo '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local synthetic UAT preview</title><style>'. $css .'</style></head><body style="margin:0;background:#fff"><header style="padding:16px 3%;background:#fff"><strong style="font:24px Georgia,serif;color:#81152a">BeYourLover</strong></header>'; }
+function get_header() { $css=file_get_contents(dirname(__DIR__).'/theme/beyourlover-v3/assets/css/affiliate-dashboard.css'); echo '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Local synthetic UAT preview</title><style>'. $css .'</style></head><body class="byl-affiliate-route" style="margin:0;background:#fff">'; }
 function get_footer() { echo '</body></html>'; }
 function user_can($u,$cap) { return false; }
 require dirname(__DIR__).'/theme/beyourlover-v3/inc/affiliate-dashboard.php';
@@ -88,6 +93,11 @@ $assert(str_contains($render,'Hi, Emma') && str_contains($render,'USD 550.00'),'
 if (in_array('--preview', $argv, true)) { file_put_contents(dirname(__DIR__).'/affiliate-preview.html', $render); }
 $assert(!str_contains($render,'9000') && !str_contains($render,'10000'),'cross-affiliate values do not render');
 $assert(str_contains($render,'Dev test data only'),'Dev local affiliate stats are clearly labeled');
+$assert(str_contains($render,'creator-v2-hero-photo.webp') && str_contains($render,'creator-v2-sidebar-poster.webp'),'approved artwork used as independently hosted WebP');
+$assert(str_contains($render,'Total Referred Orders') && str_contains($render,'Conversion Rate'),'five visually faithful KPI cards without invented conversion rate');
+$assert(!str_contains($render,'EMMA10') && !str_contains($render,'482.50'),'reference mockup coupon and earnings never impersonate live data');
+$assert(str_contains($render,'not yet released as downloadable affiliate campaign assets'),'reference creatives are not falsely approved');
+
 $assert(str_contains($render,'REALCODE'),'assigned coupon shortcode is used');
 $_GET['byl_ref_page']='2';
 $_GET['byl_pay_page']='2';
