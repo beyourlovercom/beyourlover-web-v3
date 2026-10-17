@@ -39,6 +39,10 @@ check("data-byl-invoice-fields" in js and "syncBillingAddressChoice()" in js,"JS
 check("fields.disabled = !separate" in js,"unselected invoice fields not posted")
 check("validateAddress()" in js and "Please complete the separate billing address." in js,"real validation before Payment")
 check("review('billing'" in js,"show true billing summary")
+for token in ('wc_address_i18n_params', "['state','postcode']", "spec.hidden === true",
+              "spec.required !== false", "input.disabled = hidden", "syncInvoiceLocale()"):
+ check(token in js, "Country locale UI contract: " + token)
+check("get_address_fields($country, 'billing_')" in php,"actual Woo locale validation, not one country fits all")
 check(".byl-invoice-address[hidden]" in css and ".byl-address-choice input[type=checkbox]:checked" in css,"burgundy visual")
 check("checkout-drawer.js" not in js and "byl_checkout_drawer" not in form,"no retired checkout drawer")
 print("PASS Checkout genuine address source contract: %s checks" % n)
