@@ -881,17 +881,25 @@
       row.classList.toggle('validate-required', required);
       const label = row.querySelector('label');
       if (!label) continue;
-      let star = label.querySelector('[data-byl-invoice-required]');
-      if (required && !star) {
-        star = document.createElement('span');
-        star.className = 'required';
-        star.dataset.bylInvoiceRequired = '1';
-        star.setAttribute('aria-hidden','true');
-        star.textContent = ' *';
-        label.appendChild(star);
-      } else if (!required && star) star.remove();
-      const oldStars = label.querySelectorAll('.required:not([data-byl-invoice-required])');
-      oldStars.forEach(x => { if (!required) x.remove(); });
+      if (required) {
+        label.querySelectorAll('.optional').forEach(node => node.remove());
+        if (!label.querySelector('.required')) {
+          const star = document.createElement('span');
+          star.className = 'required';
+          star.dataset.bylInvoiceRequired = '1';
+          star.setAttribute('aria-hidden','true');
+          star.textContent = ' *';
+          label.appendChild(star);
+        }
+      } else {
+        label.querySelectorAll('.required').forEach(node => node.remove());
+        if (!label.querySelector('.optional')) {
+          const optional = document.createElement('span');
+          optional.className = 'optional';
+          optional.textContent = ' (optional)';
+          label.appendChild(optional);
+        }
+      }
     }
   }
 
