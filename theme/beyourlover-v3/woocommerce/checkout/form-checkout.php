@@ -75,6 +75,74 @@ $cart = WC()->cart;
             <div class="byl-address-card">
               <h2 class="byl-shipping-details-heading">Add shipping details</h2>
               <div id="customer_details"><div class="byl-checkout-billing"><?php do_action('woocommerce_checkout_billing'); ?></div><div class="byl-checkout-shipping"><?php do_action('woocommerce_checkout_shipping'); ?></div></div>
+
+              <div class="byl-address-persistence" data-byl-address-persistence>
+                <label class="byl-address-choice" for="byl_save_address">
+                  <input type="checkbox" id="byl_save_address" name="byl_save_address" value="1" <?php disabled(!is_user_logged_in()); ?>>
+                  <span>Save this address for future orders</span>
+                </label>
+                <?php if (!is_user_logged_in()) : ?>
+                  <p class="byl-address-account-hint">Log in to save an address for future orders.</p>
+                <?php else : ?>
+                  <p class="byl-address-account-hint" hidden>Saved to your account only if you choose this option when placing an order.</p>
+                <?php endif; ?>
+                <input type="hidden" name="byl_use_shipping_for_billing" value="0">
+                <label class="byl-address-choice" for="byl_use_shipping_for_billing">
+                  <input type="checkbox" id="byl_use_shipping_for_billing" name="byl_use_shipping_for_billing" value="1" checked>
+                  <span>Use this address for billing</span>
+                </label>
+              </div>
+
+              <section class="byl-invoice-address" data-byl-invoice-address hidden aria-label="Separate billing address">
+                <h3>Billing address</h3>
+                <p>Enter the address associated with your payment method. Delivery and shipping costs still use the shipping address above.</p>
+                <fieldset data-byl-invoice-fields disabled>
+                  <?php
+                    // Read stored billing address only when authenticated;
+                    // never claim guest addresses will persist on this site.
+                    $byl_invoice_customer = is_user_logged_in()
+                        ? new WC_Customer(get_current_user_id()) : null;
+                    $byl_invoice_input = static function (string $field): string {
+                        // Re-use only on a failed checkout submission, not arbitrary GET data.
+                        if (isset($_POST['woocommerce-process-checkout-nonce'])
+                            && isset($_POST['byl_invoice_' . $field])
+                            && is_scalar($_POST['byl_invoice_' . $field])) {
+                            return sanitize_text_field(wp_unslash((string) $_POST['byl_invoice_' . $field]));
+                        }
+                        return '';
+                    };
+                    $byl_invoice_fields = [
+                      'country' => ['type'=>'country', 'label'=>'Country / Region', 'required'=>true, 'class'=>['form-row-wide']],
+                      'first_name' => ['type'=>'text', 'label'=>'First name', 'required'=>true, 'class'=>['form-row-first']],
+                      'last_name' => ['type'=>'text', 'label'=>'Last name', 'required'=>true, 'class'=>['form-row-last']],
+                      'address_1' => ['type'=>'text', 'label'=>'Street address', 'required'=>true, 'class'=>['form-row-wide']],
+                      'address_2' => ['type'=>'text', 'label'=>'Apartment, suite, floor', 'required'=>false, 'class'=>['form-row-wide']],
+                      'city' => ['type'=>'text', 'label'=>'City', 'required'=>true, 'class'=>['form-row-first']],
+                      'state' => ['type'=>'state', 'label'=>'State / Region', 'required'=>true, 'class'=>['form-row-last']],
+                      'postcode' => ['type'=>'text', 'label'=>'Postal code', 'required'=>true, 'class'=>['form-row-wide']],
+                      'company' => ['type'=>'text', 'label'=>'Organization', 'required'=>false, 'class'=>['form-row-wide']],
+                    ];
+                    foreach ($byl_invoice_fields as $key => $field) {
+                        $get = 'get_billing_' . $key;
+                        $value = $byl_invoice_input($key);
+                        if ($value === '' && $byl_invoice_customer && is_callable([$byl_invoice_customer, $get])) {
+                            $value = (string) $byl_invoice_customer->{$get}();
+                        }
+                        if ($key === 'state') {
+                            $country_get = $byl_invoice_input('country');
+                            if ($country_get === '' && $byl_invoice_customer) {
+                                $country_get = (string) $byl_invoice_customer->get_billing_country();
+                            }
+                            $field['country'] = $country_get;
+                        }
+                        $field['id'] = 'byl_invoice_' . $key;
+                        $field['input_class'] = ['input-text'];
+                        woocommerce_form_field('byl_invoice_' . $key, $field, $value);
+                    }
+                  ?>
+                </fieldset>
+              </section>
+
               <div data-byl-notes-host></div>
               <div data-byl-country-notices hidden></div>
               <div class="byl-duties-note" role="note">

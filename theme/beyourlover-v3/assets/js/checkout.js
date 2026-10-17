@@ -474,6 +474,12 @@
     const address = [field('billing_address_1'), field('billing_address_2'), field('billing_city'), field('billing_state'), field('billing_postcode'), field('billing_country')].filter(Boolean).join(', ');
     const contact = [field('billing_email'), field('shipping_phone')].filter(Boolean).join(' · ');
     review('address', [name, address].filter(Boolean).join(' · '));
+    const sameBilling = root.querySelector('#byl_use_shipping_for_billing');
+    const invoiceBilling = ['first_name','last_name','address_1','city','state','postcode','country']
+      .map(key => field('byl_invoice_' + key)).filter(Boolean).join(', ');
+    review('billing', sameBilling && !sameBilling.checked
+      ? (invoiceBilling || 'Enter your separate billing address')
+      : 'Same as shipping address');
     review('contact', contact);
     review('delivery', shippingLabel());
     review('payment', paymentLabel());
@@ -499,6 +505,24 @@
       message('Please complete the required shipping and contact information.');
       firstInvalid.focus({preventScroll:false});
       return false;
+    }
+    // Separate billing is a second real address, not just a visual section.
+    // Block progression before Woo/native payment submission when incomplete.
+    const invoiceBox = root.querySelector('[data-byl-invoice-address]');
+    if (invoiceBox && !invoiceBox.hidden) {
+      const billingFieldset = invoiceBox.querySelector('fieldset');
+      const invalid = Array.from(invoiceBox.querySelectorAll('.validate-required')).find(wrapper => {
+        if (wrapper.hidden || getComputedStyle(wrapper).display === 'none') return false;
+        const input = wrapper.querySelector('input:not([type="hidden"]), select, textarea');
+        return !!(input && !input.disabled &&
+          (!String(input.value || '').trim() || (input.validity && !input.validity.valid)));
+      });
+      if (!billingFieldset || billingFieldset.disabled || invalid) {
+        message('Please complete the separate billing address.');
+        const first = invalid && invalid.querySelector('input:not([type="hidden"]), select, textarea');
+        if (first) first.focus({preventScroll:false});
+        return false;
+      }
     }
     return true;
   }
@@ -566,6 +590,7 @@
     wireOptionalAddressFields();
     alignShippingAddressFields();
     syncMexicoRFCField();
+    syncBillingAddressChoice();
     deliveryOptions();
     updateDetails();
     updateAction();
@@ -827,6 +852,134 @@
     }
   }
 
+  // Use the *same* Woo country locale as native Woo billing fields: e.g.
+  // Germany's region optional; UAE postcode optional/hidden. Server validation
+  // reads WC()->countries->get_address_fields(), not client-side claims.
+  function syncInvoiceLocale() {
+    const countryEl = root.querySelector('#byl_invoice_country');
+    if (!countryEl) return;
+    let locale;
+    try {
+      const raw = window.wc_address_i18n_params && window.wc_address_i18n_params.locale;
+      locale = raw && JSON.parse(String(raw).replace(/&quot;/g, '"'));
+    } catch (_e) { return; }
+    if (!locale || !locale.default) return;
+
+    // Woo's core country-select.js only rewrites #billing_state and
+    // #shipping_state. Our separately named invoice state is intentionally
+    // outside that selector, so build its country list from Woo's ORIGINAL
+    // localized countries map, not a hardcoded country/region directory.
+    const stateRow = root.querySelector('#byl_invoice_state_field');
+    let stateInput = root.querySelector('#byl_invoice_state');
+    try {
+      const rawStates = window.wc_country_select_params && window.wc_country_select_params.countries;
+      const countries = rawStates && JSON.parse(String(rawStates).replace(/&quot;/g, '"'));
+      const states = countries && countries[countryEl.value];
+      if (stateRow && stateInput && states && typeof states === 'object'
+          && Object.keys(states).length) {
+        const previous = stateInput.value;
+        if (stateInput.tagName !== 'SELECT') {
+          const select = document.createElement('select');
+          select.id = 'byl_invoice_state';
+          select.name = 'byl_invoice_state';
+          select.className = 'state_select input-text';
+          select.setAttribute('autocomplete', 'address-level1');
+          stateInput.replaceWith(select);
+          stateInput = select;
+          delete stateRow.dataset.bylInvoiceStatesCountry;
+        }
+        if (stateRow.dataset.bylInvoiceStatesCountry !== countryEl.value) {
+          const empty = new Option('Choose state / region', '');
+          const options = [empty];
+          Object.keys(states).forEach(code => {
+            options.push(new Option(states[code], code));
+          });
+          stateInput.replaceChildren(...options);
+          stateInput.value = Object.prototype.hasOwnProperty.call(states, previous)
+            ? previous : '';
+          stateRow.dataset.bylInvoiceStatesCountry = countryEl.value;
+        }
+      } else {
+        if (stateRow && stateInput && stateInput.tagName === 'SELECT') {
+          const field = document.createElement('input');
+          field.type = 'text';
+          field.id = 'byl_invoice_state';
+          field.name = 'byl_invoice_state';
+          field.className = 'input-text';
+          field.setAttribute('autocomplete', 'address-level1');
+          stateInput.replaceWith(field);
+          delete stateRow.dataset.bylInvoiceStatesCountry;
+        }
+      }
+    } catch (_error) {
+      // Never replace real Woo data with invented state values when its
+      // localization is unavailable. Server validation remains authoritative.
+    }
+    const chosen = locale[countryEl.value] || {};
+    for (const key of ['state','postcode']) {
+      const row = root.querySelector('#byl_invoice_' + key + '_field');
+      const input = root.querySelector('#byl_invoice_' + key);
+      if (!row || !input) continue;
+      const defaults = locale.default[key] || {};
+      const countrySpec = chosen[key] || {};
+      const spec = Object.assign({}, defaults, countrySpec);
+      const hidden = spec.hidden === true;
+      const required = !hidden && spec.required !== false;
+      row.hidden = hidden;
+      input.disabled = hidden || !!row.closest('fieldset[disabled]');
+      input.required = required;
+      input.setAttribute('aria-required', required ? 'true' : 'false');
+      row.classList.toggle('validate-required', required);
+      const label = row.querySelector('label');
+      if (!label) continue;
+      if (required) {
+        label.querySelectorAll('.optional').forEach(node => node.remove());
+        if (!label.querySelector('.required')) {
+          const star = document.createElement('span');
+          star.className = 'required';
+          star.dataset.bylInvoiceRequired = '1';
+          star.setAttribute('aria-hidden','true');
+          star.textContent = ' *';
+          label.appendChild(star);
+        }
+      } else {
+        label.querySelectorAll('.required').forEach(node => node.remove());
+        if (!label.querySelector('.optional')) {
+          const optional = document.createElement('span');
+          optional.className = 'optional';
+          optional.textContent = ' (optional)';
+          label.appendChild(optional);
+        }
+      }
+    }
+  }
+
+  // Optional account saving never writes any address from the browser.
+  // Woo Checkout's server-side customer-update gate owns persistence.
+  function syncBillingAddressChoice() {
+    const useShipping = root.querySelector('#byl_use_shipping_for_billing');
+    const section = root.querySelector('[data-byl-invoice-address]');
+    const fields = section && section.querySelector('[data-byl-invoice-fields]');
+    if (!useShipping || !section || !fields) return;
+    const separate = !useShipping.checked;
+    section.hidden = !separate;
+    fields.disabled = !separate;
+    useShipping.setAttribute('aria-expanded', separate ? 'true' : 'false');
+    if (separate && section.dataset.bylInvoiceInitialized !== '1') {
+      section.dataset.bylInvoiceInitialized = '1';
+      const country = section.querySelector('#byl_invoice_country');
+      // Re-use Woo's native country→state list, never a cloned selector.
+      if (country && window.jQuery) window.jQuery(country).trigger('change');
+    }
+    if (separate) syncInvoiceLocale();
+    updateDetails();
+  }
+  $(document).on('change', '#byl_invoice_country', syncInvoiceLocale);
+  const useShippingForBilling = root.querySelector('#byl_use_shipping_for_billing');
+  if (useShippingForBilling) {
+    useShippingForBilling.addEventListener('change', syncBillingAddressChoice);
+    syncBillingAddressChoice();
+  }
   $(document).on('change', '#billing_country', syncMexicoRFCField);
   form.addEventListener('input', updateDetails);
   form.addEventListener('change', updateDetails);
@@ -841,6 +994,7 @@
     wireOptionalAddressFields();
     alignShippingAddressFields();
     syncMexicoRFCField();
+    syncBillingAddressChoice();
     deliveryOptions();
     updateDetails();
     updateAction();

@@ -789,3 +789,40 @@ body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.s
   .byl-checkout-marketing-optin{margin-top:8px}
   .byl-checkout-marketing-label{font-size:12px}
 }
+
+/* Account address saving + separate Billing address — native Woo checkout.
+   No additional checkout step or Drawer. Reference's burgundy, compact UI. */
+.byl-address-persistence{margin:12px 0 0;padding:3px 1px 0}
+.byl-address-choice{display:flex;gap:10px;align-items:center;margin:9px 0;font-size:13px;line-height:1.55;color:#262027;cursor:pointer}
+.byl-address-choice input[type=checkbox]{
+  flex:0 0 19px;width:19px;height:19px;margin:0;appearance:none;-webkit-appearance:none;
+  border:1.5px solid #514750;border-radius:2px;background:#fff;position:relative;cursor:pointer}
+.byl-address-choice input[type=checkbox]:checked{border-color:#93002c;background:#93002c}
+.byl-address-choice input[type=checkbox]:checked:after{
+  content:"";position:absolute;left:5px;top:1px;width:6px;height:11px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.byl-address-choice input[type=checkbox]:focus-visible{outline:2px solid #93002c;outline-offset:3px}
+.byl-address-choice input:disabled{opacity:.48;cursor:not-allowed}
+.byl-address-choice:has(input:disabled){opacity:.65;cursor:not-allowed}
+.byl-address-account-hint{font-size:11px;color:#786e73;margin:0 0 11px 29px;line-height:1.45}
+.byl-address-account-hint[hidden],.byl-invoice-address[hidden]{display:none!important}
+.byl-invoice-address{margin-top:14px;border-top:1px solid #e8e3e6;padding:15px 0 0}
+.byl-invoice-address h3{font-size:15px;font-weight:700;margin:0 0 5px}
+.byl-invoice-address>p{font-size:11px;line-height:1.5;color:#6b6267;margin:0 0 12px}
+.byl-invoice-address fieldset{border:0;padding:0;margin:0;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 10px}
+.byl-invoice-address .form-row{padding:0;margin:0;float:none!important;max-width:100%;min-width:0}
+.byl-invoice-address .form-row-wide{grid-column:1/-1}
+.byl-invoice-address .form-row-first{grid-column:1}
+.byl-invoice-address .form-row-last{grid-column:2}
+.byl-invoice-address .form-row label{display:block;font-size:12px;font-weight:500;margin:0 0 5px}
+.byl-invoice-address .input-text,.byl-invoice-address select,
+.byl-invoice-address .select2-selection{width:100%;max-width:100%;height:42px;min-height:42px;border:1px solid #ded9de;border-radius:5px;background:#fff;padding:8px 10px;box-sizing:border-box;font-size:13px}
+.byl-invoice-address .select2-container{width:100%!important}
+.byl-invoice-address .select2-selection{padding:0 28px 0 10px}
+.byl-invoice-address .select2-selection__rendered{line-height:40px!important}
+.byl-invoice-address .select2-selection__arrow{top:0;height:40px}
+.byl-invoice-address .woocommerce-invalid .input-text,.byl-invoice-address .woocommerce-invalid select{border-color:#93002c}
+@media(max-width:375px){
+  .byl-invoice-address fieldset{grid-template-columns:1fr}
+  .byl-invoice-address .form-row-first,.byl-invoice-address .form-row-last{grid-column:1/-1}
+}
