@@ -123,13 +123,16 @@ get_header();
                     <?php else : ?>
                         <div class="byl-affiliate-link-missing">Your verified referral link is currently unavailable. Please contact your affiliate manager.</div>
                     <?php endif; ?>
-                    <?php
-                    $coupon_html = shortcode_exists('affiliate_coupons') ? trim((string) do_shortcode('[affiliate_coupons]')) : '';
+                    <?php if (!empty($aff['remote_readonly'])): ?>
+                        <p class="byl-affiliate-coupon-note">Promotion codes from your WWW affiliate account are not yet available in this read-only dashboard. Contact your affiliate manager to confirm an assigned code; no Dev test codes are shown.</p>
+                    <?php else:
+                        $coupon_html = shortcode_exists('affiliate_coupons') ? trim((string) do_shortcode('[affiliate_coupons]')) : '';
                     ?>
-                    <?php if ($coupon_html !== ''): ?>
-                        <div class="byl-affiliate-assigned-coupons"><h3>Your assigned promo codes</h3><?php echo wp_kses_post($coupon_html); ?></div>
-                    <?php else: ?>
-                        <p class="byl-affiliate-coupon-note">Your verified promotional codes will appear here when assigned through AffiliateWP. No sample code is shown.</p>
+                        <?php if ($coupon_html !== ''): ?>
+                            <div class="byl-affiliate-assigned-coupons"><h3>Your assigned promo codes</h3><?php echo wp_kses_post($coupon_html); ?></div>
+                        <?php else: ?>
+                            <p class="byl-affiliate-coupon-note">Your verified promotional codes will appear here when assigned through AffiliateWP. No sample code is shown.</p>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </section>
                 <section class="byl-affiliate-card byl-affiliate-referrals" id="referrals" aria-labelledby="byl-referrals-title">
@@ -187,14 +190,18 @@ get_header();
                             </article>
                         <?php endforeach; ?>
                         </div>
-                    <?php else: ?><div class="byl-affiliate-creative-empty"><span aria-hidden="true">◇</span><p>Your affiliate team has not yet published creatives here.</p><small>Only approved promotional material will be displayed.</small></div><?php endif; ?>
+                    <?php else: ?><div class="byl-affiliate-creative-empty"><span aria-hidden="true">◇</span><p><?php echo !empty($aff['remote_readonly']) ? 'Creative assets are not yet available through the WWW read-only connection.' : 'Your affiliate team has not yet published creatives here.'; ?></p><small>Only verified, approved promotional material will be displayed.</small></div><?php endif; ?>
                 </section>
                 <section class="byl-affiliate-card byl-affiliate-support" id="account" aria-labelledby="byl-account-title">
                     <p class="byl-affiliate-eyebrow">WE'RE HERE TO HELP</p><h2 id="byl-account-title">Account & Support</h2>
                     <p>Manage your shopping profile, reach the team about a commission or update payout details through the program's approved process.</p>
                     <div class="byl-affiliate-support-links">
                         <a href="<?php echo esc_url(byl_v3_account_url()); ?>">My Shopping Account <span aria-hidden="true">↗</span></a>
-                        <a href="<?php echo esc_url(home_url('/affiliate-area/')); ?>">Existing AffiliateWP settings &amp; payout preferences <span aria-hidden="true">↗</span></a>
+                        <?php if (!empty($aff['remote_readonly'])): ?>
+                            <a href="https://www.beyourlover.com/affiliate-area/" rel="noopener noreferrer">WWW AffiliateWP settings &amp; payout preferences (WWW affiliate login required) <span aria-hidden="true">↗</span></a>
+                        <?php else: ?>
+                            <a href="<?php echo esc_url(home_url('/affiliate-area/')); ?>">Dev AffiliateWP test settings <span aria-hidden="true">↗</span></a>
+                        <?php endif; ?>
                         <a href="<?php echo esc_url(home_url('/customer-help/')); ?>">Contact Support <span aria-hidden="true">↗</span></a>
                     </div>
                 </section>
