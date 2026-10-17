@@ -43,6 +43,14 @@ for token in ('wc_address_i18n_params', "['state','postcode']", "spec.hidden ===
               "spec.required !== false", "input.disabled = hidden", "syncInvoiceLocale()"):
  check(token in js, "Country locale UI contract: " + token)
 check("get_address_fields($country, 'billing_')" in php,"actual Woo locale validation, not one country fits all")
+for token in ("wc_country_select_params", "byl_invoice_state_field",
+              "states && typeof states === 'object'", "Object.keys(states).length",
+              "new Option('Choose state / region', '')",
+              "Object.keys(states).forEach", "stateInput.replaceChildren(...options)",
+              "stateRow.dataset.bylInvoiceStatesCountry",
+              "stateInput.value = Object.prototype.hasOwnProperty.call(states, previous)",
+              "field.name = 'byl_invoice_state'"):
+ check(token in js,"Separate invoice state uses live Woo country map: " + token)
 check(".byl-invoice-address[hidden]" in css and ".byl-address-choice input[type=checkbox]:checked" in css,"burgundy visual")
 check("checkout-drawer.js" not in js and "byl_checkout_drawer" not in form,"no retired checkout drawer")
 print("PASS Checkout genuine address source contract: %s checks" % n)
