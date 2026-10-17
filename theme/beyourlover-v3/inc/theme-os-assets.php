@@ -53,6 +53,7 @@ add_action('wp_enqueue_scripts', static function (): void {
             $checkout_dependencies[] = 'wc-checkout';
         }
         wp_enqueue_script('byl-v3-checkout', $uri.'/assets/js/checkout.js', $checkout_dependencies, $v('assets/js/checkout.js'), true);
+        wp_enqueue_script('byl-v3-checkout-newsletter', $uri.'/assets/js/checkout-newsletter.js', ['byl-v3-checkout'], $v('assets/js/checkout-newsletter.js'), true);
         wp_localize_script('byl-v3-checkout', 'BYLShippingPromotionCheckout', [
             'cartUrl' => function_exists('rest_url') ? rest_url('wc/store/v1/cart') : '',
             'applyUrl' => function_exists('rest_url') ? rest_url('wc/store/v1/cart/apply-coupon') : '',
