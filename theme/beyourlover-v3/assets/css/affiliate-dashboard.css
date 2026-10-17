@@ -1,0 +1,371 @@
+/* BeYourLover Affiliate Dashboard V1 — scoped, mobile first, no global Woo overrides. */
+.byl-affiliate{--aff-wine:#781127;--aff-wine-dark:#650d20;--aff-pink:#f7eae9;--aff-ink:#241b1f;--aff-muted:#766e70;--aff-border:#eadfe0;background:#fbfaf9;color:var(--aff-ink);font-family:var(--byl-font,'Poppins',sans-serif);font-size:14px;line-height:1.55;min-height:80vh}
+.byl-affiliate h1,.byl-affiliate h2,.byl-affiliate h3,.byl-affiliate em{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.025em}
+.byl-affiliate h1,.byl-affiliate h2,.byl-affiliate h3,.byl-affiliate p{margin-top:0}
+.byl-affiliate a{text-decoration:none;color:inherit}
+.byl-affiliate a:hover{color:var(--aff-wine)}
+.byl-affiliate button,.byl-affiliate input{font:inherit}
+.byl-affiliate button{cursor:pointer}
+.byl-affiliate-eyebrow{font:600 11px/1.45 var(--byl-font,'Poppins',sans-serif);letter-spacing:.17em;text-transform:uppercase;color:var(--aff-wine)}
+.byl-affiliate-layout{max-width:1580px;margin:0 auto;display:grid;grid-template-columns:235px minmax(0,1fr);gap:18px;padding:22px clamp(15px,3vw,40px) 55px}
+.byl-affiliate-rail{background:#fff;border:1px solid #f1ecea;border-radius:12px;padding:20px 14px 22px;min-width:0;align-self:stretch}
+.byl-affiliate-profile{display:flex;align-items:center;gap:11px;padding:2px 5px 27px}
+.byl-affiliate-profile strong{display:block;font:500 21px/1.15 Georgia,serif;color:#241b1f;overflow-wrap:anywhere}
+.byl-affiliate-profile small{display:block;margin:5px 0 8px;color:var(--aff-muted);font-size:11px}
+.byl-affiliate-avatar{display:grid;place-items:center;width:60px;height:60px;flex-shrink:0;border-radius:50%;background:linear-gradient(145deg,#e9c9c3,#f8eeeb 70%);color:var(--aff-wine);font:italic 31px Georgia,serif;border:2px solid #f8e9e4}
+.byl-affiliate-pill{border-radius:50px;background:#f8e8e8;color:#8a3446;font-size:9px;letter-spacing:.11em;padding:4px 9px;font-weight:700}
+.byl-affiliate-menu{display:flex;flex-direction:column;gap:5px}
+.byl-affiliate-menu a{min-height:46px;display:flex;align-items:center;gap:13px;padding:10px 13px;border-radius:8px;font-size:13px}
+.byl-affiliate-menu a:hover,.byl-affiliate-menu a:focus-visible{background:#faf0ef}
+.byl-affiliate-menu a[aria-current]{background:#f8eae9;color:var(--aff-wine);font-weight:600}
+.byl-affiliate-menu-icon{width:22px;text-align:center;font-size:20px;line-height:1;color:var(--aff-wine)}
+.byl-affiliate-rail-foot{margin-top:28px;padding:19px 9px 0;border-top:1px solid var(--aff-border);display:grid;gap:12px;font-size:12px}
+.byl-affiliate-rail-foot a{display:flex;justify-content:space-between}
+.byl-affiliate-rail-quote{border-radius:10px;background:linear-gradient(140deg,#f4eae6,#ead5d4 70%,#f5eeeb);margin-top:48px;padding:28px 18px;min-height:230px;display:flex;flex-direction:column;justify-content:center}
+.byl-affiliate-rail-quote em{font-size:25px;line-height:1.27}
+.byl-affiliate-rail-quote p{font-size:9px;letter-spacing:.18em;margin:24px 0 0;color:#6e555c}
+.byl-affiliate-main{min-width:0}
+.byl-affiliate-hero{border-radius:10px;position:relative;overflow:hidden;height:225px;background:linear-gradient(100deg,#f0e7e3 3%,#f6edeb 55%,#b79e96);margin-bottom:12px}
+.byl-affiliate-hero-text{position:relative;z-index:2;padding:31px 42px;width:min(64%,690px)}
+.byl-affiliate-hero h1{font-size:clamp(34px,3.2vw,51px);line-height:1.02;font-weight:400;margin:10px 0 0}
+.byl-affiliate-hero-dot{color:var(--aff-wine)}
+.byl-affiliate-hero-subtitle{font-size:clamp(17px,2.1vw,27px);margin:4px 0 12px}
+.byl-affiliate-hero-description{color:#685d60;font-size:12px;max-width:520px;line-height:1.8}
+.byl-affiliate-hero-image{position:absolute;right:0;top:0;width:44%;height:100%;object-fit:cover;object-position:center 31%;filter:saturate(.68)}
+.byl-affiliate-hero:after{content:"";position:absolute;z-index:1;right:34%;top:0;bottom:0;width:21%;background:linear-gradient(90deg,#f0e7e3,rgba(240,231,227,0))}
+.byl-affiliate-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:12px}
+.byl-affiliate-stat{border:1px solid #eee4e4;background:#fff;border-radius:9px;padding:15px 13px;display:flex;align-items:flex-start;gap:10px;min-width:0;min-height:112px}
+.byl-affiliate-stat-icon{width:39px;height:39px;border-radius:50%;background:#f9ebeb;color:var(--aff-wine);font:24px/1 Georgia,serif;display:grid;place-items:center;flex-shrink:0}
+.byl-affiliate-stat p{font-size:11px;margin:1px 0 8px;color:#4e4348}
+.byl-affiliate-stat strong{display:block;white-space:nowrap;font:400 clamp(17px,1.85vw,28px)/1.1 Georgia,serif;letter-spacing:-.04em;color:#171316}
+.byl-affiliate-stat small{display:block;color:var(--aff-muted);font-size:10px;margin-top:9px;line-height:1.4}
+.byl-affiliate-panels{display:grid;grid-template-columns:minmax(0,1.23fr) minmax(310px,.85fr);gap:12px}
+.byl-affiliate-card{min-width:0;background:#fff;border:1px solid #ede5e5;border-radius:10px;padding:21px 22px;scroll-margin-top:110px}
+.byl-affiliate-card h2{font-weight:400;font-size:25px;line-height:1.2;margin:0}
+.byl-affiliate-card h3{font-size:20px;font-weight:400;margin:20px 0 8px}
+.byl-affiliate-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.byl-affiliate-tag{display:inline-block;white-space:nowrap;color:#77646a;border:1px solid #eee2e3;border-radius:20px;padding:5px 10px;font-size:10px}
+.byl-affiliate-muted,.byl-affiliate-chart-caption,.byl-affiliate-footnote{color:#8a8082;font-size:11px;line-height:1.7;margin-bottom:10px}
+.byl-affiliate-chart{height:188px;border-bottom:1px solid #d8ced0;display:flex;align-items:flex-end;gap:8px;padding:3px 10px 0;background:repeating-linear-gradient(to top,transparent 0,transparent 45px,rgba(129,94,102,.12) 46px,transparent 47px)}
+.byl-affiliate-bar{flex:1;min-width:8px;height:var(--byl-bar-height);max-height:97%;background:linear-gradient(180deg,#a53653,#7c142c);border-radius:3px 3px 0 0;transition:background .18s}
+.byl-affiliate-bar:hover{background:#cf7884}
+.byl-affiliate-chart-caption{margin:12px 0 0}
+.byl-affiliate-empty-chart{height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#77686a;background:repeating-linear-gradient(to top,#fff 0,#fff 44px,#f7f1f1 45px,#fff 46px)}
+.byl-affiliate-empty-chart span{font:48px Georgia,serif;color:#bd8793}.byl-affiliate-empty-chart p{margin:8px 0 1px;font-weight:600}.byl-affiliate-empty-chart small{font-size:11px}
+.byl-affiliate-sharing{background:linear-gradient(120deg,#f7ebea 0%,#f8efed 58%,#edd7d6 100%);border-color:#f0dfde}
+.byl-affiliate-sharing-top{padding:3px 2px 12px}
+.byl-affiliate-sharing h2{font-size:31px}
+.byl-affiliate-sharing-top p:last-child{font-size:12px;color:#74646a;margin:8px 0 0}
+.byl-affiliate-link-wrap{padding:6px 0 0}
+.byl-affiliate-link-wrap label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:#8c6c74;margin-bottom:7px}
+.byl-affiliate-copy-row{display:flex;gap:8px}
+.byl-affiliate-copy-row input{width:100%;min-width:0;padding:12px 10px;color:#47323b;border:1px solid #efdede;border-radius:7px;background:#fff;font-size:11px;outline-offset:2px}
+.byl-affiliate-copy{border:0;background:var(--aff-wine);color:white;border-radius:7px;padding:0 18px;white-space:nowrap;font-size:12px;font-weight:600;min-height:44px}
+.byl-affiliate-copy:hover{background:var(--aff-wine-dark)}
+.byl-affiliate-open-link{display:inline-block;margin-top:10px;color:var(--aff-wine)!important;font-size:11px;text-decoration:underline!important}
+.byl-affiliate-coupon-note{margin:22px 0 0;color:#745e64;font-size:11px;line-height:1.8}
+.byl-affiliate-link-missing{background:#fff;padding:15px;border-radius:6px;color:#674c54;font-size:12px}
+.byl-affiliate-table-wrap{overflow-x:auto;max-width:100%}
+.byl-affiliate-table{border-collapse:collapse;width:100%;text-align:left;white-space:nowrap;font-size:12px}
+.byl-affiliate-table thead{background:#faf7f7}
+.byl-affiliate-table th{font-weight:500;color:#726568;font-size:11px}
+.byl-affiliate-table th,.byl-affiliate-table td{padding:11px 9px;border-bottom:1px solid #f0ebeb}
+.byl-affiliate-table td:first-child{font-weight:600}
+.byl-affiliate-status{display:inline-flex;align-items:center;gap:6px;font-size:11px}
+.byl-affiliate-status:before{content:"";width:7px;height:7px;border-radius:50%;background:#c69535}
+.byl-affiliate-status--paid:before{background:#3c9a62}.byl-affiliate-status--unpaid:before{background:#c69535}.byl-affiliate-status--rejected:before{background:#ba5561}
+.byl-affiliate-payout-summary{background:#f9f2f1;padding:17px;border-radius:8px;display:flex;gap:12px;align-items:center}
+.byl-affiliate-payout-summary>span{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#f4e4e3;color:var(--aff-wine);font-size:26px}
+.byl-affiliate-payout-summary small{color:#73666a;font-size:11px;display:block}
+.byl-affiliate-payout-summary strong{display:block;font:25px Georgia,serif;margin-top:3px}
+.byl-affiliate-payout-list{list-style:none;margin:0;padding:0}
+.byl-affiliate-payout-list li{display:grid;grid-template-columns:1fr auto auto;gap:10px;padding:11px 0;border-bottom:1px solid #f1ebeb;font-size:11px;align-items:center}
+.byl-affiliate-payout-list strong{font-weight:500}
+.byl-affiliate-payout-list small{font-size:10px;background:#ebf5ec;border-radius:25px;padding:3px 8px;color:#427550}
+.byl-affiliate-creative-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.byl-affiliate-creative-item{min-width:0}
+.byl-affiliate-creative-item img,.byl-affiliate-creative-fallback{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:7px;background:linear-gradient(130deg,#e7c7c4,#9c6375);overflow:hidden}
+.byl-affiliate-creative-fallback{display:grid;place-items:center;color:#fff;font:14px Georgia,serif}
+.byl-affiliate-creative-item strong{display:block;font-size:11px;font-weight:500;margin-top:7px;overflow-wrap:anywhere}
+.byl-affiliate-creative-empty{background:#faf4f3;border-radius:8px;padding:36px 16px;text-align:center;color:#796a6d}
+.byl-affiliate-creative-empty span{font:40px Georgia,serif;color:#8b344c}.byl-affiliate-creative-empty p{margin:4px 0;font-weight:500}.byl-affiliate-creative-empty small{font-size:11px}
+.byl-affiliate-empty{color:#827779;background:#fcf9f9;border-radius:8px;padding:28px 12px;text-align:center;font-size:12px}
+.byl-affiliate-support{background:linear-gradient(125deg,#faf1ee,#f1e3e1)}
+.byl-affiliate-support h2{font-size:28px}
+.byl-affiliate-support>p:not(.byl-affiliate-eyebrow){font-size:12px;color:#6e5c62;line-height:1.9;max-width:400px;margin:10px 0 26px}
+.byl-affiliate-support-links{display:grid;gap:10px}
+.byl-affiliate-support-links a{background:var(--aff-wine);color:#fff;display:flex;justify-content:space-between;gap:10px;border-radius:6px;padding:12px 15px;font-size:12px;min-height:43px}
+.byl-affiliate-support-links a:hover{background:#6b152b;color:#fff}
+.byl-affiliate-gate{max-width:650px;margin:55px auto 100px;padding:55px 36px;text-align:center;background:linear-gradient(125deg,#fff,#f7eceb);border:1px solid #f2e4e4;border-radius:12px}
+.byl-affiliate-gate h1{font-size:clamp(30px,4vw,45px);font-weight:400;margin:10px 0 12px}.byl-affiliate-gate>p:not(.byl-affiliate-eyebrow){color:#76696e}
+.byl-affiliate-button{display:inline-flex;gap:16px;background:var(--aff-wine);color:white!important;padding:13px 24px;border-radius:6px;margin-top:18px}
+.byl-affiliate-bottom-nav{display:none}
+@media(max-width:1250px){
+ .byl-affiliate-layout{grid-template-columns:205px minmax(0,1fr);gap:12px;padding:15px}
+ .byl-affiliate-stat{padding:13px 9px;gap:7px}.byl-affiliate-stat-icon{width:34px;height:34px}
+ .byl-affiliate-stats{gap:8px}.byl-affiliate-panels{gap:9px}
+ .byl-affiliate-card{padding:18px}
+ .byl-affiliate-hero-text{padding:25px 29px}
+}
+@media(max-width:990px){
+ .byl-affiliate-layout{grid-template-columns:1fr}
+ .byl-affiliate-rail{display:none}
+ .byl-affiliate-hero{height:205px}
+ .byl-affiliate-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .byl-affiliate-panels{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .byl-affiliate-creative-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:660px){
+ .byl-affiliate{font-size:13px;padding-bottom:74px}
+ .byl-affiliate-layout{display:block;padding:0 12px 26px}
+ .byl-affiliate-hero{height:160px;margin:0 -12px 11px;border-radius:0}
+ .byl-affiliate-hero-text{padding:20px 18px;width:70%}
+ .byl-affiliate-hero h1{font-size:31px;margin-top:7px}
+ .byl-affiliate-hero-subtitle{font-size:16px;margin:1px 0 5px}
+ .byl-affiliate-hero-description{font-size:10px;line-height:1.4;max-width:240px}
+ .byl-affiliate-hero .byl-affiliate-eyebrow{font-size:9px}
+ .byl-affiliate-hero-image{width:40%;object-position:center}
+ .byl-affiliate-hero:after{right:33%;width:22%}
+ .byl-affiliate-stats{gap:8px;margin-bottom:10px}
+ .byl-affiliate-stat{min-height:100px;border-radius:8px;padding:12px;gap:9px}
+ .byl-affiliate-stat-icon{width:34px;height:34px;font-size:20px}
+ .byl-affiliate-stat p{font-size:10px;margin:1px 0 5px}
+ .byl-affiliate-stat strong{font-size:21px}
+ .byl-affiliate-stat small{font-size:9px;margin-top:5px}
+ .byl-affiliate-panels{display:flex;flex-direction:column;gap:10px}
+ .byl-affiliate-card{padding:17px 16px;border-radius:9px;scroll-margin-top:95px}
+ .byl-affiliate-card h2{font-size:23px}
+ .byl-affiliate-sharing{order:-1}
+ .byl-affiliate-sharing h2{font-size:27px}
+ .byl-affiliate-performance{order:0}
+ .byl-affiliate-referrals{order:1}
+ .byl-affiliate-payouts{order:2}
+ .byl-affiliate-creatives{order:3}
+ .byl-affiliate-support{order:4}
+ .byl-affiliate-chart{height:170px}
+ .byl-affiliate-copy-row input{font-size:10px}.byl-affiliate-copy{padding:0 12px;font-size:11px}
+ .byl-affiliate-bottom-nav{position:fixed;z-index:199;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:1px solid #eddfdf;padding:7px max(10px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));box-shadow:0 -4px 20px #4222260b}
+ .byl-affiliate-bottom-nav a{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;min-height:45px;color:#67535a;font-size:10px;text-align:center}
+ .byl-affiliate-bottom-nav a:first-child{color:var(--aff-wine)}
+ .byl-affiliate-bottom-nav a span{font-size:22px;line-height:1}
+ .byl-affiliate-gate{margin:22px 12px 40px;padding:40px 20px}
+}
+@media(max-width:365px){
+ .byl-affiliate-hero h1{font-size:27px}
+ .byl-affiliate-hero-description{max-width:195px}
+ .byl-affiliate-stat strong{font-size:17px;letter-spacing:-.02em}
+}
+@media(prefers-reduced-motion:reduce){.byl-affiliate *{scroll-behavior:auto!important;transition:none!important}}
+
+/* M390 owner concept parity: keep text clear of hero photography and cards inside viewport. */
+@media(max-width:660px){.byl-affiliate-hero-text{width:67%;}.byl-affiliate-hero-image{width:41%;object-position:50% 45%;}.byl-affiliate-hero:after{right:36%;width:21%;}.byl-affiliate-hero-description{max-width:205px;}.byl-affiliate-stat,.byl-affiliate-stat>div{min-width:0;}.byl-affiliate-stat strong{white-space:normal;overflow-wrap:anywhere;}.byl-affiliate-copy-row input{flex:1;width:0;}}
+
+/* Historic AffiliateWP records: compact, touch-friendly, native GET navigation. */
+.byl-affiliate-history-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:14px 0 4px;font-size:13px;color:#6e6868}
+.byl-affiliate-history-nav a{color:#84152a;text-decoration:underline;text-underline-offset:3px;min-height:36px;display:inline-flex;align-items:center}
+.byl-affiliate-history-nav a:focus-visible{outline:2px solid #84152a;outline-offset:3px}
+
+/* Creator Dashboard V2 — exact-design visual layer.
+ * Scoped to the Creator route; no Woo/checkout/account/global theme change.
+ * The raster artwork is cropped from the Owner-approved 1448×1086 design.
+ * Real referral, earnings and payout figures remain AffiliateWP-owned.
+ */
+body.byl-affiliate-route .byl-shell-header,
+body.byl-affiliate-route .byl-shell-footer{display:none!important}
+body.byl-affiliate-route{background:#faf8f6}
+.byl-affiliate-v2{--aff-wine:#6c1025;--aff-wine-dark:#520b1b;--aff-pink:#f6e8e6;--aff-ink:#191319;--aff-muted:#786c70;--aff-border:#e8e3e1;width:100%;max-width:none;min-height:100vh;background:#faf8f6;color:#1c1419;font-family:Georgia,'Times New Roman',serif;line-height:1.35;font-size:14px}
+.byl-affiliate-v2 *{box-sizing:border-box}
+.byl-affiliate-v2 h1,.byl-affiliate-v2 h2,.byl-affiliate-v2 h3{letter-spacing:-.033em}
+.byl-affiliate-v2 .byl-v2-topbar{height:55px;display:flex;justify-content:space-between;align-items:center;gap:22px;padding:0 35px;background:#fff;border-bottom:1px solid #eeeae8;position:relative;z-index:10}
+.byl-v2-wordmark{font:400 27px/1 Georgia,'Times New Roman',serif;letter-spacing:.19em;color:#581322!important;white-space:nowrap}
+.byl-v2-top-links{display:flex;gap:clamp(20px,3vw,42px);align-items:center;margin:auto}
+.byl-v2-top-links a{font:14px Georgia,'Times New Roman',serif;white-space:nowrap}
+.byl-v2-top-actions{display:flex;gap:22px;align-items:center}
+.byl-v2-top-actions a{display:flex;align-items:center;justify-content:center;width:25px;height:32px;color:#1a1a1a}
+.byl-affiliate-v2 .byl-affiliate-layout{max-width:1536px;margin:0 auto;grid-template-columns:244px minmax(0,1fr);gap:14px;padding:0 40px 36px 0}
+.byl-affiliate-v2 .byl-affiliate-rail{padding:29px 12px 0 15px;background:linear-gradient(96deg,#f9f8f7,#fff);border:0;border-radius:0;min-height:1010px;align-self:stretch}
+.byl-affiliate-v2 .byl-affiliate-profile{gap:12px;padding:0 4px 28px}
+.byl-affiliate-v2 .byl-affiliate-avatar{display:block;object-fit:cover;width:78px;height:78px;border:0;background:#e6d9d4;border-radius:50%;padding:0}
+.byl-affiliate-v2 .byl-affiliate-profile strong{font:400 18px/1.1 Georgia,'Times New Roman',serif;color:#241c1e}
+.byl-affiliate-v2 .byl-affiliate-profile small{font:13px/1.1 Georgia,'Times New Roman',serif;color:#5b4a4f;margin:7px 0 10px}
+.byl-affiliate-v2 .byl-affiliate-pill{font:700 9px/1.3 var(--byl-font,'Arial',sans-serif);letter-spacing:.15em;padding:4px 9px;border-radius:30px;color:#894050;background:#f4e5e4}
+.byl-affiliate-v2 .byl-affiliate-menu{gap:3px}
+.byl-affiliate-v2 .byl-affiliate-menu a{min-height:45px;border-radius:9px;padding:10px 18px;gap:15px;font:14px/1.2 Georgia,'Times New Roman',serif}
+.byl-affiliate-v2 .byl-affiliate-menu a[aria-current]{background:#f7e9e7;font-weight:400;color:#681226}
+.byl-affiliate-v2 .byl-affiliate-menu-icon{width:27px;display:flex;align-items:center;justify-content:center;color:#261f20}
+.byl-affiliate-v2 .byl-affiliate-menu a[aria-current] .byl-affiliate-menu-icon{color:#681226}
+.byl-affiliate-v2 .byl-affiliate-rail-foot{margin:12px 14px 0;padding:21px 4px 0;border-top:1px solid #ebe6e4;gap:15px;font:13px Georgia,serif}
+.byl-affiliate-v2 .byl-affiliate-rail-foot a:not(.byl-v2-logout){display:none}
+.byl-affiliate-v2 .byl-affiliate-rail-foot a.byl-v2-logout{justify-content:flex-start;align-items:center;gap:13px;font-size:14px}
+.byl-affiliate-v2 .byl-affiliate-rail-quote{margin:74px 0 0;padding:0;border:0;background:transparent;display:block;min-height:0}
+.byl-affiliate-v2 .byl-affiliate-rail-quote img{display:block;width:100%;height:auto;border-radius:9px;object-fit:cover}
+.byl-affiliate-v2 .byl-affiliate-main{padding-top:0}
+.byl-affiliate-v2 .byl-affiliate-hero{height:189px;border-radius:9px;background:linear-gradient(90deg,#f1efed 0%,#f3f0ee 54%,#d5ccc7 100%);margin:0 0 11px;display:block}
+.byl-affiliate-v2 .byl-affiliate-hero-text{padding:30px 40px;width:49%;z-index:3}
+.byl-affiliate-v2 .byl-affiliate-hero h1{font:400 clamp(32px,3.2vw,49px)/1.06 Georgia,serif;margin:0;letter-spacing:-.04em;color:#101011}
+.byl-affiliate-v2 .byl-affiliate-hero-subtitle{font:italic clamp(19px,2vw,28px)/1.12 Georgia,serif;margin:1px 0 14px;color:#211e1e}
+.byl-affiliate-v2 .byl-affiliate-hero-description{font:13px/1.42 Georgia,serif;max-width:475px;color:#71676a}
+.byl-affiliate-v2 .byl-affiliate-hero-image{left:43%;right:auto;top:0;width:43%;height:100%;object-fit:cover;object-position:center center;filter:none}
+.byl-affiliate-v2 .byl-affiliate-hero:after{z-index:2;left:38%;right:auto;top:0;bottom:0;width:13%;background:linear-gradient(90deg,#f1efed 0%,rgba(241,239,237,0) 100%)}
+.byl-v2-hero-slogan{position:absolute;right:1.5%;top:43%;width:13%;z-index:3;font:600 8px/1.9 var(--byl-font,'Arial',sans-serif);letter-spacing:.24em;color:#3c3232;text-align:left;white-space:nowrap}
+.byl-v2-hero-slogan span{display:block;background:#a68787;width:30px;height:1px;margin-top:9px}
+.byl-affiliate-v2 .byl-affiliate-stats{grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:11px}
+.byl-affiliate-v2 .byl-affiliate-stat{border-radius:9px;padding:14px 12px 13px;min-height:97px;gap:11px;align-items:flex-start;background:#fff;border:1px solid #eae7e5;overflow:hidden}
+.byl-affiliate-v2 .byl-affiliate-stat-icon{background:#f8eae8;width:43px;height:43px;font:28px/1 Georgia,serif;flex-shrink:0;color:#79162c}
+.byl-affiliate-v2 .byl-affiliate-stat-icon svg{width:20px;height:20px}
+.byl-affiliate-v2 .byl-affiliate-stat p{font:12px/1.2 Georgia,serif;color:#4d4547;margin:1px 0 8px}
+.byl-affiliate-v2 .byl-affiliate-stat strong{font:400 clamp(18px,1.8vw,25px)/1.12 Georgia,serif;letter-spacing:-.045em;color:#161214;overflow-wrap:anywhere;white-space:normal}
+.byl-affiliate-v2 .byl-affiliate-stat small{font:11px/1.2 Georgia,serif;margin-top:7px;color:#847779;white-space:normal}
+.byl-affiliate-v2 .byl-affiliate-panels{grid-template-columns:minmax(0,1.31fr) minmax(0,1fr);gap:11px 12px}
+.byl-affiliate-v2 .byl-affiliate-card{border-radius:9px;border-color:#eae6e4;padding:16px 18px;overflow:hidden}
+.byl-affiliate-v2 .byl-affiliate-card h2{font:400 22px/1.18 Georgia,serif;letter-spacing:-.04em;color:#241e21}
+.byl-affiliate-v2 .byl-affiliate-card h3{font:400 15px/1.2 Georgia,serif}
+.byl-affiliate-v2 .byl-affiliate-card-top{margin-bottom:12px}
+.byl-affiliate-v2 .byl-affiliate-tag{font:11px Georgia,serif;padding:5px 11px}
+.byl-affiliate-v2 .byl-v2-text-link,.byl-affiliate-v2 .byl-v2-view-all{font:12px Georgia,serif;color:#70132b;background:none;border:0;padding:4px 0;white-space:nowrap;cursor:pointer}
+.byl-affiliate-v2 .byl-affiliate-performance{min-height:224px}
+.byl-affiliate-v2 .byl-affiliate-performance .byl-affiliate-muted{font:11px Georgia,serif;margin:0 0 4px}
+.byl-affiliate-v2 .byl-affiliate-chart{height:137px;gap:8px;padding:2px 11px 0 20px;background:repeating-linear-gradient(to top,transparent 0,transparent 31px,rgba(106,82,81,.14) 32px,transparent 33px);border-bottom-color:#d5cfcf}
+.byl-affiliate-v2 .byl-affiliate-bar{border-radius:1px 1px 0 0;background:linear-gradient(180deg,#ad4358,#79172c);min-width:6px}
+.byl-affiliate-v2 .byl-affiliate-chart-caption{font:10px Georgia,serif;margin:4px 0 0;color:#8b7f81;line-height:1.3}
+.byl-affiliate-v2 .byl-affiliate-sharing{position:relative;min-height:224px;padding:0;background:linear-gradient(120deg,#f7e8e5 0%,#f4e2df 64%,#ecdad5 100%)}
+.byl-affiliate-v2 .byl-affiliate-sharing-top{position:relative;height:143px;padding:17px 22px 0;overflow:hidden;isolation:isolate}
+.byl-affiliate-v2 .byl-affiliate-sharing h2{font:400 19px Georgia,serif;color:#651126}
+.byl-affiliate-v2 .byl-affiliate-sharing-top>p{max-width:60%;font:12px/1.2 Georgia,serif;color:#76666a;margin:5px 0 7px}
+.byl-affiliate-v2 .byl-affiliate-sharing-top .byl-v2-code-unavailable{width:49%;background:#fff;min-height:42px;border-radius:7px;color:#7b3847;display:flex;align-items:center;justify-content:center;font:12px Georgia,serif;letter-spacing:.03em}
+.byl-v2-promo-photo{position:absolute;z-index:-1;right:0;top:0;width:43%;height:143px;object-fit:cover;object-position:center}
+.byl-affiliate-v2 .byl-affiliate-link-wrap{padding:8px 19px 0}
+.byl-affiliate-v2 .byl-affiliate-link-wrap label{font:700 9px/1 var(--byl-font,'Arial',sans-serif);margin:0 0 7px;letter-spacing:.17em;color:#846c70}
+.byl-affiliate-v2 .byl-affiliate-copy-row{gap:7px}
+.byl-affiliate-v2 .byl-affiliate-copy-row input{min-height:36px;height:36px;border:0;border-radius:6px;padding:7px 10px;font:11px Georgia,serif}
+.byl-affiliate-v2 .byl-affiliate-copy{min-height:36px;height:36px;border-radius:6px;background:#671126;font:12px Georgia,serif;padding:0 15px}
+.byl-affiliate-v2 .byl-v2-share-button{min-height:36px;height:36px;padding:0 11px;border-radius:6px;background:#fff;border:1px solid #b88e98;color:#76182e;font:12px Georgia,serif;cursor:pointer}
+.byl-affiliate-v2 .byl-affiliate-open-link{display:none}
+.byl-affiliate-v2 .byl-affiliate-coupon-note{font:10px/1.3 Georgia,serif;color:#88787a;margin:5px 18px 8px;max-width:95%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.byl-affiliate-v2 .byl-affiliate-referrals,.byl-affiliate-v2 .byl-affiliate-payouts{min-height:237px}
+.byl-affiliate-v2 .byl-affiliate-table th{font:12px Georgia,serif;background:#f8f6f5;color:#52484a}
+.byl-affiliate-v2 .byl-affiliate-table td{font:12px Georgia,serif;color:#3f3639}
+.byl-affiliate-v2 .byl-affiliate-table th,.byl-affiliate-v2 .byl-affiliate-table td{padding:8px 9px;border-bottom:1px solid #ede9e8}
+.byl-affiliate-v2 .byl-affiliate-table td:first-child{font-weight:400}
+.byl-affiliate-v2 .byl-affiliate-status{font:12px Georgia,serif;white-space:nowrap}
+.byl-affiliate-v2 .byl-affiliate-status--paid{color:#4b8a58}.byl-affiliate-v2 .byl-affiliate-status--unpaid{color:#be7926}
+.byl-affiliate-v2 .byl-v2-row-chevron{float:right;font:18px/1 Georgia,serif;margin-left:4px;color:#54464c}
+.byl-affiliate-v2 .byl-affiliate-referrals:not(.is-expanded) .byl-affiliate-table tbody tr:nth-child(n+6){display:none}
+.byl-affiliate-v2 .byl-affiliate-referrals:not(.is-expanded) .byl-affiliate-history-nav,.byl-affiliate-v2 .byl-affiliate-referrals:not(.is-expanded)>.byl-affiliate-footnote{display:none}
+.byl-affiliate-v2 .byl-affiliate-payout-summary{padding:10px 12px;background:#f9f7f6;min-height:63px;gap:12px}
+.byl-affiliate-v2 .byl-affiliate-payout-summary>span{width:40px;height:40px;color:#7a1830}
+.byl-affiliate-v2 .byl-affiliate-payout-summary>div:not(.byl-v2-unpaid-cell){flex:1}
+.byl-affiliate-v2 .byl-v2-unpaid-cell{border-left:1px solid #e2dcda;padding-left:15px;flex:1}
+.byl-affiliate-v2 .byl-affiliate-payout-summary small{font:11px Georgia,serif}
+.byl-affiliate-v2 .byl-affiliate-payout-summary strong{font:20px Georgia,serif;margin-top:4px;white-space:nowrap}
+.byl-affiliate-v2 .byl-affiliate-payout-summary strong.byl-v2-no-date{font-size:16px}
+.byl-affiliate-v2 .byl-affiliate-payouts h3{font-size:14px;margin:13px 0 4px}
+.byl-affiliate-v2 .byl-affiliate-payouts .byl-affiliate-empty{background:transparent;text-align:left;font:12px Georgia,serif;color:#84787c;padding:10px 0}
+.byl-affiliate-v2 .byl-affiliate-payouts .byl-affiliate-history-nav,.byl-affiliate-v2 .byl-affiliate-payouts>.byl-affiliate-footnote{font-size:10px;margin:3px 0 0}
+.byl-affiliate-v2 .byl-affiliate-creatives,.byl-affiliate-v2 .byl-affiliate-support{min-height:196px}
+.byl-v2-creative-filters{display:flex;gap:6px;flex-wrap:nowrap;margin:-3px 0 11px;overflow-x:auto;scrollbar-width:none}
+.byl-v2-creative-filters button{font:11px Georgia,serif;border:1px solid #eae6e4;background:#fff;border-radius:20px;color:#55484c;padding:5px 12px;white-space:nowrap;cursor:pointer}
+.byl-v2-creative-filters button.byl-v2-filter-active{background:#681326;color:#fff;border-color:#681326}
+.byl-v2-creative-previews{display:grid;grid-template-columns:1.34fr 1fr .9fr 1.38fr;gap:6px;overflow:hidden}
+.byl-v2-creative-previews img{min-width:0;display:block;width:100%;height:111px;object-fit:cover;border-radius:5px}
+.byl-v2-creative-previews img[hidden]{display:none}
+.byl-v2-concept-disclaimer{font:9px/1.2 Georgia,serif;color:#817477;margin:5px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.byl-affiliate-v2 .byl-affiliate-support{position:relative;padding:18px 18px;background:#f9f4f1}
+.byl-v2-support-anchor{position:absolute;top:0}
+.byl-v2-support-photo{position:absolute;right:0;top:0;width:43%;height:100%;object-fit:cover;object-position:top right;z-index:0}
+.byl-affiliate-v2 .byl-affiliate-support:after{content:"";position:absolute;right:35%;top:0;bottom:0;width:20%;background:linear-gradient(90deg,#f9f4f1,transparent);pointer-events:none}
+.byl-v2-support-content{position:relative;z-index:2;max-width:65%}
+.byl-v2-support-content h2{display:flex;align-items:center;gap:10px;font-size:19px!important;white-space:nowrap}
+.byl-v2-support-icon{display:inline-flex;color:#772039;flex-shrink:0;border:1px solid #8f3a50;border-radius:50%;padding:4px}
+.byl-affiliate-v2 .byl-v2-support-lead{font:14px Georgia,serif!important;color:#282126!important;margin:10px 0 4px!important}
+.byl-affiliate-v2 .byl-v2-support-content>p:not(.byl-v2-support-lead){font:11px/1.3 Georgia,serif;max-width:310px;margin:0 0 12px;color:#786c70}
+.byl-v2-contact-button{display:flex;justify-content:center;align-items:center;background:#6c1025;color:#fff!important;min-height:36px;border-radius:5px;padding:8px 12px;font:12px Georgia,serif;width:75%;max-width:255px}
+.byl-v2-account-links{font:10px Georgia,serif;margin-top:5px;max-width:300px}
+.byl-v2-account-links summary{cursor:pointer;color:#7a3b4d}
+.byl-v2-account-links a{display:block;color:#76172b!important;margin:4px 0}
+@media(max-width:1190px){
+ .byl-affiliate-v2 .byl-affiliate-layout{grid-template-columns:210px minmax(0,1fr);gap:10px;padding-right:10px}
+ .byl-affiliate-v2 .byl-affiliate-rail{padding-left:10px;padding-right:9px}
+ .byl-affiliate-v2 .byl-affiliate-stat{gap:7px;padding:11px 7px}
+ .byl-affiliate-v2 .byl-affiliate-stat-icon{width:33px;height:33px;font-size:21px}
+ .byl-affiliate-v2 .byl-affiliate-stat p{font-size:10px}
+ .byl-affiliate-v2 .byl-affiliate-stat strong{font-size:18px}
+ .byl-affiliate-v2 .byl-affiliate-card{padding:14px}
+ .byl-affiliate-v2 .byl-affiliate-hero-text{padding:30px 26px}
+ .byl-v2-wordmark{font-size:22px}
+}
+@media(max-width:990px){
+ .byl-affiliate-v2 .byl-affiliate-layout{grid-template-columns:1fr;padding:0 11px 35px;gap:0}
+ .byl-affiliate-v2 .byl-affiliate-rail{display:flex;min-height:0;border-radius:0;background:transparent;padding:10px 0 0}
+ .byl-affiliate-v2 .byl-affiliate-profile{padding:5px 0 14px}
+ .byl-affiliate-v2 .byl-affiliate-avatar{width:50px;height:50px}
+ .byl-affiliate-v2 .byl-affiliate-menu,.byl-affiliate-v2 .byl-affiliate-rail-foot,.byl-affiliate-v2 .byl-affiliate-rail-quote{display:none}
+ .byl-affiliate-v2 .byl-affiliate-panels{grid-template-columns:minmax(0,1.31fr) minmax(0,1fr)}
+ .byl-affiliate-v2 .byl-affiliate-hero{height:205px}
+ .byl-affiliate-v2 .byl-affiliate-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .byl-v2-top-links{gap:13px}
+}
+@media(max-width:660px){
+ .byl-affiliate-v2{padding-bottom:78px}
+ .byl-affiliate-v2 .byl-v2-topbar{height:54px;padding:0 13px;gap:6px}
+ .byl-v2-wordmark{font-size:17px;letter-spacing:.12em}
+ .byl-v2-top-links{display:none}
+ .byl-v2-top-actions{gap:12px}
+ .byl-affiliate-v2 .byl-affiliate-profile strong{font-size:17px}
+ .byl-affiliate-v2 .byl-affiliate-layout{padding:0 11px 16px}
+ .byl-affiliate-v2 .byl-affiliate-hero{height:212px;border-radius:8px;margin:0 0 10px}
+ .byl-affiliate-v2 .byl-affiliate-hero-text{padding:23px 15px;width:68%}
+ .byl-affiliate-v2 .byl-affiliate-hero h1{font-size:33px}
+ .byl-affiliate-v2 .byl-affiliate-hero-subtitle{font-size:17px;margin:4px 0 15px}
+ .byl-affiliate-v2 .byl-affiliate-hero-description{font-size:10px;line-height:1.4;max-width:240px}
+ .byl-affiliate-v2 .byl-affiliate-hero-image{left:51%;width:49%;object-position:38%}
+ .byl-affiliate-v2 .byl-affiliate-hero:after{left:46%;width:16%}
+ .byl-v2-hero-slogan{display:none}
+ .byl-affiliate-v2 .byl-affiliate-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .byl-affiliate-v2 .byl-affiliate-stat{min-height:92px;padding:10px}
+ .byl-affiliate-v2 .byl-affiliate-stat strong{font-size:21px}
+ .byl-affiliate-v2 .byl-affiliate-stats .byl-affiliate-stat:last-child{grid-column:1/-1}
+ .byl-affiliate-v2 .byl-affiliate-panels{display:flex;flex-direction:column;gap:10px}
+ .byl-affiliate-v2 .byl-affiliate-card{padding:15px}
+ .byl-affiliate-v2 .byl-affiliate-sharing{order:-1;padding:0;min-height:224px}
+ .byl-affiliate-v2 .byl-affiliate-sharing-top{padding:17px 15px 0}
+ .byl-affiliate-v2 .byl-affiliate-link-wrap{padding:8px 11px 0}
+ .byl-affiliate-v2 .byl-affiliate-coupon-note{white-space:normal;margin:5px 12px 10px}
+ .byl-affiliate-v2 .byl-affiliate-hero h1{word-break:normal}
+ .byl-affiliate-v2 .byl-affiliate-performance{order:0}
+ .byl-affiliate-v2 .byl-affiliate-referrals{order:1}
+ .byl-affiliate-v2 .byl-affiliate-payouts{order:2}
+ .byl-affiliate-v2 .byl-affiliate-creatives{order:3}
+ .byl-affiliate-v2 .byl-affiliate-support{order:4}
+ .byl-v2-creative-filters{overflow-x:auto}
+ .byl-v2-creative-previews img{height:91px}
+ .byl-v2-support-content{max-width:72%}
+ .byl-v2-support-content h2{font-size:17px!important;white-space:normal}
+ .byl-affiliate-v2 .byl-affiliate-bottom-nav{display:grid}
+}
+@media(max-width:390px){
+ .byl-affiliate-v2 .byl-affiliate-hero h1{font-size:28px}
+ .byl-affiliate-v2 .byl-affiliate-hero-description{max-width:208px}
+ .byl-affiliate-v2 .byl-affiliate-stat strong{font-size:19px}
+ .byl-v2-support-content{max-width:76%}
+ .byl-affiliate-v2 .byl-affiliate-copy{padding:0 10px}
+ .byl-affiliate-v2 .byl-v2-share-button{padding:0 8px}
+}
+
+
+/* V2 exact-reference KPI and real-data chart axes */
+.byl-affiliate-v2 .byl-affiliate-stat{height:97px;min-height:97px;padding-top:10px;padding-bottom:8px}
+.byl-affiliate-v2 .byl-affiliate-stat p{margin-bottom:6px}
+.byl-affiliate-v2 .byl-affiliate-stat strong{font-size:clamp(17px,1.75vw,24px)}
+.byl-affiliate-v2 .byl-affiliate-stat small{font-size:10px;line-height:1.1;margin-top:5px}
+.byl-v2-chart-frame{display:flex;gap:6px;align-items:stretch}
+.byl-v2-y-axis{width:43px;flex-shrink:0;display:flex;justify-content:space-between;flex-direction:column;text-align:right;color:#877d7e;font:9px/1 Georgia,serif;padding:0 0 17px}
+.byl-v2-chart-plot{min-width:0;flex:1}
+.byl-affiliate-v2 .byl-v2-chart-plot .byl-affiliate-chart{padding:2px 7px 0;height:124px}
+.byl-v2-chart-dates{display:flex;justify-content:space-between;gap:4px;color:#7f7679;font:9px/1.3 Georgia,serif;margin-top:5px;min-height:13px}
+@media(max-width:660px){
+ .byl-affiliate-v2 .byl-affiliate-stat{height:auto;min-height:93px;padding:10px}
+ .byl-affiliate-v2 .byl-affiliate-stat strong{font-size:20px}
+ .byl-v2-y-axis{width:43px;font-size:9px}
+ .byl-v2-chart-dates{font-size:9px}
+}

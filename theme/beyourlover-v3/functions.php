@@ -99,6 +99,9 @@ function byl_v3_nav_item_is_current(array $item): bool {
 
 require_once get_stylesheet_directory().'/inc/theme-os-assets.php';
 
+// Standalone guarded creator account UI; AffiliateWP remains data authority.
+require_once get_stylesheet_directory().'/inc/affiliate-dashboard.php';
+
 require_once get_stylesheet_directory().'/inc/free-shipping-v2-policy.php';
 
 // H6.3-P: GET/HEAD-only legacy Privacy URL redirect; no content or DB writes.
