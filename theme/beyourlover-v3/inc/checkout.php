@@ -92,3 +92,71 @@ add_filter('woocommerce_get_terms_and_conditions_checkbox_text', static function
     // so only when dev opt-in is active can a checkbox-less order be valid.
     return byl_v3_dev_checkout_terms_handoff_enabled() ? '' : $text;
 }, 20);
+
+
+/**
+ * A second, non-interactive Shipping choice is shown only when this package's
+ * CURRENT Woo zone has an enabled amount-gated free rate not yet eligible.
+ * The real Woo rate inputs, chosen methods, thresholds, discounts and totals
+ * remain authoritative; this is display metadata, never a checkout rate.
+ *
+ * This hook is rendered inside the AJAX-refreshed review-order <tfoot>,
+ * so moving Country/State also refreshes the honest locked-rate notice.
+ */
+add_action('woocommerce_review_order_after_shipping', static function (): void {
+    if (!function_exists('is_checkout') || !is_checkout() || !class_exists('WC_Shipping_Zones')
+        || !function_exists('WC') || !WC()->shipping()) {
+        return;
+    }
+
+    $packages = WC()->shipping()->get_packages();
+    if (!is_array($packages)) {
+        return;
+    }
+    foreach ($packages as $package_index => $package) {
+        if (!is_array($package) || empty($package['destination']['country'])) {
+            continue;
+        }
+        $available_rates = isset($package['rates']) && is_array($package['rates'])
+            ? $package['rates'] : [];
+        $free_available = false;
+        foreach ($available_rates as $rate) {
+            if ($rate instanceof WC_Shipping_Rate && $rate->get_method_id() === 'free_shipping') {
+                $free_available = true;
+                break;
+            }
+        }
+        if ($free_available) {
+            continue; // Never duplicate an actually selectable Woo free rate.
+        }
+
+        $zone = WC_Shipping_Zones::get_zone_matching_package($package);
+        if (!$zone instanceof WC_Shipping_Zone) {
+            continue;
+        }
+        foreach ($zone->get_shipping_methods(true) as $method) {
+            if ($method->id !== 'free_shipping'
+                || $method->get_option('requires', '') !== 'min_amount') {
+                continue;
+            }
+            $minimum = wc_format_decimal($method->get_option('min_amount', '0'));
+            if (!is_numeric($minimum) || (float) $minimum <= 0) {
+                continue;
+            }
+            $threshold = html_entity_decode(
+                wp_strip_all_tags(wc_price((float) $minimum)),
+                ENT_QUOTES,
+                get_bloginfo('charset') ?: 'UTF-8'
+            );
+            // The free rate is not in the actual Woo rate list. A disabled
+            // guidance card can therefore explain the genuine zone threshold.
+            echo '<tr class="byl-locked-free-rate-source"'
+               . ' data-byl-package-index="' . esc_attr((string) $package_index) . '"'
+               . ' data-byl-free-threshold="' . esc_attr($threshold) . '">'
+               . '<td colspan="2"><span class="screen-reader-text">'
+               . esc_html(sprintf('Free shipping requires an eligible order subtotal of at least %s.', $threshold))
+               . '</span></td></tr>';
+            break;
+        }
+    }
+}, 20);
