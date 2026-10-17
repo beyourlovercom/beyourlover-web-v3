@@ -119,7 +119,7 @@ $_POST=['byl_use_shipping_for_billing'=>'0','byl_save_address'=>'0','byl_invoice
 $data=$post($ship);
 $errors=new ErrorBag();$validate($data,$errors);
 ok(count($errors->list)>=5,'incomplete invoice blocked');
-ok(isset($errors->list['byl_invoice_state_invalid']),'state required from verified WC states');
+ok(isset($errors->list['byl_invoice_state_required']),'state required according to Woo US country locale');
 ok($should_save(true)===false,'opted-out customer untouched');
 ok($should_save(false)===false,'respect upstream Woo false');
 $_POST=array_merge(['byl_use_shipping_for_billing'=>'0','byl_save_address'=>'0'],$invoice);
