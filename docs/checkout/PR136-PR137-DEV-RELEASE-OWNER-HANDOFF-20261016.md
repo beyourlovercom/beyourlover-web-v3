@@ -17,7 +17,7 @@ Purpose: Finish Owner annotated Shipping visual: correct real Woo field order (P
 |---|---|---|
 | `inc/checkout.php` | `63724e8be201aa8b85bf9212177d4e123e6c10f2457672912eb9d91a768eac14` | `888d13dc80a563c9b198f28100f247fe0d131d3994447e0c2fe60af617cd9eed` |
 | `assets/js/checkout.js` | `5eb5dcefd5928708b518fe5b2cdddbaf2bba7605ad5549d2bfa1cb54b5ab91d2` | `ace14ec4152d508b902a2daafa8a713668fb281508821bdaa5e05367719cacdd` |
-| `assets/css/checkout.css` | `7cfc5d237d7fb8d7ac9aa61681650e582b60b70a5a440` | `f636f3487a78d1eb5fa8f936d16ed594a025c7be670780649f0c85d1453306f0` |
+| `assets/css/checkout.css` | `7cfc5d237d7fb8d7ac9aa61681650bfe465df81df5e73060e582b60b70a5a440` | `f636f3487a78d1eb5fa8f936d16ed594a025c7be670780649f0c85d1453306f0` |
 
 These three candidates are fetched from GitHub PR #137's exact source commit before this evidence document (`b605d28b9cf21c684cb906b6b42f0ac19af986e4`); any newer PR HEAD requires re-verification of each source SHA. Do not use Windows working-copy files unless their BYTE SHA equals the rightmost column.
 
