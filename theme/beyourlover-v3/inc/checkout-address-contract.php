@@ -37,7 +37,10 @@ add_filter('woocommerce_checkout_get_value', static function ($value, $key) {
     if (!preg_match('/^billing_(first_name|last_name|company|country|address_1|address_2|city|state|postcode)$/', $key, $m)) {
         return $value;
     }
-    $customer = new WC_Customer(get_current_user_id(), true);
+    // One persisted customer read per request, not a separate DB lookup
+    // for each of the nine shipping fields on mobile Checkout.
+    static $customer = null;
+    if ($customer === null) $customer = new WC_Customer(get_current_user_id(), true);
     $getter = 'get_shipping_' . $m[1];
     if (!is_callable([$customer, $getter])) return $value;
     $saved = (string) $customer->{$getter}();
