@@ -40,7 +40,9 @@ add_filter('woocommerce_checkout_get_value', static function ($value, $key) {
     // One persisted customer read per request, not a separate DB lookup
     // for each of the nine shipping fields on mobile Checkout.
     static $customer = null;
-    if ($customer === null) $customer = new WC_Customer(get_current_user_id(), true);
+    // Account address prefill must use the persisted customer store; Woo's
+    // second constructor argument TRUE selects the transient SESSION store.
+    if ($customer === null) $customer = new WC_Customer(get_current_user_id());
     $getter = 'get_shipping_' . $m[1];
     if (!is_callable([$customer, $getter])) return $value;
     $saved = (string) $customer->{$getter}();
