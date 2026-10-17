@@ -254,3 +254,695 @@ body.woocommerce-checkout .wt_sc_pagination { display:none!important; }
 .byl-progressive-checkout [data-byl-terms-host] #byl-checkout-legal-panel :is(p,li,h2,h3,h4){
   overflow-wrap:anywhere;
 }
+
+
+/* LELO 3-Step Canonical V1 — Cart -> Shipping (rates and address) -> Payment.
+   Woo owns shipping/tax/FX totals, gateways, consent and submission. */
+.byl-checkout-track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 22px;padding:12px 8px 17px;border-bottom:1px solid var(--byl-line);text-align:center}
+.byl-checkout-track>[data-byl-track]{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--byl-ink-3);font-weight:550;text-decoration:none;font-size:13px}
+.byl-checkout-track>[data-byl-track]>span{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--byl-line);border-radius:50%;font-size:12px}
+.byl-checkout-track>[aria-current="step"]{color:var(--byl-brand);font-weight:700}
+.byl-checkout-track>[aria-current="step"]>span{background:var(--byl-brand);color:white;border-color:var(--byl-brand)}
+.byl-shipping-rate-section{margin-top:19px;border-top:1px solid var(--byl-line);padding-top:18px}
+.byl-shipping-rate-section>h2,.byl-payment-options-heading{margin:0 0 13px;font:600 17px/1.45 var(--byl-font)}
+.byl-delivery-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+.byl-delivery-rate{min-height:64px}
+.byl-payment-review{padding:16px 0;border-bottom:1px solid var(--byl-line)}
+.byl-payment-review .byl-review-details{margin:0}
+.byl-payment-review .byl-review-details>div{grid-template-columns:110px minmax(0,1fr) auto}
+.byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-grid{grid-template-columns:minmax(290px,.85fr) minmax(0,1.15fr)}
+.byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-summary{order:-1;position:static}
+.byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-stages{order:0}
+.byl-progressive-checkout [data-byl-terms-host]{margin-top:12px}
+.byl-progressive-checkout #shipping_phone-description{display:block!important;white-space:normal;line-height:1.55}
+@media(max-width:760px){
+ .byl-checkout-track{margin-bottom:12px;padding:9px 2px 14px}
+ .byl-checkout-track>[data-byl-track]{flex-direction:column;gap:4px;font-size:11px}
+ .byl-delivery-options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .byl-delivery-rate{padding:12px 10px;gap:8px}
+ .byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-grid{display:flex;flex-direction:column}
+ .byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-stages{order:0}
+ .byl-progressive-checkout[data-byl-current-step="payment"] .byl-checkout-summary{order:1}
+ .byl-progressive-checkout .byl-checkout-summary{order:1}
+ .byl-payment-review .byl-review-details>div{grid-template-columns:80px minmax(0,1fr) auto}
+}
+@media(max-width:360px){.byl-delivery-options{grid-template-columns:1fr}}
+
+/* Progressive guest/login entry and optional native Woo address fields. */
+.byl-account-entry{display:flex;justify-content:flex-end;margin:0 0 15px}
+.byl-account-entry a{color:var(--byl-ink);font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.byl-shipping-rate-section{margin-top:0}
+.byl-shipping-details-heading{margin:25px 0 14px;font:600 17px/1.45 var(--byl-font)}
+.byl-optional-address-trigger{grid-column:1/-1;justify-self:start;display:block;min-height:35px;padding:5px 0;border:0;background:transparent;color:var(--byl-brand);text-decoration:underline;text-underline-offset:2px;font-weight:600;font-size:12px;text-align:left;cursor:pointer}
+.byl-optional-address-trigger[hidden],.byl-progressive-checkout #billing_address_2_field[hidden],.byl-progressive-checkout #billing_company_field[hidden]{display:none!important}
+
+.byl-account-email-host{margin-bottom:20px}
+.byl-account-email-host .form-row{margin:0!important;width:100%!important}
+.byl-account-email-host .input-text{width:100%;min-height:48px}
+.byl-account-entry{margin-bottom:10px}
+
+/* Native Woo shipping package contract: even single hidden-rate destinations count. */
+.byl-delivery-package{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.byl-delivery-package-title{grid-column:1/-1;font:600 12px/1.5 var(--byl-font);color:var(--byl-ink-2)}
+.byl-delivery-rate:disabled{cursor:default;opacity:1}
+@media(max-width:375px){.byl-delivery-package{grid-template-columns:1fr}}
+
+/*
+ * Woo SelectWoo dropdown skin — standard Checkout only.
+ * The native Country/State option menu is portalled as a DIRECT child of
+ * <body>, not inside .byl-progressive-checkout. Keep Woo's real select inputs,
+ * search, positioning and country_to_state_changed/update_checkout ownership.
+ * Never restore Checkout Drawer or override vendor dropdown JavaScript.
+ */
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-dropdown {
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(153, 50, 76, .19) !important;
+  border-radius: 12px !important;
+  background: #fff;
+  box-shadow: 0 16px 38px rgba(30, 14, 22, .14);
+  font: 400 14px/1.45 var(--byl-font, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif);
+  color: var(--byl-ink, #161316);
+}
+
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-search--dropdown {
+  padding: 10px 10px 8px;
+}
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-search__field {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 42px;
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--byl-line, #ded6d9) !important;
+  border-radius: 8px;
+  outline: none;
+  background: #fff;
+  color: var(--byl-ink, #161316);
+  font: 400 16px/1.35 var(--byl-font, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif) !important;
+  box-shadow: none !important;
+}
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-search__field:focus {
+  border-color: var(--byl-brand, #99324c) !important;
+  box-shadow: 0 0 0 3px rgba(153, 50, 76, .10) !important;
+}
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-results__options {
+  max-height: min(224px, 40vh) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-results__option {
+  box-sizing: border-box;
+  min-height: 42px;
+  padding: 10px 13px !important;
+  border-radius: 0;
+  font: 400 14px/1.5 var(--byl-font, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif) !important;
+  color: var(--byl-ink, #161316);
+  background: #fff;
+  transition: background-color 90ms ease, color 90ms ease;
+}
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-results__option[aria-selected="true"]:not(.select2-results__option--highlighted) {
+  color: var(--byl-brand, #99324c) !important;
+  background: #f7edf0 !important;
+  font-weight: 600 !important;
+}
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-results__option--highlighted[aria-selected],
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-results__option--highlighted {
+  color: #fff !important;
+  background: var(--byl-brand, #99324c) !important;
+}
+body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-results__option[aria-disabled="true"] {
+  color: var(--byl-ink-3, #9a9297) !important;
+  background: #fff !important;
+}
+@media (max-width: 480px) {
+  body.byl-secure-checkout-shell.woocommerce-checkout > .select2-container--open.select2-container--default .select2-results__option {
+    min-height: 46px;
+    padding: 11px 14px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* Checkout Shipping Reference Fidelity V1 — Owner's 390px iPhone canonical.
+   Presentation only: Woo keeps real country/state, rates, prices, tax ID, validation,
+   legal consent and payment. Standard /checkout/ ONLY; no drawer reintroduction. */
+.byl-checkout-mobile-close,.byl-checkout-return,.byl-mobile-order-toggle{display:none}
+.byl-contact-card,.byl-choice-card,.byl-address-card{min-width:0}
+.byl-duties-note{display:flex;gap:10px;margin-top:20px;padding:15px;border-radius:9px;background:#fcf1ea;color:#3d2c29}
+.byl-duties-icon{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#c98b5d;color:#fff;font:700 16px/1 var(--byl-font)}
+.byl-duties-note strong{display:block;font-size:13px;line-height:1.3}
+.byl-duties-note p{margin:5px 0 0;font-size:12px;line-height:1.5;color:#594a44}
+.byl-delivery-price{margin-left:auto;flex:0 0 auto;white-space:nowrap;font-weight:700;font-size:15px}
+@media(max-width:760px){
+  /* The reference uses its own Shipping header: remove the shop logo bar on
+     Checkout only. Keep the real exit-to-cart in the canonical page header. */
+  body.woocommerce-checkout.byl-secure-checkout-shell .byl-secure-header,
+  body.woocommerce-checkout.byl-secure-checkout-shell .byl-secure-footer{display:none!important}
+  body.woocommerce-checkout #main-content.byl-commerce-content{
+    max-width:none!important;min-width:0;margin:0!important;
+    padding:18px 10px calc(158px + env(safe-area-inset-bottom))!important
+  }
+  .byl-progressive-checkout{font-size:14px;color:#17141a}
+  .byl-checkout-heading{
+    position:relative;display:flex;justify-content:space-between;align-items:center;
+    gap:8px;margin:0 0 4px!important;padding:0 2px
+  }
+  .byl-checkout-heading h1{
+    margin:0;font:700 27px/1.28 var(--byl-font)!important;letter-spacing:-.04em!important;
+    color:#171418
+  }
+  .byl-checkout-security{display:none!important}
+  .byl-checkout-mobile-close{
+    display:grid;width:36px;height:37px;place-items:center;flex:0 0 36px;
+    margin:-4px -4px 0 0;color:#181519;text-decoration:none;
+    font:300 32px/1 var(--byl-font)
+  }
+  .byl-checkout-mobile-close:focus-visible,.byl-checkout-return a:focus-visible{
+    outline:2px solid var(--byl-brand);outline-offset:3px
+  }
+  .byl-checkout-return{display:block;padding:0 2px;margin:0 0 6px}
+  .byl-checkout-return a{display:inline-flex;align-items:center;gap:5px;text-decoration:none;color:#171418;font-weight:700;font-size:14px}
+  .byl-checkout-return a span{font:400 31px/.7 var(--byl-font);transform:translateY(-1px)}
+  .byl-checkout-track{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    align-items:center;gap:0;border:0!important;margin:0 0 12px!important;
+    padding:0 5px 2px!important;min-height:83px;position:relative
+  }
+  .byl-checkout-track>[data-byl-track]{position:relative;display:flex;flex-direction:column!important;gap:5px!important;
+    align-items:center;justify-content:flex-start!important;
+    min-height:73px;color:#666267;font-size:12px!important;font-weight:450!important;
+    text-decoration:none;text-align:center
+  }
+  .byl-checkout-track>[data-byl-track]:not(:first-child):before{
+    content:'';position:absolute;height:1px;background:#c6c2c5;
+    top:16px;right:calc(50% + 25px);width:calc(100% - 50px)
+  }
+  .byl-checkout-track>[data-byl-track="shipping"]:before{
+    background:linear-gradient(to right,#ccc 0 54%,var(--byl-brand) 54% 100%)!important
+  }
+  .byl-checkout-track>[data-byl-track]>span{
+    width:33px!important;height:33px!important;flex:0 0 33px!important;
+    border:0!important;border-radius:0!important;background:transparent!important;color:#6d6b70!important
+  }
+  .byl-checkout-track>[data-byl-track]>span svg{display:block;width:27px;height:27px;fill:none}
+  .byl-checkout-track>[data-byl-track="shipping"]{font-weight:700!important;color:var(--byl-brand)!important}
+  .byl-checkout-track>[data-byl-track="shipping"]>span{color:var(--byl-brand)!important}
+  .byl-checkout-track>[data-byl-track="shipping"] svg path:first-child{fill:var(--byl-brand);stroke:var(--byl-brand)}
+  .byl-checkout-track>[data-byl-track="shipping"] svg circle{fill:#fff;stroke:#fff}
+  .byl-checkout-grid{display:block!important}
+  .byl-checkout-stages{width:100%!important;min-width:0}
+  /* Split the original monolithic Woo shipping panel into three exact cards. */
+  .byl-checkout-step[data-byl-step="shipping"]{
+    overflow:visible!important;padding:0!important;margin:0!important;
+    border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important
+  }
+  .byl-checkout-step[data-byl-step="shipping"]>.byl-step-toggle{display:none!important}
+  .byl-checkout-step[data-byl-step="shipping"]>.byl-step-body{display:block!important;padding:0!important}
+  .byl-contact-card,.byl-choice-card,.byl-address-card{
+    border:1px solid #e7e3e5;border-radius:10px;background:#fff;
+    padding:13px 12px;margin:0 0 9px;box-shadow:0 1px 3px rgba(0,0,0,.015)
+  }
+  .byl-contact-card{padding-top:12px;padding-bottom:11px}
+  .byl-account-entry{margin:0 0 13px!important;justify-content:flex-end!important}
+  .byl-account-entry a{font-size:12.5px!important;font-weight:650!important;color:#171418!important;text-decoration:underline;text-underline-offset:2px}
+  .byl-account-email-host{margin:0!important}
+  .byl-account-email-host .form-row{margin:0!important}
+  .byl-account-email-host .form-row label{font-size:12px!important;line-height:1.4}
+  .byl-account-email-host .input-text{min-height:47px!important;height:47px!important;border-radius:5px!important}
+  .byl-contact-card [data-byl-marketing-optin-slot][hidden]{display:none!important}
+  .byl-choice-card{padding:10px 12px 12px}
+  .byl-shipping-rate-section{margin:0!important;padding:0!important;border:0!important}
+  .byl-shipping-rate-section>h2,.byl-shipping-details-heading{
+    margin:0 0 11px!important;color:#171418;
+    font:700 18px/1.28 var(--byl-font)!important;letter-spacing:-.025em
+  }
+  .byl-delivery-options,.byl-delivery-package{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px!important}
+  .byl-delivery-package{grid-column:1/-1}
+  .byl-delivery-rate{
+    position:relative;min-width:0;min-height:68px!important;margin:0!important;
+    display:flex!important;align-items:center!important;gap:8px!important;
+    padding:10px!important;border-radius:5px!important;
+    border:1px solid #cbc5ca!important;background:#fff!important;
+    color:#171418!important;text-align:left
+  }
+  .byl-delivery-rate.is-selected{background:#fff6f8!important;border-color:var(--byl-brand)!important;box-shadow:0 0 0 .5px var(--byl-brand)}
+  .byl-delivery-radio{flex:0 0 20px!important;width:20px!important;height:20px!important;
+    border:1.6px solid #171418!important;border-radius:50%!important}
+  .byl-delivery-rate.is-selected>.byl-delivery-radio{border:6px solid var(--byl-brand)!important}
+  .byl-delivery-label{font-size:13px!important;line-height:1.4;min-width:0;flex:1}
+  .byl-delivery-label strong{font-size:13px!important;line-height:1.3!important;font-weight:700!important;overflow-wrap:anywhere}
+  .byl-delivery-price{margin-left:auto;min-width:0;text-align:right;color:#171418;font-size:13px;font-weight:750}
+  .byl-delivery-rate.is-selected .byl-delivery-price{color:var(--byl-brand)}
+  .byl-choice-card .byl-step-hint{font-size:11px;line-height:1.45;margin:9px 0 0;color:#777076}
+  .byl-address-card{padding:10px 12px 15px}
+  .byl-address-card #customer_details{margin:0}
+  .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper{
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px 9px!important;align-items:start
+  }
+  .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row{
+    float:none!important;width:100%!important;min-width:0!important;grid-column:1/-1;margin:0!important
+  }
+  .byl-progressive-checkout #billing_country_field{grid-column:1/-1!important;order:1}
+  .byl-progressive-checkout #billing_first_name_field{grid-column:1!important;order:2}
+  .byl-progressive-checkout #billing_last_name_field{grid-column:2!important;order:3}
+  .byl-progressive-checkout #billing_address_1_field{grid-column:1/-1!important;order:4}
+  .byl-progressive-checkout [data-byl-optional-for="billing_address_2_field"]{order:5!important}
+  .byl-progressive-checkout #billing_address_2_field{order:5!important}
+  .byl-progressive-checkout #billing_city_field{grid-column:1!important;order:6}
+  .byl-progressive-checkout #billing_state_field{grid-column:2!important;order:7}
+  .byl-progressive-checkout #shipping_phone_field{grid-column:1/-1!important;order:8}
+  .byl-progressive-checkout #billing_postcode_field{grid-column:1/-1!important;order:9}
+  .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row:not([id^="billing_"]):not(#shipping_phone_field){order:15}
+  .byl-progressive-checkout [data-byl-optional-for="billing_company_field"]{order:90!important}
+  .byl-progressive-checkout #billing_company_field{order:90!important}
+  .byl-address-card .form-row label{font-size:12px!important;line-height:1.4!important;margin:0 0 4px!important;color:#363039}
+  .byl-address-card .input-text,.byl-address-card select,.byl-address-card .select2-selection{
+    min-height:43px!important;max-width:100%;border:1px solid #d9d4d8!important;
+    border-radius:5px!important;background:#fff!important;padding:8px 10px!important;
+    font:400 14px/1.4 var(--byl-font)!important;color:#171418!important
+  }
+  .byl-address-card input:focus,.byl-address-card .select2-selection:focus{outline:2px solid var(--byl-brand-soft)!important;outline-offset:1px}
+  .byl-address-card .select2-selection--single{height:43px!important;min-height:43px!important;padding:0 30px 0 10px!important}
+  .byl-address-card .select2-selection__rendered{line-height:41px!important;white-space:nowrap;text-overflow:ellipsis}
+  .byl-address-card .select2-selection__arrow{top:0!important;height:41px!important}
+  .byl-optional-address-trigger{
+    min-height:27px!important;margin:1px 0 0!important;padding:4px 0!important;
+    font-size:12px!important;font-weight:650!important;color:var(--byl-brand)!important;
+    text-decoration:underline!important;grid-column:1/-1!important
+  }
+  .byl-address-card #shipping_phone-description{font-size:10.5px!important;line-height:1.45!important;margin-top:5px!important;color:#6b656c!important}
+  .byl-duties-note{margin:13px 0 0;padding:12px 10px;gap:8px;border-radius:8px;background:#fff2eb}
+  .byl-duties-icon{width:25px;height:25px;flex-basis:25px;font-size:15px}
+  .byl-duties-note strong{font-size:12px}
+  .byl-duties-note p{font-size:10.5px;line-height:1.45}
+  .byl-checkout-step[data-byl-step="payment"]:not(.is-active){display:none!important}
+  .byl-checkout-step[data-byl-step="payment"].is-active{margin:9px 0!important}
+  .byl-checkout-step[data-byl-step="payment"].is-active .byl-step-toggle{min-height:58px!important;padding:12px 14px!important}
+  /* Shipping reference has ONE persistent footer, never multiple floating CTAs. */
+  .byl-checkout-action-bar{
+    position:fixed!important;bottom:0!important;left:0!important;right:0!important;
+    z-index:320!important;margin:0!important;
+    padding:8px 10px calc(10px + env(safe-area-inset-bottom))!important;
+    border:1px solid #efebed!important;border-bottom:0!important;border-radius:14px 14px 0 0!important;
+    background:rgba(255,255,255,.98)!important;
+    box-shadow:0 -7px 22px rgba(30,12,20,.095)!important;
+    backdrop-filter:blur(12px)
+  }
+  .byl-mobile-order-toggle{
+    display:flex;align-items:center;gap:9px;min-height:32px;padding:0 4px 6px;
+    margin:0;width:100%;border:0;background:transparent;color:#171418;text-align:left;cursor:pointer
+  }
+  .byl-mobile-order-toggle strong{font-size:13px;font-weight:750;white-space:nowrap}
+  .byl-mobile-see-details{font-size:12px;color:var(--byl-brand);text-decoration:underline;white-space:nowrap}
+  .byl-mobile-see-details>span{font-size:17px;display:inline-block;text-decoration:none;vertical-align:middle}
+  .byl-mobile-total{margin-left:auto;min-width:0;text-align:right;white-space:nowrap;font-size:14px;font-weight:750}
+  .byl-checkout-next{min-height:51px!important;border-radius:7px!important;text-transform:uppercase!important;
+    letter-spacing:.035em;font:750 15px/1.3 var(--byl-font)!important;
+    background:#92002e!important;color:#fff!important}
+  .byl-checkout-next:disabled{background:#d6d0d3!important;color:#615b61!important}
+  .byl-checkout-error:not([hidden]){margin:0 4px 7px!important;font-size:11px}
+  .byl-checkout-summary{display:none!important}
+  .byl-checkout-summary:has(.byl-summary-card.is-open){
+    display:block!important;position:fixed!important;z-index:310!important;
+    left:10px!important;right:10px!important;bottom:calc(104px + env(safe-area-inset-bottom))!important;
+    width:auto!important;max-height:62dvh!important;overflow:auto!important;overscroll-behavior:contain;
+    background:#fff!important;border:1px solid #e9e2e5!important;
+    border-radius:12px!important;box-shadow:0 -14px 42px rgba(25,12,20,.17)!important
+  }
+  .byl-summary-card{margin:0;border:0;border-radius:12px!important;box-shadow:none!important;padding:14px!important}
+  .byl-summary-toggle{min-height:25px}
+  .byl-summary-body{padding-top:9px!important}
+}
+@media(min-width:761px){
+ .byl-contact-card,.byl-choice-card,.byl-address-card{
+   margin-bottom:12px;padding:20px;border:1px solid var(--byl-line);border-radius:12px;background:#fff
+ }
+ .byl-checkout-step[data-byl-step="shipping"]{border:0;box-shadow:none;background:transparent;overflow:visible}
+ .byl-checkout-step[data-byl-step="shipping"]>.byl-step-body{padding:0}
+ .byl-checkout-step[data-byl-step="shipping"]>.byl-step-toggle{display:none}
+ .byl-delivery-rate{gap:10px}
+}
+
+/* Reference Fidelity V1 second-pass microalignment: reduce card heights to the
+   owner's 390px visual and keep real Woo text legible at 320px. */
+@media(max-width:760px){
+  .byl-contact-card{padding-top:9px!important;padding-bottom:9px!important}
+  .byl-account-entry{margin-bottom:8px!important}
+  .byl-contact-card .form-row label{margin-bottom:3px!important}
+  .byl-account-email-host .input-text{min-height:44px!important;height:44px!important}
+  .byl-choice-card{padding-top:10px!important;padding-bottom:10px!important}
+  .byl-shipping-rate-section>h2{margin-bottom:8px!important}
+  .byl-delivery-rate{min-height:55px!important;padding:8px 9px!important}
+  .byl-choice-card .byl-step-hint{display:none!important}
+  .byl-mobile-order-toggle{min-height:29px!important;padding-bottom:4px!important}
+  .byl-checkout-next{min-height:47px!important}
+  .byl-checkout-action-bar{padding-top:7px!important;padding-bottom:calc(7px + env(safe-area-inset-bottom))!important}
+}
+@media(max-width:360px){
+  .byl-delivery-rate{
+    display:grid!important;grid-template-columns:20px minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;gap:1px 6px!important;min-height:60px!important
+  }
+  .byl-delivery-rate>.byl-delivery-radio{grid-column:1!important;grid-row:1/3!important;align-self:center}
+  .byl-delivery-rate>.byl-delivery-label{grid-column:2!important;grid-row:1!important;min-width:0}
+  .byl-delivery-rate>.byl-delivery-price{grid-column:2!important;grid-row:2!important;
+    justify-self:start!important;margin:0!important;font-size:12px!important}
+}
+
+/* Reference Fidelity V1 payment return gate: hide Shipping body after Next,
+   but preserve the native Woo Shipping step-toggle to return and edit. */
+@media(max-width:760px){
+  .byl-progressive-checkout.is-enhanced .byl-checkout-step[data-byl-step="shipping"]:not(.is-active)>.byl-step-body{
+    display:none!important
+  }
+  .byl-progressive-checkout.is-enhanced .byl-checkout-step[data-byl-step="shipping"]:not(.is-active)>.byl-step-toggle{
+    display:flex!important;min-height:58px!important;padding:12px 14px!important
+  }
+  .byl-progressive-checkout.is-enhanced .byl-checkout-step[data-byl-step="shipping"]:not(.is-active){
+    padding:0!important;border:1px solid #e7e3e5!important;border-radius:10px!important;background:#fff!important
+  }
+}
+
+/* Canonical Owner reference — desktop/native field order parity.
+   The input wrappers are in the SAME DOM sequence as mobile and reference.
+   Never change the Woo country/state AJAX or the hidden payment values. */
+@media(min-width:761px) {
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper{
+   display:grid!important;
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   column-gap:14px!important;
+   row-gap:13px!important
+ }
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.form-row,
+ .byl-progressive-checkout .woocommerce-billing-fields__field-wrapper>.byl-optional-address-trigger{
+   grid-column:1/-1!important;
+   min-width:0!important;
+   width:100%!important
+ }
+ .byl-progressive-checkout #billing_country_field{grid-column:1/-1!important;order:10}
+ .byl-progressive-checkout #billing_first_name_field{grid-column:1!important;order:20}
+ .byl-progressive-checkout #billing_last_name_field{grid-column:2!important;order:30}
+ .byl-progressive-checkout #billing_address_1_field{grid-column:1/-1!important;order:40}
+ .byl-progressive-checkout [data-byl-optional-for="billing_address_2_field"]{order:50!important}
+ .byl-progressive-checkout #billing_address_2_field{order:51!important}
+ .byl-progressive-checkout #billing_city_field{grid-column:1!important;order:60}
+ .byl-progressive-checkout #billing_state_field{grid-column:2!important;order:70}
+ .byl-progressive-checkout #shipping_phone_field{grid-column:1/-1!important;order:80}
+ .byl-progressive-checkout #billing_postcode_field{grid-column:1/-1!important;order:90}
+ .byl-progressive-checkout #billing_company_field{grid-column:1/-1!important;order:120}
+ .byl-progressive-checkout [data-byl-optional-for="billing_company_field"]{order:119!important}
+ .byl-progressive-checkout .form-row[id*="tax"],.byl-progressive-checkout .form-row[id*="tin"],
+ .byl-progressive-checkout .form-row[id*="rfc"],.byl-progressive-checkout .form-row[id*="vat"],
+ .byl-progressive-checkout .form-row[id*="cpf"]{grid-column:1/-1!important;order:100}
+}
+
+/* Standard Checkout — unavailable free delivery is informative, NOT a Woo rate.
+   Show alongside the real paid rate only when the active Woo zone advertises
+   a configured minimum and Woo omits the free rate from its rate list. */
+.byl-delivery-rate.is-locked {
+  cursor:default!important;
+  opacity:1!important;
+  border:1px dashed #d8cbd0!important;
+  background:#fbf9fa!important;
+  box-shadow:none!important;
+  color:#60595e!important;
+}
+.byl-delivery-rate.is-locked .byl-delivery-radio {
+  border-color:#b7adb2!important;
+  background:#fff!important;
+}
+.byl-delivery-rate.is-locked .byl-delivery-label {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.byl-delivery-rate.is-locked .byl-delivery-label strong {
+  color:#4e474c!important;
+}
+.byl-delivery-eligibility {
+  font:400 11px/1.4 var(--byl-font, -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif);
+  color:#7b6670;
+  overflow-wrap:anywhere;
+}
+@media(max-width:760px) {
+  .byl-delivery-rate.is-locked {
+    min-height:55px!important;
+    padding:8px 9px!important;
+  }
+  .byl-delivery-eligibility{font-size:10px}
+}
+
+/* Mexico customs RFC V1: one genuine Woo field, not a decorative input.
+   Controlled by native billing country and validated server-side. */
+.byl-progressive-checkout #billing_rfc_tax_id_field:not(.is-country-active){
+  display:none!important;
+}
+.byl-progressive-checkout #billing_rfc_tax_id_field.is-country-active{
+  display:block!important;
+  grid-column:1/-1!important;
+  clear:both!important;
+  width:100%!important;
+  min-width:0;
+}
+.byl-progressive-checkout #billing_rfc_tax_id_field .description{
+  font-size:11px;
+  line-height:1.45;
+  color:#6d6269;
+}
+@media(max-width:760px){
+  .byl-progressive-checkout #billing_rfc_tax_id_field.is-country-active{order:10!important}
+}
+@media(min-width:761px){
+  .byl-progressive-checkout #billing_rfc_tax_id_field.is-country-active{order:100!important}
+}
+
+/* Checkout optional marketing consent. This is NOT a Woo order option.
+   Andy Core Newsletter double-opt-in readiness controls availability. */
+.byl-checkout-marketing-optin {
+  margin-top:11px;
+  width:100%;
+}
+.byl-checkout-marketing-label {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0;
+  font-size:13px;
+  line-height:1.5;
+  color:#1d1d1f;
+  cursor:pointer;
+}
+.byl-checkout-marketing-label input[type="checkbox"] {
+  appearance:none;
+  -webkit-appearance:none;
+  display:block;
+  flex:0 0 18px;
+  width:18px;
+  height:18px;
+  border:1.5px solid #4c4549;
+  border-radius:2px;
+  background:#fff;
+  margin:0;
+  padding:0;
+  position:relative;
+  accent-color:#93002c;
+  cursor:pointer;
+}
+.byl-checkout-marketing-label input[type="checkbox"]:checked {
+  border-color:#93002c;
+  background:#93002c;
+}
+.byl-checkout-marketing-label input[type="checkbox"]:checked::after {
+  content:"";
+  position:absolute;
+  left:5px;
+  top:1px;
+  width:5px;
+  height:10px;
+  border:solid #fff;
+  border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+.byl-checkout-marketing-label input[type="checkbox"]:focus-visible {
+  outline:2px solid #93002c;
+  outline-offset:3px;
+}
+.byl-checkout-marketing-label input[type="checkbox"]:disabled {
+  opacity:.48;
+  cursor:not-allowed;
+}
+.byl-checkout-marketing-label:has(input:disabled) {
+  color:#6f696d;
+  cursor:not-allowed;
+}
+.byl-checkout-marketing-status {
+  margin:4px 0 0 28px;
+  font-size:11px;
+  line-height:1.45;
+  color:#71666c;
+}
+.byl-checkout-marketing-status:empty{display:none}
+@media(max-width:760px){
+  .byl-checkout-marketing-optin{margin-top:8px}
+  .byl-checkout-marketing-label{font-size:12px}
+}
+
+/* Account address saving + separate Billing address — native Woo checkout.
+   No additional checkout step or Drawer. Reference's burgundy, compact UI. */
+.byl-address-persistence{margin:12px 0 0;padding:3px 1px 0}
+.byl-address-choice{display:flex;gap:10px;align-items:center;margin:9px 0;font-size:13px;line-height:1.55;color:#262027;cursor:pointer}
+.byl-address-choice input[type=checkbox]{
+  flex:0 0 19px;width:19px;height:19px;margin:0;appearance:none;-webkit-appearance:none;
+  border:1.5px solid #514750;border-radius:2px;background:#fff;position:relative;cursor:pointer}
+.byl-address-choice input[type=checkbox]:checked{border-color:#93002c;background:#93002c}
+.byl-address-choice input[type=checkbox]:checked:after{
+  content:"";position:absolute;left:5px;top:1px;width:6px;height:11px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.byl-address-choice input[type=checkbox]:focus-visible{outline:2px solid #93002c;outline-offset:3px}
+.byl-address-choice input:disabled{opacity:.48;cursor:not-allowed}
+.byl-address-choice:has(input:disabled){opacity:.65;cursor:not-allowed}
+.byl-address-account-hint{font-size:11px;color:#786e73;margin:0 0 11px 29px;line-height:1.45}
+.byl-address-account-hint[hidden],.byl-invoice-address[hidden]{display:none!important}
+.byl-invoice-address{margin-top:14px;border-top:1px solid #e8e3e6;padding:15px 0 0}
+.byl-invoice-address h3{font-size:15px;font-weight:700;margin:0 0 5px}
+.byl-invoice-address>p{font-size:11px;line-height:1.5;color:#6b6267;margin:0 0 12px}
+.byl-invoice-address fieldset{border:0;padding:0;margin:0;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 10px}
+.byl-invoice-address .form-row{padding:0;margin:0;float:none!important;max-width:100%;min-width:0}
+.byl-invoice-address .form-row-wide{grid-column:1/-1}
+.byl-invoice-address .form-row-first{grid-column:1}
+.byl-invoice-address .form-row-last{grid-column:2}
+.byl-invoice-address .form-row label{display:block;font-size:12px;font-weight:500;margin:0 0 5px}
+.byl-invoice-address .input-text,.byl-invoice-address select,
+.byl-invoice-address .select2-selection{width:100%;max-width:100%;height:42px;min-height:42px;border:1px solid #ded9de;border-radius:5px;background:#fff;padding:8px 10px;box-sizing:border-box;font-size:13px}
+.byl-invoice-address .select2-container{width:100%!important}
+.byl-invoice-address .select2-selection{padding:0 28px 0 10px}
+.byl-invoice-address .select2-selection__rendered{line-height:40px!important}
+.byl-invoice-address .select2-selection__arrow{top:0;height:40px}
+.byl-invoice-address .woocommerce-invalid .input-text,.byl-invoice-address .woocommerce-invalid select{border-color:#93002c}
+@media(max-width:375px){
+  .byl-invoice-address fieldset{grid-template-columns:1fr}
+  .byl-invoice-address .form-row-first,.byl-invoice-address .form-row-last{grid-column:1/-1}
+}
+
+/* Checkout Owner reference — Mobile Fidelity V2 preview.
+ * Visual only. Does not change Woo fields, rates, order, country AJAX.
+ * Extends existing CSS; all rules gated to native mobile Checkout.
+ */
+@media(max-width:760px) {
+  body.woocommerce-checkout #main-content.byl-commerce-content{
+    padding-top:13px!important;
+  }
+  .byl-checkout-heading{margin-bottom:1px!important}
+  .byl-checkout-heading h1{font-size:25px!important;line-height:1.2!important}
+  .byl-checkout-mobile-close{width:34px;height:34px;flex-basis:34px;font-size:31px}
+  .byl-checkout-return{margin-bottom:2px!important}
+  .byl-checkout-return a{font-size:13px}
+  .byl-checkout-track{
+    min-height:67px!important;margin-bottom:8px!important;
+    padding:0 5px 0!important;
+  }
+  .byl-checkout-track>[data-byl-track]{
+    min-height:62px!important;gap:3px!important;
+  }
+  .byl-checkout-track>[data-byl-track]>span{height:31px!important;flex-basis:31px!important}
+  .byl-contact-card,.byl-choice-card,.byl-address-card{
+    border-color:#e6e0e4!important;border-radius:10px!important;
+    box-shadow:none!important;
+  }
+  .byl-contact-card{padding-top:10px!important;padding-bottom:11px!important}
+  .byl-account-entry{margin-bottom:9px!important}
+  /* Reference: Email label lives INSIDE its outlined field, above the value. */
+  .byl-contact-card #billing_email_field{
+    position:relative!important;min-height:0!important;
+  }
+  .byl-contact-card #billing_email_field>label{
+    position:absolute!important;top:5px!important;left:11px!important;
+    z-index:1;pointer-events:none!important;
+    margin:0!important;line-height:1.2!important;
+    font-size:10.5px!important;color:#454046!important;
+    background:transparent!important;
+  }
+  .byl-contact-card #billing_email{
+    min-height:51px!important;height:51px!important;
+    padding:20px 11px 5px!important;
+    font-size:13px!important;border-color:#d7d2d6!important;
+    border-radius:5px!important;
+  }
+  .byl-contact-card #billing_email::placeholder{
+    color:#a39da2;opacity:1;
+  }
+  .byl-checkout-marketing-optin{margin-top:8px!important}
+  .byl-shipping-rate-section>h2,.byl-shipping-details-heading{
+    font-size:18px!important;line-height:1.25!important;
+  }
+  .byl-address-card{padding:11px 12px 14px!important}
+  /* Reference: Country label INSIDE the country selector border. */
+  .byl-address-card #billing_country_field{
+    position:relative!important;z-index:auto;
+  }
+  .byl-address-card #billing_country_field>label{
+    position:absolute!important;left:11px!important;top:5px!important;
+    z-index:2;pointer-events:none!important;margin:0!important;
+    line-height:1.15!important;font-size:10.5px!important;
+    color:#4a4249!important;
+  }
+  .byl-address-card #billing_country_field .select2-selection--single{
+    height:53px!important;min-height:53px!important;
+    padding:16px 29px 3px 11px!important;
+    display:flex!important;align-items:center!important;
+  }
+  .byl-address-card #billing_country_field .select2-selection__rendered{
+    line-height:30px!important;font-size:13px!important;
+  }
+  .byl-address-card #billing_country_field .select2-selection__arrow{
+    height:51px!important;top:0!important;
+  }
+  .byl-address-card #billing_country_field>select{
+    height:53px!important;min-height:53px!important;
+    padding:18px 28px 4px 11px!important;font-size:13px!important;
+  }
+  .byl-address-card .woocommerce-billing-fields__field-wrapper{
+    row-gap:9px!important;
+  }
+  .byl-address-card .form-row label{
+    color:#343039!important;letter-spacing:0;
+  }
+  .byl-address-card .input-text,.byl-address-card select{
+    border-color:#ded9de!important;
+  }
+  .byl-duties-note{background:#fdf0e7!important}
+  /* Match reference: single anchored CTA without a trailing arrow. */
+  .byl-checkout-next>span[aria-hidden="true"]{display:none!important}
+  .byl-checkout-action-bar{
+    border-radius:12px 12px 0 0!important;
+    padding-left:12px!important;padding-right:12px!important;
+  }
+  .byl-mobile-order-toggle{
+    gap:8px!important;
+  }
+}
+/* V3 spacing correction after pixel-position audit of Owner phone reference. */
+@media(max-width:760px){
+  .byl-checkout-return{margin-bottom:-6px!important}
+  .byl-checkout-track{
+    min-height:56px!important;
+    margin-bottom:4px!important;
+  }
+  .byl-checkout-track>[data-byl-track]{min-height:54px!important}
+  .byl-choice-card{padding-top:8px!important;padding-bottom:8px!important}
+  .byl-delivery-rate{min-height:52px!important}
+  .byl-contact-card{padding-top:8px!important;padding-bottom:9px!important}
+  .byl-account-entry{margin-bottom:5px!important}
+}
+/* WooPayments may render an unfinished express-payment iframe with only an
+   orphan OR separator at 320px. While provider declares aria-busy=true,
+   hide that unfinished block, not a ready/available express wallet.
+   Provider controls, amount and payment submit are unchanged. */
+@media(max-width:760px) {
+ .byl-progressive-checkout .wcpay-express-checkout-wrapper:has(#wcpay-express-checkout-element[aria-busy="true"]) {
+   display:none!important;
+ }
+}

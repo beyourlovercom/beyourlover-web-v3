@@ -57,8 +57,8 @@ $routes = [
     'shipping' => [['byl-v3-free-shipping'],['byl-v3-free-shipping-v2']],
     'support'  => [['byl-v3-track-order'],[]],
     'cart'     => [['byl-v3-cart','byl-v3-cart-focus'],['byl-v3-cart-experience','byl-v3-cart']],
-    'checkout' => [['byl-v3-checkout','byl-v3-checkout-shell'],['byl-v3-checkout']],
-    'orderpay' => [['byl-v3-checkout','byl-v3-checkout-shell','byl-v3-order-pay'],['byl-v3-checkout']],
+    'checkout' => [['byl-v3-checkout','byl-v3-checkout-shell'],['byl-v3-checkout','byl-v3-checkout-newsletter']],
+    'orderpay' => [['byl-v3-checkout','byl-v3-checkout-shell','byl-v3-order-pay'],['byl-v3-checkout','byl-v3-checkout-newsletter']],
     'received' => [[],[]],
 ];
 foreach ($routes as $route=>$pair) {
@@ -81,6 +81,7 @@ foreach ($routes as $route=>$pair) {
     }
     if ($route === 'checkout' || $route === 'orderpay') {
         check($GLOBALS['scripts']['byl-v3-checkout']['deps'] === ['jquery','wc-checkout'], 'native Checkout dependency');
+        check($GLOBALS['scripts']['byl-v3-checkout-newsletter']['deps'] === ['byl-v3-checkout'], 'Newsletter script depends exclusively on native Checkout');
         $payload = $GLOBALS['localizations']['byl-v3-checkout']['BYLShippingPromotionCheckout'] ?? [];
         check($payload['nonce'] === 'fixed-fixture' && str_contains($payload['cartUrl'],'wc/store/v1/cart'), 'Checkout native Store API');
         check(($GLOBALS['script_data']['byl-v3-checkout']['strategy'] ?? null) === 'defer', 'Checkout defer');
