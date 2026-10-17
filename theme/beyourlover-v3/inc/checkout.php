@@ -160,3 +160,6 @@ add_action('woocommerce_review_order_after_shipping', static function (): void {
         }
     }
 }, 20);
+
+/** Mexico RFC is a real native Woo field, not a visual-only placeholder. */
+require_once __DIR__ . '/checkout-mx-rfc.php';
