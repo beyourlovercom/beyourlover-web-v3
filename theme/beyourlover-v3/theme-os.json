@@ -137,12 +137,15 @@
         "header-checkout.php",
         "footer-checkout.php",
         "inc/checkout.php",
+        "inc/checkout-mx-rfc.php",
+        "inc/checkout-address-contract.php",
         "inc/order-pay-address.php",
         "woocommerce/checkout/form-checkout.php",
         "assets/css/checkout.css",
         "assets/css/checkout-shell.css",
         "assets/css/order-pay.css",
-        "assets/js/checkout.js"
+        "assets/js/checkout.js",
+        "assets/js/checkout-newsletter.js"
       ]
     },
     "postpurchase": {

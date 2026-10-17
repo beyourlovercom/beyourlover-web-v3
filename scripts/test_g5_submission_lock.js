@@ -19,7 +19,7 @@ function between(start, end) {
 }
 const action = between('  function updateAction() {', '  function setStep(');
 const click = between("  next.addEventListener('click', () => {", "  root.addEventListener('click', e => {");
-const step = between('  function setStep(step) {', "  next.addEventListener('click', () => {");
+const step = between('  function setStep(step, {scroll = true} = {}) {', "  next.addEventListener('click', () => {");
 const formSubmit = between("  form.addEventListener('submit', e => {", "  function promotionMessage(");
 assert(step.includes('if (submitting) return;'), 'Cannot switch Checkout step while payment is pending');
 assert(formSubmit.includes('if (!submitting) {'), 'Native Enter form submit must synchronize busy state');
@@ -55,18 +55,23 @@ function fixture({gateway = true, nativePresent = true} = {}) {
   };
   const context = vm.createContext({
     next, document, form,
-    root: {dataset: {needsPayment: '1'},querySelectorAll() {return [];},querySelector() {return null;}},
-    steps: ['address', 'delivery', 'payment', 'review'],
+    root: {dataset: {needsPayment: '1',needsShipping: '0'},querySelectorAll() {return [];},querySelector() {return null;}},
+    shippingReady() {return true;},
+    mountNative() {},mountWooAccountEmail() {},relabelPhone() {},
+    syncPhoneDescription() {},wireOptionalAddressFields() {},
+    alignShippingAddressFields() {},syncMexicoRFCField() {},
+    syncBillingAddressChoice() {},deliveryOptions() {},updateDetails() {},
+    steps: ['shipping', 'payment'],
     window: {setTimeout() {counters.timers++; throw Error('Unexpected timeout unlock');}},
     $() { return {on(name, callback) {events.set(name, callback);}}; },
     paymentConfigured() {return gateway;},
     validateAddress() {return true;},
     selectedShipping() {return true;},
     message(value) { counters.notices.push(value); },
-    setStep() {throw Error('Review must not change step while placing an order');},
+
   });
   vm.runInContext(
-    "let submitting = false; let active = 'review'; let furthest = 3;\n" +
+    "let submitting = false; let active = 'payment'; let furthest = 1;\n" +
       action + step + click + formSubmit + error +
       "\nthis.inspect = () => ({submitting, active});\n",
     context,
@@ -92,7 +97,7 @@ function scenario(description, fn) {fn();cases++; console.log('CASE ' + descript
 
 scenario('G5-05 rapid double click; one native submission', () => {
   const f = fixture();
-  verify(!f.next.disabled, 'Review starts enabled with an eligible gateway');
+  verify(!f.next.disabled, 'Payment starts enabled with an eligible gateway');
   f.click();
   f.click();
   verify(f.counters.native === 1, 'rapid repeated click cannot invoke Woo twice');
@@ -122,7 +127,7 @@ scenario('G5-01/G5-04 explicit Woo error permits user-initiated retry', () => {
 
 scenario('G5-07 no selected gateway remains fail-closed', () => {
   const f = fixture({gateway: false});
-  verify(f.next.disabled, 'paymentless Review CTA disabled');
+  verify(f.next.disabled, 'paymentless Payment CTA disabled');
   f.click();
   verify(f.counters.native === 0, 'no native checkout without an eligible gateway');
 });
@@ -136,8 +141,8 @@ scenario('G5-08 missing native Woo submit button fails closed', () => {
 scenario('G5-05 stage navigation cannot unlock pending payment', () => {
   const f = fixture();
   f.click();
-  f.editStep('payment');
-  verify(f.state().active === 'review', 'step-edit cannot escape a pending Review payment');
+  f.editStep('shipping');
+  verify(f.state().active === 'payment', 'step-edit cannot escape a pending Payment attempt');
   verify(f.next.disabled && f.attrs.get('aria-busy') === 'true',
     'native pending state stays disabled after edit attempts');
   f.fail();
