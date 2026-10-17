@@ -10,7 +10,7 @@ const script=fs.readFileSync(path.join(__dirname,'../theme/beyourlover-v3/assets
 function field(values){
   return {...values,events:{},addEventListener(name,fn){(this.events[name]??=[]).push(fn)},async emit(name){for(const fn of this.events[name]||[])await fn()}};
 }
-async function session({ready=true,policy='newsletter-v1',endpoint='https://dev.beyourlover.com/wp-json/andy-core/v1/newsletter/subscribe',response=200}={}){
+async function session({ready=true,policy='newsletter-v1',endpoint='https://dev.beyourlover.com/wp-json/andy-core/v1/newsletter/subscribe',response=200,delayResponse=false}={}){
   const calls=[],consent=field({checked:false,disabled:!ready});
   const status=field({textContent:''}),email=field({value:'',validity:{valid:true}});
   const box={dataset:{bylNewsletterReady:ready?'1':'0',bylNewsletterEndpoint:endpoint,bylNewsletterPolicy:ready?policy:''},
@@ -18,12 +18,15 @@ async function session({ready=true,policy='newsletter-v1',endpoint='https://dev.
   const root={querySelector(s){return {'[data-byl-checkout-newsletter]':box,'#billing_email':email}[s]||null}};
   const document={readyState:'complete',documentElement:{lang:'en'},querySelector(s){return s==='[data-byl-progressive-checkout]'?root:null}};
   const window={location:{origin:'https://dev.beyourlover.com',pathname:'/checkout/'}};
+  let releaseResponse=()=>{};
+  const responseGate=delayResponse?new Promise(resolve=>{releaseResponse=resolve}):null;
   const fetch=async(url,options)=>{
     calls.push({url,options,data:JSON.parse(options.body)});
+    if(responseGate) await responseGate;
     return {ok:response===200,status:response,json:async()=>({success:response===200})};
   };
   vm.runInNewContext(script,{URL,AbortController,document,window,fetch,console},{filename:'checkout-newsletter.js'});
-  return {calls,consent,email,status};
+  return {calls,consent,email,status,releaseResponse};
 }
 async function flush(){await new Promise(r=>setTimeout(r,0))}
 (async()=>{
@@ -64,6 +67,21 @@ async function flush(){await new Promise(r=>setTimeout(r,0))}
   check(s.calls[1].data.email,'qa+different@example.test','request targets newly approved email');
   s.consent.checked=false;await s.consent.emit('change');
   check(s.calls.length,2,'uncheck does not resubmit');
+
+  // Email edit during an outstanding network response must not leave the
+  // prior opt-in attached to the new email or trigger another request on blur.
+  s=await session({delayResponse:true});
+  s.email.value='qa+inflight@example.test';s.consent.checked=true;
+  await s.consent.emit('change');await flush();
+  check(s.calls.length,1,'one pending request while fetch is in flight');
+  check(s.consent.disabled,true,'control disabled during request');
+  s.email.value='qa+modified@example.test';await s.email.emit('input');
+  s.releaseResponse();await flush();await flush();
+  check(s.consent.checked,false,'in-flight email change revokes old consent after response');
+  check(s.status.textContent.includes('Email changed'),true,'no stale confirmation for new email');
+  check(s.consent.disabled,false,'network completion restores checkbox');
+  await s.email.emit('blur');await flush();
+  check(s.calls.length,1,'email edited in flight cannot auto subscribe');
 
   s=await session({response:503});
   s.email.value='qa+fail@example.test';s.consent.checked=true;await s.consent.emit('change');await flush();
