@@ -691,15 +691,24 @@
     host.hidden = false;
     host.replaceChildren();
 
+    // Only the Dev PILLOW adapter emits this Woo review-order source marker.
+    // The legacy BYL49 extension can reflect the WHOLE cart subtotal, even
+    // though Woo now charges the pillow shipment independently. Do not promise
+    // cart-wide free shipping while a paid oversized package is present.
+    const hasOversizedPillow = !!root.querySelector(
+      '#order_review .byl-dev-pillow-package-source'
+    );
     const label = document.createElement('strong');
     label.className = 'byl-promo-title';
-    label.textContent = 'Free shipping';
+    label.textContent = hasOversizedPillow ? 'Shipping & promo code' : 'Free shipping';
     host.appendChild(label);
 
     const messageNode = document.createElement('p');
     messageNode.className = 'byl-promo-message';
     messageNode.setAttribute('aria-live', 'polite');
-    messageNode.textContent = promotionMessage(data);
+    messageNode.textContent = hasOversizedPillow
+      ? 'Oversized pillow shipping is $30 per item. Free shipping applies only to eligible regular items.'
+      : promotionMessage(data);
     host.appendChild(messageNode);
 
     if (data.state === 'require_code_available') {
