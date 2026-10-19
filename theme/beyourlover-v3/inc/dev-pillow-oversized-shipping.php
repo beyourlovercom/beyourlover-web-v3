@@ -151,8 +151,14 @@ function byl_dev_pillow_shipping_rates(array $rates, array $package): array {
             }
         }
         if (!$rate) {
-            // Some zones have no flat method; a valid, separately identified
-            // shipping rate is required so free shipping cannot zero pillows.
+            // Fail closed for an unsupported destination with NO Woo rates:
+            // a fixed pillow charge must never enable shipping to a country
+            // that the configured Woo shipping zones do not serve.
+            if (!$rates) {
+                return [];
+            }
+            // A valid Woo zone can offer only free_shipping. Convert this
+            // allowed method context to the paid oversized-only rate.
             $rate = new WC_Shipping_Rate(
                 'byl_dev_pillow_oversized', 'Oversized Pillow Shipping',
                 $cost, [], 'byl_dev_pillow_oversized'
