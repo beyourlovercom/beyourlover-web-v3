@@ -9,7 +9,20 @@ $GLOBALS['pillow_test_filters'] = [];
 function home_url($path = '/') { return 'https://' . $GLOBALS['pillow_test_host'] . $path; }
 function wp_parse_url($url, $component) { return parse_url($url, $component); }
 function wp_get_environment_type() { return $GLOBALS['pillow_test_env']; }
-function WC() { return (object) []; }
+class DevPillowCartMock {
+    public function get_cart(): array { return (array) ($GLOBALS['pillow_test_cart_items'] ?? []); }
+}
+function WC() { return (object) ['cart' => new DevPillowCartMock()]; }
+class DevPillowRestResponse {
+    private array $data;
+    public function __construct(array $data) {$this->data=$data;}
+    public function get_data(): array {return $this->data;}
+    public function set_data(array $d): void {$this->data=$d;}
+}
+class DevPillowRestRequest {
+    public function __construct(private string $route) {}
+    public function get_route(): string {return $this->route;}
+}
 function add_action($hook, $callback, $priority = 10) { $GLOBALS['pillow_test_filters'][$hook] = $callback; }
 function add_filter($hook, $callback, $priority = 10, $accepted = 1) {
     $GLOBALS['pillow_test_filters'][$hook] = [$callback, $priority, $accepted];
@@ -106,6 +119,41 @@ check_shipping($unsupported === [], 'no rates in shipping zone stays unavailable
 $fallback=byl_dev_pillow_shipping_rates(['free_shipping:9'=>$rfree()],$mixed[1]);
 check_shipping(count($fallback)===1 && reset($fallback)->get_cost()===30.0, 'no flat method still charges pillow');
 check_shipping(reset($fallback)->get_method_id()==='byl_dev_pillow_oversized','fallback dedicated Woo rate');
+$promoTemplate=[
+    'active'=>true,'mode'=>'automatic','policy_code'=>'byl49',
+    'zone_id'=>5,'threshold'=>69.0,'subtotal'=>79.0,'remaining'=>0.0,
+    'eligible'=>true,'unlocked'=>true,'applied_code'=>'','has_code'=>false,
+    'policy_code_applied'=>false,'state'=>'automatic_unlocked',
+];
+$regularTwenty = ['pillow'=>$pillow, 'ordinary'=>$cheap];
+$fixed=byl_dev_pillow_shipping_promo_correct($promoTemplate,$regularTwenty);
+check_shipping($fixed['subtotal']===20.0, 'Store API eligible basis ordinary subtotal $20 only');
+check_shipping($fixed['remaining']===49.0, 'shipping remaining is $49');
+check_shipping($fixed['eligible']===false && $fixed['unlocked']===false, 'no false unlock for $79 mixed cart');
+check_shipping($fixed['state']==='below_threshold', 'correct below-threshold state');
+$normalNinetySix=byl_dev_pillow_shipping_promo_correct($promoTemplate,['pillow'=>$pillow,'normal'=>$normal]);
+check_shipping($normalNinetySix['subtotal']===96.0 && $normalNinetySix['unlocked']===true, 'normal $96 genuinely unlocks ordinary package');
+$pillowOnly=byl_dev_pillow_shipping_promo_correct($promoTemplate,['pillow'=>$pillow]);
+check_shipping($pillowOnly['subtotal']===0.0 && $pillowOnly['unlocked']===false, 'pillow alone never unlocks regular free');
+check_shipping(byl_dev_pillow_shipping_promo_correct($promoTemplate,['normal'=>$normal])===$promoTemplate,'normal-only legacy extension unchanged');
+$discountPromo=byl_dev_pillow_shipping_promo_correct($promoTemplate,['pillow'=>$pillow,'normal'=>$discounted]);
+check_shipping($discountPromo['subtotal']===68.0 && $discountPromo['eligible']===false,'discounted normal $68 below $69');
+$codeRequired=$promoTemplate;
+$codeRequired['mode']='require_code';$codeRequired['policy_code_applied']=false;
+$codePromo=byl_dev_pillow_shipping_promo_correct($codeRequired,['pillow'=>$pillow,'normal'=>$normal]);
+check_shipping($codePromo['eligible']===true && $codePromo['unlocked']===false,'coupon required mode remains code gated');
+$inactive=$promoTemplate; $inactive['active']=false;
+check_shipping(byl_dev_pillow_shipping_promo_correct($inactive,$regularTwenty)===$inactive,'inactive promo untouched');
+$GLOBALS['pillow_test_cart_items']=$regularTwenty;
+$rest=new DevPillowRestResponse(['extensions'=>['byl-shipping-promotion'=>$promoTemplate],'totals'=>['total_price'=>'11900']]);
+$check=byl_dev_pillow_shipping_promo_rest_response($rest,null,new DevPillowRestRequest('/wc/store/v1/cart'));
+check_shipping($rest===$check && $check->get_data()['extensions']['byl-shipping-promotion']['subtotal']===20.0,'REST response correct on cart route');
+check_shipping($check->get_data()['totals']['total_price']==='11900','REST corrector never changes actual Woo totals');
+$otherRoute=new DevPillowRestResponse(['extensions'=>['byl-shipping-promotion'=>$promoTemplate]]);
+byl_dev_pillow_shipping_promo_rest_response($otherRoute,null,new DevPillowRestRequest('/wc/store/v1/checkout'));
+check_shipping($otherRoute->get_data()['extensions']['byl-shipping-promotion']===$promoTemplate,'never mutate Checkout REST response');
+check_shipping(isset($GLOBALS['pillow_test_filters']['rest_post_dispatch'])
+    && $GLOBALS['pillow_test_filters']['rest_post_dispatch'][1]===9999,'REST hook ordered after extension registration');
 $initial=byl_dev_pillow_shipping_packages($build(['pillow'=>$pillow,'normal'=>$normal]));
 foreach ([['www.beyourlover.com','staging'],['dev.beyourlover.com','production'],['www.beyourlover.com','production']] as $scope) {
     $GLOBALS['pillow_test_host']=$scope[0];$GLOBALS['pillow_test_env']=$scope[1];
