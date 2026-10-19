@@ -117,6 +117,20 @@ add_action('woocommerce_review_order_after_shipping', static function (): void {
         if (!is_array($package) || empty($package['destination']['country'])) {
             continue;
         }
+        // Dev-only PILLOW package always charges $30 per item. Showing an
+        // amount-gated Free Shipping placeholder here would promise a method
+        // that Woo never offers for this specific oversized package.
+        // Also mark the read-only Checkout promo so its copy never claims
+        // all packages are free when a paid oversized package is present.
+        if (function_exists('byl_dev_pillow_shipping_enabled')
+            && byl_dev_pillow_shipping_enabled()
+            && ($package['byl_dev_pillow_kind'] ?? '') === 'pillow') {
+            echo '<tr class="byl-dev-pillow-package-source" hidden style="display:none"'
+               . ' data-byl-pillow-package-index="' . esc_attr((string) $package_index) . '">'
+               . '<td colspan="2"></td></tr>';
+            continue;
+        }
+
         $available_rates = isset($package['rates']) && is_array($package['rates'])
             ? $package['rates'] : [];
         $free_available = false;
