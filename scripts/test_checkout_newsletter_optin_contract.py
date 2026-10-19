@@ -56,5 +56,11 @@ check("localStorage" not in js and "sessionStorage" not in js and "navigator.sen
 check("checkout.js" in assets and "checkout-newsletter.js" in assets,"Enqueue only on checkout")
 check("['byl-v3-checkout']" in assets,"Existing native checkout initializes first")
 check(".byl-checkout-marketing-label" in css and "#93002c" in css,"Canonical burgundy appearance")
+check('class="byl-checkout-marketing-copy"' in template and '(not available yet)' in template,
+      "Explicit inline unavailable note when newsletter OFF")
+check('data-byl-newsletter-ready="0"] .byl-checkout-marketing-status{display:none}' in css,
+      "Unavailable newsletter stays in one visual row without duplicate text")
+check('.byl-checkout-marketing-copy{display:inline-flex;align-items:center;' in css,
+      "Checkbox and unavailable copy aligned in one row")
 check("byl_checkout_drawer" not in js and "checkout-drawer.js" not in assets,"No retired checkout drawer")
 print("PASS Checkout Andy Newsletter consent gate: %s assertions (no email sent)" % assertions)

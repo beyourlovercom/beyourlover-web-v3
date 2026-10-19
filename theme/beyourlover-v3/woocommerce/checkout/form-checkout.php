@@ -56,7 +56,7 @@ $cart = WC()->cart;
                    data-byl-newsletter-policy="<?php echo esc_attr($byl_newsletter_policy); ?>">
                 <label class="byl-checkout-marketing-label">
                   <input type="checkbox" data-byl-newsletter-consent value="1" <?php disabled(!$byl_newsletter_ready); ?>>
-                  <span>Notify me of exclusive offers</span>
+                  <span class="byl-checkout-marketing-copy">Notify me of exclusive offers<?php if (!$byl_newsletter_ready) : ?> <small class="byl-checkout-marketing-unavailable">(not available yet)</small><?php endif; ?></span>
                 </label>
                 <p class="byl-checkout-marketing-status" data-byl-newsletter-status role="status" aria-live="polite"><?php
                   if (!$byl_newsletter_ready) {
@@ -168,7 +168,7 @@ $cart = WC()->cart;
           <p class="byl-checkout-error" data-byl-error role="alert" hidden></p>
           <button class="byl-mobile-order-toggle" type="button" data-byl-mobile-summary-toggle aria-expanded="false" aria-controls="byl-checkout-summary-panel">
             <strong>Order total (<?php echo esc_html($cart ? (string) $cart->get_cart_contents_count() : '0'); ?>)</strong>
-            <span class="byl-mobile-see-details">See details <span aria-hidden="true">&#8964;</span></span>
+            <span class="byl-mobile-see-details"><span class="byl-mobile-see-details-text">See details</span><svg class="byl-mobile-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <span class="byl-mobile-total" data-byl-mobile-total><?php echo wp_kses_post($cart ? $cart->get_total() : ''); ?></span>
           </button>
           <button type="button" class="byl-checkout-next" data-byl-next>Continue to Payment <span aria-hidden="true">→</span></button></div>
