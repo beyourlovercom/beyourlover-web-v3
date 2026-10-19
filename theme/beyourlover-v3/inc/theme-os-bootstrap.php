@@ -19,6 +19,4 @@ require_once get_stylesheet_directory().'/inc/order-pay-address.php';
 require_once get_stylesheet_directory().'/inc/thank-you.php';
 require_once get_stylesheet_directory().'/inc/cart-experience.php';
 require_once get_stylesheet_directory().'/inc/cart-drawer.php';
-// Site-local Dev-only PILLOW shipping test (exact Dev host/staging runtime gated).
-require_once get_stylesheet_directory().'/inc/dev-pillow-oversized-shipping.php';
 require_once get_stylesheet_directory().'/inc/blog-legacy-script-ampersand.php';
