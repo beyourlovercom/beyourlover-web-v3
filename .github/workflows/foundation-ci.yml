@@ -82,6 +82,12 @@ jobs:
           echo "Theme ZIP reproducibility verified; no release or deployment."
       - name: Cart V2 focused regression
         run: php scripts/test_cart_v2_contract.php
+      - name: Cart Production Canary V1 isolated dual-switch fail-closed matrix
+        run: php -l scripts/test_cart_prod_canary_isolated_gates_v1.php && php scripts/test_cart_prod_canary_isolated_gates_v1.php
+      - name: Cart Shoptimizer compatibility legacy-fallback matrix (unwired)
+        run: php -l scripts/test_cart_prod_canary_compatibility_v1.php && php scripts/test_cart_prod_canary_compatibility_v1.php
+      - name: Cart B4 WordPress context authority and theme fingerprint (unwired)
+        run: php -l scripts/test_cart_prod_canary_wp_context_v1.php && php scripts/test_cart_prod_canary_wp_context_v1.php
       - name: Cart final quantity and fragment regression
         run: node scripts/test_cart_quantity_refresh_c1c4.js
       - name: Cart Drawer D3 preview contract
