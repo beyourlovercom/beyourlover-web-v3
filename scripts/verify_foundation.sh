@@ -9,5 +9,6 @@ python3 scripts/test_shipping_promotion_runtime_contract.py
 python3 scripts/test_checkout_shipping_promotion_docs.py
 python3 scripts/test_cart_promotion_ux_contract.py
 python3 scripts/test_checkout_progressive_ux_contract.py
+python3 scripts/test_cart_prod_canary_preflight_hold_v1.py
 git diff --check
 echo "FOUNDATION_VERIFY=PASS"
