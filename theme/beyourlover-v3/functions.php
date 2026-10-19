@@ -2,6 +2,8 @@
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 require_once get_stylesheet_directory().'/inc/theme-os-bootstrap.php';
+// Site-local Dev-only PILLOW shipping test; guarded to Dev+staging inside PHP.
+require_once get_stylesheet_directory().'/inc/dev-pillow-oversized-shipping.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
