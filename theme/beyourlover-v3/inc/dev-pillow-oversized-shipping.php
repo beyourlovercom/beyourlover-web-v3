@@ -266,14 +266,25 @@ function byl_dev_pillow_shipping_promo_rest_response($response, $server, $reques
         return $response;
     }
     $data = $response->get_data();
-    if (!is_array($data)
-        || !is_array($data['extensions']['byl-shipping-promotion'] ?? null)) {
+    if (!is_array($data)) {
         return $response;
     }
-    $current = $data['extensions']['byl-shipping-promotion'];
+    // Woo Store API uses stdClass for the nested extensions registry, even
+    // though the REST response root is an array. Preserve those object shapes.
+    $rawExtensions = $data['extensions'] ?? null;
+    $extensions = is_object($rawExtensions) ? get_object_vars($rawExtensions) : $rawExtensions;
+    if (!is_array($extensions)) {
+        return $response;
+    }
+    $rawPromo = $extensions['byl-shipping-promotion'] ?? null;
+    $current = is_object($rawPromo) ? get_object_vars($rawPromo) : $rawPromo;
+    if (!is_array($current)) {
+        return $response;
+    }
     $corrected = byl_dev_pillow_shipping_promo_correct($current, (array) WC()->cart->get_cart());
     if ($current !== $corrected) {
-        $data['extensions']['byl-shipping-promotion'] = $corrected;
+        $extensions['byl-shipping-promotion'] = is_object($rawPromo) ? (object) $corrected : $corrected;
+        $data['extensions'] = is_object($rawExtensions) ? (object) $extensions : $extensions;
         $response->set_data($data);
     }
     return $response;
