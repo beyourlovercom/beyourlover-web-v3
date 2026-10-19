@@ -12,6 +12,38 @@ declare(strict_types=1);
 defined('ABSPATH') || exit;
 
 /**
+ * Verify physical PHP component bytes against the locked release receipt.
+ * A config release SHA alone is not proof that these installed files match.
+ * Exact filenames only: no arbitrary paths or contents from remote inputs.
+ */
+function byl_v3_cart_prod_canary_component_files_verified($expected): bool {
+    $allowlist = [
+        'cart-production-canary-gates.php',
+        'cart-production-canary-compatibility.php',
+        'cart-production-canary-wp-context.php',
+    ];
+    if (!is_array($expected) || count($expected) !== count($allowlist)) {
+        return false;
+    }
+    foreach ($allowlist as $name) {
+        $digest = $expected[$name] ?? null;
+        if (!is_string($digest)
+            || !preg_match('/\\A[a-f0-9]{64}\\z/D', $digest)) {
+            return false;
+        }
+        $file = __DIR__.'/'.$name;
+        if (!is_file($file) || !is_readable($file)) {
+            return false;
+        }
+        $actual = hash_file('sha256', $file);
+        if (!is_string($actual) || !hash_equals($digest, $actual)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
  * Derive trusted authentication and active-theme fields from WP only.
  *
  * Operator policy must be a *server-defined PHP constant* provisioned only
@@ -26,6 +58,13 @@ function byl_v3_cart_prod_canary_wp_context(): array {
     }
     $policy = constant('BYL_CART_CANARY_V1_SERVER_POLICY');
     if (!is_array($policy)) {
+        return [];
+    }
+    // Require physical file hashes from the signed/reviewed deployment receipt.
+    // No receipt means OFF, even when a human copies both release SHA strings.
+    if (!byl_v3_cart_prod_canary_component_files_verified(
+        $policy['approved_component_sha256'] ?? null
+    )) {
         return [];
     }
     foreach ([
