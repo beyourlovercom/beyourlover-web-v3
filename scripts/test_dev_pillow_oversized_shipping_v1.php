@@ -101,6 +101,8 @@ $afterCoupon=byl_dev_pillow_shipping_rates($rates(),$cut[0]);
 check_shipping(!isset($afterCoupon['free_shipping:9']), 'after-coupon normal $68 loses $69 free');
 $alone=byl_dev_pillow_shipping_packages($build(['normal'=>$normal]));
 check_shipping(count($alone)===1 && !isset($alone[0]['byl_dev_pillow_kind']), 'ordinary-only cart unchanged');
+$unsupported=byl_dev_pillow_shipping_rates([], $mixed[1]);
+check_shipping($unsupported === [], 'no rates in shipping zone stays unavailable — never auto-enable unsupported countries');
 $fallback=byl_dev_pillow_shipping_rates(['free_shipping:9'=>$rfree()],$mixed[1]);
 check_shipping(count($fallback)===1 && reset($fallback)->get_cost()===30.0, 'no flat method still charges pillow');
 check_shipping(reset($fallback)->get_method_id()==='byl_dev_pillow_oversized','fallback dedicated Woo rate');
