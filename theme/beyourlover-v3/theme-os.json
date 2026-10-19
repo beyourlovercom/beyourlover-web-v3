@@ -121,6 +121,7 @@
         "inc/cart-drawer.php",
         "inc/cart-production-canary-gates.php",
         "inc/cart-production-canary-compatibility.php",
+        "inc/cart-production-canary-wp-context.php",
         "assets/css/cart-drawer.css",
         "assets/css/cart-empty-parity.css",
         "assets/js/cart-drawer.js"
