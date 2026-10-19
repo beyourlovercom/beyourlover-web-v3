@@ -199,11 +199,92 @@ function byl_dev_pillow_shipping_rates(array $rates, array $package): array {
     return $rates;
 }
 
+
+/**
+ * Correct ONLY the existing BYL promotion presentation in mixed/PILLOW carts.
+ * The legacy BYL Store API extension counts PILLOW towards the ordinary free
+ * threshold, despite our separate paid oversized Woo shipping package.
+ * Fix its Dev REST response without updating the shared BYL/Andy plugin.
+ * Actual Woo shipping rates/taxes/prices are never changed by this function.
+ */
+function byl_dev_pillow_shipping_promo_correct(array $promo, array $cartItems): array {
+    $hasPillow = false;
+    $regular = [];
+    foreach ($cartItems as $key => $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        if (byl_dev_pillow_shipping_is_pillow($item)) {
+            $hasPillow = true;
+        } else {
+            $regular[$key] = $item;
+        }
+    }
+    if (!$hasPillow || empty($promo['active'])
+        || !isset($promo['threshold']) || !is_numeric($promo['threshold'])) {
+        return $promo;
+    }
+
+    $threshold = max(0.0, (float) $promo['threshold']);
+    $decimals = function_exists('wc_get_price_decimals') ? (int) wc_get_price_decimals() : 2;
+    $regularSubtotal = round(byl_dev_pillow_shipping_items_total($regular), $decimals);
+    $eligible = $regularSubtotal + 0.000001 >= $threshold;
+    $mode = (string) ($promo['mode'] ?? 'automatic');
+    $applied = (string) ($promo['applied_code'] ?? '');
+    $policyCodeApplied = ($promo['policy_code_applied'] ?? false) === true;
+
+    $promo['subtotal'] = $regularSubtotal;
+    $promo['remaining'] = max(0.0, round($threshold - $regularSubtotal, $decimals));
+    $promo['eligible'] = $eligible;
+    $promo['unlocked'] = $eligible && ($mode !== 'require_code' || $policyCodeApplied);
+    if (!$eligible) {
+        $promo['state'] = ($mode === 'require_code' && $policyCodeApplied)
+            ? 'require_code_applied' : 'below_threshold';
+    } elseif ($mode !== 'require_code') {
+        $promo['state'] = $applied !== '' ? 'automatic_code' : 'automatic_unlocked';
+    } elseif ($policyCodeApplied) {
+        $promo['state'] = 'require_code_unlocked';
+    } elseif ($applied !== '') {
+        $promo['state'] = 'require_code_other';
+    } else {
+        $promo['state'] = 'require_code_available';
+    }
+    return $promo;
+}
+
+/** Read-only Store API response correction; fail closed on other REST routes. */
+function byl_dev_pillow_shipping_promo_rest_response($response, $server, $request) {
+    if (!byl_dev_pillow_shipping_enabled()
+        || !is_object($request) || !method_exists($request, 'get_route')
+        || !preg_match('#^/wc/store/v1/cart(?:/[^/?]+)?$#D', (string) $request->get_route())
+        || !is_object($response) || !method_exists($response, 'get_data')
+        || !method_exists($response, 'set_data')) {
+        return $response;
+    }
+    if (!WC() || !isset(WC()->cart) || !is_object(WC()->cart)
+        || !method_exists(WC()->cart, 'get_cart')) {
+        return $response;
+    }
+    $data = $response->get_data();
+    if (!is_array($data)
+        || !is_array($data['extensions']['byl-shipping-promotion'] ?? null)) {
+        return $response;
+    }
+    $current = $data['extensions']['byl-shipping-promotion'];
+    $corrected = byl_dev_pillow_shipping_promo_correct($current, (array) WC()->cart->get_cart());
+    if ($current !== $corrected) {
+        $data['extensions']['byl-shipping-promotion'] = $corrected;
+        $response->set_data($data);
+    }
+    return $response;
+}
+
 function byl_dev_pillow_shipping_boot(): void {
     if (!byl_dev_pillow_shipping_enabled()) {
         return;
     }
     add_filter('woocommerce_cart_shipping_packages', 'byl_dev_pillow_shipping_packages', 900, 1);
     add_filter('woocommerce_package_rates', 'byl_dev_pillow_shipping_rates', 99999, 2);
+    add_filter('rest_post_dispatch', 'byl_dev_pillow_shipping_promo_rest_response', 9999, 3);
 }
 add_action('woocommerce_init', 'byl_dev_pillow_shipping_boot', 99);
