@@ -149,6 +149,33 @@ $rest=new DevPillowRestResponse(['extensions'=>['byl-shipping-promotion'=>$promo
 $check=byl_dev_pillow_shipping_promo_rest_response($rest,null,new DevPillowRestRequest('/wc/store/v1/cart'));
 check_shipping($rest===$check && $check->get_data()['extensions']['byl-shipping-promotion']['subtotal']===20.0,'REST response correct on cart route');
 check_shipping($check->get_data()['totals']['total_price']==='11900','REST corrector never changes actual Woo totals');
+// Real Woo Store API nests extensions and namespace payloads as stdClass.
+$restObject=new DevPillowRestResponse([
+    'extensions'=>(object) [
+        'byl-shipping-promotion'=>(object) $promoTemplate,
+        'another-extension'=>(object) ['untouched'=>true],
+    ],
+    'totals'=>['total_price'=>'11900'],
+]);
+$correctedObject=byl_dev_pillow_shipping_promo_rest_response(
+    $restObject,null,new DevPillowRestRequest('/wc/store/v1/cart')
+);
+$realData=$correctedObject->get_data();
+check_shipping($realData['extensions'] instanceof stdClass, 'Woo top nested extensions stays stdClass');
+check_shipping($realData['extensions']->{'byl-shipping-promotion'} instanceof stdClass, 'Woo promotion extension stays stdClass');
+check_shipping($realData['extensions']->{'byl-shipping-promotion'}->subtotal===20.0, 'stdClass payload corrects $79 mixed cart to $20 ordinary');
+check_shipping($realData['extensions']->{'byl-shipping-promotion'}->remaining===49.0, 'stdClass remaining $49');
+check_shipping($realData['extensions']->{'byl-shipping-promotion'}->unlocked===false, 'stdClass no false free unlock');
+check_shipping($realData['extensions']->{'another-extension'}->untouched===true, 'other Woo Store API extensions untouched');
+check_shipping($realData['totals']['total_price']==='11900', 'actual money still untouched for stdClass registry');
+$GLOBALS['pillow_test_cart_items'] = ['normal'=>$normal];
+$normalObject=new DevPillowRestResponse([
+    'extensions'=>(object)['byl-shipping-promotion'=>(object)$promoTemplate]
+]);
+byl_dev_pillow_shipping_promo_rest_response($normalObject,null,new DevPillowRestRequest('/wc/store/v1/cart'));
+check_shipping($normalObject->get_data()['extensions']->{'byl-shipping-promotion'}->subtotal===79.0,
+    'ordinary-only response remains untouched by PILLOW-scoped correction');
+$GLOBALS['pillow_test_cart_items']=$regularTwenty;
 $otherRoute=new DevPillowRestResponse(['extensions'=>['byl-shipping-promotion'=>$promoTemplate]]);
 byl_dev_pillow_shipping_promo_rest_response($otherRoute,null,new DevPillowRestRequest('/wc/store/v1/checkout'));
 check_shipping($otherRoute->get_data()['extensions']['byl-shipping-promotion']===$promoTemplate,'never mutate Checkout REST response');
