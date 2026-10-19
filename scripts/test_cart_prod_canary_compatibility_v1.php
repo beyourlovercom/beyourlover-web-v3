@@ -38,6 +38,13 @@ $base = [
     // These are attestations made by a hypothetical verified WordPress adapter.
     // Never treat the source test as proof that any real WWW evidence exists.
     'legacy_cart_fragments_recovered' => true,
+    // Synthetic positive fixtures: none are evidence of live WWW recovery.
+    'legacy_cold_guest_empty_cart_pass' => true,
+    'legacy_cold_guest_filled_cart_pass' => true,
+    'legacy_fragment_latency_under_timeout_pass' => true,
+    'www_dynamic_ajax_503_stable' => true,
+    'woo_post_upgrade_integrity_verified' => true,
+    'payment_gateway_readonly_health_verified' => true,
     'legacy_drawer_verified' => true,
     'legacy_cart_page_verified' => true,
     'www_post_hotfix_hashes_reconciled' => true,
@@ -80,6 +87,12 @@ check_compat(is_legacy($go([])), 'empty runtime evidence fail closed');
 
 $prerequisites = [
     'incident_p0_cleared','legacy_cart_fragments_recovered',
+    'legacy_cold_guest_empty_cart_pass',
+    'legacy_cold_guest_filled_cart_pass',
+    'legacy_fragment_latency_under_timeout_pass',
+    'www_dynamic_ajax_503_stable',
+    'woo_post_upgrade_integrity_verified',
+    'payment_gateway_readonly_health_verified',
     'legacy_drawer_verified','legacy_cart_page_verified',
     'www_post_hotfix_hashes_reconciled','legacy_restore_artifact_verified',
     'www_theme_identity_attested','www_integration_point_attested',
