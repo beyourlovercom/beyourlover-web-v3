@@ -38,6 +38,14 @@ function byl_v3_cart_prod_canary_compatibility_decision(array $evidence): array 
     foreach ([
         'incident_p0_cleared',
         'legacy_cart_fragments_recovered',
+        // A's hook removal fixes enqueue but does not establish a cold guest
+        // fragment response within the current Woo 5s timeout or 503 health.
+        'legacy_cold_guest_empty_cart_pass',
+        'legacy_cold_guest_filled_cart_pass',
+        'legacy_fragment_latency_under_timeout_pass',
+        'www_dynamic_ajax_503_stable',
+        'woo_post_upgrade_integrity_verified',
+        'payment_gateway_readonly_health_verified',
         'legacy_drawer_verified',
         'legacy_cart_page_verified',
         'www_post_hotfix_hashes_reconciled',
