@@ -59,12 +59,23 @@ $mandatory = [
     'page_template_route_attested','page_native_woo_cart_authority_attested',
     'page_legacy_fallback_attested','page_empty_state_independently_gated',
 ];
+$componentHashes=[];
+foreach ([
+    'cart-production-canary-gates.php',
+    'cart-production-canary-compatibility.php',
+    'cart-production-canary-wp-context.php'
+] as $componentName) {
+    $digest=hash_file('sha256', $root.'/theme/beyourlover-v3/inc/'.$componentName);
+    if (!is_string($digest)) { fwrite(STDERR, "FAIL mock component digest\n"); exit(1); }
+    $componentHashes[$componentName]=$digest;
+}
 $policy = array_fill_keys($mandatory,true);
 $policy += [
     'drawer_enabled'=>true,'page_enabled'=>false,
     'approved_stylesheet'=>'shoptimizer-child-theme',
     'approved_parent_template'=>'shoptimizer',
     'approved_theme_fingerprint'=>$theme,
+    'approved_component_sha256'=>$componentHashes,
     'approved_release_sha'=>$sha,
     'installed_release_sha'=>$sha,
     'allowed_staff_ids'=>[17],
@@ -84,6 +95,24 @@ function assert_wp_canary(bool $ok,string $reason): void {
     global $checks;
     if (!$ok) {fwrite(STDERR, "FAIL B4 WP mock adapter: ".$reason."\n");exit(1);}
     $checks++;
+}
+assert_wp_canary(
+    byl_v3_cart_prod_canary_component_files_verified($componentHashes),
+    'actual three component sha256 files verified'
+);
+$badReceipts=[
+    [],
+    ['cart-production-canary-gates.php'=>str_repeat('a',64)],
+    array_replace($componentHashes, ['cart-production-canary-gates.php'=>str_repeat('f',64)]),
+    array_replace($componentHashes, ['cart-production-canary-wp-context.php'=>'bad']),
+    $componentHashes + ['unexpected.php'=>str_repeat('a',64)],
+    null, false, 'true',
+];
+foreach ($badReceipts as $receipt) {
+    assert_wp_canary(
+        !byl_v3_cart_prod_canary_component_files_verified($receipt),
+        'incomplete, additional, or altered component receipt denied'
+    );
 }
 $ctx = byl_v3_cart_prod_canary_wp_context();
 assert_wp_canary($ctx!==[], 'valid server-attested context only');
