@@ -126,6 +126,13 @@ jobs:
         run: python scripts/test_checkout_progressive_ux_contract.py
       - name: Notification UX V1 opt-in dispatcher regression
         run: php -l theme/beyourlover-v3/notification-preview-v1.php && node --check theme/beyourlover-v3/assets/js/notification.js && node --check theme/beyourlover-v3/assets/js/notification-preview.js && node --check theme/beyourlover-v3/assets/js/notification-surfaces.js && node --check scripts/test_notification_ux_v1.js && node scripts/test_notification_ux_v1.js
+      - name: Blog editorial post and category shell isolation contract
+        run: |
+          php -l theme/beyourlover-v3/inc/blog-editorial-shell.php
+          php -l theme/beyourlover-v3/category.php
+          php -l theme/beyourlover-v3/single-post.php
+          node --check theme/beyourlover-v3/assets/js/blog-editorial-shell.js
+          node scripts/test_blog_editorial_shell_contract.js
       - name: Blog P1 #97 scoped legacy inline JavaScript entity regression
         run: php -l theme/beyourlover-v3/inc/blog-legacy-script-ampersand.php && php scripts/test_blog_legacy_inline_ampersand.php
       - name: Compact Persistent Notice V1 scoped CSS and source-only safety
