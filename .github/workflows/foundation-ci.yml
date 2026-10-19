@@ -82,6 +82,8 @@ jobs:
           echo "Theme ZIP reproducibility verified; no release or deployment."
       - name: Cart V2 focused regression
         run: php scripts/test_cart_v2_contract.php
+      - name: BYL Dev-only Pillow Oversized Shipping V1 regression
+        run: php -l theme/beyourlover-v3/inc/dev-pillow-oversized-shipping.php && php scripts/test_dev_pillow_oversized_shipping_v1.php
       - name: Cart final quantity and fragment regression
         run: node scripts/test_cart_quantity_refresh_c1c4.js
       - name: Cart Drawer D3 preview contract
