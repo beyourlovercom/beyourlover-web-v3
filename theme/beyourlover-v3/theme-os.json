@@ -96,6 +96,7 @@
       "kind": "commerce-ui",
       "files": [
         "inc/free-shipping-v2-policy.php",
+        "inc/dev-after-discount-free-shipping.php",
         "page-free-shipping-guide.php",
         "page-free-shipping.php",
         "assets/css/free-shipping.css",
