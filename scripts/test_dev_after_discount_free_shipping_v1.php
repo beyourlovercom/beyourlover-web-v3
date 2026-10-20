@@ -64,7 +64,7 @@ $blocked=byl_dev_after_discount_rates($rates,['contents'=>['sku'=>$discounted]])
 insist(!isset($blocked['free_shipping:9'])&&isset($blocked['flat_rate:10']),'$66 excludes normal free $69');
 $pass=byl_dev_after_discount_rates($rates,['contents'=>['sku'=>$original]]);
 insist(isset($pass['free_shipping:9']),'$96 maintains free');
-foreach([68.99=>false,69=>true,70=>true] as $sum=>$eligible){
+foreach([[68.99,false],[69.00,true],[70.00,true]] as [$sum,$eligible]){
     $item=['product_id'=>25447,'line_total'=>(float)$sum];
     $out=byl_dev_after_discount_rates($rates,['contents'=>['sku'=>$item]]);
     insist(isset($out['free_shipping:9'])===$eligible, "threshold exact $sum");
