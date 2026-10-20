@@ -17,8 +17,9 @@ function byl_dev_after_discount_enabled(): bool {
         && wp_parse_url(home_url('/'), PHP_URL_HOST) === 'dev.beyourlover.com'
         && wp_get_environment_type() === 'staging'
         && function_exists('WC')
-        && is_object(WC())
-        && isset(WC()->cart);
+        && is_object(WC());
+        // Woo's cart session can be uninitialized at woocommerce_init;
+        // defer existence checks until the actual shipping/REST callback.
 }
 
 /** The separate Dev PILLOW adapter already owns all mixed-cart packages. */
