@@ -2,6 +2,8 @@
 declare(strict_types=1);
 if (!defined('ABSPATH')) { exit; }
 require_once get_stylesheet_directory().'/inc/theme-os-bootstrap.php';
+// Dev-only after-coupon Free Shipping UAT; exact staging host gated inside adapter.
+require_once get_stylesheet_directory().'/inc/dev-after-discount-free-shipping.php';
 
 add_action('after_setup_theme', static function (): void {
     add_theme_support('title-tag');
