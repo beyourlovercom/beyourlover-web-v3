@@ -73,7 +73,8 @@ function item(int $id, float $line, int $qty=1): array {
 }
 function package(array $items,string $country='GB'): array {
     return ['contents'=>$items,'destination'=>['country'=>$country],
-        'contents_cost'=>byl_dev_restworld_sum($items)];
+        'contents_cost'=>byl_dev_restworld_sum($items),
+        'byl_dev_restworld_kind'=>'ordinary'];
 }
 function rates(float $flatCost=20.0): array {
     return [
@@ -136,7 +137,7 @@ foreach([[20,false],[60,false],[68.99,false],[69,true],[70,true],[80,true]] as [
 $specialPackage=$split[1];
 $specialRates=byl_dev_restworld_rates(rates(),$specialPackage);
 check(count($specialRates)===1,'special has single true Woo rate');
-check(!isset($specialRates['free_shipping:1']),'special never free at $179');
+check(!isset($specialRates['free_shipping:11']),'special never free at $179');
 check($specialRates['flat_rate:3']->get_cost()===30.0,
     'special is $30 independent of configured class surcharge');
 $specialRatesAfterSurcharge=byl_dev_restworld_rates(rates(50.0),$specialPackage);
@@ -153,7 +154,7 @@ check(byl_dev_restworld_rates(rates(),$us)['flat_rate:3']->get_cost()===20.0,
 foreach([[60,false],[69,true]] as [$amount,$free]) {
     $p=package(['sleeve'=>item(37763,$amount)]);
     $p['byl_dev_restworld_kind']='ordinary';
-    check(isset(byl_dev_restworld_rates(rates(),$p)['free_shipping:1'])===$free,
+    check(isset(byl_dev_restworld_rates(rates(),$p)['free_shipping:11'])===$free,
         'discounted line subtotal eligibility');
 }
 $promo=['active'=>true,'zone_id'=>0,'threshold'=>49,'subtotal'=>199,
