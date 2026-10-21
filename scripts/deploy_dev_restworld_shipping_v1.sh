@@ -38,6 +38,8 @@ CURRENT="$($WP option get byl_dev_restworld_shipping_active_v1 2>/dev/null || tr
 umask 077
 LOCK="$HOME/.byl-dev-restworld-v1.stage.lock"
 mkdir "$LOCK" || { echo "FAIL existing Dev stage lock"; exit 2; }
+# Also release the lock if early preflight/download fails before full rollback is armed.
+trap 'rmdir "$LOCK" 2>/dev/null || true' EXIT
 stage_changed=0
 stage_committed=0
 BACKUP="$(mktemp -d "$HOME/.byl-dev-restworld-v1.XXXXXXXX")"
