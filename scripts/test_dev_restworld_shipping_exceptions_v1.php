@@ -45,9 +45,25 @@ class WC_Tax {
 class WC_Shipping_Rate {
     private ?string $label = null;
     private array $taxes = [];
-    public function __construct(private string $id, private string $method, private float $cost) {}
+    private string $method;
+    private string $taxStatus;
+    public function __construct(
+        private string $id,
+        string $labelOrMethod,
+        private float $cost,
+        array $taxes = [],
+        string $methodId = '',
+        int $instanceId = 0,
+        string $taxStatus = 'taxable'
+    ) {
+        $this->label = $labelOrMethod;
+        $this->method = $methodId !== '' ? $methodId : $labelOrMethod;
+        $this->taxes = $taxes;
+        $this->taxStatus = $taxStatus;
+    }
     public function get_id(): string { return $this->id; }
     public function get_method_id(): string { return $this->method; }
+    public function get_tax_status(): string { return $this->taxStatus; }
     public function get_instance_id(): int { return (int)explode(':',$this->id)[1]; }
     public function get_cost(): float { return $this->cost; }
     public function set_cost(float $cost): void { $this->cost = $cost; }
