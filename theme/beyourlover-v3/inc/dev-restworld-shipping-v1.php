@@ -271,7 +271,7 @@ function byl_dev_restworld_rates(array $rates, array $package): array {
 }
 
 /** Correct the existing promotion presentation; Woo monetary rates stay source. */
-function byl_dev_restworld_promo_correct(array $promo, array $cart): array {
+function byl_dev_restworld_promo_correct(array $promo, array $cart, bool $selectedFree = false): array {
     if (empty($promo['active'])
         || (int) ($promo['zone_id'] ?? -1) !== 0) {
         return $promo;
@@ -294,11 +294,14 @@ function byl_dev_restworld_promo_correct(array $promo, array $cart): array {
     $promo['subtotal'] = $amount;
     $promo['remaining'] = max(0.0, round(69.0 - $amount, 2));
     $promo['eligible'] = $qualified;
-    $promo['unlocked'] = $qualified
+    // Never announce that shipping is free without a selected Woo Free rate.
+    $promo['unlocked'] = $qualified && $selectedFree
         && ($mode !== 'require_code' || $codeOk);
     if (!$qualified) {
         $promo['state'] = $mode === 'require_code' && $codeOk
             ? 'require_code_applied' : 'below_threshold';
+    } elseif (!$selectedFree) {
+        $promo['state'] = 'free_rate_unavailable';
     } elseif ($mode !== 'require_code') {
         $promo['state'] = $code !== ''
             ? 'automatic_code' : 'automatic_unlocked';
@@ -337,8 +340,43 @@ function byl_dev_restworld_store_response($response, $server, $request) {
     if (!is_array($promo)) {
         return $response;
     }
+    // Woo's FINAL selected shipping rates, not promotions, decide whether
+    // free shipping can be promised in Cart / Drawer / Checkout messages.
+    $selectedFree = false;
+    foreach ((array) ($data['shipping_rates'] ?? []) as $rawPackage) {
+        $shippingPackage = is_object($rawPackage)
+            ? get_object_vars($rawPackage) : $rawPackage;
+        if (!is_array($shippingPackage)) {
+            continue;
+        }
+        foreach ((array) ($shippingPackage['shipping_rates'] ?? []) as $rawRate) {
+            $shipRate = is_object($rawRate)
+                ? get_object_vars($rawRate) : $rawRate;
+            if (!is_array($shipRate)
+                || !preg_match('/^free_shipping:[1-9][0-9]*$/D',
+                    (string) ($shipRate['rate_id'] ?? ''))
+                || ($shipRate['selected'] ?? false) !== true
+                || (string) ($shipRate['price'] ?? '') !== '0') {
+                continue;
+            }
+            // A Woo Free Shipping rate can only unlock the actual $69 policy
+            // if its instance option matches our validated amount-gated rule.
+            $instance = (int) substr((string) $shipRate['rate_id'], 14);
+            $opts = get_option(
+                'woocommerce_free_shipping_' . $instance . '_settings', []
+            );
+            if (is_array($opts)
+                && ($opts['requires'] ?? '') === 'min_amount'
+                && is_numeric($opts['min_amount'] ?? null)
+                && abs((float) $opts['min_amount'] - 69.0) < 0.000001
+                && ($opts['ignore_discounts'] ?? 'no') !== 'yes') {
+                $selectedFree = true;
+                break 2;
+            }
+        }
+    }
     $fixed = byl_dev_restworld_promo_correct(
-        $promo, (array) WC()->cart->get_cart()
+        $promo, (array) WC()->cart->get_cart(), $selectedFree
     );
     if ($fixed !== $promo) {
         $registry['byl-shipping-promotion'] = is_object($rawPromo)
