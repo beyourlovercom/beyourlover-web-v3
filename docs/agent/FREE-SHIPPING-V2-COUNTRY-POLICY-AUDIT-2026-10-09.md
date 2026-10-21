@@ -3,6 +3,8 @@
 Owner approved V1 Free Shipping page and then requested all four country policies
 on the page. Implement the approved V2 guide on Dev first, no WWW.
 
+> **2026-10-21 policy update (NOT YET LIVE):** Owner replaced the future Rest of World (Zone 0) ordinary shipping contract with **USD $20 below $69 discounted eligible ordinary merchandise subtotal, free at/above $69**. PILLOW remains $30 **per unit**, while SAKURA #32251 and BDSM BONDAGE KIT #9145/#9153 must retain their existing **$30 special shipment** and not qualify for ordinary free shipping. This is **Dev-only work pending actual Woo configuration & Cart/Checkout UAT**, not a claim that WWW or even Dev currently offers Zone0 free shipping. The historic 2026-10-09 observed zone facts below remain archived evidence. Website B Issue #151 and Draft PR #153 own the implementation; WWW is Owner-manual-only after separate approval; **no WWW SSH**.
+
 ## Live Dev evidence (read-only Woo shipping API and zone matcher)
 - Zone 1: Hong Kong (HK), enabled Free Shipping with no minimum ($0).
 - Zone 5: Asia continent plus US mainland / military states. Free Shipping
