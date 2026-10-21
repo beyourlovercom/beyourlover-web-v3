@@ -86,6 +86,8 @@ jobs:
         run: php -l theme/beyourlover-v3/inc/dev-after-discount-free-shipping.php && php scripts/test_dev_after_discount_free_shipping_v1.php && bash -n scripts/deploy_dev_after_discount_shipping_v1.sh
       - name: Dev-only Rest of World shipping class exceptions contract
         run: php -l theme/beyourlover-v3/inc/dev-restworld-shipping-v1.php && php scripts/test_dev_restworld_shipping_exceptions_v1.php && bash -n scripts/deploy_dev_restworld_shipping_v1.sh && php -l scripts/dev_restworld_woocommerce_settings_v1.php && php -l scripts/rollback_dev_restworld_settings_v1.php
+      - name: Dev-only Global Special Shipping $30 all zones contract
+        run: php -l theme/beyourlover-v3/inc/dev-global-special-shipping-v1.php && php scripts/test_dev_global_special_shipping_v1.php
       - name: Cart final quantity and fragment regression
         run: node scripts/test_cart_quantity_refresh_c1c4.js
       - name: Cart Drawer D3 preview contract
