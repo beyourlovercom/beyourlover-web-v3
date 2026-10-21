@@ -134,82 +134,140 @@ function byl_dev_restworld_packages(array $packages): array {
     return $out;
 }
 
-function byl_dev_restworld_flat_rate(array $rates) {
-    foreach ($rates as $rate) {
-        if (is_object($rate)
-            && method_exists($rate, 'get_method_id')
-            && $rate->get_method_id() === 'flat_rate'
-            && method_exists($rate, 'get_id')) {
-            return clone $rate;
-        }
+/** Return a rate only when it is the original Woo Zone0 Flat Rate #3. */
+function byl_dev_restworld_flat_rate(array $rates): ?array {
+    $key = 'flat_rate:3';
+    $rate = $rates[$key] ?? null;
+    if (!is_object($rate)
+        || !method_exists($rate, 'get_method_id')
+        || $rate->get_method_id() !== 'flat_rate'
+        || !method_exists($rate, 'get_id')
+        || $rate->get_id() !== $key
+        || !method_exists($rate, 'get_cost')) {
+        return null;
     }
-    return null;
-}
-
-function byl_dev_restworld_set_shipping_tax($rate, float $cost): void {
-    if (!method_exists($rate, 'set_taxes')) {
-        return;
-    }
-    $taxes = [];
-    if (class_exists('WC_Tax')
-        && method_exists('WC_Tax', 'get_shipping_tax_rates')
-        && method_exists('WC_Tax', 'calc_shipping_tax')) {
-        $taxes = WC_Tax::calc_shipping_tax(
-            $cost, WC_Tax::get_shipping_tax_rates()
-        );
-    }
-    $rate->set_taxes(is_array($taxes) ? $taxes : []);
+    return [$key, clone $rate];
 }
 
 /**
- * Final scope-limited Woo rate filter: never generate an unconfigured
- * destination method. Correct subtotal based on actual discounted line_total,
- * even if older BYL/Andy pre-discount hooks offered an invalid free rate.
+ * A new Dev Free Shipping method receives an ID assigned by WooCommerce.
+ * Never assume its ID equals WWW's historical #1. Validate the actual
+ * enabled amount-gated Woo settings, not merely a method's displayed label.
+ */
+function byl_dev_restworld_valid_free($rate): bool {
+    if (!is_object($rate) || !method_exists($rate, 'get_method_id')
+        || $rate->get_method_id() !== 'free_shipping'
+        || !method_exists($rate, 'get_instance_id')
+        || !method_exists($rate, 'get_id')
+        || !method_exists($rate, 'get_cost')) {
+        return false;
+    }
+    $id = (int) $rate->get_instance_id();
+    if ($id <= 0 || $rate->get_id() !== 'free_shipping:' . $id
+        || (float) $rate->get_cost() !== 0.0) {
+        return false;
+    }
+    $opts = get_option('woocommerce_free_shipping_' . $id . '_settings', []);
+    return is_array($opts)
+        && (string) ($opts['requires'] ?? '') === 'min_amount'
+        && is_numeric($opts['min_amount'] ?? null)
+        && abs((float) $opts['min_amount'] - 69.0) < 0.000001
+        && ($opts['ignore_discounts'] ?? 'no') !== 'yes';
+}
+
+/** Recalculate taxes instead of preserving the cloned rate's old cost tax. */
+function byl_dev_restworld_set_shipping_tax($rate, float $cost): bool {
+    if (!method_exists($rate, 'set_taxes')
+        || !class_exists('WC_Tax')
+        || !method_exists('WC_Tax', 'get_shipping_tax_rates')
+        || !method_exists('WC_Tax', 'calc_shipping_tax')) {
+        return false; // No guessed / erased shipping tax.
+    }
+    $taxes = WC_Tax::calc_shipping_tax(
+        $cost, WC_Tax::get_shipping_tax_rates()
+    );
+    if (!is_array($taxes)) {
+        return false;
+    }
+    $rate->set_taxes($taxes);
+    return true;
+}
+
+/**
+ * Final per-package Woo rate filter: fail closed on lost PILLOW/special
+ * markers, only allow the actual Woo configured rate, no custom free rate.
+ * Other Woo zones and already-separated PILLOW packages bypass unchanged.
  */
 function byl_dev_restworld_rates(array $rates, array $package): array {
     if (!byl_dev_restworld_zone0($package)
         || ($package['byl_dev_pillow_kind'] ?? '') === 'pillow') {
         return $rates;
     }
-    if (($package['byl_dev_restworld_kind'] ?? '') === 'special30') {
-        $flat = byl_dev_restworld_flat_rate($rates);
-        if (!$flat) {
-            return []; // Fail closed, do not invent a paid shipping method.
+    if (!is_array($package['contents'] ?? null)
+        || !$package['contents']) {
+        return [];
+    }
+    $specialFound = false;
+    $normalFound = false;
+    $pillowFound = false;
+    foreach ($package['contents'] as $item) {
+        if (!is_array($item)) {
+            return [];
         }
-        if (method_exists($flat, 'set_cost')) {
-            $flat->set_cost(30.0);
+        if (byl_dev_restworld_pillow($item)) {
+            $pillowFound = true;
+        } elseif (byl_dev_restworld_special($item)) {
+            $specialFound = true;
+        } else {
+            $normalFound = true;
         }
+    }
+    if ($pillowFound || ($specialFound && $normalFound)) {
+        return []; // A required upstream package split was lost.
+    }
+    $kind = (string) ($package['byl_dev_restworld_kind'] ?? '');
+    $flatPair = byl_dev_restworld_flat_rate($rates);
+    if ($specialFound) {
+        if ($kind !== 'special30' || $flatPair === null) {
+            return [];
+        }
+        [$key, $flat] = $flatPair;
+        if (!method_exists($flat, 'set_cost')
+            || !byl_dev_restworld_set_shipping_tax($flat, 30.0)) {
+            return [];
+        }
+        $flat->set_cost(30.0);
         if (method_exists($flat, 'set_label')) {
             $flat->set_label('Extra $30 Shipping');
         }
-        byl_dev_restworld_set_shipping_tax($flat, 30.0);
-        return [$flat->get_id() => $flat];
+        return [$key => $flat]; // Preserve Woo's actual rate array key.
     }
-    $eligible = byl_dev_restworld_sum(
-        (array) ($package['contents'] ?? [])
-    ) + 0.000001 >= 69.0;
+    if ($kind !== 'ordinary') {
+        return []; // Unexpected contents/markers must not become free.
+    }
+    $eligible = byl_dev_restworld_sum($package['contents'])
+        + 0.000001 >= 69.0;
     $free = [];
-    $flat = [];
-    $other = [];
+    $pickup = [];
     foreach ($rates as $key => $rate) {
-        $method = is_object($rate) && method_exists($rate, 'get_method_id')
-            ? (string) $rate->get_method_id() : '';
-        if ($method === 'free_shipping'
-            && method_exists($rate, 'get_cost')
-            && (float) $rate->get_cost() === 0.0) {
+        if (byl_dev_restworld_valid_free($rate)) {
             $free[$key] = $rate;
-        } elseif ($method === 'flat_rate') {
-            $flat[$key] = $rate;
-        } else {
-            $other[$key] = $rate;
+        } elseif (is_object($rate)
+            && method_exists($rate, 'get_method_id')
+            && $rate->get_method_id() === 'local_pickup') {
+            $pickup[$key] = $rate;
         }
     }
-    // Leave local pickup and future Woo methods alone; enforce regular rates
-    // only when an actual Woo free method is present.
     if ($eligible && $free) {
-        return $free + $other;
+        return $free + $pickup;
     }
-    return $flat + $other;
+    // Woo's base/actual Flat must be $20 for a regular package.
+    // If missing or the class formula unexpectedly adds more, do not
+    // create a fake free/paid rate or silently overcharge.
+    if ($flatPair === null || (float) $flatPair[1]->get_cost() !== 20.0) {
+        return $pickup;
+    }
+    return [$flatPair[0] => $flatPair[1]] + $pickup;
 }
 
 /** Correct the existing promotion presentation; Woo monetary rates stay source. */
