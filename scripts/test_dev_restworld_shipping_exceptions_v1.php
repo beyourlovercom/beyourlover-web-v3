@@ -14,6 +14,9 @@ function get_option($name, $default = null) {
     if ($name === 'byl_dev_restworld_shipping_active_v1') {
         return $GLOBALS['enabled'];
     }
+    if ($name === 'byl_dev_global_special_shipping_active_v1') {
+        return $GLOBALS['globalSpecialEnabled'] ?? 'no';
+    }
     if ($name === 'woocommerce_free_shipping_11_settings') {
         return ['requires'=>'min_amount','min_amount'=>'69','ignore_discounts'=>'no'];
     }
@@ -24,7 +27,14 @@ class TestCart { public function get_cart(): array { return $GLOBALS['cart_items
 class WC_Shipping_Zones {
     public static function get_zone_matching_package(array $package) {
         $country = $package['destination']['country'] ?? '';
-        return new TestZone(in_array($country, ['GB','FR'], true) ? 0 : 5);
+        $state = $package['destination']['state'] ?? '';
+        if (in_array($country, ['GB','FR'], true)) { return new TestZone(0); }
+        if ($country === 'HK') { return new TestZone(1); }
+        if ($country === 'MK') { return new TestZone(3); }
+        if ($country === 'US' && in_array($state, ['AK','HI'], true)) {
+            return new TestZone(4);
+        }
+        return new TestZone(5);
     }
 }
 class TestZone { public function __construct(private int $id) {} public function get_id(): int { return $this->id; } }
