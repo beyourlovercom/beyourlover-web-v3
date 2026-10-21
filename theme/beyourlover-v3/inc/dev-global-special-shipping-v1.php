@@ -226,6 +226,7 @@ function byl_dev_global_special_store_response($response, $server, $request) {
         return $response;
     }
     $data = $response->get_data();
+    if (!is_array($data)) { return $response; }
     $registry = $data['extensions'] ?? null;
     $wasObject = is_object($registry);
     $fields = $wasObject ? get_object_vars($registry) : $registry;
