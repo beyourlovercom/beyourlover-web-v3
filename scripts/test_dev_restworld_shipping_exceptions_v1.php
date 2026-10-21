@@ -171,6 +171,36 @@ check($correct['subtotal']===60.0,'only discounted ordinary $60 eligible');
 check($correct['remaining']===9.0,'$9 remaining');
 check($correct['unlocked']===false && $correct['eligible']===false,
     'mixed special/pillow does not unlock normal free shipping');
+
+/**
+ * Real Dev Store API evidence 2026-10-21: fixed_cart coupon $20 on a
+ * mixed $80 regular + special item reported ordinary discounted line_total
+ * $64 (not the script's assumed $60). The Woo line_total is authoritative
+ * regardless of how Woo distributes a coupon across cart items.
+ * This fixture asserts rate policy for observed ordinary $64; it does NOT
+ * claim independent proof of special-product discount allocation.
+ */
+$allocatedLineItems=[
+    'ordinary'=>item(37763,64.00),
+    'special'=>item(32251,98.00),
+];
+$allocatedPackages=byl_dev_restworld_packages([package($allocatedLineItems)]);
+check(count($allocatedPackages)===2,'discounted mixed package split');
+$allocatedNormalRates=byl_dev_restworld_rates(rates(),$allocatedPackages[0]);
+$allocatedSpecialRates=byl_dev_restworld_rates(rates(50.0),$allocatedPackages[1]);
+check(isset($allocatedNormalRates['flat_rate:3'])
+    && !isset($allocatedNormalRates['free_shipping:11']),
+    'observed $64 ordinary subtotal still requires $20');
+check($allocatedNormalRates['flat_rate:3']->get_cost()===20.0,
+    'ordinary $64 shipping stays $20');
+check($allocatedSpecialRates['flat_rate:3']->get_cost()===30.0,
+    'mixed special shipment remains $30');
+$allocatedPromo=byl_dev_restworld_promo_correct($promo,$allocatedLineItems);
+check($allocatedPromo['subtotal']===64.0
+    && $allocatedPromo['remaining']===5.0
+    && $allocatedPromo['unlocked']===false,
+    'mixed coupon messaging reflects discounted ordinary $64, not guessed $60');
+
 $otherPromo=$promo;
 $otherPromo['zone_id']=5;
 check(byl_dev_restworld_promo_correct($otherPromo,$items)===$otherPromo,
