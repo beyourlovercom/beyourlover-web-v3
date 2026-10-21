@@ -23,6 +23,9 @@ function byl_dev_restworld_active(): bool {
         && function_exists('WC')
         && class_exists('WC_Shipping_Zones')
         && class_exists('WC_Shipping_Rate')
+        && function_exists('byl_dev_pillow_shipping_is_pillow')
+        && function_exists('byl_dev_pillow_shipping_enabled')
+        && byl_dev_pillow_shipping_enabled()
         && get_option('byl_dev_restworld_shipping_active_v1', 'no') === 'yes';
 }
 
@@ -39,6 +42,14 @@ function byl_dev_restworld_special(array $item): bool {
 }
 
 function byl_dev_restworld_pillow(array $item): bool {
+    // Recognize the actual PILLOW parent even if the old helper disappears.
+    $id = (int) ($item['product_id'] ?? 0);
+    $product = $item['data'] ?? null;
+    if ($id === 38047 || (is_object($product)
+        && method_exists($product, 'get_parent_id')
+        && (int) $product->get_parent_id() === 38047)) {
+        return true;
+    }
     return function_exists('byl_dev_pillow_shipping_is_pillow')
         && byl_dev_pillow_shipping_is_pillow($item);
 }
@@ -76,6 +87,20 @@ function byl_dev_restworld_packages(array $packages): array {
             || !is_array($package['contents'] ?? null)
             || ($package['byl_dev_pillow_kind'] ?? '') === 'pillow'
             || !byl_dev_restworld_zone0($package)) {
+            $out[] = $package;
+            continue;
+        }
+        // The pre-existing PR150 priority-900 PILLOW splitter must already
+        // have taken pillow items into their own package at this point.
+        $unsplitPillow = false;
+        foreach ($package['contents'] as $item) {
+            if (is_array($item) && byl_dev_restworld_pillow($item)) {
+                $unsplitPillow = true;
+                break;
+            }
+        }
+        if ($unsplitPillow) {
+            $package['byl_dev_restworld_kind'] = 'unsafe_unsplit_pillow';
             $out[] = $package;
             continue;
         }
