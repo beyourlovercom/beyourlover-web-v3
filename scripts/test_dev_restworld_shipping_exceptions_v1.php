@@ -11,8 +11,13 @@ function home_url($path = '/') { return 'https://' . $GLOBALS['host'] . $path; }
 function wp_parse_url($url, $component) { return parse_url($url, $component); }
 function wp_get_environment_type() { return $GLOBALS['environment']; }
 function get_option($name, $default = null) {
-    return $name === 'byl_dev_restworld_shipping_active_v1'
-        ? $GLOBALS['enabled'] : $default;
+    if ($name === 'byl_dev_restworld_shipping_active_v1') {
+        return $GLOBALS['enabled'];
+    }
+    if ($name === 'woocommerce_free_shipping_11_settings') {
+        return ['requires'=>'min_amount','min_amount'=>'69','ignore_discounts'=>'no'];
+    }
+    return $default;
 }
 function WC() { return (object)['cart' => new TestCart()]; }
 class TestCart { public function get_cart(): array { return $GLOBALS['cart_items']; } }
@@ -23,10 +28,17 @@ class WC_Shipping_Zones {
     }
 }
 class TestZone { public function __construct(private int $id) {} public function get_id(): int { return $this->id; } }
+class WC_Tax {
+    public static function get_shipping_tax_rates(): array { return []; }
+    public static function calc_shipping_tax($cost,$rates): array { return []; }
+}
 class WC_Shipping_Rate {
+    private ?string $label = null;
+    private array $taxes = [];
     public function __construct(private string $id, private string $method, private float $cost) {}
     public function get_id(): string { return $this->id; }
     public function get_method_id(): string { return $this->method; }
+    public function get_instance_id(): int { return (int)explode(':',$this->id)[1]; }
     public function get_cost(): float { return $this->cost; }
     public function set_cost(float $cost): void { $this->cost = $cost; }
     public function set_label(string $label): void { $this->label = $label; }
@@ -48,6 +60,7 @@ function add_action($name,$handler,$priority=10){$GLOBALS['hooks'][$name][]=[$ha
 function byl_dev_pillow_shipping_is_pillow(array $item): bool {
     return (int)($item['product_id'] ?? 0)===38047;
 }
+function byl_dev_pillow_shipping_enabled(): bool { return true; }
 require dirname(__DIR__) . '/theme/beyourlover-v3/inc/dev-restworld-shipping-v1.php';
 $checks=0;
 function check(bool $cond, string $why): void {
@@ -62,10 +75,10 @@ function package(array $items,string $country='GB'): array {
     return ['contents'=>$items,'destination'=>['country'=>$country],
         'contents_cost'=>byl_dev_restworld_sum($items)];
 }
-function rates(): array {
+function rates(float $flatCost=20.0): array {
     return [
-        'free_shipping:1'=>new WC_Shipping_Rate('free_shipping:1','free_shipping',0.0),
-        'flat_rate:3'=>new WC_Shipping_Rate('flat_rate:3','flat_rate',50.0),
+        'free_shipping:11'=>new WC_Shipping_Rate('free_shipping:11','free_shipping',0.0),
+        'flat_rate:3'=>new WC_Shipping_Rate('flat_rate:3','flat_rate',$flatCost),
     ];
 }
 check(byl_dev_restworld_active(), 'Dev staging allowlist + explicit activation');
@@ -93,7 +106,18 @@ check(count($twospecial)===1,'same special class shares one shipment');
 $mix=byl_dev_restworld_packages([package([
     'sleeve'=>item(37763,20),'special'=>item(32251,98),'pillow'=>item(38047,59)
 ])]);
-check(count($mix)===2,'restworld special split without taking PILLOW ownership');
+check(count($mix)===1
+    && $mix[0]['byl_dev_restworld_kind']==='unsafe_unsplit_pillow',
+    'unsplit PILLOW must be marked unsafe');
+check(byl_dev_restworld_rates(rates(),$mix[0])===[],
+    'unsplit PILLOW cannot receive a new ordinary rate');
+$realSplitInput=package(['sleeve'=>item(37763,20),'special'=>item(32251,98)]);
+$realPillowInput=package(['pillow'=>item(38047,59)]);
+$realPillowInput['byl_dev_pillow_kind']='pillow';
+$realThreeWay=byl_dev_restworld_packages([$realSplitInput,$realPillowInput]);
+check(count($realThreeWay)===3,'PR150 package output -> normal, special, pillow');
+check($realThreeWay[2]['byl_dev_pillow_kind']==='pillow',
+    'third package still PILLOW');
 $preSplitPillow=package(['pillow'=>item(38047,59)]);
 $preSplitPillow['byl_dev_pillow_kind']='pillow';
 check(byl_dev_restworld_packages([$preSplitPillow])[0]===$preSplitPillow,
@@ -104,7 +128,7 @@ check(byl_dev_restworld_packages([$us])[0]===$us,
 foreach([[20,false],[60,false],[68.99,false],[69,true],[70,true],[80,true]] as [$amount,$free]) {
     $part=package(['sku'=>item(37763,$amount)]);
     $actual=byl_dev_restworld_rates(rates(),$part);
-    check(isset($actual['free_shipping:1'])===$free,
+    check(isset($actual['free_shipping:11'])===$free,
         "USD $amount free toggle");
     check(isset($actual['flat_rate:3'])!==$free,
         "USD $amount flat toggle");
@@ -114,14 +138,17 @@ $specialRates=byl_dev_restworld_rates(rates(),$specialPackage);
 check(count($specialRates)===1,'special has single true Woo rate');
 check(!isset($specialRates['free_shipping:1']),'special never free at $179');
 check($specialRates['flat_rate:3']->get_cost()===30.0,
-    'special is $30 not inherited flat $50');
+    'special is $30 independent of configured class surcharge');
+$specialRatesAfterSurcharge=byl_dev_restworld_rates(rates(50.0),$specialPackage);
+check($specialRatesAfterSurcharge['flat_rate:3']->get_cost()===30.0,
+    'class special stays $30 even if Woo originally calculated $50');
 check($specialRates['flat_rate:3']->get_label()==='Extra $30 Shipping',
     'truthful special shipping label');
 check(byl_dev_restworld_rates([], $specialPackage)===[],
     'special never invents unsupported Woo destination rate');
-check(byl_dev_restworld_rates(rates(),$preSplitPillow)['flat_rate:3']->get_cost()===50.0,
+check(byl_dev_restworld_rates(rates(),$preSplitPillow)['flat_rate:3']->get_cost()===20.0,
     'PILLOW package left untouched; prior adapter owns $30/item');
-check(byl_dev_restworld_rates(rates(),$us)['flat_rate:3']->get_cost()===50.0,
+check(byl_dev_restworld_rates(rates(),$us)['flat_rate:3']->get_cost()===20.0,
     'US zone untouched');
 foreach([[60,false],[69,true]] as [$amount,$free]) {
     $p=package(['sleeve'=>item(37763,$amount)]);
@@ -174,6 +201,6 @@ foreach([['www.beyourlover.com','production','yes'],
     $GLOBALS['enabled']=$enabled;
     check(!byl_dev_restworld_active(), 'never active outside explicitly enabled Dev');
     check(byl_dev_restworld_rates(rates(),package(['sku'=>item(37763,20)]))
-        ['flat_rate:3']->get_cost()===50.0,'WWW/disabled rate unchanged');
+        ['flat_rate:3']->get_cost()===20.0,'WWW/disabled rate unchanged');
 }
 echo "PASS Dev Rest of World exception policy: $checks offline assertions, no Woo/WWW changes\n";
