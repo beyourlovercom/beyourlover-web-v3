@@ -97,6 +97,7 @@
       "files": [
         "inc/free-shipping-v2-policy.php",
         "inc/dev-after-discount-free-shipping.php",
+        "inc/dev-restworld-shipping-v1.php",
         "page-free-shipping-guide.php",
         "page-free-shipping.php",
         "assets/css/free-shipping.css",
