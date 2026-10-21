@@ -66,7 +66,8 @@ foreach ([1,3,4,5] as $zone) {
         'regular separated zone '.$zone);
     check($split[1]['byl_dev_global_special_kind']==='special30',
         'special separated zone '.$zone);
-    check(byl_dev_global_special_rates(allzone($zone),$split[0])===allzone($zone),
+    $ordinaryRates=allzone($zone);
+    check(byl_dev_global_special_rates($ordinaryRates,$split[0])===$ordinaryRates,
         'ordinary rates preserved exactly zone '.$zone);
     $specialRates=byl_dev_global_special_rates(allzone($zone),$split[1]);
     check(current($specialRates)->get_cost()===30.0,'mixed special paid zone '.$zone);
@@ -77,7 +78,8 @@ foreach ([1,3,4,5] as $zone) {
     $pillow['byl_dev_pillow_kind']='pillow';
     check(byl_dev_global_special_packages([$pillow])[0]===$pillow,
         'PILLOW package stays owned by existing adapter zone '.$zone);
-    check(byl_dev_global_special_rates(allzone($zone),$pillow)===allzone($zone),
+    $pillowRates=allzone($zone);
+    check(byl_dev_global_special_rates($pillowRates,$pillow)===$pillowRates,
         'PILLOW rate untouched zone '.$zone);
     $malformed=allpackage(['regular'=>item(37763,20),
         'special'=>item(32251,98),'pillow'=>item(38047,59)],$zone);
@@ -91,7 +93,8 @@ foreach ([1,3,4,5] as $zone) {
 $ordinary=allpackage(['regular'=>item(37763,20)],1);
 check(byl_dev_global_special_packages([$ordinary])[0]===$ordinary,
     'Hong Kong normal package unchanged');
-check(byl_dev_global_special_rates(allzone(1),$ordinary)===allzone(1),
+$hkRates=allzone(1);
+check(byl_dev_global_special_rates($hkRates,$ordinary)===$hkRates,
     'Hong Kong ordinary Free Shipping #2 unchanged');
 $gb=package(['regular'=>item(37763,20),'special'=>item(32251,98)]);
 check(byl_dev_global_special_packages([$gb])[0]===$gb,
@@ -131,7 +134,8 @@ check(!byl_dev_global_special_active(),'WWW never activates');
 $GLOBALS['host']='dev.beyourlover.com';
 $GLOBALS['globalSpecialEnabled']='no';
 check(!byl_dev_global_special_active(),'separate global flag default OFF');
-check(byl_dev_global_special_rates(allzone(5),
-    allpackage(['special'=>item(9153,179)],5))===allzone(5),
+$inactiveRates=allzone(5);
+check(byl_dev_global_special_rates($inactiveRates,
+    allpackage(['special'=>item(9153,179)],5))===$inactiveRates,
     'disabled adapter leaves Woo rates unchanged');
 echo "PASS Dev Global Special Shipping V1: $checks cumulative offline assertions, no Woo or WWW changes\n";
