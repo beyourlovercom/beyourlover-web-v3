@@ -129,6 +129,57 @@ $untouched=byl_dev_global_special_promo(
     $promo,['ordinary'=>item(37763,80)]
 );
 check($untouched===$promo,'normal-only promotions unchanged');
+
+$hkSpecialPackage=byl_dev_global_special_packages([
+    allpackage(['special'=>item(9153,179)],1)
+])[0];
+$hkSpecialRates=byl_dev_global_special_rates(allzone(1),$hkSpecialPackage);
+$hkCharge=current($hkSpecialRates);
+check($hkCharge->get_method_id()==='byl_dev_global_special30_hk',
+    'HK emergency method ID must follow verified Woo 11.2.1 constructor');
+check($hkCharge->get_tax_status()==='taxable',
+    'HK exception shipping tax status must use Woo default taxable');
+check($hkCharge->get_taxes()===[],
+    'HK exception calculates Woo shipping tax data (empty for test rates)');
+$GLOBALS['cart_items']=[
+    'regular'=>item(37763,64),'special'=>item(32251,94)
+];
+$specialPromotion=[
+    'active'=>true,'zone_id'=>5,'threshold'=>69,
+    'subtotal'=>158,'remaining'=>0,'eligible'=>true,
+    'unlocked'=>true,'state'=>'automatic_unlocked'
+];
+$response=new TestRestResponse([
+    'extensions'=>(object)[
+        'byl-shipping-promotion'=>(object)$specialPromotion,
+        'other-extension'=>(object)['other'=>'unchanged']
+    ],
+    'totals'=>['total_shipping'=>'3000','currency_code'=>'USD']
+]);
+byl_dev_global_special_store_response(
+    $response,null,new TestRestRequest('/wc/store/v1/cart')
+);
+$respData=$response->get_data();
+$thePromo=$respData['extensions']->{'byl-shipping-promotion'};
+check($thePromo->state==='special_shipping_applies'
+    && $thePromo->subtotal===64.0 && $thePromo->remaining===5.0,
+    'Store API post-discount global special promotion corrected');
+check($thePromo->unlocked===false && $thePromo->special_shipping_applies===true,
+    'Store API must not promise free delivery for paid special item');
+check($respData['totals']['total_shipping']==='3000',
+    'Store API correction never modifies real Woo freight');
+check($respData['extensions']->{'other-extension'}->other==='unchanged',
+    'Store API correction does not disturb other extension');
+$checkoutResponse=new TestRestResponse([
+    'extensions'=>(object)['byl-shipping-promotion'=>(object)$specialPromotion]
+]);
+byl_dev_global_special_store_response(
+    $checkoutResponse,null,new TestRestRequest('/wc/store/v1/checkout')
+);
+check($checkoutResponse->get_data()['extensions']
+    ->{'byl-shipping-promotion'}->subtotal===158,
+    'Checkout/payment REST not changed by this adapter');
+
 $GLOBALS['host']='www.beyourlover.com';
 check(!byl_dev_global_special_active(),'WWW never activates');
 $GLOBALS['host']='dev.beyourlover.com';
