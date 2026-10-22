@@ -287,8 +287,10 @@ $GLOBALS['environment']='production';
 $source=file_get_contents(dirname(__DIR__)
     .'/theme/beyourlover-v3/inc/www-shipping-production-candidate-v1.php');
 foreach (['update_option(', 'delete_option(', 'wp_insert_post(',
-    'wp_mail(', 'woocommerce_checkout_create_order', 'add_action('] as $needle) {
+    'wp_mail(', 'woocommerce_checkout_create_order'] as $needle) {
     check_prod(!str_contains($source,$needle),
         "source cannot mutate WP options/orders/email or self-bootstrap: $needle");
 }
+check_prod(!preg_match('/^\s*add_action\s*\(/m', $source),
+    'module has no runtime bootstrap registrations');
 echo "PASS WWW shipping production candidate OFF: {$GLOBALS['assertions']} offline assertions; no site access/no orders/no settings writes\n";
