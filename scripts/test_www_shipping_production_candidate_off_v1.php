@@ -89,7 +89,7 @@ class ProdShippingCartStub {
 }
 function WC(): object { return (object)['cart'=>new ProdShippingCartStub()]; }
 
-require dirname(__DIR__) . '/theme/beyourlover-v3/inc/www-shipping-production-candidate-v1.php';
+require __DIR__ . '/release-candidates/www-shipping-production-candidate-v1.php';
 
 function config_fixture(): array {
     $spec=[
@@ -285,7 +285,7 @@ $GLOBALS['environment']='staging';
 check_prod(!byl_www_ship_armed(),'WWW must be production environment');
 $GLOBALS['environment']='production';
 $source=file_get_contents(dirname(__DIR__)
-    .'/theme/beyourlover-v3/inc/www-shipping-production-candidate-v1.php');
+    .'/scripts/release-candidates/www-shipping-production-candidate-v1.php');
 foreach (['update_option(', 'delete_option(', 'wp_insert_post(',
     'wp_mail(', 'woocommerce_checkout_create_order'] as $needle) {
     check_prod(!str_contains($source,$needle),
