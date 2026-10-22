@@ -392,8 +392,18 @@ $zone0Mix=byl_www_ship_packages([mk_package(0,[
 $zone0FreeTotal=0.0;
 foreach ($zone0Mix as $part) {
     $one=byl_www_ship_rates(mk_rates(0,$ledger),$part);
-    check_prod(count($one) === 1, 'Zone0 free coupon leaves one eligible rate per split package');
-    $zone0FreeTotal+=reset($one)->get_cost();
+    if ($part['byl_www_ship_kind']==='ordinary') {
+        // Native Woo legitimately offers Free and Flat concurrently; only
+        // the customer's selected Free method is zero. Both may be shown.
+        check_prod(isset($one['free_shipping:1'])
+            && isset($one['flat_rate:3']),
+            'valid Woo coupon enables free and preserves normal paid option');
+        $zone0FreeTotal+=$one['free_shipping:1']->get_cost();
+    } else {
+        check_prod(count($one)===1 && key($one)==='flat_rate:3',
+            'special and PILLOW packages retain only mandatory paid rate');
+        $zone0FreeTotal+=reset($one)->get_cost();
+    }
 }
 check_prod($zone0FreeTotal===90.0,
     'valid Woo free coupon waives regular freight only; specials30 and 2 pillows60 remain paid');
