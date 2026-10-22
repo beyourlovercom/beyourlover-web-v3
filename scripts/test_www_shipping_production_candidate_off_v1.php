@@ -5,6 +5,8 @@ define('ABSPATH', __DIR__);
 $GLOBALS['site'] = 'www.beyourlover.com';
 $GLOBALS['environment'] = 'production';
 $GLOBALS['currency'] = 'USD';
+$GLOBALS['effective_currency'] = 'USD';
+$GLOBALS['zoneLocationVersion'] = 'v1';
 $GLOBALS['options'] = ['byl_www_shipping_v1_enabled' => 'no'];
 $GLOBALS['hooks'] = [];
 $GLOBALS['assertions'] = 0;
@@ -28,6 +30,9 @@ function get_option(string $key, $default = false) {
     return $GLOBALS['options'][$key] ?? $default;
 }
 function get_woocommerce_currency(): string { return $GLOBALS['currency']; }
+function byl_www_shipping_v1_verified_checkout_currency(): string {
+    return $GLOBALS['effective_currency'];
+}
 function add_filter(string $name, $callable, int $priority, int $args): void {
     $GLOBALS['hooks'][$name] = [$callable, $priority, $args];
 }
@@ -37,8 +42,19 @@ class ShippingZoneStub {
     public function get_shipping_methods(bool $enabledOnly = true): array {
         return $GLOBALS['zoneMethods'][$this->id] ?? [];
     }
+    public function get_zone_locations(): array {
+        return [['type'=>'country', 'code'=>(string)$this->id,
+            'version'=>$GLOBALS['zoneLocationVersion']]];
+    }
+    public function get_zone_order(): int { return $this->id; }
 }
 class WC_Shipping_Zones {
+    // Woo get_zones() excludes fallback Zone 0.
+    public static function get_zones(): array {
+        $zones = $GLOBALS['zoneMethods'] ?? [];
+        unset($zones[0]);
+        return $zones;
+    }
     public static function get_zone(int $id): ShippingZoneStub {
         return new ShippingZoneStub($id);
     }
@@ -112,9 +128,15 @@ function config_fixture(): array {
             'minimum'=>$data['min'],
             'before_discount'=>false];
         if (isset($data['flat'])) {
-            $flat=['cost'=>(string)$data['cost'],'class_cost_1939'=>'30',
-                'class_cost_1874'=>'0','no_class_cost'=>'',
-                'type'=>'class'];
+            // Exact known WWW admin class fees are deliberately *not*
+            // final special charge: Zone0 has base20+class30.
+            $class1939=[0=>'30',3=>'20',4=>'10',5=>'20'][$zone];
+            $flat=['cost'=>(string)$data['cost'],
+                'class_cost_932'=>in_array($zone,[0,3],true)?'0':'',
+                'class_cost_1874'=>in_array($zone,[0,3],true)?'10':'0',
+                'class_cost_1939'=>$class1939,
+                'no_class_cost'=>$zone===0?'0':'',
+                'type'=>$zone===3?'order':'class'];
             $GLOBALS['options']['woocommerce_flat_rate_'.$data['flat'].'_settings']=$flat;
             $GLOBALS['zoneMethods'][$zone][] = new ShippingMethodStub('flat_rate',$data['flat']);
             $entry += ['flat_id'=>$data['flat'],
@@ -163,6 +185,11 @@ $ledger=config_fixture();
 $offRates=mk_rates(0,$ledger);
 check_prod(byl_www_ship_rates($offRates,$offPackage)===$offRates,'rate filter inert while OFF');
 check_prod(byl_www_ship_contract()===null,'missing Owner actual WWW ledger keeps OFF');
+check_prod(!byl_www_ship_currency_ok(),
+    'Woo base USD cannot authorize YayCurrency without reviewed FX contract');
+define('BYL_WWW_SHIPPING_V1_FX_REVIEWED',true);
+check_prod(byl_www_ship_currency_ok(),
+    'only reviewed bridge with selected checkout USD may proceed');
 define('BYL_WWW_SHIPPING_V1_APPROVED',true);
 define('BYL_WWW_SHIPPING_V1_METHOD_CONTRACT',$ledger);
 check_prod(!byl_www_ship_gate(),'approval alone cannot switch on');
@@ -184,6 +211,10 @@ foreach ([0,1,3,4,5] as $zoneId) {
     check_prod(count($regularPart)===1 &&
         $regularPart[0]['byl_www_ship_kind']==='ordinary',
         "zone $zoneId ordinary package identity");
+    check_prod(isset($regularPart[0]['byl_www_ship_runtime_marker'])
+        && preg_match('/^[a-f0-9]{64}$/D',
+            $regularPart[0]['byl_www_ship_runtime_marker'])===1,
+        "zone $zoneId Woo cache invalidation marker present while armed");
     $filtered=byl_www_ship_rates(mk_rates($zoneId,$ledger),$regularPart[0]);
     $freeKey='free_shipping:'.$ledger[$zoneId]['free_id'];
     check_prod(($zoneId===1)===isset($filtered[$freeKey]),
@@ -254,6 +285,15 @@ $specialPkg=byl_www_ship_packages([mk_package(5,['red'=>mk_item(9153,179)])])[0]
 $wrongRate=['free_shipping:510'=>$base['free_shipping:510']];
 check_prod(byl_www_ship_rates($wrongRate,$specialPkg)===[],
     'missing genuine flat instance cannot silently waive exception fee');
+$GLOBALS['effective_currency']='GBP';
+check_prod(get_woocommerce_currency()==='USD'
+    && !byl_www_ship_currency_ok(),
+    'Woo base USD is insufficient when YayCurrency checkout is GBP');
+check_prod(byl_www_ship_rates($base,$specialPkg)===[],
+    'GBP storefront cart cannot receive guessed USD $30 fee');
+check_prod(byl_www_ship_rates($base,$normal)===[],
+    'GBP ordinary cart cannot silently trust Woo base USD');
+$GLOBALS['effective_currency']='USD';
 $GLOBALS['currency']='EUR';
 check_prod(byl_www_ship_gate() && !byl_www_ship_currency_ok(),
     'live ledger verified but unreviewed FX unsupported');
@@ -263,14 +303,48 @@ check_prod(byl_www_ship_rates($base,$normal)===[],
     'EUR ordinary is also blocked not silently shipped');
 $GLOBALS['currency']='USD';
 $flatKey='woocommerce_flat_rate_511_settings';
+$oldShipMarker=$specialPkg['byl_www_ship_runtime_marker'];
 $GLOBALS['options'][$flatKey]['class_cost_1939']='0'; // drift including class cost.
+$changedShipMarker=byl_www_ship_packages([
+    mk_package(5,['red'=>mk_item(9153,179)])
+])[0]['byl_www_ship_runtime_marker'];
+check_prod($oldShipMarker!==$changedShipMarker,
+    'Woo session package hash invalidated on Flat shipping class cost drift');
 check_prod(!byl_www_ship_gate(),'class-rate drift invalidates entire release ledger');
 check_prod(byl_www_ship_rates($base,$specialPkg)===[],
     'drift never permits free special freight');
 check_prod(byl_www_ship_rates($base,$normal)===[],
     'drift never permits base Woo free method');
-$GLOBALS['options'][$flatKey]['class_cost_1939']='30';
+$GLOBALS['options'][$flatKey]['class_cost_1939']='20';
 check_prod(byl_www_ship_gate(),'known settings restored by local stub');
+// WWW native Zone0 Free #1 is actually "either" (amount OR coupon),
+ // NOT the Dev mock's "min_amount"; contract MUST fail closed until the
+ // BYL49/free-coupon exception is independently reviewed. No silent toggle.
+$zone0Free='woocommerce_free_shipping_101_settings';
+$GLOBALS['options'][$zone0Free]['requires']='either';
+check_prod(!byl_www_ship_gate(),
+    'real WWW Zone0 either coupon OR amount is explicitly NO-GO');
+check_prod(byl_www_ship_rates($base,$specialPkg)===[],
+    'unexpected coupon OR amount cannot bypass special freight');
+$GLOBALS['options'][$zone0Free]['requires']='min_amount';
+check_prod(byl_www_ship_gate(),'reviewed strict-minimum mock restored');
+$beforeZoneMove = byl_www_ship_packages([
+    mk_package(5,['red'=>mk_item(9153,179)])
+])[0]['byl_www_ship_runtime_marker'];
+$GLOBALS['zoneLocationVersion']='v2';
+$afterZoneMove = byl_www_ship_packages([
+    mk_package(5,['red'=>mk_item(9153,179)])
+])[0]['byl_www_ship_runtime_marker'];
+check_prod($beforeZoneMove!==$afterZoneMove,
+    'Woo package hash changes when destination zone coverage drifts');
+$GLOBALS['zoneLocationVersion']='v1';
+$GLOBALS['zoneMethods'][6]=[
+    new ShippingMethodStub('free_shipping',600)
+];
+check_prod(!byl_www_ship_gate(),
+    'new higher-priority Woo shipping zone invalidates approved zone set');
+unset($GLOBALS['zoneMethods'][6]);
+check_prod(byl_www_ship_gate(),'reviewed zone set restored');
 $GLOBALS['zoneMethods'][5][] = new ShippingMethodStub('free_shipping',999);
 check_prod(!byl_www_ship_gate(),'unexpected enabled Woo Free instance invalidates ledger');
 check_prod(byl_www_ship_rates($base,$specialPkg)===[],
