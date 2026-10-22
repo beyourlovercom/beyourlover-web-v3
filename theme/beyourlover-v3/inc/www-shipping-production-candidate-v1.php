@@ -179,7 +179,12 @@ function byl_www_ship_woo_methods_match(array $ledger): bool {
     return true;
 }
 
-function byl_www_ship_gate(): bool {
+/**
+ * "Armed" is a deliberate release state separate from runtime readiness.
+ * If Owner arms the feature and a Woo option/currency drifts, return NO
+ * SHIPPING rather than silently revert to an old free shipping rate.
+ */
+function byl_www_ship_armed(): bool {
     return defined('BYL_WWW_SHIPPING_V1_APPROVED')
         && BYL_WWW_SHIPPING_V1_APPROVED === true
         && function_exists('home_url')
@@ -188,13 +193,18 @@ function byl_www_ship_gate(): bool {
         && wp_parse_url(home_url('/'), PHP_URL_HOST) === 'www.beyourlover.com'
         && wp_get_environment_type() === 'production'
         && function_exists('get_option')
-        && get_option('byl_www_shipping_v1_enabled', 'no') === 'yes'
-        && function_exists('get_woocommerce_currency')
-        && get_woocommerce_currency() === 'USD'
+        && get_option('byl_www_shipping_v1_enabled', 'no') === 'yes';
+}
+function byl_www_ship_gate(): bool {
+    return byl_www_ship_armed()
         && class_exists('WC_Shipping_Rate')
         && function_exists('WC')
         && ($ledger = byl_www_ship_contract()) !== null
         && byl_www_ship_woo_methods_match($ledger);
+}
+function byl_www_ship_currency_ok(): bool {
+    return function_exists('get_woocommerce_currency')
+        && get_woocommerce_currency() === 'USD';
 }
 
 function byl_www_ship_zone_id(array $package): ?int {
@@ -264,7 +274,12 @@ function byl_www_ship_tax($rate, float $fee): bool {
 
 /** Must always run after legacy Woo/BYL shipping filters. */
 function byl_www_ship_rates(array $rates, array $package): array {
-    if (!byl_www_ship_gate()) { return $rates; }
+    if (!byl_www_ship_armed()) { return $rates; }
+    // A live settings/zone fingerprint mismatch or unverified FX currency
+    // blocks shipment while armed. NEVER fall back to a legacy $0 free rate.
+    if (!byl_www_ship_gate() || !byl_www_ship_currency_ok()) {
+        return [];
+    }
     $kind = (string)($package['byl_www_ship_kind'] ?? '');
     $contents = $package['contents'] ?? null;
     if (!is_array($contents) || !$contents) { return []; }
@@ -343,7 +358,11 @@ function byl_www_ship_rates(array $rates, array $package): array {
 }
 
 function byl_www_ship_boot(): void {
-    if (!byl_www_ship_gate()) { return; }
+    if (!byl_www_ship_armed()) { return; }
+    // Deliberately install the fail-closed filter even when the contract
+    // no longer matches. Otherwise the merchant could sell with stale free.
+    // No hooks are attached at all until a future separately authorized
+    // bootstrap includes this unwired file and invokes this function.
     add_filter('woocommerce_cart_shipping_packages', 'byl_www_ship_packages', 970, 1);
     add_filter('woocommerce_package_rates', 'byl_www_ship_rates', 100200, 2);
 }
