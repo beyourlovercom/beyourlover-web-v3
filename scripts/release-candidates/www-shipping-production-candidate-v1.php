@@ -117,9 +117,17 @@ function byl_www_ship_contract(): ?array {
 
 function byl_www_ship_woo_methods_match(array $ledger): bool {
     if (!class_exists('WC_Shipping_Zones')
-        || !method_exists('WC_Shipping_Zones', 'get_zone')) {
+        || !method_exists('WC_Shipping_Zones', 'get_zone')
+        || !method_exists('WC_Shipping_Zones', 'get_zones')) {
         return false;
     }
+    // Reject any new/reordered destination zone added since Owner's audit.
+    // A new region can shadow Zone0 even if its Free/Flat method digests
+    // are unchanged, so a previous release contract cannot authorize it.
+    $configuredZones = array_map('intval',
+        array_keys((array)WC_Shipping_Zones::get_zones()));
+    sort($configuredZones, SORT_NUMERIC);
+    if ($configuredZones !== [1, 3, 4, 5]) { return false; }
     foreach ($ledger as $zoneId => $entry) {
         $zone = WC_Shipping_Zones::get_zone((int)$zoneId);
         if (!is_object($zone) || !method_exists($zone, 'get_shipping_methods')) {
@@ -231,6 +239,68 @@ function byl_www_ship_currency_ok(): bool {
         && byl_www_ship_effective_currency() === 'USD';
 }
 
+/**
+ * Woo caches shipping rates in WC()->session against a package hash. Without
+ * an explicit release/config/currency marker, an already-cached Free rate
+ * may survive an OFF->ON transition or later shipping-option drift, so the
+ * package_rates fail-closed callback might never be invoked.
+ *
+ * Store only this SHA-256 in the package, not admin options or customer data.
+ * The fingerprint includes all five reviewed Woo method settings, matched
+ * zone coverage/order and the effective checkout currency. A change forces
+ * Woo to compute a new package hash when the future adapter is armed.
+ */
+function byl_www_ship_runtime_fingerprint(): string {
+    $ledger = byl_www_ship_contract();
+    $state = [
+        'enabled' => function_exists('get_option')
+            ? get_option('byl_www_shipping_v1_enabled', 'no') : 'unknown',
+        'ledger' => $ledger,
+        'base_currency' => function_exists('get_woocommerce_currency')
+            ? get_woocommerce_currency() : null,
+        'effective_currency' => byl_www_ship_effective_currency(),
+        'zones' => [],
+    ];
+    if (class_exists('WC_Shipping_Zones')
+        && method_exists('WC_Shipping_Zones', 'get_zones')) {
+        $state['all_zone_ids'] = array_keys((array)WC_Shipping_Zones::get_zones());
+        sort($state['all_zone_ids'], SORT_NUMERIC);
+    }
+    if (is_array($ledger) && class_exists('WC_Shipping_Zones')) {
+        foreach ($ledger as $id => $entry) {
+            $zone = WC_Shipping_Zones::get_zone((int)$id);
+            $methods = is_object($zone)
+                && method_exists($zone, 'get_shipping_methods')
+                ? (array)$zone->get_shipping_methods(true) : [];
+            $enabled = [];
+            foreach ($methods as $method) {
+                if (is_object($method)
+                    && method_exists($method, 'get_instance_id')) {
+                    $enabled[] = (string)($method->id ?? '')
+                        . ':' . (int)$method->get_instance_id();
+                }
+            }
+            sort($enabled, SORT_STRING);
+            $freeKey = 'woocommerce_free_shipping_'
+                . (int)$entry['free_id'] . '_settings';
+            $one = ['enabled_methods' => $enabled,
+                'free' => get_option($freeKey, [])];
+            if (isset($entry['flat_id'])) {
+                $one['flat'] = get_option('woocommerce_flat_rate_'
+                    . (int)$entry['flat_id'] . '_settings', []);
+            }
+            $one['locations'] = is_object($zone)
+                && method_exists($zone, 'get_zone_locations')
+                ? $zone->get_zone_locations() : null;
+            $one['order'] = is_object($zone)
+                && method_exists($zone, 'get_zone_order')
+                ? $zone->get_zone_order() : null;
+            $state['zones'][$id] = $one;
+        }
+    }
+    return byl_www_ship_settings_digest($state);
+}
+
 function byl_www_ship_zone_id(array $package): ?int {
     if (!class_exists('WC_Shipping_Zones')
         || !is_array($package['destination'] ?? null)) {
@@ -242,10 +312,20 @@ function byl_www_ship_zone_id(array $package): ?int {
 }
 
 function byl_www_ship_packages(array $packages): array {
-    if (!byl_www_ship_gate()) { return $packages; }
+    if (!byl_www_ship_armed()) { return $packages; }
+    $marker = byl_www_ship_runtime_fingerprint();
+    $ready = byl_www_ship_gate() && byl_www_ship_currency_ok();
     $out = [];
     foreach ($packages as $package) {
-        if (!is_array($package) || !is_array($package['contents'] ?? null)) {
+        if (!is_array($package)) {
+            $out[] = $package;
+            continue;
+        }
+        // Always change the Woo shipping cache key while armed, EVEN when
+        // current zone/FX settings fail validation. Otherwise Woo might
+        // serve old cached Free Shipping without re-running rate filters.
+        $package['byl_www_ship_runtime_marker'] = $marker;
+        if (!$ready || !is_array($package['contents'] ?? null)) {
             $out[] = $package;
             continue;
         }
@@ -299,9 +379,11 @@ function byl_www_ship_tax($rate, float $fee): bool {
 /** Must always run after legacy Woo/BYL shipping filters. */
 function byl_www_ship_rates(array $rates, array $package): array {
     if (!byl_www_ship_armed()) { return $rates; }
-    // A live settings/zone fingerprint mismatch or unverified FX currency
-    // blocks shipment while armed. NEVER fall back to a legacy $0 free rate.
-    if (!byl_www_ship_gate() || !byl_www_ship_currency_ok()) {
+    // A live settings/zone/fx mismatch or stale cached package must not
+    // silently reinstate a previously eligible free shipping rate.
+    if (!byl_www_ship_gate() || !byl_www_ship_currency_ok()
+        || ($package['byl_www_ship_runtime_marker'] ?? '')
+            !== byl_www_ship_runtime_fingerprint()) {
         return [];
     }
     $kind = (string)($package['byl_www_ship_kind'] ?? '');
