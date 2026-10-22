@@ -241,10 +241,15 @@ $GLOBALS['mockYayVersion']='3.3.3';
 check_prod(!byl_www_ship_yaycurrency_prerequisite(),
     'YayCurrency 3.3.3 still precedes Order-type shipping fix 3.3.4');
 $GLOBALS['mockYayVersion']='3.3.4';
+check_prod(!byl_www_ship_yaycurrency_prerequisite(),
+    '3.3.4 has Order shipping fix but is below source-only security review floor');
+check_prod(!byl_www_ship_currency_ok(),
+    'approved FX constant cannot override 3.3.5 security version floor');
+$GLOBALS['mockYayVersion']='3.3.5';
 check_prod(byl_www_ship_yaycurrency_prerequisite(),
-    '3.3.4 is only a minimum version prerequisite, never FX UAT');
+    '3.3.5 is minimum source security prerequisite, never live FX UAT');
 check_prod(byl_www_ship_currency_ok(),
-    'reviewed bridge and USD at vendor baseline can proceed in offline mock');
+    'reviewed bridge and USD at source prerequisite can proceed in offline mock');
 $GLOBALS['options']['active_plugins']=[];
 check_prod(!byl_www_ship_currency_ok(),
     'inactive YayCurrency plugin fails version/FX prerequisite');
