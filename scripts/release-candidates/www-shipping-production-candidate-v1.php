@@ -259,11 +259,12 @@ function byl_www_ship_effective_currency(): ?string {
         ? $currency : null;
 }
 /**
- * Verified WWW has YayCurrency Pro v3.2.1. Vendor later published shipping
- * class fixes in v3.3.3 and shipping "Order" mode fixes in v3.3.4; Zone3
- * uses Order. Treat <3.3.4 as an explicit release NO-GO, regardless of a
- * future FX_REVIEWED flag. Version >=3.3.4 is only a prerequisite; it is
- * NEVER sufficient proof of real EUR/GBP/AUD/CAD checkout correctness.
+ * Verified WWW has YayCurrency Pro v3.2.1. Vendor later published
+ * shipping class fixes v3.3.3 and shipping "Order" type fixes v3.3.4;
+ * a public advisory for YayCurrency (<3.3.5, CVE-2026-16058) adds a
+ * security review concern. Pro applicability must be vendor-confirmed.
+ * Source-only floor >=3.3.5 is a conservative prerequisite, never proof
+ * of safe real EUR/GBP/AUD/CAD checkout, tax, or payment settlement.
  */
 function byl_www_ship_yaycurrency_prerequisite(): bool {
     if (!defined('WP_PLUGIN_DIR')
@@ -281,7 +282,7 @@ function byl_www_ship_yaycurrency_prerequisite(): bool {
     $header = get_file_data($pluginFile, ['Version'=>'Version'], 'plugin');
     $version = is_array($header) ? ($header['Version'] ?? '') : '';
     return is_string($version) && $version !== ''
-        && version_compare($version, '3.3.4', '>=');
+        && version_compare($version, '3.3.5', '>=');
 }
 function byl_www_ship_currency_ok(): bool {
     return defined('BYL_WWW_SHIPPING_V1_FX_REVIEWED')
