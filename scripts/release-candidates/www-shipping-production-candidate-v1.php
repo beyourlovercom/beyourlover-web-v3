@@ -202,9 +202,33 @@ function byl_www_ship_gate(): bool {
         && ($ledger = byl_www_ship_contract()) !== null
         && byl_www_ship_woo_methods_match($ledger);
 }
+/**
+ * YayCurrency on WWW allows USD/EUR/GBP/AUD/CAD checkout. The Woo base
+ * currency being USD DOES NOT identify a customer's effective checkout
+ * currency. Require a future independently reviewed currency bridge before
+ * any shipping pricing is armed. Until a GBP/EUR/AUD/CAD fee-conversion
+ * contract passes runtime UAT, this candidate only permits a VERIFIED USD
+ * checkout, and has no bootstrap/activation of its own.
+ */
+function byl_www_ship_effective_currency(): ?string {
+    if (!function_exists('byl_www_shipping_v1_verified_checkout_currency')) {
+        return null;
+    }
+    try {
+        $currency = byl_www_shipping_v1_verified_checkout_currency();
+    } catch (Throwable $error) {
+        return null;
+    }
+    return is_string($currency)
+        && in_array($currency, ['USD', 'EUR', 'GBP', 'AUD', 'CAD'], true)
+        ? $currency : null;
+}
 function byl_www_ship_currency_ok(): bool {
-    return function_exists('get_woocommerce_currency')
-        && get_woocommerce_currency() === 'USD';
+    return defined('BYL_WWW_SHIPPING_V1_FX_REVIEWED')
+        && BYL_WWW_SHIPPING_V1_FX_REVIEWED === true
+        && function_exists('get_woocommerce_currency')
+        && get_woocommerce_currency() === 'USD'
+        && byl_www_ship_effective_currency() === 'USD';
 }
 
 function byl_www_ship_zone_id(array $package): ?int {
