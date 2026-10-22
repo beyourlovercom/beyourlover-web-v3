@@ -683,32 +683,20 @@
     const host = root.querySelector('[data-byl-promotion]');
     const data = promotion.data;
     if (!host) return;
-    if (!data || !data.active) {
-      host.hidden = true;
-      return;
-    }
 
+    // The only free-shipping marketing sentence on Checkout. Shipping
+    // methods/fees still come unchanged from Woo's actual selected rates.
     host.hidden = false;
     host.replaceChildren();
+    const headline = document.createElement('p');
+    headline.className = 'byl-promo-message';
+    const policyLink = document.createElement('a');
+    policyLink.href = '/free-shipping/';
+    policyLink.textContent = 'Free shipping from $69 (special items excluded)';
+    headline.appendChild(policyLink);
+    host.appendChild(headline);
 
-    const label = document.createElement('strong');
-    label.className = 'byl-promo-title';
-    label.textContent = 'Free shipping';
-    host.appendChild(label);
-
-    const messageNode = document.createElement('p');
-    messageNode.className = 'byl-promo-message';
-    messageNode.setAttribute('aria-live', 'polite');
-    messageNode.textContent = promotionMessage(data);
-    host.appendChild(messageNode);
-
-    if (data.state === 'require_code_available') {
-      const hint = document.createElement('p');
-      hint.className = 'byl-promo-hint';
-      hint.textContent = 'Use code ' + String(data.policy_code || '').toUpperCase();
-      host.appendChild(hint);
-    }
-
+    if (!data || !data.active) return;
     const applied = !!(data.has_code && data.applied_code);
     if (applied && !promotion.editing) {
       const row = document.createElement('p');
