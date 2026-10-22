@@ -37,6 +37,10 @@ if (function_exists('WC') && WC() && WC()->cart && class_exists('WC_Shipping_Zon
             $terms = $zone_id !== null && function_exists('byl_v3_fs_zone_free_terms')
                 ? byl_v3_fs_zone_free_terms($zone_id) : null;
             $threshold = is_array($terms) ? ($terms['threshold'] ?? null) : null;
+            if ($threshold === null && function_exists('byl_v3_fs_zone_free_method')
+                && !byl_v3_fs_zone_free_method((int)$zone_id)) {
+                $state['kind'] = 'unavailable';
+            }
             if ($threshold !== null) {
                 $supports_free = true; // Verified native Woo free method.
                 $decimals = function_exists('wc_get_price_decimals') ? (int)wc_get_price_decimals() : 2;
