@@ -49,6 +49,7 @@ The WooCommerce/Smart Coupons admin listing search `post_type=shop_coupon&s=BYL4
 - **Auto select currency by countries = ON**; UK → GBP, Australia → AUD, Canada → CAD (as displayed); EUR also enabled for checkout.
 - **Update exchange rate automatically = ON**.
 - A current WordPress admin notice reports **YayCurrency Pro license expired** and requests renewal for updates; do NOT treat this as proof the currency-switching runtime is broken.
+- **Additional same-day read-only Plugins UI confirmation:** `yaycurrency-pro/yay-currency.php` is **active, Version 3.2.1**. The user never authorized a plugin update or license renewal, and the audit-only tab was closed. Vendor changelog's 3.3.3 shipping-class currency correction and 3.3.4 `Order` shipping type correction are later than the installed version. Treat both EUR/GBP/AUD/CAD and selected USD shipping conversion on this installation as pending real runtime UAT, not automatically wrong or correct. The source candidate's version-floor guard is now `>=3.3.4` AND a separately reviewed FX bridge; no production update occurred.
 - Current source-only candidate checks `get_woocommerce_currency() === 'USD'` — this is inadequate alone to verify the customer's YayCurrency selected/checkout currency. A separately reviewed effective-currency integration and FX conversion UAT across **EUR/GBP/AUD/CAD** is REQUIRED. Until proven, WWW enable is NO-GO. No plugin updates/license changes authorized.
 
 ### Native WooCommerce Shipping settings (global options)
