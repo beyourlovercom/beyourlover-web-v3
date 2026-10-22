@@ -8,7 +8,7 @@ Keep exact approved single-line Cart/Checkout notice: `Free shipping from $69 (s
 
 ## New isolated checks
 
-- Exact Pro header `3.2.1` **and** active plugin, Woo base `woocommerce_currency=USD`, named `BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED` sentinel, pre-existing production Owner flags, and explicit verified selected-currency detector are required. No auto switch, no WP settings writes.
+- Exact Pro header `3.2.1` **and** active plugin, Woo base `woocommerce_currency=USD`, named `BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED` sentinel, pre-existing production Owner flags, and **two matching independently reviewed currency detectors** (Checkout and YayCurrency's own effective currency) are required. An apparently reversible but USD-passthrough calculation with GBP labeling must not pass. No auto switch, no WP settings writes.
 - Requires YayCurrency 3.1.0+ documented `yay_currency_convert_price` and `yay_currency_revert_price` hooks *to actually be registered*, plus numeric/finite/positive values. Tests conversion of base USD 30 and round-trip back to USD with a fail-closed bound.
 - Proposed Woo `woocommerce_package_rates` post-converter callback at priority 100200 converts newly constructed mandatory **base-USD fees exactly once** into the effective currency; never charges numeric 30 in EUR/GBP/AUD/CAD by relabeling.
 - For an ordinary non-free destination (especially Zone3 `order`), compares the already-converted native Woo flat rate against a separately converted expected USD base freight. An incompatible vendor native amount yields *no shipping options* rather than charging a known-wrong amount.
@@ -17,7 +17,7 @@ Keep exact approved single-line Cart/Checkout notice: `Free shipping from $69 (s
 
 ## Isolated regression (US Mac mini, user-owned OAuth DC)
 
-`php -l` candidate + harness: **PASS**. `php scripts/test_www_shipping_production_candidate_off_v1.php`: **199 offline assertions PASS**, increased from 167. `python3 scripts/test_www_shipping_fx_acceptance_matrix_v1.py`: **180 fixture rows PASS**. Cases cover synthetic USD/EUR/GBP/AUD/CAD ratios, mixed normal+special+2x pillow, special $30 vs pillow $60, legacy Zone3 `order` native mismatch fail-closed, invalid/throwing vendor converter, incoherent reverse conversion, unknown currency, wrong base, wrong Pro version, absence of registered vendor hooks, FX cache invalidation, and inertness on Dev. All ratios are **illustrative**; none are current quotes. No real order, checkout, payment or WWW shell.
+`php -l` candidate + harness: **PASS**. `php scripts/test_www_shipping_production_candidate_off_v1.php`: **200 offline assertions PASS**, increased from 167. `python3 scripts/test_www_shipping_fx_acceptance_matrix_v1.py`: **180 fixture rows PASS**. Cases cover synthetic USD/EUR/GBP/AUD/CAD ratios, mixed normal+special+2x pillow, special $30 vs pillow $60, legacy Zone3 `order` native mismatch fail-closed, invalid/throwing vendor converter, incoherent reverse conversion, unknown currency, wrong base, wrong Pro version, absence of registered vendor hooks, mismatch between visible and vendor effective currency, FX cache invalidation, and inertness on Dev. All ratios are **illustrative**; none are current quotes. No real order, checkout, payment or WWW shell.
 
 ## Remaining P0 gates — DO NOT ENABLE
 
