@@ -7,6 +7,7 @@ $GLOBALS['environment'] = 'production';
 $GLOBALS['currency'] = 'USD';
 $GLOBALS['effective_currency'] = 'USD';
 $GLOBALS['zoneLocationVersion'] = 'v1';
+$GLOBALS['classMembers'] = ['38047','32251','9153','9145'];
 $GLOBALS['options'] = ['byl_www_shipping_v1_enabled' => 'no'];
 $GLOBALS['hooks'] = [];
 $GLOBALS['assertions'] = 0;
@@ -28,6 +29,10 @@ function wp_parse_url(string $url, int $component) {
 function wp_get_environment_type(): string { return $GLOBALS['environment']; }
 function get_option(string $key, $default = false) {
     return $GLOBALS['options'][$key] ?? $default;
+}
+function get_objects_in_term(int $term, string $taxonomy) {
+    return ($term === 1939 && $taxonomy === 'product_shipping_class')
+        ? $GLOBALS['classMembers'] : [];
 }
 function get_woocommerce_currency(): string { return $GLOBALS['currency']; }
 function byl_www_shipping_v1_verified_checkout_currency(): string {
@@ -83,6 +88,7 @@ class WC_Shipping_Rate {
     public function get_cost(): float { return $this->cost; }
     public function get_label(): string { return $this->label; }
     public function get_taxes(): array { return $this->taxes; }
+    public function get_tax_status(): string { return $this->taxStatus; }
     public function set_label(string $label): void { $this->label = $label; }
     public function set_cost(float $cost): void { $this->cost = $cost; }
     public function set_taxes(array $taxes): void { $this->taxes = $taxes; }
@@ -109,11 +115,13 @@ require __DIR__ . '/release-candidates/www-shipping-production-candidate-v1.php'
 
 function config_fixture(): array {
     $spec=[
-        0=>['free'=>101,'flat'=>203,'min'=>69.0,'cost'=>20.0],
-        1=>['free'=>202,'min'=>0.0],
-        3=>['free'=>306,'flat'=>307,'min'=>169.0,'cost'=>30.0],
-        4=>['free'=>408,'flat'=>409,'min'=>129.0,'cost'=>20.0],
-        5=>['free'=>510,'flat'=>511,'min'=>69.0,'cost'=>10.0],
+        // Exact IDs were read from the authenticated WWW Woo admin.
+        // Zone0 "either" rule is tested separately as a strict NO-GO.
+        0=>['free'=>1,'flat'=>3,'min'=>69.0,'cost'=>20.0],
+        1=>['free'=>2,'min'=>0.0],
+        3=>['free'=>6,'flat'=>5,'min'=>169.0,'cost'=>30.0],
+        4=>['free'=>8,'flat'=>7,'min'=>129.0,'cost'=>20.0],
+        5=>['free'=>9,'flat'=>10,'min'=>69.0,'cost'=>10.0],
     ];
     $ledger=[];
     foreach ($spec as $zone=>$data) {
@@ -136,7 +144,8 @@ function config_fixture(): array {
                 'class_cost_1874'=>in_array($zone,[0,3],true)?'10':'0',
                 'class_cost_1939'=>$class1939,
                 'no_class_cost'=>$zone===0?'0':'',
-                'type'=>$zone===3?'order':'class'];
+                'type'=>$zone===3?'order':'class',
+                'tax_status'=>'taxable'];
             $GLOBALS['options']['woocommerce_flat_rate_'.$data['flat'].'_settings']=$flat;
             $GLOBALS['zoneMethods'][$zone][] = new ShippingMethodStub('flat_rate',$data['flat']);
             $entry += ['flat_id'=>$data['flat'],
@@ -195,6 +204,8 @@ define('BYL_WWW_SHIPPING_V1_METHOD_CONTRACT',$ledger);
 check_prod(!byl_www_ship_gate(),'approval alone cannot switch on');
 $GLOBALS['options']['byl_www_shipping_v1_enabled']='yes';
 check_prod(byl_www_ship_gate(),'all explicit arm guards + mock Owner ledger match');
+check_prod(byl_www_ship_product_classes_match(),
+    'actual class1939 four-parents matching WWW list');
 check_prod(byl_www_ship_settings_digest(['b'=>2,'a'=>['z'=>4,'x'=>3]])
     ===byl_www_ship_settings_digest(['a'=>['x'=>3,'z'=>4],'b'=>2]),
     'nested Woo option hash order normalized');
@@ -265,13 +276,13 @@ foreach ([0,1,3,4,5] as $zoneId) {
 }
 $base=mk_rates(5,$ledger);
 $normal=byl_www_ship_packages([mk_package(5,['normal'=>mk_item(37763,68.99)])])[0];
-check_prod(!isset(byl_www_ship_rates($base,$normal)['free_shipping:510']),
+check_prod(!isset(byl_www_ship_rates($base,$normal)['free_shipping:9']),
     'post-coupon USD68.99 cannot unlock zone5 USD69');
 $at69=byl_www_ship_packages([mk_package(5,['normal'=>mk_item(37763,69.0)])])[0];
-check_prod(isset(byl_www_ship_rates($base,$at69)['free_shipping:510']),
+check_prod(isset(byl_www_ship_rates($base,$at69)['free_shipping:9']),
     'post-coupon exact USD69 retains original Woo free');
 $GLOBALS['coupons']=['BYL49'];
-check_prod(isset(byl_www_ship_rates($base,$normal)['free_shipping:510']),
+check_prod(isset(byl_www_ship_rates($base,$normal)['free_shipping:9']),
     'BYL49 special existing-code protection preserved');
 $GLOBALS['coupons']=[];
 $unknown=mk_package(999,['red'=>mk_item(9153,179)]);
@@ -282,7 +293,18 @@ $lost=mk_package(5,['regular'=>mk_item(37763,20),'red'=>mk_item(9153,179)]);
 check_prod(byl_www_ship_rates($base,$lost)===[],
     'lost package splitter fails closed instead of free');
 $specialPkg=byl_www_ship_packages([mk_package(5,['red'=>mk_item(9153,179)])])[0];
-$wrongRate=['free_shipping:510'=>$base['free_shipping:510']];
+$taxless=mk_rates(5,$ledger);
+$taxless['flat_rate:10']=new WC_Shipping_Rate(
+    'flat_rate:10', 'Flat rate', 10.0, [], 'flat_rate', 10, 'none'
+);
+check_prod(byl_www_ship_rates($taxless,$specialPkg)===[],
+    'non-taxable Woo Flat quote cannot be silently turned taxable');
+$GLOBALS['taxReturn']=['TAX-ID-1'=>1.25];
+$taxed=byl_www_ship_rates(mk_rates(5,$ledger),$specialPkg);
+check_prod(reset($taxed)->get_taxes()===['TAX-ID-1'=>1.25],
+    'special rate propagates positive Woo shipping tax result');
+unset($GLOBALS['taxReturn']);
+$wrongRate=['free_shipping:9'=>$base['free_shipping:9']];
 check_prod(byl_www_ship_rates($wrongRate,$specialPkg)===[],
     'missing genuine flat instance cannot silently waive exception fee');
 $GLOBALS['effective_currency']='GBP';
@@ -302,7 +324,7 @@ check_prod(byl_www_ship_rates($base,$specialPkg)===[],
 check_prod(byl_www_ship_rates($base,$normal)===[],
     'EUR ordinary is also blocked not silently shipped');
 $GLOBALS['currency']='USD';
-$flatKey='woocommerce_flat_rate_511_settings';
+$flatKey='woocommerce_flat_rate_10_settings';
 $oldShipMarker=$specialPkg['byl_www_ship_runtime_marker'];
 $GLOBALS['options'][$flatKey]['class_cost_1939']='0'; // drift including class cost.
 $changedShipMarker=byl_www_ship_packages([
@@ -320,7 +342,7 @@ check_prod(byl_www_ship_gate(),'known settings restored by local stub');
 // WWW native Zone0 Free #1 is actually "either" (amount OR coupon),
  // NOT the Dev mock's "min_amount"; contract MUST fail closed until the
  // BYL49/free-coupon exception is independently reviewed. No silent toggle.
-$zone0Free='woocommerce_free_shipping_101_settings';
+$zone0Free='woocommerce_free_shipping_1_settings';
 $GLOBALS['options'][$zone0Free]['requires']='either';
 check_prod(!byl_www_ship_gate(),
     'real WWW Zone0 either coupon OR amount is explicitly NO-GO');
@@ -345,6 +367,21 @@ check_prod(!byl_www_ship_gate(),
     'new higher-priority Woo shipping zone invalidates approved zone set');
 unset($GLOBALS['zoneMethods'][6]);
 check_prod(byl_www_ship_gate(),'reviewed zone set restored');
+$oldClassMarker=byl_www_ship_runtime_fingerprint();
+$GLOBALS['classMembers'][]='50000';
+check_prod(!byl_www_ship_gate(),
+    'fifth product assigned to class1939 fails WWW release gate');
+check_prod(byl_www_ship_runtime_fingerprint()!==$oldClassMarker,
+    'shipping class membership drift invalidates cached Woo quote');
+check_prod(byl_www_ship_rates($base,$specialPkg)===[],
+    'new class member cannot bypass exception fee via stale Free rate');
+array_pop($GLOBALS['classMembers']);
+check_prod(byl_www_ship_gate(),'verified four-product class membership restored');
+$GLOBALS['options'][$flatKey]['tax_status']='none';
+check_prod(!byl_www_ship_gate(),
+    'native Woo non-taxable Flat setting drift invalidates release ledger');
+$GLOBALS['options'][$flatKey]['tax_status']='taxable';
+check_prod(byl_www_ship_gate(),'taxable setting restored');
 $GLOBALS['zoneMethods'][5][] = new ShippingMethodStub('free_shipping',999);
 check_prod(!byl_www_ship_gate(),'unexpected enabled Woo Free instance invalidates ledger');
 check_prod(byl_www_ship_rates($base,$specialPkg)===[],
