@@ -52,6 +52,24 @@ for value in (
 ):
     check(value in css, "missing informative styling: " + value)
 
+# An exceptional WWW shipping package always has a mandatory freight fee:
+# $30 for the three special SKUs per package, and $30 for each PILLOW unit.
+# It must NOT receive the disabled "Free shipping from $X" ghost-rate card.
+# This guard must run before any free eligibility scan.
+www_guard = "if (in_array((string)($package['byl_www_ship_kind'] ?? ''),"
+check(www_guard in php, "WWW special/PILLOW paid-package guard exists")
+start = php.index(www_guard)
+end = php.index("continue;", start)
+next_rate_scan = php.index("foreach ($available_rates as $rate)", start)
+check("['special', 'pillow']" in php[start:end],
+      "both WWW exceptional kinds are excluded from locked-free guidance")
+check(end < next_rate_scan,
+      "WWW guard runs before scanning/printing ordinary free-shipping guidance")
+check("byl_dev_pillow_shipping_enabled" in php[end:next_rate_scan],
+      "existing Dev PILLOW guard remains unchanged")
+check("woocommerce_package_rates" not in php[start:next_rate_scan],
+      "presentation guard never mutates Woo shipping rates")
+
 check("dispatchEvent" not in js[js.index("const match = /^shipping_method"):js.index("deliveryHost.appendChild(pack)", js.index("const match = /^shipping_method"))],
       "locked card must never set shipping method")
 check("byl_checkout_drawer" not in php and "byl_checkout_drawer" not in js, "no Checkout Drawer comeback")
