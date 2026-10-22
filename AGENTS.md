@@ -1,6 +1,14 @@
 # BYL Website V3 — Agent Governance V2
 > Applies to this repository and the new BeYourLover website only. The Owner-approved operating model is Dev-first. Do not inherit a generic Local-first mandate from shared-plugin repositories.
 
+## Owner policy — Andy-series WordPress admin is Desktop-only (2026-10-22)
+
+**Highest-priority UI scope rule for Andy-family plugin administration** (including Andy Core, Andy Commerce, and future Andy-series plugins):
+- All plugin **WordPress admin (`wp-admin`) interfaces**—settings, dashboards, lists, forms, metaboxes, management panels, previews and admin dialogs—are **Desktop-only / Desktop-first**. The Owner will operate these interfaces on a computer, not a phone.
+- Design, implement, review and perform visual/functional Owner UAT on **desktop browsers only** (use the approved desktop visual baseline, normally ~1280–1440px or wider). **Do not require mobile layouts, phone breakpoints, mobile mockups, M14 screenshots or mobile UI UAT for these admin interfaces.** Do not expand scope or delay releases solely for admin mobile adaptation.
+- This rule is limited to the **plugin admin UI**, not to the plugin's front-end output. Customer-visible pages, checkout/cart/drawers, product components, popups, shortcodes (including language/currency switchers), and other public-facing widgets **retain their site-specific responsive/mobile-first design and UAT requirements**.
+- This explicit Owner directive overrides earlier generic "all UI mobile-first / desktop-and-mobile" language **only for Andy-series WordPress admin pages**. It does not relax functionality, accessibility on desktop, security, QA evidence, PR review, or release/production Owner approval gates.
+
 ## Mission and source of truth
 - Build **the complete new website** on `https://dev.beyourlover.com`; tune theme, plugins, content, integrations and business flows together until full Owner UAT passes.
 - **GitHub is the only code source of truth.** Work on a scoped branch/worktree; no untracked or direct Dev-only source fixes. Record exact commit SHA for deployed code.
@@ -14,7 +22,7 @@
 
 1. **Freeze an Owner-approved design/interaction baseline first.** Materially new or changed visual behavior still needs Owner design proposal PASS; do not keep redesigning approved pages while their underlying functions are broken.
 2. **Native-first ownership and functional contract.** Before styling a control, map it to the existing WordPress/WooCommerce/Andy Commerce/Andy Core authority, native field/API, validation, events, state, failures and fallback. Reuse genuine controls and data; theme/drawer CSS or JavaScript must not shadow, clone or replace them without an approved architecture change.
-3. **Inventory every in-scope interactive control.** For each input, button, selection, notice and link: prove focus/click/type/search, real authority and state changes, errors/keyboard/touch, mobile/desktop and native fallback. Track UNTESTED / SOURCE-ONLY / ISOLATED PASS / LIVE DEV PASS / FAIL / BLOCKED separately; synthetic screenshots and mocked tests are never live PASS.
+3. **Inventory every in-scope interactive control.** For each in-scope input, button, selection, notice and link: prove focus/click/type/search, real authority and state changes, errors, relevant keyboard/touch interactions, and native fallback. Require mobile and desktop coverage for customer-facing UI; apply the Desktop-only exception above to Andy-series WordPress admin UI. Track UNTESTED / SOURCE-ONLY / ISOLATED PASS / LIVE DEV PASS / FAIL / BLOCKED separately; synthetic screenshots and mocked tests are never live PASS.
 4. **Functional gate before visual polish.** Fix P0/P1 native functionality failures before fine visual calibration; a beautiful page with an unusable Woo field is **FAIL**. Then polish against the frozen Owner reference, run affected functional regressions again, and obtain **both Functional PASS and Visual Owner PASS** before page closure.
 5. **Page-by-page, risk-scaled acceptance.** Interactive commerce uses **Cart → Shipping → Payment**, with shipping methods inside Shipping and totals/confirmation within Payment; **no additional Delivery/Review customer stage** without explicit Owner approval. Checkout's [54-case control inventory](https://github.com/beyourlovercom/beyourlover-web-v3/issues/125) is the current contract (Cart 10 / Shipping 22 / Payment 12 / cross-flow 10). Static/content pages require proportionate checks, not payment tests.
 6. **Never fake capability or acceptance.** Actual Woo cart/session/shipping/tax/discount/gateway behavior is authoritative. If a native widget or gateway is blocked, report FAIL/BLOCKED, preserve the legitimate fallback, fix the integration and re-test; do not use hardcoded prices, mock payment buttons, hidden validation, or unapproved real transactions to fabricate PASS.
@@ -39,7 +47,7 @@ Stop and ask the Owner before:
 - Preserve WooCommerce as checkout, tax/shipping/payment/order authority; Andy Commerce is business policy; BYL V3 Theme is rendering/interaction; Andy Core is generic foundation.
 - No bypass of real Woo validation, checkout nonce, authorization checks, payment confirmation, ERP fulfillment gates or discount restrictions.
 - Before modifying live Dev runtime: confirm scope and source SHA, back up affected files/config, use additive/reversible changes where possible, and verify real browser/server behavior. Don't claim Dev PASS on lint alone.
-- Mobile-first. Test changed UI at phone (~390px) and desktop (~1440px); use the approved visual baseline and meaningful checkout states; no artificial Woo orders to fabricate success.
+- Customer-facing/public UI remains mobile-first: test changed front-end UI at phone (~390px) and desktop (~1440px). Andy-series WordPress admin UI instead receives desktop-only layout and UAT per the top-level Owner policy above. Use the approved visual baseline and meaningful checkout states; no artificial Woo orders to fabricate success.
 - Never commit secrets, full WordPress copies, credentials, uploads, databases, caches, or temporary screenshots. Avoid restarting a working computer/browser/DC service merely to run tests.
 - The final task report states exactly what changed, SHA/PR, verification, unresolved issues, and whether WWW was touched.
 
