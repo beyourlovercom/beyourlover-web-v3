@@ -18,7 +18,8 @@ assert(nativeCart.includes('get_persisted_zone_effective_threshold'), 'Cart free
 assert(nativeCart.includes('chosen_shipping_methods') && nativeCart.includes('get_packages()'), 'Cart applied status requires actual selected free shipping rate');
 assert(promotion.includes('if (nativeCart()) window.location.reload();'), 'classic coupon changes refresh native Woo totals');
 assert(promotion.includes('if (!embedded) return null;'), 'classic Cart cannot use stale Blocks snapshot');
-assert(promotion.includes("🎉 Congrats! You've unlocked free shipping."), 'Cart matches Free Shipping Page celebration');
+assert(promotion.includes('Free shipping from $69 (special items excluded)') && promotion.includes('href="/free-shipping/"'), 'Cart uses Owner-approved single linked country-policy sentence');
+assert(checkoutJs.includes('Free shipping from $69 (special items excluded)') && checkoutJs.includes("policyLink.href = '/free-shipping/'"), 'Checkout shares single linked sentence, Woo rates still native');
 assert(quantity.includes('form.requestSubmit(submit)') && !quantity.includes('fetch('), 'quantity actions are native Woo, not custom cart writes');
 assert(quantity.includes('updated_wc_div updated_cart_totals'), 'quantity controls survive classic Woo fragment replacement');
 assert(!/wp_create_order|wc_create_order|process_payment|update_post_meta|WC_Order/.test(quantity), 'quantity presentation cannot create orders');
