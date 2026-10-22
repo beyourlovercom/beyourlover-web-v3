@@ -30,6 +30,24 @@ function byl_www_ship_product_kind(array $item): string {
     return 'ordinary';
 }
 
+/**
+ * WWW shipping class 1939 is currently shared by exactly four parent
+ * products: three per-shipment specials and the per-unit PILLOW. An
+ * accidental fifth product assignment cannot inherit the native class
+ * surcharge while the adapter treats it as ordinary.
+ */
+function byl_www_ship_class_membership(): ?array {
+    if (!function_exists('get_objects_in_term')) { return null; }
+    $objects = get_objects_in_term(1939, 'product_shipping_class');
+    if (!is_array($objects)) { return null; }
+    $ids = array_values(array_unique(array_map('intval', $objects)));
+    sort($ids, SORT_NUMERIC);
+    return $ids;
+}
+function byl_www_ship_product_classes_match(): bool {
+    return byl_www_ship_class_membership() === [9145, 9153, 32251, 38047];
+}
+
 function byl_www_ship_subtotal(array $items): float {
     $sum = 0.0;
     foreach ($items as $item) {
@@ -179,7 +197,8 @@ function byl_www_ship_woo_methods_match(array $ledger): bool {
             if (!is_array($flat)
                 || !hash_equals($entry['flat_digest'], byl_www_ship_settings_digest($flat))
                 || !is_numeric($flat['cost'] ?? null)
-                || abs((float)$flat['cost'] - (float)$entry['flat_cost']) > 0.000001) {
+                || abs((float)$flat['cost'] - (float)$entry['flat_cost']) > 0.000001
+                || ($flat['tax_status'] ?? 'taxable') !== 'taxable') {
                 return false;
             }
         }
@@ -208,7 +227,8 @@ function byl_www_ship_gate(): bool {
         && class_exists('WC_Shipping_Rate')
         && function_exists('WC')
         && ($ledger = byl_www_ship_contract()) !== null
-        && byl_www_ship_woo_methods_match($ledger);
+        && byl_www_ship_woo_methods_match($ledger)
+        && byl_www_ship_product_classes_match();
 }
 /**
  * YayCurrency on WWW allows USD/EUR/GBP/AUD/CAD checkout. The Woo base
@@ -259,6 +279,7 @@ function byl_www_ship_runtime_fingerprint(): string {
         'base_currency' => function_exists('get_woocommerce_currency')
             ? get_woocommerce_currency() : null,
         'effective_currency' => byl_www_ship_effective_currency(),
+        'special_class_products' => byl_www_ship_class_membership(),
         'zones' => [],
     ];
     if (class_exists('WC_Shipping_Zones')
@@ -429,8 +450,10 @@ function byl_www_ship_rates(array $rates, array $package): array {
         if (!is_object($raw)
             || !method_exists($raw, 'get_id')
             || !method_exists($raw, 'get_method_id')
+            || !method_exists($raw, 'get_tax_status')
             || $raw->get_id() !== $key
-            || $raw->get_method_id() !== 'flat_rate') {
+            || $raw->get_method_id() !== 'flat_rate'
+            || $raw->get_tax_status() !== 'taxable') {
             return []; // Never coerce Free to paid under other zone IDs.
         }
         $rate = clone $raw;
