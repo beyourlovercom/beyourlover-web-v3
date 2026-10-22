@@ -19,6 +19,15 @@ Keep exact approved single-line Cart/Checkout notice: `Free shipping from $69 (s
 
 `php -l` candidate + harness: **PASS**. `php scripts/test_www_shipping_production_candidate_off_v1.php`: **200 offline assertions PASS**, increased from 167. `python3 scripts/test_www_shipping_fx_acceptance_matrix_v1.py`: **180 fixture rows PASS**. Cases cover synthetic USD/EUR/GBP/AUD/CAD ratios, mixed normal+special+2x pillow, special $30 vs pillow $60, legacy Zone3 `order` native mismatch fail-closed, invalid/throwing vendor converter, incoherent reverse conversion, unknown currency, wrong base, wrong Pro version, absence of registered vendor hooks, mismatch between visible and vendor effective currency, FX cache invalidation, and inertness on Dev. All ratios are **illustrative**; none are current quotes. No real order, checkout, payment or WWW shell.
 
+## Additional upstream 3.2 evidence (public Lite only)
+
+On the authorized **US Mac mini through self-hosted formal OAuth DC**, statically inspected official WordPress.org **YayCurrency Lite 3.2** distribution at `https://downloads.wordpress.org/plugin/yaycurrency.3.2.zip`, SHA256 `e1a82731e55ad9c438217e5d10de1c218117948fd45f6bd354f47aad49551a08`; archive validated and was **not installed or executed**. The exact WordPress.org `3.2.1` Lite ZIP URL returned 404, so we do **not** claim a public Lite 3.2.1 artifact. The live commercial Pro 3.2.1 is distinct and not inspected.
+
+- Public Lite 3.2 `includes/Engine/FEPages/WooCommerceCurrency.php`: Woo `woocommerce_package_rates` vendor callback at **10**; free-shipping instance option at **20**. The proposed BYL late callback **100200** therefore must apply the mandatory USD $30 fee conversion itself.
+- Its `change_shipping_cost()` handles Flat Rate `class` versus `order` calculations separately and changes shipping taxes, confirming the importance of exact **Zone3 order-type** native amount and tax UAT, rather than assuming a later fixed version's behavior.
+- Public Lite 3.2 `includes/Helpers/YayCurrencyHelper.php` exposes `detect_current_currency()` / `get_apply_currency()` with a currency metadata array containing `currency`. **Do not assume** the installed Pro 3.2.1 provides exactly the same path; a future separately reviewed detector can use it only if independently confirmed. This candidate requires separate verified vendor and Checkout currency readouts to match, and stays inactive without them.
+- Neither public Lite internals nor the 200 mock tests establish an authentic Pro 3.2.1 checkout conversion, its settlement currency, or permission to copy/use a Pro binary on Dev.
+
 ## Remaining P0 gates — DO NOT ENABLE
 
 1. True authenticated Pro **3.2.1** runtime: confirm documented hook signatures, active vendor priorities, selected-currency detector and round-trip conversion; **no untrusted packages or renewed subscription**.
