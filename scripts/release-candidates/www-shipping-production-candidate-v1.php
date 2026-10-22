@@ -7,7 +7,7 @@
  * - independent Owner approval for the exact production release,
  * - a separate wp-config constant + explicit persisted ON switch,
  * - a complete Owner-reviewed, site-specific Woo method settings contract,
- * - a verified single-currency USD runtime (FX ships under a separate gate).
+ * - FX-reviewed checkout currency; legacy YayCurrency 3.2.1 is a separately gated source-only experiment.
  *
  * No WordPress shipping settings are changed by this file. Never use Dev
  * module flags/instance IDs to enable WWW or guess production costs.
@@ -266,30 +266,84 @@ function byl_www_ship_effective_currency(): ?string {
  * Source-only floor >=3.3.5 is a conservative prerequisite, never proof
  * of safe real EUR/GBP/AUD/CAD checkout, tax, or payment settlement.
  */
-function byl_www_ship_yaycurrency_prerequisite(): bool {
+function byl_www_ship_yaycurrency_version(): ?string {
     if (!defined('WP_PLUGIN_DIR')
         || !function_exists('get_option')
         || !function_exists('get_file_data')) {
-        return false;
+        return null;
     }
-    $active = (array)get_option('active_plugins', []);
     $path = 'yaycurrency-pro/yay-currency.php';
-    if (!in_array($path, $active, true)) {
-        return false;
+    if (!in_array($path, (array)get_option('active_plugins', []), true)
+        || !is_file(WP_PLUGIN_DIR . '/' . $path)) {
+        return null;
     }
-    $pluginFile = WP_PLUGIN_DIR . '/' . $path;
-    if (!is_file($pluginFile)) { return false; }
-    $header = get_file_data($pluginFile, ['Version'=>'Version'], 'plugin');
-    $version = is_array($header) ? ($header['Version'] ?? '') : '';
-    return is_string($version) && $version !== ''
-        && version_compare($version, '3.3.5', '>=');
+    $header = get_file_data(WP_PLUGIN_DIR . '/' . $path,
+        ['Version'=>'Version'], 'plugin');
+    $version = is_array($header) ? ($header['Version'] ?? null) : null;
+    return is_string($version) && $version !== '' ? $version : null;
+}
+function byl_www_ship_yaycurrency_prerequisite(): bool {
+    $version = byl_www_ship_yaycurrency_version();
+    return $version !== null && version_compare($version, '3.3.5', '>=');
+}
+
+/**
+ * LEGACY SOURCE-ONLY PROPOSAL. Never treat this as vendor Pro 3.2.1 UAT.
+ * A second explicit owner-reviewed sentinel is mandatory. Old versions do
+ * not inherit the >=3.3.5 path, and no handler is bootstrapped here.
+ */
+function byl_www_ship_legacy321_supported(): bool {
+    return defined('BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED')
+        && BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED === true
+        && byl_www_ship_yaycurrency_version() === '3.2.1'
+        && function_exists('get_option')
+        && get_option('woocommerce_currency', '') === 'USD'
+        && function_exists('has_filter')
+        && function_exists('apply_filters')
+        && has_filter('yay_currency_convert_price') !== false
+        && has_filter('yay_currency_revert_price') !== false
+        && byl_www_ship_effective_currency() !== null;
+}
+/**
+ * Converts BASE USD mandatory parcel charge exactly once, after the
+ * observed vendor package_rates priority-10 converter. Refuses unknown,
+ * nonnumeric, non-reversible or unexpected fee output; does NOT interpolate
+ * a rate or relabel USD $30 as £30/A$30. No WordPress writes.
+ */
+function byl_www_ship_legacy321_fee(float $baseUsd): ?float {
+    if (!byl_www_ship_legacy321_supported()
+        || !is_finite($baseUsd) || $baseUsd <= 0.0) {
+        return null;
+    }
+    try {
+        $converted = apply_filters('yay_currency_convert_price', $baseUsd);
+        if (!is_numeric($converted) || !is_finite((float)$converted)
+            || (float)$converted <= 0.0) {
+            return null;
+        }
+        $localFee = round((float)$converted, 2);
+        $reverted = apply_filters('yay_currency_revert_price', $localFee);
+        if (!is_numeric($reverted) || !is_finite((float)$reverted)
+            || abs((float)$reverted - $baseUsd) > max(0.05, $baseUsd * 0.005)) {
+            return null;
+        }
+        return $localFee;
+    } catch (Throwable $error) {
+        return null;
+    }
 }
 function byl_www_ship_currency_ok(): bool {
-    return defined('BYL_WWW_SHIPPING_V1_FX_REVIEWED')
-        && BYL_WWW_SHIPPING_V1_FX_REVIEWED === true
-        && byl_www_ship_yaycurrency_prerequisite()
-        && function_exists('get_woocommerce_currency')
-        && get_woocommerce_currency() === 'USD'
+    if (!defined('BYL_WWW_SHIPPING_V1_FX_REVIEWED')
+        || BYL_WWW_SHIPPING_V1_FX_REVIEWED !== true
+        || !function_exists('get_woocommerce_currency')
+        || get_woocommerce_currency() !== 'USD') {
+        return false;
+    }
+    if (byl_www_ship_legacy321_supported()) {
+        // Conversion is required for all five currencies, including USD.
+        return byl_www_ship_legacy321_fee(30.0) !== null;
+    }
+    return byl_www_ship_yaycurrency_prerequisite()
         && byl_www_ship_effective_currency() === 'USD';
 }
 
@@ -313,6 +367,12 @@ function byl_www_ship_runtime_fingerprint(): string {
         'base_currency' => function_exists('get_woocommerce_currency')
             ? get_woocommerce_currency() : null,
         'effective_currency' => byl_www_ship_effective_currency(),
+        'yaycurrency_pro_version' => byl_www_ship_yaycurrency_version(),
+        'legacy321_reviewed' => defined('BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED')
+            && BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED === true,
+        // Currency/rate changes invalidate Woo's cached rate hash.
+        'legacy321_usd30_local' => byl_www_ship_legacy321_supported()
+            ? byl_www_ship_legacy321_fee(30.0) : null,
         'special_class_products' => byl_www_ship_class_membership(),
         'zones' => [],
     ];
@@ -487,6 +547,19 @@ function byl_www_ship_rates(array $rates, array $package): array {
     }
     $zone = $ledger[$zoneId];
     if ($kind === 'ordinary') {
+        // On the legacy multi-FX route reject native flat amounts that
+        // YayCurrency 3.2.1 failed to convert (notably Zone3 Order type).
+        if (byl_www_ship_legacy321_supported()
+            && isset($zone['flat_id'])) {
+            $flatKey = 'flat_rate:' . $zone['flat_id'];
+            $nativeFlat = $rates[$flatKey] ?? null;
+            $expected = byl_www_ship_legacy321_fee((float)$zone['flat_cost']);
+            if ($expected === null || !is_object($nativeFlat)
+                || !method_exists($nativeFlat, 'get_cost')
+                || abs((float)$nativeFlat->get_cost() - $expected) > 0.051) {
+                return []; // Never assume buggy native Order/class FX is correct.
+            }
+        }
         $sum = byl_www_ship_subtotal($contents);
         if ($sum + 0.000001 >= (float)$zone['minimum']) {
             return $rates; // Never invent a Free rate; Woo decides eligibility.
@@ -511,6 +584,11 @@ function byl_www_ship_rates(array $rates, array $package): array {
         ? 30.0 * max(0, (int)($package['byl_www_ship_pillow_qty'] ?? 0))
         : 30.0;
     if ($fee <= 0) { return []; }
+    if (byl_www_ship_legacy321_supported()) {
+        $convertedFee = byl_www_ship_legacy321_fee($fee);
+        if ($convertedFee === null) { return []; }
+        $fee = $convertedFee;
+    }
     if (isset($zone['flat_id'])) {
         $key = 'flat_rate:' . $zone['flat_id'];
         $raw = $rates[$key] ?? null;
