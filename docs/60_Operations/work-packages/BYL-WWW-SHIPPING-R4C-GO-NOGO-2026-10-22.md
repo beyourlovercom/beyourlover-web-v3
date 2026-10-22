@@ -1,6 +1,6 @@
 # BYL Shipping R4-C — release evidence and production Go/No-Go (2026-10-22)
 
-**STATUS: NO-GO / HOLD.** This file is evidence-only. It is NOT an implementation, a release authorization, or a new visual-UAT requirement. No main merge, plugin install/upgrade, Dev/WWW deploy, WWW SSH, real order/payment/mail changes, or READY-device restart.
+**STATUS: NO-GO / HOLD for real multi-currency testing, NOT for subscription renewal.** The owner confirmed there will be **no YayCurrency Pro renewal or newer Pro package**. Continue using the already installed official Pro v3.2.1 and investigate a version-compatible adapter. This file is evidence-only. It is NOT an implementation, a release authorization, or a new visual-UAT requirement. No main merge, plugin install/upgrade, Dev/WWW deploy, WWW SSH, real order/payment/mail changes, or READY-device restart.
 
 ## 1. Frozen owner contract (do not regress)
 
@@ -50,7 +50,7 @@ The legacy `shipping_class=1939` surcharge + flat base is **NOT** the owner-appr
 | Work package | Result | Remaining condition |
 |---|---|---|
 | R4-C1 fresh HEAD/CI/stack audit | **PASS** source metadata checked | Re-read HEAD if branches move |
-| R4-C2 trusted Pro ≥3.3.5, entitlement, Dev-only installation | **BLOCKED / NO-GO** | Vendor-origin authenticated package and separate Dev-only authorization; prior third-party ZIP must never be installed |
+| R4-C2 legacy Pro 3.2.1 compatibility (no renewal) | **PIVOT ACCEPTED; VERSION GATE REQUIRES REWORK** | Existing WWW Pro 3.2.1 is baseline. Inspect its documented/read-only conversion behaviour and safely test a compatibility adapter; no new Pro ZIP or subscription required |
 | R4-C3 FX hook ordering, taxes, Order-type, cache, coupons | **SOURCE REVIEW PASS; RUNTIME UNVERIFIED** | Legitimate Pro plugin path, selected-currency rate/fee/tax and invalidation tests in isolated Dev |
 | R4-C4 Checkout #142 min-diff source reconciliation | **ISOLATED OVERLAY PASS; INTEGRATION HOLD** | Checkout owner branch conflict resolution and full exact-head hosted CI; never wholesale replace Checkout |
 | R4-C5 production rollout plan, rollback | **NO-GO recorded** | All dynamic gates first; independent exact-head main and WWW release approval required |
@@ -63,11 +63,22 @@ For every applicable zone, cover ordinary merchandise just under/at the local di
 
 ## 6. Release + rollback sequence (requires new independent owner approvals)
 
-1. Authenticate official vendor package provenance and license entitlement; authorize **Dev-only** plugin test in an isolated environment. Retain prior Dev plugin-version snapshot and restoration method.
-2. Close five-currency actual Woo-rate/tax/Checkout gates, including Zone3 `order`, Woo cache/selection, Andy Commerce BYL49 exact behavior, and Checkout #142 integration. Document every unsatisfied check as UNVERIFIED/NO-GO.
+1. Use **existing legally installed YayCurrency Pro 3.2.1** as the compatibility target. Gather non-mutating runtime evidence through authorized WordPress admin GUI / existing source, and use an isolated equivalent test fixture where legally available. No renewal, newer Pro ZIP or production plugin update requested. Any Dev copy/install of Pro is a separate permission/licensing gate.
+2. Refactor the **candidate's hardcoded `>=3.3.5` floor** only in an independently tested source-only branch to a narrowly reviewed **3.2.1 capability + hook-integrity + exact shipping-behaviour contract**. The existing 3.2.1 cannot be presumed safe by merely changing a version string. Use documented legacy `yay_currency_convert_price` / `yay_currency_rate` hooks only after demonstrating actual availability, conversion exactly once, and Woo tax/coupon/zone parity. Close five-currency actual Woo-rate/tax/Checkout gates including Zone3 `order`, Woo cache/selection, Andy Commerce BYL49 and Checkout #142. Mark unavailable checks UNVERIFIED/NO-GO rather than demanding new Pro purchases.
 3. Re-read all exact HEADs and CI; separately request an **exact-head GitHub main merge authorization**. **No merge is implicitly approved by this audit.**
 4. Prepare WWW **WordPress admin** read-only snapshot of every enabled instance, zone order/location, current plugin/theme build, settings digests, currency behavior and source backups. **Never use WWW SSH**.
 5. Request separate explicit **WWW release authorization** before any production admin save, activation, plugin upgrade, theme deploy or shipping method change; then perform safeguarded fee/tax/Checkout UAT and final Owner mobile review only if user-visible changes require it.
 6. Roll back only the production changes actually made: first turn OFF newly armed shipping (if independently authorized), verify Woo real rates, then restore reviewed instance/config/build snapshots through approved release controls; never overwrite WWW from Dev snapshots.
 
 **Stop at final Owner gate. R1–R3 Owner PASS remains valid. Current decision: HOLD.**
+
+
+## 7. Owner correction — no paid-plugin renewal dependency (2026-10-22)
+
+Owner explicitly cannot supply an upgraded Pro package and does not plan to renew. **Do not request payment or make a newer Pro binary the only path to shipping R4-C.** R4-C2 is now a **compatibility engineering issue**, with existing production YayCurrency Pro **3.2.1** as the reference runtime. The previous ≥3.3.5 floor was a deliberately conservative *candidate* precondition, not an inherent WooCommerce requirement, and remains active in the unpublished #156 candidate until safely revised and tested.
+
+The official YayCurrency WordPress.org release history states `yay_currency_convert_price` / `yay_currency_revert_price` hooks were introduced by v3.1.0; official documentation also identifies `yay_currency_rate`. Later v3.3.3 / v3.3.4 releases repaired separate shipping-class / Order-mode cases. These facts support a **possible** old-version compatibility adapter, **not proof** Pro 3.2.1's live Cart/Checkout behavior is correct. The candidate late rate hook at 100200 must apply native conversion to USD-base exceptional shipping **exactly once**, without currency mismatch, waived fees, bad threshold, or wrong tax, and must fail closed on any uncertainty.
+
+**Safe order:** (1) read-only existing WWW configured-currency and selected-rate behavior, no Save or SSH; (2) static/mock legacy-hook adapter and native Woo threshold/coupon regression; (3) real isolated runtime UAT only when authorized and legally available; (4) Checkout #142 conflict reconciliation; (5) separate exact-head main / WWW approvals. No action on subscriptions, credentials, payment records or WWW files. Remote DC quota currently exhausted; no attempts to bypass it. If runtime cannot be demonstrated, keep final activation HOLD **because of missing test evidence**, not because Owner declined a subscription.
+
+Official upstream references: https://wordpress.org/plugins/yaycurrency/ and https://docs.yaycommerce.com/yaycurrency/configurations/developer-zone/available-yaycurrency-hooks and https://docs.yaycommerce.com/yaycurrency/other-links/changelog.
