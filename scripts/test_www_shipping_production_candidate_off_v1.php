@@ -125,7 +125,7 @@ require __DIR__ . '/release-candidates/www-shipping-production-candidate-v1.php'
 function config_fixture(): array {
     $spec=[
         // Exact IDs were read from the authenticated WWW Woo admin.
-        // Zone0 "either" rule is tested separately as a strict NO-GO.
+        // Actual WWW Zone0 "either" rule is preserved for valid free coupons.
         0=>['free'=>1,'flat'=>3,'min'=>69.0,'cost'=>20.0],
         1=>['free'=>2,'min'=>0.0],
         3=>['free'=>6,'flat'=>5,'min'=>169.0,'cost'=>30.0],
@@ -134,16 +134,17 @@ function config_fixture(): array {
     ];
     $ledger=[];
     foreach ($spec as $zone=>$data) {
-        $free=$zone===1
-            ? ['requires'=>'no','min_amount'=>'','ignore_discounts'=>'no']
-            : ['requires'=>'min_amount','min_amount'=>(string)$data['min'],
-               'ignore_discounts'=>'no'];
+        $required = $zone===1 ? 'no' : ($zone===0 ? 'either' : 'min_amount');
+        $free=['requires'=>$required,
+            'min_amount'=>$zone===1 ? '' : (string)$data['min'],
+            'ignore_discounts'=>'no'];
         $GLOBALS['options']['woocommerce_free_shipping_'.$data['free'].'_settings']=$free;
         $GLOBALS['zoneMethods'][$zone] = [new ShippingMethodStub('free_shipping',$data['free'])];
         $entry=['free_id'=>$data['free'],
             'free_digest'=>byl_www_ship_settings_digest($free),
             'minimum'=>$data['min'],
-            'before_discount'=>false];
+            'before_discount'=>false,
+            'free_requirement'=>$required];
         if (isset($data['flat'])) {
             // Exact known WWW admin class fees are deliberately *not*
             // final special charge: Zone0 has base20+class30.
@@ -362,17 +363,49 @@ check_prod(byl_www_ship_rates($base,$normal)===[],
     'drift never permits base Woo free method');
 $GLOBALS['options'][$flatKey]['class_cost_1939']='20';
 check_prod(byl_www_ship_gate(),'known settings restored by local stub');
-// WWW native Zone0 Free #1 is actually "either" (amount OR coupon),
- // NOT the Dev mock's "min_amount"; contract MUST fail closed until the
- // BYL49/free-coupon exception is independently reviewed. No silent toggle.
+// Actual WWW Zone0 Free #1 is "either": honor only a genuine Woo
+// valid free-shipping coupon, and only on a regular-item package.
 $zone0Free='woocommerce_free_shipping_1_settings';
-$GLOBALS['options'][$zone0Free]['requires']='either';
-check_prod(!byl_www_ship_gate(),
-    'real WWW Zone0 either coupon OR amount is explicitly NO-GO');
-check_prod(byl_www_ship_rates($base,$specialPkg)===[],
-    'unexpected coupon OR amount cannot bypass special freight');
+$zone0Low=byl_www_ship_packages([mk_package(0,['normal'=>mk_item(37763,68.99)])])[0];
+$zone0LowRates=mk_rates(0,$ledger);
+check_prod(byl_www_ship_gate(),
+    'actual native Woo Zone0 either setting matches the reviewed ledger');
+check_prod(!isset(byl_www_ship_rates($zone0LowRates,$zone0Low)['free_shipping:1']),
+    'Zone0 regular USD68.99 with no true free coupon still owes Flat USD20');
+$GLOBALS['coupons']=['BYL49'];
+check_prod(!isset(byl_www_ship_rates($zone0LowRates,$zone0Low)['free_shipping:1']),
+    'plain BYL49 text alone cannot waive Zone0 ordinary shipping');
+$GLOBALS['nativeFreeCouponObjects']=['SAMPLE'=>new NativeWooCouponStub(true,false)];
+check_prod(!isset(byl_www_ship_rates($zone0LowRates,$zone0Low)['free_shipping:1']),
+    'valid discount-only Woo coupon does not qualify for free shipping');
+$GLOBALS['nativeFreeCouponObjects']=['SAMPLE'=>new NativeWooCouponStub(false,true)];
+check_prod(!isset(byl_www_ship_rates($zone0LowRates,$zone0Low)['free_shipping:1']),
+    'invalid free-marked Woo coupon cannot qualify for free shipping');
+$GLOBALS['nativeFreeCouponObjects']=['VALID-FREE'=>new NativeWooCouponStub(true,true)];
+check_prod(isset(byl_www_ship_rates($zone0LowRates,$zone0Low)['free_shipping:1']),
+    'native valid free-shipping coupon preserves ordinary Zone0 free method');
+$zone0Mix=byl_www_ship_packages([mk_package(0,[
+    'regular'=>mk_item(37763,20),
+    'special'=>mk_item(9153,179),
+    'pillow'=>mk_item(38047,118,2)
+])]);
+$zone0FreeTotal=0.0;
+foreach ($zone0Mix as $part) {
+    $one=byl_www_ship_rates(mk_rates(0,$ledger),$part);
+    check_prod(count($one) === 1, 'Zone0 free coupon leaves one eligible rate per split package');
+    $zone0FreeTotal+=reset($one)->get_cost();
+}
+check_prod($zone0FreeTotal===90.0,
+    'valid Woo free coupon waives regular freight only; specials30 and 2 pillows60 remain paid');
+$GLOBALS['nativeFreeCouponObjects']=[];
+$GLOBALS['coupons']=[];
 $GLOBALS['options'][$zone0Free]['requires']='min_amount';
-check_prod(byl_www_ship_gate(),'reviewed strict-minimum mock restored');
+check_prod(!byl_www_ship_gate(),
+    'changing native Zone0 either to min_amount without new ledger is forbidden');
+check_prod(byl_www_ship_rates(mk_rates(0,$ledger),$zone0Low)===[],
+    'unexpected Zone0 requirement drift is fail-closed');
+$GLOBALS['options'][$zone0Free]['requires']='either';
+check_prod(byl_www_ship_gate(),'reviewed native WWW Zone0 either requirement restored');
 $beforeZoneMove = byl_www_ship_packages([
     mk_package(5,['red'=>mk_item(9153,179)])
 ])[0]['byl_www_ship_runtime_marker'];
