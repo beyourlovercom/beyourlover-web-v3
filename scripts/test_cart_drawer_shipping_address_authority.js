@@ -11,7 +11,9 @@ const savedAddress={country:'US',state:'CA',city:'Los Angeles',postcode:'90001',
 function el(){
  return {hidden:false,textContent:'',innerHTML:'',dataset:{},style:{},children:[],
   attrs:{},classList:{add(){},remove(){},toggle(){}},setAttribute(k,v){this.attrs[k]=v;},
-  removeAttribute(k){delete this.attrs[k]},appendChild(x){this.children.push(x)},
+  removeAttribute(k){delete this.attrs[k]},
+  replaceChildren(...nodes){this.children=nodes;this.textContent=nodes.map(x=>x.textContent||'').join('');},
+  appendChild(x){this.children.push(x);this.textContent+=(x.textContent||'');},
   getClientRects(){return [1]},addEventListener(){},querySelector(){return null},
   querySelectorAll(){return []},focus(){}};
 }
@@ -71,20 +73,20 @@ async function run(label,payload,expected){
  assert.ok(totals.includes('$254.00'),label+' subtotal stays visible');
  assert.ok(totals.includes(expected.shipping),label+' shipping amount');
  assert.ok(totals.includes(expected.total),label+' Woo numeric total');
- if(expected.noticeEnabled===false){
-  assert.ok(!totals.includes('byl-drawer__charges-notice'),label+' notice disabled');
- }else if(expected.noticeText){
-  assert.ok(totals.includes('Custom duties note'),label+' custom option text displayed');
-  assert.ok(!totals.includes('<b>'),label+' unsafe admin formatting escaped');
- }else{
-  assert.ok(totals.includes('import duties and local taxes'),label+' default notice displayed');
- }
- if(provisional){
-  assert.match(delivery,/Estimated shipping shown/,label+' warn rather than promise free shipping');
-  assert.ok(!delivery.includes('Free shipping confirmed'),label+' no false free award');
-  assert.ok(totals.includes('Order total (estimated)'),label+' total is clearly estimated');
- }else{
-  assert.ok(totals.includes('Order total'),label+' Woo confirmed amount');
+ // Owner replaced the long duties/coupon shipping banners with a single
+ // linked headline; the actual provisional/confirmed Woo amount remains in
+ // the numeric totals row independently.
+ assert.ok(!totals.includes('byl-drawer__charges-notice'),
+   label+' no duplicate notices, even if previous admin copy was enabled');
+ assert.equal(delivery,'Free shipping from $69 (special items excluded)',
+   label+' policy headline never changes with estimated/selected rates');
+ assert.equal(nodes['[data-drawer-delivery]'].children[0]?.href,'/free-shipping/',
+   label+' whole headline links to full country shipping policy');
+ if (provisional) {
+   assert.ok(totals.includes('Order total (estimated)'),
+     label+' provisional Woo totals remain explicitly estimated');
+ } else {
+   assert.ok(totals.includes('Order total'),label+' Woo confirmed amount');
  }
  assert.equal(nodes['[data-drawer-marketing-slots]'].hidden,true,'promotions OFF');
 }
@@ -99,5 +101,5 @@ async function run(label,payload,expected){
  await run('address saved but no selected shipping rate',noRate,{confirmed:false,shipping:'$10.00',total:'$264.00'});
  await run('Admin can disable standalone notice',cart(emptyAddress),{confirmed:false,shipping:'$10.00',total:'$264.00',noticeEnabled:false});
  await run('Admin text is escaped on Cart',cart(emptyAddress),{confirmed:false,shipping:'$10.00',total:'$264.00',noticeText:'<b>Custom duties note</b>'});
- console.log('CART_DEFAULT_10_USD_ESTIMATE_WITH_NOTICE_PASS_9; REAL_ORDER_WRITES=0');
+ console.log('CART_DEFAULT_10_USD_ESTIMATE_WITH_ONE_LINE_POLICY_PASS_9; REAL_ORDER_WRITES=0');
 })().catch(e=>{console.error(e.stack||e);process.exitCode=1});
