@@ -117,6 +117,18 @@ add_action('woocommerce_review_order_after_shipping', static function (): void {
         if (!is_array($package) || empty($package['destination']['country'])) {
             continue;
         }
+        // Future WWW special and PILLOW packages are mandatory paid
+        // shipments. The disabled "Free shipping available from $X" card
+        // belongs only to ordinary merchandise; it must never be shown next
+        // to a $30 exceptional shipment or $30-per-unit PILLOW package.
+        // This is presentation-only; actual Woo rates/totals are untouched.
+        // On existing Dev/WWW installations without the new kind marker,
+        // this branch stays behaviorally identical.
+        if (in_array((string)($package['byl_www_ship_kind'] ?? ''),
+            ['special', 'pillow'], true)) {
+            continue;
+        }
+
         // Dev-only PILLOW package always charges $30 per item. Showing an
         // amount-gated Free Shipping placeholder here would promise a method
         // that Woo never offers for this specific oversized package.
