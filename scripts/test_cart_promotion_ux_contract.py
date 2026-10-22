@@ -61,10 +61,10 @@ if "cart.js" in product_branch or "cart.css" in product_branch:
 
 for marker in (
     "extensions['byl-shipping-promotion']",
-    "Free shipping applied",
-    "Free shipping on orders over ",
-    "thresholdCurrency(data.threshold)",
-    "Add ",
+    "Free shipping from $69 (special items excluded)",
+    "href=\"/free-shipping/\"",
+    "var shippingHeadline",
+    "nativeCart()",
     "data-byl-native-promotion",
     "nativeCart()",
     "Free shipping available",

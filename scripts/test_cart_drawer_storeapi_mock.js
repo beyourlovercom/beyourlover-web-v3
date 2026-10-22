@@ -14,7 +14,9 @@ const events = {};
 function domElement() {
   return {
     hidden: false, value: '', textContent: '', innerHTML: '', dataset: {},
-    attrs: {},
+    attrs: {}, children: [],
+    replaceChildren(...nodes){ this.children=nodes;this.textContent=nodes.map(x=>x.textContent||'').join(''); },
+    appendChild(node){ this.children.push(node);this.textContent+=(node.textContent||'');return node; },
     classList: {add(){}, remove(){}, toggle(){}, contains(){return false;}},
     setAttribute(k,v){this.attrs[k]=v;},
     removeAttribute(k){delete this.attrs[k];},
@@ -46,6 +48,7 @@ function fixture(href='https://dev.example.invalid/?byl_cart_drawer_preview=1') 
     activeElement:domElement(),
     documentElement:domElement(),
     querySelector:selector=>selector==='[data-byl-cart-drawer]'?root:null,
+    createElement:tag=>{const node=domElement();node.tagName=tag.toUpperCase();return node;},
     querySelectorAll:()=>[],
     addEventListener:(kind,fn)=>{events['document.'+kind]=fn;}
   };
@@ -119,8 +122,11 @@ async function main() {
   assert.ok(el['[data-drawer-items]'].innerHTML.includes('https://dev.example.invalid/cart/'),'unsafe href falls back to cart URL');
   assert.equal(el['[data-drawer-footer-total]'].textContent,'$59.99','the server Woo total remains a numeric estimate');
   assert.ok(el['[data-drawer-totals]'].innerHTML.includes('$59.99'),'the Woo-authoritative item subtotal stays visible');
-  assert.match(el['[data-drawer-delivery]'].textContent,/Estimated shipping shown/,
-    'no fabricated free shipping when Woo returns no rates');
+  assert.equal(el['[data-drawer-delivery]'].textContent,
+    'Free shipping from $69 (special items excluded)',
+    'one destination-policy hint even when Woo shipping is not yet calculated');
+  assert.equal(el['[data-drawer-delivery]'].children[0].href,'/free-shipping/',
+    'entire shipping sentence links to country rules');
   server.shipping_address={country:'US',state:'CA',postcode:'90001',city:'Los Angeles',address_1:'123 Test Street'};
   server.has_calculated_shipping=true;
   server.shipping_rates=[{shipping_rates:[
@@ -128,13 +134,15 @@ async function main() {
     {rate_id:'free_shipping:2',selected:true}
   ]}];
   await window.BYL_Cart_Drawer_Preview.refresh();
-  assert.match(el['[data-drawer-delivery]'].textContent,/Free shipping confirmed/,
-    'free shipping claim only after selected Woo confirmed free rate');
+  assert.equal(el['[data-drawer-delivery]'].textContent,
+    'Free shipping from $69 (special items excluded)',
+    'even selected free rate does not add another marketing claim');
   server.shipping_rates[0].shipping_rates[0].selected=true;
   server.shipping_rates[0].shipping_rates[1].selected=false;
   await window.BYL_Cart_Drawer_Preview.refresh();
-  assert.match(el['[data-drawer-delivery]'].textContent,/Free shipping available/,
-    'eligible but non-selected free shipping rate must not claim applied');
+  assert.equal(el['[data-drawer-delivery]'].textContent,
+    'Free shipping from $69 (special items excluded)',
+    'paid selected rate never adds an inaccurate marketing promise');
   server.shipping_rates=[];
   await window.BYL_Cart_Drawer_Preview.refresh();
 

@@ -68,25 +68,18 @@
     }
 
     function render(data) {
-        if (!root || !data || !data.active) {
-            if (root) root.innerHTML = '';
+        if (!root) return;
+        // The free-shipping headline is a static pointer to the full
+        // destination policy, never a promise about this cart's actual rate.
+        var shippingHeadline = '<p class="byl-cart-promotion__message">' +
+            '<a href="/free-shipping/">Free shipping from $69 (special items excluded)</a></p>';
+        if (!data || !data.active) {
+            root.innerHTML = shippingHeadline;
             document.body.classList.remove('byl-cart-coupon-enhanced');
-            return;
+            return; // Leave native Woo coupons visible when promo API is off.
         }
         var applied = data.has_code && data.applied_code;
-        var html = '';
-        if (data.state !== 'shipping_unavailable' && data.threshold > 0) {
-            html += '<p class="byl-cart-promotion__threshold">Free shipping on orders over ' + thresholdCurrency(data.threshold) + '</p>';
-        }
-        var celebrated = ['automatic_unlocked', 'require_code_unlocked', 'free_shipping_available'].indexOf(data.state) !== -1;
-        html += '<p class="byl-cart-promotion__message' + (celebrated ? ' byl-cart-promotion__message--celebrate' : '') + '" aria-live="polite">' + messageFor(data) + '</p>';
-        if (data.state === 'free_shipping_available') html += '<p class="byl-cart-promotion__delivery-note">Select Free Shipping under Shipping above to apply it to your order.</p>';
-        if (data.state === 'automatic_unlocked' || data.state === 'require_code_unlocked') html += '<p class="byl-cart-promotion__delivery-note">Free shipping applied to your order.</p>';
-        if (data.state === 'require_code_available') html += '<p class="byl-cart-promotion__hint">Use code ' + escapeHtml(data.policy_code) + '</p>';
-        if (data.state === 'below_threshold') {
-            var progress = data.threshold > 0 ? Math.min(100, Math.max(0, (data.subtotal / data.threshold) * 100)) : 0;
-            html += '<div class="byl-cart-promotion__meter" role="progressbar" aria-label="Progress toward free shipping" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + progress.toFixed(0) + '"><span style="width:' + progress.toFixed(2) + '%"></span></div>';
-        }
+        var html = shippingHeadline;
         // One predictable Coupon Code entry point, regardless of free-shipping or applied-code state.
         html += '<form class="byl-cart-promotion__form"><label for="byl-promotion-code">Promo / Coupon Code</label><div class="byl-cart-promotion__inputs"><input id="byl-promotion-code" name="code" type="text" autocomplete="off" placeholder="Enter coupon code" required><button type="submit"' + (busy ? ' disabled' : '') + '>Apply</button></div></form>';
         if (applied) html += '<p class="byl-cart-promotion__applied">' + escapeHtml(data.applied_code) + ' applied <button type="button" class="byl-cart-promotion__remove">Remove</button></p>';
