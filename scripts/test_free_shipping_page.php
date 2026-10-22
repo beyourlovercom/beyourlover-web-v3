@@ -177,6 +177,7 @@ check(byl_v3_fs_destination_policy('US','AK')['threshold']===129.0, 'Alaska 129 
 check(byl_v3_fs_destination_policy('AE')['threshold']===69.0, 'UAE actual Asia priority overrides configured 129 zone');
 check(byl_v3_fs_destination_policy('MX')['threshold']===129.0, 'Mexico 129 minimum');
 check(byl_v3_fs_destination_policy('RU')['threshold']===169.0, 'Russia 169 minimum');
+$GLOBALS['case']='below';
 check(byl_v3_fs_destination_policy('DE')['threshold']===69.0, 'Germany Zone0 actual native Woo free minimum69');
 check(byl_v3_fs_destination_policy('DE')['base_flat_cost']===20.0, 'Germany Zone0 actual flat base20');
 check(byl_v3_fs_destination_policy('DE')['basis']==='after_coupon', 'Zone0 after-coupon basis');
