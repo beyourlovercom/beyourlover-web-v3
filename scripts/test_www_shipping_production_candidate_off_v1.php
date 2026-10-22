@@ -65,8 +65,34 @@ function get_woocommerce_currency(): string { return $GLOBALS['currency']; }
 function byl_www_shipping_v1_verified_checkout_currency(): string {
     return $GLOBALS['effective_currency'];
 }
+function byl_www_shipping_v1_verified_legacy_vendor_currency(): ?string {
+    return $GLOBALS['vendor_currency'] ?? null;
+}
 function add_filter(string $name, $callable, int $priority, int $args): void {
     $GLOBALS['hooks'][$name] = [$callable, $priority, $args];
+}
+// Synthetic vendor filters ONLY; these do not contain any commercial
+// plugin code, live exchange rates or site/customer data.
+function has_filter(string $name) {
+    return $GLOBALS['mockFxHooks'][$name] ?? false;
+}
+function apply_filters(string $name, $value) {
+    if (($GLOBALS['mockFxThrows'] ?? false) === true) {
+        throw new RuntimeException('synthetic conversion failed');
+    }
+    if (($GLOBALS['mockFxInvalid'] ?? false) === true) {
+        return 'not-a-number';
+    }
+    $factor = (float)($GLOBALS['mockFxRate'] ?? 1.0);
+    if ($name === 'yay_currency_convert_price') {
+        return round((float)$value * $factor, 4);
+    }
+    if ($name === 'yay_currency_revert_price') {
+        return $factor > 0.0
+            ? ((float)$value / $factor) * (float)($GLOBALS['mockRevertDrift'] ?? 1.0)
+            : null;
+    }
+    return $value;
 }
 class ShippingZoneStub {
     public function __construct(private int $id) {}
@@ -538,6 +564,118 @@ $GLOBALS['site']='www.beyourlover.com';
 $GLOBALS['environment']='staging';
 check_prod(!byl_www_ship_armed(),'WWW must be production environment');
 $GLOBALS['environment']='production';
+
+// The next block is OFF-by-default compatibility PROPOSAL for legacy Pro
+// 3.2.1. It does not prove actual vendor hook order or currency behavior.
+$GLOBALS['mockYayVersion']='3.2.1';
+$GLOBALS['options']['woocommerce_currency']='USD';
+$GLOBALS['mockFxRate']=0.80;
+$GLOBALS['effective_currency']='GBP';
+$GLOBALS['vendor_currency']='GBP';
+check_prod(!byl_www_ship_legacy321_supported(),
+    'legacy cannot run without separate Owner-reviewed compatibility switch');
+define('BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED', true);
+check_prod(!byl_www_ship_currency_ok(),
+    'legacy cannot run without both vendor conversion and revert hooks');
+$GLOBALS['mockFxHooks']=[
+    'yay_currency_convert_price'=>10,
+    'yay_currency_revert_price'=>10,
+];
+check_prod(byl_www_ship_legacy321_supported(),
+    'explicit legacy switch and synthetic vendor hooks/currency can pass preflight');
+$GLOBALS['vendor_currency']='EUR';
+check_prod(!byl_www_ship_currency_ok(),
+    'GBP display with EUR vendor engine is a hard stop even with roundtrip');
+$GLOBALS['vendor_currency']='GBP';
+check_prod(byl_www_ship_currency_ok(),
+    'legacy GBP mock requires verified round-trip before any shipping rate');
+check_prod(abs((float)byl_www_ship_legacy321_fee(30.0)-24.0)<0.001,
+    'GBP mock $30 shipping converts exactly once to 24');
+$legacyPkg=byl_www_ship_packages([
+    mk_package(5,['red'=>mk_item(9153,179),'pillow'=>mk_item(38047,118,2),
+        'normal'=>mk_item(37763,20)])
+]);
+check_prod(count($legacyPkg)===3,
+    'legacy mixed cart isolates ordinary special and pillow');
+$legacyRates=mk_rates(5,$ledger);
+$legacyRates['flat_rate:10']->set_cost(8.0);
+foreach ($legacyPkg as $part) {
+    $charged=byl_www_ship_rates($legacyRates,$part);
+    $kind=$part['byl_www_ship_kind'];
+    if ($kind==='ordinary') {
+        check_prod(!isset($charged['free_shipping:9'])
+            && isset($charged['flat_rate:10'])
+            && abs($charged['flat_rate:10']->get_cost()-8.0)<0.001,
+            'legacy ordinary sub-threshold uses verified converted native flat');
+    } else {
+        $rate=reset($charged);
+        check_prod(is_object($rate)
+            && abs($rate->get_cost()-($kind==='special'?24.0:48.0))<0.001,
+            "legacy GBP $30 special parcel versus two-unit $60 pillow");
+    }
+}
+$ordinaryPart=$legacyPkg[0];
+check_prod($ordinaryPart['byl_www_ship_kind']==='ordinary',
+    'package ordering preserved ordinary first');
+$unconverted=mk_rates(5,$ledger);
+check_prod(byl_www_ship_rates($unconverted,$ordinaryPart)===[],
+    'unconverted GBP native flat rejected instead of undercharging');
+$zone3Legacy=byl_www_ship_packages([
+    mk_package(3,['ordinary'=>mk_item(37763,80)])
+])[0];
+$zone3Rates=mk_rates(3,$ledger);
+check_prod(byl_www_ship_rates($zone3Rates,$zone3Legacy)===[],
+    'legacy Zone3 Order-type buggy native unconverted rate fails closed');
+$zone3Rates['flat_rate:5']->set_cost(24.0);
+$zone3Accepted=byl_www_ship_rates($zone3Rates,$zone3Legacy);
+check_prod(isset($zone3Accepted['flat_rate:5']),
+    'legacy Zone3 mock allows only matching native converted Order-type');
+$beforeFx=byl_www_ship_runtime_fingerprint();
+$GLOBALS['mockFxRate']=0.79;
+check_prod(byl_www_ship_runtime_fingerprint()!==$beforeFx,
+    'legacy vendor-rate changes invalidate Woo package cache fingerprint');
+foreach (['USD'=>1.0,'EUR'=>0.92,'GBP'=>0.79,'AUD'=>1.51,'CAD'=>1.35] as $code=>$factor) {
+    $GLOBALS['effective_currency']=$code;
+    $GLOBALS['vendor_currency']=$code;
+    $GLOBALS['mockFxRate']=$factor;
+    check_prod(byl_www_ship_currency_ok(),
+        "$code legacy fixture remains fail-closed unless converter roundtrip valid");
+    check_prod(abs((float)byl_www_ship_legacy321_fee(30)-round(30*$factor,2))<0.001,
+        "$code base USD 30 fixture exactly once");
+}
+$GLOBALS['mockRevertDrift']=1.10;
+check_prod(!byl_www_ship_currency_ok(),
+    'corrupt FX reverse mismatch blocks release');
+unset($GLOBALS['mockRevertDrift']);
+$GLOBALS['mockFxInvalid']=true;
+check_prod(!byl_www_ship_currency_ok(),
+    'nonnumeric vendor output blocks release');
+unset($GLOBALS['mockFxInvalid']);
+$GLOBALS['mockFxThrows']=true;
+check_prod(!byl_www_ship_currency_ok(),
+    'vendor exception blocks release without changing checkout total');
+unset($GLOBALS['mockFxThrows']);
+$GLOBALS['effective_currency']='JPY';
+check_prod(!byl_www_ship_currency_ok(),
+    'unknown selected currency never receives fabricated shipping');
+$GLOBALS['effective_currency']='USD';
+$GLOBALS['vendor_currency']='USD';
+$GLOBALS['mockFxRate']=1.0;
+$GLOBALS['mockYayVersion']='3.3.3';
+check_prod(!byl_www_ship_currency_ok(),
+    'legacy reviewed flag must not authorize untested Pro 3.3.3');
+$GLOBALS['mockYayVersion']='3.2.1';
+$GLOBALS['options']['woocommerce_currency']='EUR';
+check_prod(!byl_www_ship_currency_ok(),
+    'legacy cannot silently reinterpret non-USD Woo base');
+$GLOBALS['options']['woocommerce_currency']='USD';
+check_prod(byl_www_ship_currency_ok(),
+    'restoring exact 3.2.1 + USD base and trusted hook fixture passes mock');
+$GLOBALS['site']='dev.beyourlover.com';
+check_prod(!byl_www_ship_armed()
+    && byl_www_ship_rates($legacyRates,$legacyPkg[1])===$legacyRates,
+    'legacy candidate still inert on Dev even with synthetic valid FX');
+$GLOBALS['site']='www.beyourlover.com';
 $source=file_get_contents(dirname(__DIR__)
     .'/scripts/release-candidates/www-shipping-production-candidate-v1.php');
 foreach (['update_option(', 'delete_option(', 'wp_insert_post(',
