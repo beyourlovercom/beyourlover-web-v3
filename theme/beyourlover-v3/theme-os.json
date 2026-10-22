@@ -122,6 +122,7 @@
         "assets/js/cart-experience.js",
         "assets/js/cart.js",
         "inc/cart-drawer.php",
+        "inc/dev-pillow-oversized-shipping.php",
         "assets/css/cart-drawer.css",
         "assets/css/cart-empty-parity.css",
         "assets/js/cart-drawer.js"
