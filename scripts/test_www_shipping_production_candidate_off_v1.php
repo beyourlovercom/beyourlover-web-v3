@@ -12,6 +12,7 @@ $GLOBALS['options'] = ['byl_www_shipping_v1_enabled' => 'no'];
 $GLOBALS['hooks'] = [];
 $GLOBALS['assertions'] = 0;
 $GLOBALS['coupons'] = [];
+$GLOBALS['nativeFreeCouponObjects'] = [];
 
 function check_prod(bool $ok, string $name): void {
     ++$GLOBALS['assertions'];
@@ -106,8 +107,16 @@ class WC_Tax {
         return $GLOBALS['taxReturn'] ?? [];
     }
 }
+class NativeWooCouponStub {
+    public function __construct(
+        private bool $valid, private bool $freeShipping
+    ) {}
+    public function is_valid(): bool { return $this->valid; }
+    public function get_free_shipping(): bool { return $this->freeShipping; }
+}
 class ProdShippingCartStub {
     public function get_applied_coupons(): array { return $GLOBALS['coupons']; }
+    public function get_coupons(): array { return $GLOBALS['nativeFreeCouponObjects']; }
 }
 function WC(): object { return (object)['cart'=>new ProdShippingCartStub()]; }
 
@@ -282,8 +291,22 @@ $at69=byl_www_ship_packages([mk_package(5,['normal'=>mk_item(37763,69.0)])])[0];
 check_prod(isset(byl_www_ship_rates($base,$at69)['free_shipping:9']),
     'post-coupon exact USD69 retains original Woo free');
 $GLOBALS['coupons']=['BYL49'];
-check_prod(isset(byl_www_ship_rates($base,$normal)['free_shipping:9']),
-    'BYL49 special existing-code protection preserved');
+check_prod(!isset(byl_www_ship_rates($base,$normal)['free_shipping:9']),
+    'literal BYL49 text alone never overrides Woo native free shipping');
+check_prod(!byl_www_ship_valid_native_free_coupon(),
+    'plain BYL49 code without valid Woo coupon grants nothing');
+$GLOBALS['nativeFreeCouponObjects']=['BYL49'=>new NativeWooCouponStub(true,false)];
+check_prod(!byl_www_ship_valid_native_free_coupon(),
+    'valid normal discount coupon without free_shipping entitlement grants nothing');
+$GLOBALS['nativeFreeCouponObjects']=['GIFT'=>new NativeWooCouponStub(false,true)];
+check_prod(!byl_www_ship_valid_native_free_coupon(),
+    'invalid coupon marked free_shipping grants nothing');
+$GLOBALS['nativeFreeCouponObjects']=['NATIVEFREE'=>new NativeWooCouponStub(true,true)];
+check_prod(byl_www_ship_valid_native_free_coupon(),
+    'verified Woo native free shipping coupon recognized independently of text code');
+check_prod(!isset(byl_www_ship_rates($base,$normal)['free_shipping:9']),
+    'Zone5 minimum-only rule ignores coupon bypass even if coupon valid');
+$GLOBALS['nativeFreeCouponObjects']=[];
 $GLOBALS['coupons']=[];
 $unknown=mk_package(999,['red'=>mk_item(9153,179)]);
 $unknown[ 'byl_www_ship_kind' ]='special';
