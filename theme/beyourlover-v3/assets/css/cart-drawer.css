@@ -46,6 +46,9 @@ html.byl-drawer-open{overflow:hidden}
 .byl-drawer__feedback:not(:empty){padding:9px 10px;margin-bottom:10px;background:#f8f3f5}
 .byl-drawer__feedback.is-error{color:#a42037;background:#fff0f2}
 .byl-drawer__delivery{padding:12px 14px;margin:5px 0 15px;border-radius:7px;background:#f9eef2;color:#762d4b;font-size:12px;line-height:1.4}
+.byl-drawer__delivery a{color:inherit;font-weight:650;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.byl-drawer__delivery a:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+
 .byl-drawer__empty{text-align:center;padding:70px 16px 65px;border-bottom:1px solid var(--byl-drawer-line)}
 .byl-drawer__empty-icon{font-size:45px;font-weight:300;line-height:1.3;margin-bottom:9px}
 .byl-drawer__empty h3{font-size:21px;font-weight:700;margin:0 0 9px}
