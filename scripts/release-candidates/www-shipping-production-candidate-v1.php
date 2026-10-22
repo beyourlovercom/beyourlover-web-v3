@@ -258,9 +258,35 @@ function byl_www_ship_effective_currency(): ?string {
         && in_array($currency, ['USD', 'EUR', 'GBP', 'AUD', 'CAD'], true)
         ? $currency : null;
 }
+/**
+ * Verified WWW has YayCurrency Pro v3.2.1. Vendor later published shipping
+ * class fixes in v3.3.3 and shipping "Order" mode fixes in v3.3.4; Zone3
+ * uses Order. Treat <3.3.4 as an explicit release NO-GO, regardless of a
+ * future FX_REVIEWED flag. Version >=3.3.4 is only a prerequisite; it is
+ * NEVER sufficient proof of real EUR/GBP/AUD/CAD checkout correctness.
+ */
+function byl_www_ship_yaycurrency_prerequisite(): bool {
+    if (!defined('WP_PLUGIN_DIR')
+        || !function_exists('get_option')
+        || !function_exists('get_file_data')) {
+        return false;
+    }
+    $active = (array)get_option('active_plugins', []);
+    $path = 'yaycurrency-pro/yay-currency.php';
+    if (!in_array($path, $active, true)) {
+        return false;
+    }
+    $pluginFile = WP_PLUGIN_DIR . '/' . $path;
+    if (!is_file($pluginFile)) { return false; }
+    $header = get_file_data($pluginFile, ['Version'=>'Version'], 'plugin');
+    $version = is_array($header) ? ($header['Version'] ?? '') : '';
+    return is_string($version) && $version !== ''
+        && version_compare($version, '3.3.4', '>=');
+}
 function byl_www_ship_currency_ok(): bool {
     return defined('BYL_WWW_SHIPPING_V1_FX_REVIEWED')
         && BYL_WWW_SHIPPING_V1_FX_REVIEWED === true
+        && byl_www_ship_yaycurrency_prerequisite()
         && function_exists('get_woocommerce_currency')
         && get_woocommerce_currency() === 'USD'
         && byl_www_ship_effective_currency() === 'USD';
