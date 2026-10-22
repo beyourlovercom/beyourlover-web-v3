@@ -376,6 +376,30 @@ unset($GLOBALS['taxReturn']);
 $wrongRate=['free_shipping:9'=>$base['free_shipping:9']];
 check_prod(byl_www_ship_rates($wrongRate,$specialPkg)===[],
     'missing genuine flat instance cannot silently waive exception fee');
+// YayCurrency public 3.3.5 source registers its currency conversion
+// on Woo package rates at priority 10; WWW candidate's actual PHP
+// rate callback is priority 100200 (checked above). The later callback
+// MUST NOT replace an already-converted local currency amount with a
+// literal 30, so fail-closed is required until Pro FX order is verified.
+// These FX factors are synthetic regression fixtures, NOT live quotes.
+$syntheticRates=['EUR'=>0.93,'GBP'=>0.79,'AUD'=>1.54,'CAD'=>1.36];
+check_prod($GLOBALS['hooks']['woocommerce_package_rates'][1] > 10,
+    'FX-aware shipping release callback follows published YayCurrency priority10');
+foreach ($syntheticRates as $chosen => $illustrativeRate) {
+    $GLOBALS['effective_currency']=$chosen;
+    $hypotheticalConverted=mk_rates(5,$ledger);
+    $hypotheticalConverted['flat_rate:10']->set_cost(
+        round(10.0*$illustrativeRate,2)
+    );
+    check_prod($hypotheticalConverted['flat_rate:10']->get_cost()
+        !== $base['flat_rate:10']->get_cost(),
+        "$chosen vendor-first fixture has an already-converted local rate");
+    check_prod(byl_www_ship_rates($hypotheticalConverted,$specialPkg)===[],
+        "$chosen cannot get a late literal USD30 override after FX conversion");
+    check_prod(byl_www_ship_rates($hypotheticalConverted,$normal)===[],
+        "$chosen normal rates also require FX-reviewed bridge");
+}
+$GLOBALS['effective_currency']='USD';
 foreach (['GBP', 'EUR', 'AUD', 'CAD'] as $selectedCurrency) {
     $GLOBALS['effective_currency']=$selectedCurrency;
     check_prod(get_woocommerce_currency()==='USD'
