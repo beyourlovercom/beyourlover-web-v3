@@ -65,6 +65,9 @@ function get_woocommerce_currency(): string { return $GLOBALS['currency']; }
 function byl_www_shipping_v1_verified_checkout_currency(): string {
     return $GLOBALS['effective_currency'];
 }
+function byl_www_shipping_v1_verified_legacy_vendor_currency(): ?string {
+    return $GLOBALS['vendor_currency'] ?? null;
+}
 function add_filter(string $name, $callable, int $priority, int $args): void {
     $GLOBALS['hooks'][$name] = [$callable, $priority, $args];
 }
@@ -568,6 +571,7 @@ $GLOBALS['mockYayVersion']='3.2.1';
 $GLOBALS['options']['woocommerce_currency']='USD';
 $GLOBALS['mockFxRate']=0.80;
 $GLOBALS['effective_currency']='GBP';
+$GLOBALS['vendor_currency']='GBP';
 check_prod(!byl_www_ship_legacy321_supported(),
     'legacy cannot run without separate Owner-reviewed compatibility switch');
 define('BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED', true);
@@ -578,7 +582,11 @@ $GLOBALS['mockFxHooks']=[
     'yay_currency_revert_price'=>10,
 ];
 check_prod(byl_www_ship_legacy321_supported(),
-    'explicit legacy switch and two synthetic vendor hooks can pass preflight');
+    'explicit legacy switch and synthetic vendor hooks/currency can pass preflight');
+$GLOBALS['vendor_currency']='EUR';
+check_prod(!byl_www_ship_currency_ok(),
+    'GBP display with EUR vendor engine is a hard stop even with roundtrip');
+$GLOBALS['vendor_currency']='GBP';
 check_prod(byl_www_ship_currency_ok(),
     'legacy GBP mock requires verified round-trip before any shipping rate');
 check_prod(abs((float)byl_www_ship_legacy321_fee(30.0)-24.0)<0.001,
@@ -628,6 +636,7 @@ check_prod(byl_www_ship_runtime_fingerprint()!==$beforeFx,
     'legacy vendor-rate changes invalidate Woo package cache fingerprint');
 foreach (['USD'=>1.0,'EUR'=>0.92,'GBP'=>0.79,'AUD'=>1.51,'CAD'=>1.35] as $code=>$factor) {
     $GLOBALS['effective_currency']=$code;
+    $GLOBALS['vendor_currency']=$code;
     $GLOBALS['mockFxRate']=$factor;
     check_prod(byl_www_ship_currency_ok(),
         "$code legacy fixture remains fail-closed unless converter roundtrip valid");
@@ -650,6 +659,7 @@ $GLOBALS['effective_currency']='JPY';
 check_prod(!byl_www_ship_currency_ok(),
     'unknown selected currency never receives fabricated shipping');
 $GLOBALS['effective_currency']='USD';
+$GLOBALS['vendor_currency']='USD';
 $GLOBALS['mockFxRate']=1.0;
 $GLOBALS['mockYayVersion']='3.3.3';
 check_prod(!byl_www_ship_currency_ok(),
