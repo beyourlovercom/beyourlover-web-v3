@@ -51,6 +51,19 @@ The WooCommerce/Smart Coupons admin listing search `post_type=shop_coupon&s=BYL4
 - A current WordPress admin notice reports **YayCurrency Pro license expired** and requests renewal for updates; do NOT treat this as proof the currency-switching runtime is broken.
 - Current source-only candidate checks `get_woocommerce_currency() === 'USD'` — this is inadequate alone to verify the customer's YayCurrency selected/checkout currency. A separately reviewed effective-currency integration and FX conversion UAT across **EUR/GBP/AUD/CAD** is REQUIRED. Until proven, WWW enable is NO-GO. No plugin updates/license changes authorized.
 
+### Native WooCommerce Shipping settings (global options)
+
+Read-only GET of `WooCommerce → Settings → Shipping → Shipping settings`:
+
+| WP/Woo setting | WWW checked value |
+| --- | --- |
+| `woocommerce_enable_shipping_calc` — show Cart shipping calculator | **no** |
+| `woocommerce_shipping_cost_requires_address` — hide rates until address entered | **no** |
+| `woocommerce_shipping_hide_rates_when_free` — hide Flat rates if Free exists | **no** |
+| `woocommerce_shipping_debug_mode` — bypass shipping-rate cache | **no** |
+
+The Woo rate calculation cache is therefore normally active. The production candidate's **runtime-specific package SHA marker** is important: a Woo session can otherwise reuse a pre-release Free Shipping quote without invoking `woocommerce_package_rates` again. Woo core defines package-based cached rates in `WC_Shipping::calculate_shipping_for_package`, and recent Woo has a configurable package-hash ignored-fields hook. Future WWW runtime UAT must prove that the candidate's custom marker is not ignored by any installed theme/plugin integration, and that a change to shipping-zone settings/currency causes a new quoted rate without order creation.
+
 ## 5. Production-safe gates / next actions
 1. Preserve existing WWW settings; treat source ledger as **read-only**, not a request to save/change settings. No WWW SSH ever.
 2. Production candidate must fail closed on `either` rule conflict, or explicitly implement a separately reviewed free-coupon exception; DO NOT silently waive fees for the 3 special SKUs or PILLOW.
