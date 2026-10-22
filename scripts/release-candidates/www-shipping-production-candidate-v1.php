@@ -292,6 +292,21 @@ function byl_www_ship_yaycurrency_prerequisite(): bool {
  * A second explicit owner-reviewed sentinel is mandatory. Old versions do
  * not inherit the >=3.3.5 path, and no handler is bootstrapped here.
  */
+function byl_www_ship_legacy321_vendor_currency_ok(): bool {
+    // A self-consistent USD passthrough could fake a successful roundtrip
+    // while the UI labels the amount GBP/EUR. Require independent vendor
+    // effective-currency evidence from future *audited* Pro 3.2.1 bridge.
+    if (!function_exists('byl_www_shipping_v1_verified_legacy_vendor_currency')) {
+        return false;
+    }
+    try {
+        $vendorCurrency = byl_www_shipping_v1_verified_legacy_vendor_currency();
+    } catch (Throwable $error) {
+        return false;
+    }
+    return is_string($vendorCurrency)
+        && $vendorCurrency === byl_www_ship_effective_currency();
+}
 function byl_www_ship_legacy321_supported(): bool {
     return defined('BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED')
         && BYL_WWW_SHIPPING_V1_LEGACY_321_REVIEWED === true
@@ -302,7 +317,8 @@ function byl_www_ship_legacy321_supported(): bool {
         && function_exists('apply_filters')
         && has_filter('yay_currency_convert_price') !== false
         && has_filter('yay_currency_revert_price') !== false
-        && byl_www_ship_effective_currency() !== null;
+        && byl_www_ship_effective_currency() !== null
+        && byl_www_ship_legacy321_vendor_currency_ok();
 }
 /**
  * Converts BASE USD mandatory parcel charge exactly once, after the
