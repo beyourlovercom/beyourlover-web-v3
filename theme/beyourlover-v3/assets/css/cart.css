@@ -6,6 +6,9 @@
     border-bottom: 1px solid var(--byl-line);
 }
 .woocommerce-cart .byl-cart-promotion__message { margin: 0; }
+.woocommerce-cart .byl-cart-promotion__message a { color:var(--byl-brand);font-weight:650;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere; }
+.woocommerce-cart .byl-cart-promotion__message a:focus-visible {outline:2px solid currentColor;outline-offset:3px;}
+
 .woocommerce-cart .byl-cart-promotion__threshold { margin: 0 0 .25rem; font-weight: 600; }
 .woocommerce-cart .byl-cart-promotion__hint { margin: .35rem 0 0; font-size: .9em; }
 .woocommerce-cart .byl-cart-promotion__form { display: flex; flex-direction: column; gap: .5rem; width: 100%; margin-top: .75rem; }
