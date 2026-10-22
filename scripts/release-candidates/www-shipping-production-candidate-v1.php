@@ -397,6 +397,33 @@ function byl_www_ship_tax($rate, float $fee): bool {
     return true;
 }
 
+/**
+ * Mirror Woo 11.2.1 Free Shipping's own valid-coupon test. The historical
+ * text "BYL49" in an Andy Commerce Dev preset is NOT evidence of an actual
+ * free-shipping Woo coupon on WWW; a literal applied code alone must not
+ * waive a $20 ordinary shipping charge.
+ */
+function byl_www_ship_valid_native_free_coupon(): bool {
+    if (!function_exists('WC') || !is_object(WC()->cart ?? null)
+        || !method_exists(WC()->cart, 'get_coupons')) {
+        return false;
+    }
+    foreach ((array) WC()->cart->get_coupons() as $coupon) {
+        if (!is_object($coupon) || !method_exists($coupon, 'is_valid')
+            || !method_exists($coupon, 'get_free_shipping')) {
+            continue;
+        }
+        try {
+            if ($coupon->is_valid() && $coupon->get_free_shipping()) {
+                return true;
+            }
+        } catch (Throwable $error) {
+            return false;
+        }
+    }
+    return false;
+}
+
 /** Must always run after legacy Woo/BYL shipping filters. */
 function byl_www_ship_rates(array $rates, array $package): array {
     if (!byl_www_ship_armed()) { return $rates; }
@@ -430,14 +457,21 @@ function byl_www_ship_rates(array $rates, array $package): array {
         if ($sum + 0.000001 >= (float)$zone['minimum']) {
             return $rates; // Never invent a Free rate; Woo decides eligibility.
         }
-        if (function_exists('WC') && is_object(WC()->cart ?? null)
-            && method_exists(WC()->cart, 'get_applied_coupons')
-            && in_array('byl49', array_map('strtolower',
-                (array)WC()->cart->get_applied_coupons()), true)) {
-            return $rates; // Preserve special BYL49 protection / exemptions.
-        }
         $freeKey = 'free_shipping:' . $zone['free_id'];
-        unset($rates[$freeKey]); // Prevent obsolete pre-discount override.
+        // Preserve a *validated Woo native free-shipping coupon* ONLY for
+        // a destination whose independently reviewed native requirement is
+        // exactly "either". Current source intentionally fails the Zone0
+        // "either" contract gate until an Owner-approved handoff; this code
+        // is not permission to change coupon policy or activate WWW.
+        $freeOptions = get_option('woocommerce_free_shipping_'
+            . (int)$zone['free_id'] . '_settings', []);
+        if ($zoneId === 0 && isset($rates[$freeKey])
+            && is_array($freeOptions)
+            && ($freeOptions['requires'] ?? null) === 'either'
+            && byl_www_ship_valid_native_free_coupon()) {
+            return $rates;
+        }
+        unset($rates[$freeKey]); // Never honor an unvalidated plain code.
         return $rates;
     }
     $fee = $kind === 'pillow'
