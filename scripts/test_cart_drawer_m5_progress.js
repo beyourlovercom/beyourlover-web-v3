@@ -31,7 +31,7 @@ function cart(ext=good) {
 const cases=[
  ['OFF ignores valid API data',false,cart(),false],
  ['ON missing extension stays hidden',true,cart(null),false],
- ['ON trusted extension renders',true,cart(),true],
+ ['ON trusted extension keeps legacy progress hidden',true,cart(),false],
  ['ON misleading percent hidden',true,cart({...good,percent:99}),false],
  ['ON noncanonical threshold hidden',true,cart({...good,threshold_minor:-1}),false],
  ['ON unsafe free-shipping claim hidden',true,cart({...good,claim_free_shipping:true}),false],
@@ -43,8 +43,8 @@ const cases=[
    {shipping_rates:[{selected:true,rate_id:'<script>'}]}]},false],
  ['ON stale legacy reason hidden',true,cart({...good,state:'hidden',
    show_progress:false,reason:'legacy_policy_migration_pending'}),false],
- ['ON 100 pct remains non-award',true,cart({...good,qualified_minor:4900,
-   remaining_minor:0,percent:100}),true]
+ ['ON 100 pct still hides duplicate progress',true,cart({...good,qualified_minor:4900,
+   remaining_minor:0,percent:100}),false]
 ];
 async function run(name,enabled,server,expected){
   const keys=['.byl-drawer__panel','[data-drawer-count]','[data-drawer-feedback]',
@@ -73,18 +73,11 @@ async function run(name,enabled,server,expected){
   }
   assert.ok(loops<200,'Woo response rendered '+name);
   const slot=elems['[data-drawer-m5-progress]'];
-  assert.equal(slot.hidden,!expected,name+' visibility');
+  assert.equal(slot.hidden,true,name+' progress hidden under Owner one-line copy');
   assert.equal(elems['[data-drawer-marketing-slots]'].hidden,true,
     'No coupon/gift marketing banner activated');
-  if(expected){
-    assert.equal(slot.children.length,2,'passive label and bar');
-    assert.match(slot.children[0].textContent,/\$4\.00|Threshold reached/,
-      'calculated from Woo extension');
-    assert.ok(!slot.children[0].textContent.includes('Free shipping applied'),
-      'no fake shipping award');
-  }else{
-    assert.equal(slot.children.length,0,'no side effects when hidden');
-  }
+  assert.equal(slot.children.length,0,'no duplicate progress contents');
+  assert.equal(slot.textContent,'','old progress text must not render');
 }
 (async()=>{
   for(const [name,enabled,snapshot,expected] of cases)await run(name,enabled,snapshot,expected);
@@ -92,5 +85,5 @@ async function run(name,enabled,server,expected){
     '../theme/beyourlover-v3/inc/cart-drawer.php'),'utf8');
   assert.match(php,/'marketingEnabled'\s*=>\s*false/,'server source marketing OFF');
   assert.match(php,/data-drawer-m5-progress[^>]*hidden/,'server HTML hidden');
-  console.log('M5_CART_V2_OFFLINE_GATED_PROGRESS_PASS='+ (cases.length+2)+'; BUSINESS_ACTIVATION=OFF; NO_NETWORK=YES');
+  console.log('M5_CART_V2_OWNER_ONE_LINE_PROGRESS_OFF_PASS='+ (cases.length+2)+'; BUSINESS_ACTIVATION=OFF; NO_NETWORK=YES');
 })().catch(e=>{console.error(e);process.exitCode=1;});
