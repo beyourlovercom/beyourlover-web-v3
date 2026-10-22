@@ -124,7 +124,7 @@ get_header();
       <div class="byl-free__intro">
         <p class="byl-free__eyebrow">A little extra joy, on us</p>
         <h1 id="byl-free-title">Free Shipping</h1>
-        <p class="byl-free__summary">Your favorites deserve a lovely arrival. Reach the free-shipping goal for your delivery destination, and enjoy a little extra on us.</p>
+        <p class="byl-free__summary">Free shipping starts at $69 for eligible regular items, with country-specific thresholds and special-item exceptions. Find your destination's rules below.</p>
         <div class="byl-free__links">
           <a class="byl-free__button" href="<?php echo esc_url($shop_link); ?>">Continue shopping <span aria-hidden="true">→</span></a>
           <a class="byl-free__textlink" href="#how-free-shipping-works">How it works</a>
@@ -192,16 +192,15 @@ get_header();
       </div>
     </section>
     <?php
-    // Dynamic policy amounts from Andy Commerce; labels describe geographic
-    // coverage audited against WooCommerce, not another editable config source.
+    // Native Woo Free Shipping instance configuration defines each region's
+    // actual minimum; never assume one global threshold from marketing text.
     $fs_zones = class_exists('WC_Shipping_Zones') ? WC_Shipping_Zones::get_zones() : [];
-    $fs_policy = class_exists('Andy_Commerce_Shipping_Promotion_Policy')
-        ? 'Andy_Commerce_Shipping_Promotion_Policy' : null;
     $fs_groups = [
         ['zone'=>1, 'title'=>'Hong Kong', 'region'=>'Hong Kong', 'detail'=>'Hong Kong SAR is its own zero-minimum Free Shipping region.'],
         ['zone'=>5, 'title'=>'Asia &amp; most of the U.S.', 'region'=>'Most U.S. states and Asian destinations', 'detail'=>'Mainland U.S. destinations excluding Alaska and Hawaii; Asian destinations except Hong Kong. The United Arab Emirates currently matches this region.'],
         ['zone'=>4, 'title'=>'Extended destinations', 'region'=>'Alaska, Hawaii, Puerto Rico and Mexico', 'detail'=>'U.S. Alaska and Hawaii, Puerto Rico and Mexico. Country/region eligibility is calculated from your exact destination.'],
         ['zone'=>3, 'title'=>'Selected destinations', 'region'=>'Russia, Venezuela, North Macedonia, Moldova, Costa Rica and Argentina', 'detail'=>'Russia, Venezuela, North Macedonia, Moldova, Costa Rica and Argentina. Available delivery methods and local restrictions still apply.'],
+        ['zone'=>0, 'title'=>'Rest of the world', 'region'=>'United Kingdom, France and other destinations not matched above', 'detail'=>'This is the WooCommerce fallback region. Destinations including the United Kingdom and France use the Rest of the World rates when no higher-priority shipping zone matches. Check your address in the destination lookup for a current match.'],
     ];
     $fs_countries = function_exists('WC') && WC() && isset(WC()->countries)
         ? (array)WC()->countries->get_shipping_countries() : [];
@@ -229,7 +228,7 @@ get_header();
     <section class="byl-free__country" id="shipping-by-country" aria-labelledby="byl-free-country-title">
       <p class="byl-free__eyebrow">Shipping destinations</p>
       <h2 id="byl-free-country-title">Free shipping by country &amp; region</h2>
-      <p class="byl-free__caption">Different destinations have different shipping rules. See the four current free-shipping tiers below, or look up a specific destination. Actual delivery services depend on your address and cart.</p>
+      <p class="byl-free__caption">Shipping costs and free-shipping minimums differ by destination. Check a country or U.S. state below, then review eligible rates in Cart or Checkout. Special items are excluded from ordinary free-shipping offers.</p>
 
       <div class="byl-free__lookup"
            data-byl-fs-lookup
@@ -261,11 +260,11 @@ get_header();
       <div class="byl-free__tiers">
         <?php foreach ($fs_groups as $group) :
           $zone_id = (int)$group['zone'];
-          $supports = $fs_policy && function_exists('byl_v3_fs_zone_free_method')
-              && byl_v3_fs_zone_free_method($zone_id,$fs_zones);
-          $min_amount = $supports ? $fs_policy::get_persisted_zone_effective_threshold($zone_id) : null;
-          $flat_cost = $supports && function_exists('byl_v3_fs_zone_flat_cost')
-              ? byl_v3_fs_zone_flat_cost($zone_id,$fs_zones) : null;
+          $fs_terms = function_exists('byl_v3_fs_zone_free_terms')
+              ? byl_v3_fs_zone_free_terms($zone_id, $fs_zones) : null;
+          $min_amount = is_array($fs_terms) ? $fs_terms['threshold'] : null;
+          $flat_cost = function_exists('byl_v3_fs_zone_flat_cost')
+              ? byl_v3_fs_zone_flat_cost($zone_id, $fs_zones) : null;
         ?>
           <article class="byl-free__tier" data-shipping-zone="<?php echo esc_attr((string)$zone_id); ?>">
             <div class="byl-free__tier-header"><span><?php echo wp_kses_post((string)$group['title']); ?></span>
@@ -282,37 +281,42 @@ get_header();
                 <p class="byl-free__country-list"><strong>Included Asian destinations:</strong> <?php echo esc_html(implode(', ', $fs_asia)); ?></p>
               <?php endif; ?>
               <?php if ($flat_cost !== null && $flat_cost > 0) : ?>
-                <p>Standard shipping base rate: <?php echo esc_html($price($flat_cost,true)); ?> before any applicable shipping-class charges.</p>
+                <p>Regular-item flat shipping before free-shipping eligibility: <?php echo esc_html($price($flat_cost,true)); ?> (shipping-class and special-product exceptions may apply).</p>
+              <?php endif; ?>
+              <?php if (is_array($fs_terms) && $fs_terms['basis'] === 'after_coupon' && $min_amount > 0) : ?>
+                <p>Minimum is checked against qualifying merchandise after coupon discounts, excluding any separately charged special items.</p>
+              <?php elseif (is_array($fs_terms) && $fs_terms['basis'] === 'before_coupon' && $min_amount > 0) : ?>
+                <p>This region's current Free Shipping setting checks the minimum before coupons; see the selected method in Checkout.</p>
               <?php endif; ?>
             </details>
           </article>
         <?php endforeach; ?>
       </div>
-      <p class="byl-free__country-notice"><strong>Other destinations:</strong> Free shipping is not offered for every destination. Check your Cart or Checkout for the delivery methods and final shipping charges available to your address.</p>
+      <p class="byl-free__country-notice"><strong>Other destinations and special items:</strong> The Rest of the World fallback applies where no earlier zone matches; service eligibility, destination restrictions and actual fees depend on your address. Ordinary free shipping never waives the separate special-product fees described below.</p>
     </section>
     <section id="how-free-shipping-works" class="byl-free__how">
       <p class="byl-free__eyebrow">Three easy steps</p>
       <h2>How it works</h2>
       <p class="byl-free__caption">A clearer way to see your shipping savings before checkout.</p>
       <div class="byl-free__steps">
-        <article><span>01</span><h3>Fill your cart</h3><p>Pick the products you love. Your cart shows how close you are to your destination's free-shipping minimum.</p></article>
-        <article><span>02</span><h3>Reach your goal</h3><p>As soon as your eligible merchandise subtotal meets the minimum, you'll see a celebration.</p></article>
-        <article><span>03</span><h3>Choose free delivery</h3><p>If a free-shipping method is offered, select it in Cart or Checkout. Your order total reflects the selected method.</p></article>
+        <article><span>01</span><h3>Choose your delivery country</h3><p>Shipping regions have different starting rates and free-shipping minimums.</p></article>
+        <article><span>02</span><h3>Check eligible regular items</h3><p>Coupon discounts and special-product exclusions can change which items qualify for free delivery.</p></article>
+        <article><span>03</span><h3>Review actual shipping at Checkout</h3><p>WooCommerce shows the shipping methods and charges available for your destination and cart.</p></article>
       </div>
     </section>
     <section class="byl-free__details" aria-label="Free shipping rules and frequently asked questions">
       <div class="byl-free__fineprint">
         <p class="byl-free__eyebrow">The details</p><h2>Good to know</h2>
         <div><strong>Destination-based thresholds</strong><p>Minimums and delivery methods vary by shipping zone. Your Cart and Checkout use your actual address.</p></div>
-        <div><strong>Standard shipping, where available</strong><p>Faster or special shipping options may carry a separate charge, even when free standard shipping is available.</p></div>
+        <div><strong>Special items excluded from regular free shipping</strong><p>SAKURA and the GREEN and RED BDSM BONDAGE KIT products have a separate $30 shipping charge per special-item shipment, including when other regular items qualify for free shipping. PILLOW products are shipped for $30 per pillow. Multiple fees can appear in one cart; final available rates are shown before checkout.</p></div>
         <div><strong>No surprises at checkout</strong><p>Only a free shipping method selected in your order summary reduces its fee to $0.</p></div>
       </div>
       <div class="byl-free__faq" id="free-shipping-faq">
         <p class="byl-free__eyebrow">Help &amp; answers</p><h2>Frequently asked questions</h2>
-        <details open><summary>Does free shipping start at $69 everywhere?</summary><p>No. The $69 example applies to one delivery zone. Thresholds vary by destination, and some zones don't offer free shipping. Enter your shipping address in Cart to see the applicable rates.</p></details>
-        <details><summary>What happens when I reach my goal?</summary><p>When your qualifying subtotal reaches your zone's minimum and a free-shipping service is eligible, you'll see a congratulations message. Select the Free Shipping method in Cart or Checkout to apply it.</p></details>
-        <details><summary>Why do I still see a shipping fee?</summary><p>Your selected shipping method may be a paid service or your destination may have a different threshold. Check your address and available shipping methods in your Cart.</p></details>
-        <details><summary>Do discount codes affect shipping eligibility?</summary><p>Eligibility follows the shipping policy shown at Checkout. Your Cart uses the pre-discount merchandise subtotal and your delivery zone; special code-required offers will be identified when applicable.</p></details>
+        <details open><summary>Does free shipping start at $69 everywhere?</summary><p>No. $69 is the starting advertised threshold, not a worldwide minimum. Hong Kong may offer free regular-item shipping with no minimum; other zones may require $69, $129 or $169. Rest of the World has its own regular-item rate and $69 minimum where Woo Free Shipping is enabled. Look up your country and check your final Cart rates.</p></details>
+        <details><summary>What happens when I reach my goal?</summary><p>Only eligible regular items qualify. Your actual selected WooCommerce shipping methods determine the amount charged; separately shipped special items and PILLOW products can still carry fees.</p></details>
+        <details><summary>Why do I still see a shipping fee?</summary><p>Your destination may have a higher threshold or a paid delivery method, or your cart may include excluded special items. Three specified special products cost $30 per special-item shipment; PILLOW shipping costs $30 per pillow. Rates are added independently where applicable.</p></details>
+        <details><summary>Do discount codes affect shipping eligibility?</summary><p>Yes. For the amount-based free-shipping tiers shown above, WooCommerce checks the qualifying merchandise subtotal after coupon discounts when that region's Free Shipping method is configured accordingly. Special-item fees are excluded from ordinary free shipping. Review your discounted cart and actual shipping method before payment.</p></details>
       </div>
     </section>
   </div>
