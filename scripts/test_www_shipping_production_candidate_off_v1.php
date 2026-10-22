@@ -331,14 +331,16 @@ unset($GLOBALS['taxReturn']);
 $wrongRate=['free_shipping:9'=>$base['free_shipping:9']];
 check_prod(byl_www_ship_rates($wrongRate,$specialPkg)===[],
     'missing genuine flat instance cannot silently waive exception fee');
-$GLOBALS['effective_currency']='GBP';
-check_prod(get_woocommerce_currency()==='USD'
-    && !byl_www_ship_currency_ok(),
-    'Woo base USD is insufficient when YayCurrency checkout is GBP');
-check_prod(byl_www_ship_rates($base,$specialPkg)===[],
-    'GBP storefront cart cannot receive guessed USD $30 fee');
-check_prod(byl_www_ship_rates($base,$normal)===[],
-    'GBP ordinary cart cannot silently trust Woo base USD');
+foreach (['GBP', 'EUR', 'AUD', 'CAD'] as $selectedCurrency) {
+    $GLOBALS['effective_currency']=$selectedCurrency;
+    check_prod(get_woocommerce_currency()==='USD'
+        && !byl_www_ship_currency_ok(),
+        "$selectedCurrency checkout must not infer selected currency from USD base");
+    check_prod(byl_www_ship_rates($base,$specialPkg)===[],
+        "$selectedCurrency special shipment blocks unsafe USD30 rate");
+    check_prod(byl_www_ship_rates($base,$normal)===[],
+        "$selectedCurrency ordinary rate also blocked without FX converter");
+}
 $GLOBALS['effective_currency']='USD';
 $GLOBALS['currency']='EUR';
 check_prod(byl_www_ship_gate() && !byl_www_ship_currency_ok(),
@@ -409,6 +411,12 @@ check_prod($zone0FreeTotal===90.0,
     'valid Woo free coupon waives regular freight only; specials30 and 2 pillows60 remain paid');
 $GLOBALS['nativeFreeCouponObjects']=[];
 $GLOBALS['coupons']=[];
+$GLOBALS['options'][$zone0Free]['requires']='coupon';
+check_prod(!byl_www_ship_gate(),
+    'Zone0 coupon-only requirement cannot pass approved either contract');
+$GLOBALS['options'][$zone0Free]['requires']='both';
+check_prod(!byl_www_ship_gate(),
+    'Zone0 coupon AND amount requirement cannot pass approved either contract');
 $GLOBALS['options'][$zone0Free]['requires']='min_amount';
 check_prod(!byl_www_ship_gate(),
     'changing native Zone0 either to min_amount without new ledger is forbidden');
