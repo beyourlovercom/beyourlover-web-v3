@@ -50,12 +50,52 @@ function byl_v3_fs_zone_flat_cost(int $zone_id, ?array $zones = null): ?float {
     return null;
 }
 
+/**
+ * Return the real Woo Free Shipping requirement, never merely a threshold
+ * inferred from a plugin's marketing label. Unknown/coupon-OR-min policies
+ * do not claim a universal amount qualification.
+ */
+function byl_v3_fs_zone_free_terms(int $zone_id, ?array $zones = null): ?array {
+    foreach (byl_v3_fs_zone_methods($zone_id, $zones) as $method) {
+        if (!is_object($method)
+            || (string)($method->enabled ?? 'yes') === 'no') {
+            continue;
+        }
+        $type = method_exists($method, 'get_method_id')
+            ? (string)$method->get_method_id()
+            : (string)($method->id ?? '');
+        if ($type !== 'free_shipping') { continue; }
+        $value = static function (string $key) use ($method) {
+            if (method_exists($method,'get_instance_option')) {
+                return $method->get_instance_option($key);
+            }
+            return method_exists($method,'get_option')
+                ? $method->get_option($key) : null;
+        };
+        $requires = (string) $value('requires');
+        if ($requires === '' || $requires === 'no') {
+            return ['threshold'=>0.0,'basis'=>'no_minimum'];
+        }
+        if ($requires === 'min_amount' && is_numeric($value('min_amount'))) {
+            return [
+                'threshold'=>(float)$value('min_amount'),
+                'basis'=>$value('ignore_discounts') === 'yes'
+                    ? 'before_coupon' : 'after_coupon',
+            ];
+        }
+        // A code requirement or "either" must not be advertised as plain
+        // amount-only free shipping.
+        return null;
+    }
+    return null;
+}
+
 function byl_v3_fs_destination_policy(string $country, string $state = ''): array {
     $country = strtoupper(trim($country));
     $state = strtoupper(trim($state));
     $neutral = ['status'=>'unknown','zone_id'=>null,'threshold'=>null,'base_flat_cost'=>null];
     if (!function_exists('WC') || !WC() || !isset(WC()->countries) ||
-        !class_exists('WC_Shipping_Zones') || !class_exists('Andy_Commerce_Shipping_Promotion_Policy')) { return $neutral; }
+        !class_exists('WC_Shipping_Zones')) { return $neutral; }
     $shipping_countries = (array)WC()->countries->get_shipping_countries();
     if (!isset($shipping_countries[$country])) { return ['status'=>'not_served'] + $neutral; }
     // Subnational routing is essential: Alaska/Hawaii differ from continental US.
@@ -74,14 +114,16 @@ function byl_v3_fs_destination_policy(string $country, string $state = ''): arra
     if (!byl_v3_fs_zone_free_method($zone_id, $zones)) {
         return ['status'=>'no_free_method','zone_id'=>$zone_id,'threshold'=>null,'base_flat_cost'=>null];
     }
-    $policy = 'Andy_Commerce_Shipping_Promotion_Policy';
-    if (!$policy::has_persisted_settings()) { return $neutral; }
-    $threshold = $policy::get_persisted_zone_effective_threshold($zone_id);
-    if (!is_numeric($threshold)) { return $neutral; }
+    $terms = byl_v3_fs_zone_free_terms($zone_id, $zones);
+    if ($terms === null) {
+        return ['status'=>'conditional_free',
+            'zone_id'=>$zone_id,'threshold'=>null,'base_flat_cost'=>byl_v3_fs_zone_flat_cost($zone_id,$zones)];
+    }
     return [
         'status'=>'free_method_configured',
         'zone_id'=>$zone_id,
-        'threshold'=>(float)$threshold,
+        'threshold'=>(float)$terms['threshold'],
+        'basis'=>$terms['basis'],
         'base_flat_cost'=>byl_v3_fs_zone_flat_cost($zone_id,$zones),
     ];
 }
