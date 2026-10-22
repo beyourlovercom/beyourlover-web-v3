@@ -99,18 +99,25 @@ function byl_www_ship_contract(): ?array {
         $entry = $ledger[$zoneId] ?? null;
         if (!is_array($entry)
             || !isset($entry['free_id'], $entry['free_digest'],
-                $entry['minimum'], $entry['before_discount'])
+                $entry['minimum'], $entry['before_discount'],
+                $entry['free_requirement'])
             || !is_int($entry['free_id'])
             || $entry['free_id'] < 1
             || !is_numeric($entry['minimum'])
             || !is_bool($entry['before_discount'])
+            || !is_string($entry['free_requirement'])
             || !is_string($entry['free_digest'])
             || !preg_match('/^[a-f0-9]{64}$/D', $entry['free_digest'])) {
             return null;
         }
+        $approvedFreeRequirement = $zoneId === 1 ? 'no'
+            : ($zoneId === 0 ? 'either' : 'min_amount');
+        if ($entry['free_requirement'] !== $approvedFreeRequirement) {
+            return null; // Contract must describe actual Owner-reviewed Woo.
+        }
         if ($zoneId === 1) {
             if (isset($entry['flat_id']) || (float)$entry['minimum'] !== 0.0) {
-                return null; // Existing HK is free-only for ordinary parcels.
+                return null; // HK ordinary remains free, but specials paid.
             }
             continue;
         }
@@ -173,7 +180,7 @@ function byl_www_ship_woo_methods_match(array $ledger): bool {
         if (isset($entry['flat_id'])) {
             $expect['flat_rate:' . $entry['flat_id']] = true;
         }
-        if ($byKey !== $expect && array_diff_key($byKey, $expect) !== []
+        if (array_diff_key($byKey, $expect) !== []
             || array_diff_key($expect, $byKey) !== []) {
             return false;
         }
@@ -186,7 +193,7 @@ function byl_www_ship_woo_methods_match(array $ledger): bool {
             if (!in_array((string)($free['requires'] ?? 'no'), ['no', ''], true)) {
                 return false;
             }
-        } elseif (($free['requires'] ?? null) !== 'min_amount'
+        } elseif (($free['requires'] ?? null) !== $entry['free_requirement']
             || !is_numeric($free['min_amount'] ?? null)
             || abs((float)$free['min_amount'] - (float)$entry['minimum']) > 0.000001
             || ($free['ignore_discounts'] ?? 'no') === 'yes') {
@@ -458,11 +465,10 @@ function byl_www_ship_rates(array $rates, array $package): array {
             return $rates; // Never invent a Free rate; Woo decides eligibility.
         }
         $freeKey = 'free_shipping:' . $zone['free_id'];
-        // Preserve a *validated Woo native free-shipping coupon* ONLY for
-        // a destination whose independently reviewed native requirement is
-        // exactly "either". Current source intentionally fails the Zone0
-        // "either" contract gate until an Owner-approved handoff; this code
-        // is not permission to change coupon policy or activate WWW.
+        // Preserve a VALID Woo native free-shipping coupon only under the
+        // exact WWW Zone0 "either" requirement, matching Woo 11.2.1.
+        // Applied promo text alone (including BYL49) grants no entitlement.
+        // The special/PILLOW packages are always charged independently.
         $freeOptions = get_option('woocommerce_free_shipping_'
             . (int)$zone['free_id'] . '_settings', []);
         if ($zoneId === 0 && isset($rates[$freeKey])
