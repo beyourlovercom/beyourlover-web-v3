@@ -2,13 +2,31 @@
 /** No-network, no-WordPress, no-order test of an UNWIRED production candidate. */
 declare(strict_types=1);
 define('ABSPATH', __DIR__);
+// Isolated fake WordPress plugin header fixture in the local system TMP.
+// Never install a plugin or access any real WordPress filesystem.
+$mockPluginRoot = sys_get_temp_dir() . '/byl_www_fx_test_' . getmypid();
+$mockPluginDir = $mockPluginRoot . '/yaycurrency-pro';
+if (!is_dir($mockPluginDir) && !mkdir($mockPluginDir, 0700, true)) {
+    throw new RuntimeException('Cannot create offline FX plugin fixture');
+}
+file_put_contents($mockPluginDir.'/yay-currency.php', "<?php\n/* Mock version header only. */\n");
+define('WP_PLUGIN_DIR', $mockPluginRoot);
+register_shutdown_function(static function () use ($mockPluginRoot,$mockPluginDir): void {
+    @unlink($mockPluginDir.'/yay-currency.php');
+    @rmdir($mockPluginDir);
+    @rmdir($mockPluginRoot);
+});
+$GLOBALS['mockYayVersion'] = '3.2.1';
 $GLOBALS['site'] = 'www.beyourlover.com';
 $GLOBALS['environment'] = 'production';
 $GLOBALS['currency'] = 'USD';
 $GLOBALS['effective_currency'] = 'USD';
 $GLOBALS['zoneLocationVersion'] = 'v1';
 $GLOBALS['classMembers'] = ['38047','32251','9153','9145'];
-$GLOBALS['options'] = ['byl_www_shipping_v1_enabled' => 'no'];
+$GLOBALS['options'] = [
+    'byl_www_shipping_v1_enabled' => 'no',
+    'active_plugins' => ['yaycurrency-pro/yay-currency.php']
+];
 $GLOBALS['hooks'] = [];
 $GLOBALS['assertions'] = 0;
 $GLOBALS['coupons'] = [];
@@ -30,6 +48,14 @@ function wp_parse_url(string $url, int $component) {
 function wp_get_environment_type(): string { return $GLOBALS['environment']; }
 function get_option(string $key, $default = false) {
     return $GLOBALS['options'][$key] ?? $default;
+}
+function get_file_data(string $pluginFile, array $headers, string $context): array {
+    if ($pluginFile !== WP_PLUGIN_DIR.'/yaycurrency-pro/yay-currency.php'
+        || $context !== 'plugin'
+        || !isset($headers['Version'])) {
+        return [];
+    }
+    return ['Version' => $GLOBALS['mockYayVersion']];
 }
 function get_objects_in_term(int $term, string $taxonomy) {
     return ($term === 1939 && $taxonomy === 'product_shipping_class')
@@ -206,9 +232,23 @@ check_prod(byl_www_ship_rates($offRates,$offPackage)===$offRates,'rate filter in
 check_prod(byl_www_ship_contract()===null,'missing Owner actual WWW ledger keeps OFF');
 check_prod(!byl_www_ship_currency_ok(),
     'Woo base USD cannot authorize YayCurrency without reviewed FX contract');
+check_prod(!byl_www_ship_yaycurrency_prerequisite(),
+    'actual WWW YayCurrency Pro 3.2.1 is below fixed-shipping version floor');
 define('BYL_WWW_SHIPPING_V1_FX_REVIEWED',true);
+check_prod(!byl_www_ship_currency_ok(),
+    'approval constant alone must not enable legacy YayCurrency 3.2.1');
+$GLOBALS['mockYayVersion']='3.3.3';
+check_prod(!byl_www_ship_yaycurrency_prerequisite(),
+    'YayCurrency 3.3.3 still precedes Order-type shipping fix 3.3.4');
+$GLOBALS['mockYayVersion']='3.3.4';
+check_prod(byl_www_ship_yaycurrency_prerequisite(),
+    '3.3.4 is only a minimum version prerequisite, never FX UAT');
 check_prod(byl_www_ship_currency_ok(),
-    'only reviewed bridge with selected checkout USD may proceed');
+    'reviewed bridge and USD at vendor baseline can proceed in offline mock');
+$GLOBALS['options']['active_plugins']=[];
+check_prod(!byl_www_ship_currency_ok(),
+    'inactive YayCurrency plugin fails version/FX prerequisite');
+$GLOBALS['options']['active_plugins']=['yaycurrency-pro/yay-currency.php'];
 define('BYL_WWW_SHIPPING_V1_APPROVED',true);
 define('BYL_WWW_SHIPPING_V1_METHOD_CONTRACT',$ledger);
 check_prod(!byl_www_ship_gate(),'approval alone cannot switch on');
