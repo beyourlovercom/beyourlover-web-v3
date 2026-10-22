@@ -7,10 +7,25 @@
 declare(strict_types=1);
 defined('ABSPATH') || exit;
 
-function byl_v3_fs_zone_free_method(int $zone_id, ?array $zones = null): bool {
-    if (!class_exists('WC_Shipping_Zones')) { return false; }
+/**
+ * WC_Shipping_Zones::get_zones() excludes the fallback Zone 0. Read it
+ * explicitly through Woo core, so the public country policy never reports
+ * "no free shipping" when the real Rest of World fallback has an enabled
+ * Woo Free Shipping instance.
+ */
+function byl_v3_fs_zone_methods(int $zone_id, ?array $zones = null): array {
+    if (!class_exists('WC_Shipping_Zones')) { return []; }
+    if ($zone_id === 0) {
+        $fallback = WC_Shipping_Zones::get_zone(0);
+        return is_object($fallback) && method_exists($fallback, 'get_shipping_methods')
+            ? (array) $fallback->get_shipping_methods(true) : [];
+    }
     $zones = $zones ?? WC_Shipping_Zones::get_zones();
-    foreach ((array)($zones[$zone_id]['shipping_methods'] ?? []) as $method) {
+    return (array) ($zones[$zone_id]['shipping_methods'] ?? []);
+}
+
+function byl_v3_fs_zone_free_method(int $zone_id, ?array $zones = null): bool {
+    foreach (byl_v3_fs_zone_methods($zone_id, $zones) as $method) {
         if (!is_object($method)) { continue; }
         $type = method_exists($method,'get_method_id') ? (string)$method->get_method_id() : (string)($method->id ?? '');
         if ($type === 'free_shipping' && (string)($method->enabled ?? 'yes') !== 'no') { return true; }
@@ -19,13 +34,17 @@ function byl_v3_fs_zone_free_method(int $zone_id, ?array $zones = null): bool {
 }
 
 function byl_v3_fs_zone_flat_cost(int $zone_id, ?array $zones = null): ?float {
-    if (!class_exists('WC_Shipping_Zones')) { return null; }
-    $zones = $zones ?? WC_Shipping_Zones::get_zones();
-    foreach ((array)($zones[$zone_id]['shipping_methods'] ?? []) as $method) {
+    foreach (byl_v3_fs_zone_methods($zone_id, $zones) as $method) {
         if (!is_object($method)) { continue; }
         $type = method_exists($method,'get_method_id') ? (string)$method->get_method_id() : (string)($method->id ?? '');
         if ($type !== 'flat_rate' || (string)($method->enabled ?? 'yes') === 'no') { continue; }
-        $cost = method_exists($method,'get_option') ? $method->get_option('cost') : null;
+        // Instance-specific Woo Flat Rate config is authoritative; do not
+        // infer base cost from the shipping zone name or another method.
+        $cost = method_exists($method,'get_instance_option')
+            ? $method->get_instance_option('cost') : null;
+        if (!is_numeric($cost) && method_exists($method,'get_option')) {
+            $cost = $method->get_option('cost');
+        }
         return is_numeric($cost) ? (float)$cost : null;
     }
     return null;
@@ -50,8 +69,8 @@ function byl_v3_fs_destination_policy(string $country, string $state = ''): arra
     ]);
     $zone_id = $zone && method_exists($zone, 'get_id') ? (int)$zone->get_id() : 0;
     $zones = WC_Shipping_Zones::get_zones();
-    // Zone 0 has no Free Shipping method on Dev. Do not infer availability
-    // from the historical default amount ($49 vs $69).
+    // Zone 0 is queried directly: both Dev and WWW may have Woo Free
+    // Shipping enabled with different instance IDs and staging states.
     if (!byl_v3_fs_zone_free_method($zone_id, $zones)) {
         return ['status'=>'no_free_method','zone_id'=>$zone_id,'threshold'=>null,'base_flat_cost'=>null];
     }
