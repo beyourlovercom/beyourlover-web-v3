@@ -8,6 +8,17 @@
  * session writes, no order creation, no payments. NEVER RUN ON WWW.
  */
 declare(strict_types=1);
+$GLOBALS['byl_native_probe_stage'] = 'initial WordPress identity';
+register_shutdown_function(static function (): void {
+    $last = error_get_last();
+    if (is_array($last) && in_array($last['type'],
+            [E_ERROR,E_PARSE,E_CORE_ERROR,E_COMPILE_ERROR,E_USER_ERROR],true)) {
+        fwrite(STDERR, "DEV_NATIVE_PROBE_FATAL_STAGE="
+            . $GLOBALS['byl_native_probe_stage']
+            . " error=" . (string)($last['message'] ?? 'unknown')
+            . "\n");
+    }
+});
 if (!defined('WP_CLI') || WP_CLI !== true
     || !function_exists('home_url')
     || rtrim(home_url(), '/') !== 'https://dev.beyourlover.com') {
@@ -34,10 +45,12 @@ $check = static function (bool $condition, string $name) use (&$assertions): voi
         exit(2);
     }
 };
+$GLOBALS['byl_native_probe_stage']='preload';
 $check(!function_exists('byl_www_ship_rates'),
     'candidate does not already run on Dev');
 $beforeFilter = has_filter('woocommerce_package_rates');
 $beforePackages = has_filter('woocommerce_cart_shipping_packages');
+$GLOBALS['byl_native_probe_stage']='include source';
 require $source;
 $check(function_exists('byl_www_ship_rates'),
     'candidate functions load under native Woo without bootstrap');
@@ -48,6 +61,7 @@ $check($beforeFilter === has_filter('woocommerce_package_rates'),
 $check($beforePackages === has_filter('woocommerce_cart_shipping_packages'),
     'no shipping package hook was added by loading candidate');
 
+$GLOBALS['byl_native_probe_stage']='basic package objects';
 $sample = [
     'destination' => ['country'=>'US','state'=>'CA','postcode'=>'90001'],
     'contents'=>[
@@ -68,6 +82,7 @@ $check(byl_www_ship_product_kind($sample['contents']['pillow'])==='pillow',
 $check(byl_www_ship_subtotal($sample['contents'])===258.0,
     'Woo after-coupon line_total subtotal');
 
+$GLOBALS['byl_native_probe_stage']='native rate object';
 $rate = new WC_Shipping_Rate(
     'flat_rate:10', 'Standard', 10.0, [], 'flat_rate', 10, 'taxable'
 );
@@ -93,6 +108,7 @@ $check(byl_www_ship_rates([$rate->get_id()=>$rate],$sample)
     === [$rate->get_id()=>$rate],
     'rates filter is inert without production Owner gate');
 
+$GLOBALS['byl_native_probe_stage']='native shipping hash';
 if (!method_exists(WC()->shipping(),'get_package_hash')) {
     fwrite(STDERR, "FAIL: Woo shipping package hash method absent\n");
     exit(2);
@@ -107,9 +123,11 @@ $hashB=$hashMethod->invoke(WC()->shipping(), $armed);
 $check(is_string($before)&&$before!==$hashA&&$hashA!==$hashB,
     'actual Woo package hash tracks source-controlled runtime marker');
 
+$GLOBALS['byl_native_probe_stage']='native tax calculator';
 $testTaxes=WC_Tax::calc_shipping_tax(30.0, []);
 $check(is_array($testTaxes),
     'real Woo tax calculator returns array without customer/checkout');
+$GLOBALS['byl_native_probe_stage']='completed';
 echo "PASS_DEV_WOO_NATIVE_SHIPPING_READONLY assertions={$assertions}"
    . " wc_version=" . (defined('WC_VERSION')?WC_VERSION:'unknown')
    . " checkout_orders=0 settings_writes=0 hooks_added=0\n";
