@@ -86,6 +86,8 @@ jobs:
         run: php -l theme/beyourlover-v3/inc/dev-after-discount-free-shipping.php && php scripts/test_dev_after_discount_free_shipping_v1.php && bash -n scripts/deploy_dev_after_discount_shipping_v1.sh
       - name: Dev-only Rest of World shipping class exceptions contract
         run: php -l theme/beyourlover-v3/inc/dev-restworld-shipping-v1.php && php scripts/test_dev_restworld_shipping_exceptions_v1.php && bash -n scripts/deploy_dev_restworld_shipping_v1.sh && php -l scripts/dev_restworld_woocommerce_settings_v1.php && php -l scripts/rollback_dev_restworld_settings_v1.php
+      - name: WWW shipping production candidate remains OFF and fail-closed
+        run: php -l scripts/release-candidates/www-shipping-production-candidate-v1.php && php -l scripts/test_www_shipping_production_candidate_off_v1.php && php -l scripts/probes/www-shipping-woocommerce-native-readonly-v1.php && php scripts/test_www_shipping_production_candidate_off_v1.php && python3 scripts/test_www_shipping_fx_acceptance_matrix_v1.py
       - name: Dev-only PR150 PILLOW per-unit shipping contract
         run: php -l theme/beyourlover-v3/inc/dev-pillow-oversized-shipping.php && php scripts/test_dev_pillow_oversized_shipping_v1.php
       - name: Dev-only Global Special Shipping $30 all zones contract
