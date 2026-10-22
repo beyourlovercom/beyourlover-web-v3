@@ -130,53 +130,13 @@
   // M5 progress is a read-only presentation of the accepted Woo Store API
   // extension, not a client-side promotion or a shipping qualification engine.
   function renderM5Progress(cart) {
+    // Owner-approved single-line shipping statement supersedes the
+    // prior distance-to-threshold illustration. Do not emit a second
+    // free-shipping claim; Woo rates/totals still render independently.
     const slot = elements.m5progress;
     if (!slot) return;
     slot.hidden = true;
     slot.textContent = '';
-    // The server-owned marketing gate is still OFF, even on Dev. Do not let
-    // query parameters, local storage or cart payloads activate promotions.
-    // Dedicated Dev M4 shipping gate is independent of Marketing campaigns.
-    // Marketing/BOGO/Free Gift remain OFF even when read-only progress is shown.
-    if (config.shippingProgressEnabled !== true ||
-        !confirmedShipping(cart)) return;
-    const ext = cart?.extensions?.andy_commerce_marketing_v1;
-    if (!ext || ext.schema_version !== 1 || ext.state !== 'ready' ||
-        ext.show_progress !== true || ext.gift_enabled !== false ||
-        ext.claim_free_shipping !== false || ext.authority !== 'woocommerce' ||
-        ext.reason !== 'read_only_projection') return;
-    const valid = n => Number.isSafeInteger(n) && n >= 0 && n <= 1000000000;
-    const qualified = ext.qualified_minor, threshold = ext.threshold_minor;
-    const remaining = ext.remaining_minor, percent = ext.percent;
-    if (!valid(qualified) || !valid(threshold) || threshold === 0 ||
-        !valid(remaining) || !valid(percent) || percent > 100 ||
-        remaining !== Math.max(0, threshold - qualified) ||
-        percent !== Math.min(100, Math.floor(qualified * 100 / threshold))) return;
-    // Shipping eligibility remains under Woo's authority; this is only a
-    // progress illustration. One package and one confirmed selected rate.
-    const packs = Array.isArray(cart?.shipping_rates) ? cart.shipping_rates : [];
-    if (packs.length !== 1 || !Array.isArray(packs[0]?.shipping_rates) ||
-        packs[0].shipping_rates.filter(r => r?.selected === true).length !== 1) return;
-    const selected = packs[0].shipping_rates.find(r => r?.selected === true);
-    if (typeof selected.rate_id !== 'string' ||
-        !/^[A-Za-z0-9_-]+:[A-Za-z0-9_.-]+$/.test(selected.rate_id)) return;
-    const currencyCode = cart?.totals?.currency_code;
-    const units = cart?.totals?.currency_minor_unit;
-    if (typeof currencyCode !== 'string' || !/^[A-Z]{3}$/.test(currencyCode) ||
-        !Number.isInteger(units) || units < 0 || units > 4) return;
-    const label = document.createElement('strong');
-    label.textContent = remaining > 0
-      ? 'Add ' + money(remaining, cart) + ' toward the free-shipping threshold'
-      : 'Threshold reached. Shipping is confirmed by Woo at checkout.';
-    const track = document.createElement('div');
-    track.className = 'byl-drawer__m5-track';
-    track.setAttribute('aria-hidden','true');
-    const fill = document.createElement('span');
-    fill.style.width = percent + '%';
-    track.appendChild(fill);
-    slot.appendChild(label);
-    slot.appendChild(track);
-    slot.hidden = false;
   }
 
   function render(cart) {
@@ -206,36 +166,27 @@
       const chosen = rates.find(rate=>rate && rate.selected === true);
       const free = rates.find(rate=>rate && String(rate.rate_id || '').startsWith('free_shipping:'));
       const calculated = confirmedShipping(cart);
-      let status = 'Estimated shipping shown. Final shipping and free-shipping eligibility depend on your delivery address.';
-      if (calculated && free && chosen?.rate_id === free.rate_id) {
-        status = '🎉 Free shipping confirmed for your delivery address.';
-      } else if (calculated && free) {
-        status = '🎉 Free shipping available — select Free Shipping to apply it.';
-      } else if (calculated) {
-        status = 'Shipping is calculated for your current delivery address.';
-      }
-      elements.delivery.textContent = status;
+      // Exactly one free-shipping marketing sentence, independent of
+      // destination-qualified Woo rate calculation. Rates remain visible
+      // in the unchanged actual shipping total below.
+      elements.delivery.replaceChildren();
+      const shippingLink = document.createElement('a');
+      shippingLink.href = '/free-shipping/';
+      shippingLink.textContent = 'Free shipping from $69 (special items excluded)';
+      elements.delivery.appendChild(shippingLink);
       // Owner V2: keep Woo's actual base-zone shipping estimate and
       // total numeric BEFORE address, but never call the estimate final.
       // On checkout Woo re-rates shipping for the actual destination.
       const subtotal = line('Subtotal',cart.totals?.total_items || 0,cart) +
         (Number(cart.totals?.total_discount)>0 ? line('Discount',-Number(cart.totals.total_discount),cart,'is-discount') : '');
-      const noticeSettings = config.cartSubtotalNotice || {};
-      const noticeText = typeof noticeSettings.text === 'string' &&
-        noticeSettings.text.trim() !== '' ? noticeSettings.text.trim() :
-        'Please check shipping costs, import duties and local taxes for your country or region. ' +
-        'Final charges depend on your delivery address.';
-      // Localized server copy only, escaped to text; never raw HTML.
-      const chargesNotice = noticeSettings.enabled === false ? '' :
-        '<p class="byl-drawer__charges-notice" role="note">' +
-        escape(noticeText) + '</p>';
+      // Country-specific terms belong on /free-shipping/; no secondary shipping banner.
       const hasShippingValue = cart.totals?.total_shipping !== null &&
         cart.totals?.total_shipping !== undefined && cart.totals?.total_shipping !== '';
       const hasTotalValue = cart.totals?.total_price !== null &&
         cart.totals?.total_price !== undefined && cart.totals?.total_price !== '';
       const shippingLabel = calculated ? 'Shipping' : 'Shipping (estimated)';
       const totalLabel = calculated ? 'Order total' : 'Order total (estimated)';
-      elements.totals.innerHTML = chargesNotice + subtotal +
+      elements.totals.innerHTML = subtotal +
         (hasShippingValue ? line(shippingLabel,cart.totals.total_shipping,cart) :
           lineLabel(shippingLabel,'Calculated at checkout')) +
         (hasTotalValue ? line(totalLabel,cart.totals.total_price,cart,'is-total') :
