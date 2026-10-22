@@ -198,9 +198,12 @@ check_shipping(is_string($checkoutSource) && str_contains($checkoutSource, "byl_
     && str_contains($checkoutSource, "'byl_dev_pillow_kind'")
     && str_contains($checkoutSource, "byl-dev-pillow-package-source"),
     'Dev only native Checkout suppresses fake pillow free-rate choice');
+// PR #154 Owner PASS supersedes the older PILLOW-specific checkout banner.
+ // The Woo marker still guards PHP's live rate/source; the UI now links to the
+ // single full country/exception policy, while Woo amounts remain authoritative.
 check_shipping(is_string($checkoutJsSource)
-    && str_contains($checkoutJsSource, "#order_review .byl-dev-pillow-package-source")
-    && str_contains($checkoutJsSource, "Oversized pillow shipping is $30 per item.")
-    && str_contains($checkoutJsSource, "Shipping & promo code"),
-    'Dev only Checkout promo copy uses real package marker and preserves coupon input');
+    && str_contains($checkoutJsSource, 'Free shipping from $69 (special items excluded)')
+    && str_contains($checkoutJsSource, "policyLink.href = '/free-shipping/'")
+    && str_contains($checkoutJsSource, 'byl-promo-code'),
+    'PILLOW keeps Woo shipment authority while Checkout follows approved single policy link and coupons');
 echo "PASS BYL Dev-only Pillow Shipping V1: $tests offline assertions, WWW=OFF, no Woo/DB writes\n";
