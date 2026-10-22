@@ -46,53 +46,56 @@ function run(status, blockStatus) {
   vm.runInNewContext(source, context);
   return { markup: root.innerHTML, enhanced: bodyClasses.has('byl-cart-coupon-enhanced') };
 }
+const headline = 'Free shipping from $69 (special items excluded)';
+function headlineOnce(markup, label) {
+  assert(markup.includes('<a href="/free-shipping/">'+headline+'</a>'), label+' contains policy link');
+  assert.equal((markup.match(/Free shipping from \$69/g)||[]).length,1,label+' renders exactly one hint');
+  assert(!/Add \$[\d.]+ more for free shipping|Free shipping applied to your order|Congrats!/.test(markup),
+    label+' never creates competing campaign claims');
+}
 const unlocked = run({active:true,state:'automatic_unlocked',has_code:false,applied_code:''});
-assert(unlocked.enhanced, 'working promo UI must enable single-code slot');
-assert(unlocked.markup.includes('Promo / Coupon Code'),'separate visible coupon label');
-assert(unlocked.markup.includes('Enter coupon code'),'visible coupon entry');
-assert(unlocked.markup.includes("🎉 Congrats! You've unlocked free shipping."), 'selected free shipping celebration');
-assert(unlocked.markup.includes('Free shipping applied to your order.'), 'selected free shipping explicit application confirmation');
-assert(!unlocked.markup.includes('Select Free Shipping under Shipping'), 'selected state must not ask to select again');
+assert(unlocked.enhanced, 'working promo UI must retain single coupon form');
+headlineOnce(unlocked.markup, 'unlocked');
+assert(unlocked.markup.includes('Promo / Coupon Code'), 'coupon label preserved');
+assert(unlocked.markup.includes('Enter coupon code'), 'coupon input preserved');
+
 const applied = run({active:true,state:'require_code_unlocked',has_code:true,applied_code:'BYL49'});
-assert(applied.enhanced, 'applied coupon still must show an input');
-assert(applied.markup.includes('Enter coupon code'), 'applied promo must not hide code entry');
-assert(applied.markup.includes('BYL49 applied'), 'applied code status');
-assert(applied.markup.includes('Remove'), 'allow removing existing code');
+headlineOnce(applied.markup, 'applied');
+assert(applied.enhanced,'applied promo still uses working single coupon form');
+assert(applied.markup.includes('BYL49 applied'), 'applied code preserved');
+assert(applied.markup.includes('Remove'), 'coupon removal preserved');
+
 const noData = run(null);
-assert(!noData.enhanced, 'when Store API data is missing keep native Woo coupon fallback');
-const iowa = run({
-  active:true,state:'below_threshold',threshold:69,subtotal:59,remaining:10,
-  has_code:false,applied_code:'',zone_id:5,
-}, {active:true,state:'automatic_unlocked',threshold:0,remaining:0});
-assert(iowa.markup.includes('Free shipping on orders over $69</p>'), 'Iowa native Woo whole-dollar threshold with over');
-assert(!iowa.markup.includes('byl-cart-promotion__heading'), 'remove ambiguous redundant Free shipping heading');
-assert(!iowa.markup.includes('Free shipping on orders of '), 'no obsolete of copy');
-assert(!iowa.markup.includes('Free shipping on orders over $69.00'), 'omit .00 on whole-dollar threshold');
-assert(iowa.markup.includes('Add $10.00 more for free shipping'), 'Iowa native Woo $59/$69 difference');
-assert(!iowa.markup.includes('Free shipping applied'), 'stale Blocks unlocked must not override native $10 flat');
-assert(!iowa.markup.includes("🎉 Congrats!"), 'below threshold must not celebrate');
-assert(iowa.markup.includes('role="progressbar"'), 'under-threshold progress bar');
-assert(iowa.markup.indexOf('byl-cart-promotion__threshold') < iowa.markup.indexOf('byl-cart-promotion__message'), 'threshold before remaining');
-assert(iowa.markup.indexOf('byl-cart-promotion__message') < iowa.markup.indexOf('byl-cart-promotion__meter'), 'meter immediately follows remaining');
-assert(iowa.markup.indexOf('byl-cart-promotion__meter') < iowa.markup.indexOf('byl-cart-promotion__form'), 'coupon entry follows the meter');
-const fractionalZone = run({active:true,state:'below_threshold',threshold:69.5,subtotal:59,remaining:10.5});
-assert(fractionalZone.markup.includes('Free shipping on orders over $69.50'), 'preserve fractional zone thresholds without rounding misleadingly');
-const availablePaid = run({active:true,state:'free_shipping_available',threshold:69,subtotal:79,remaining:0});
-assert(availablePaid.markup.includes("🎉 Congrats! You've unlocked free shipping."), 'eligible customer sees celebration even while paid delivery selected');
-assert(availablePaid.markup.includes('Select Free Shipping under Shipping above to apply it to your order.'), 'eligible but not selected asks to choose free delivery');
-assert(!availablePaid.markup.includes('Free shipping applied to your order.'), 'paid selected must not claim shipping is applied');
-const couponNeeded = run({active:true,state:'require_code_available',threshold:69,subtotal:89,remaining:0,policy_code:'BYL49'});
-assert(!couponNeeded.markup.includes('🎉 Congrats!'), 'code-required offer cannot celebrate before code applied');
-const couponSelected = run({active:true,state:'require_code_unlocked',threshold:69,subtotal:89,remaining:0,has_code:true,applied_code:'BYL49'});
-assert(couponSelected.markup.includes("🎉 Congrats! You've unlocked free shipping."), 'code-required selected free delivery also celebrates');
-assert(couponSelected.markup.includes('Free shipping applied to your order.'), 'code-required applied status correct');
-const noFreeRate = run({active:true,state:'shipping_unavailable',threshold:0});
-assert(noFreeRate.markup.includes('not available for this shipping address'), 'unavailable is not unlocked');
-assert(!noFreeRate.markup.includes('🎉 Congrats!'), 'unavailable country must not celebrate');
-const staleBlocksOnly = run(null, {active:true,state:'automatic_unlocked',threshold:0});
-assert(!staleBlocksOnly.enhanced, 'classic cart must not use a stale Blocks promotion snapshot');
+headlineOnce(noData.markup,'missing promotion data');
+assert(!noData.enhanced,'native Woo coupon remains available without promotion extension');
+
+const iowa = run({active:true,state:'below_threshold',threshold:69,subtotal:59,remaining:10,
+  has_code:false,applied_code:'',zone_id:5},
+  {active:true,state:'automatic_unlocked',threshold:0,remaining:0});
+headlineOnce(iowa.markup,'Iowa below threshold');
+assert(!iowa.markup.includes('role="progressbar"'),'no old destination-dependent progress bar');
+assert(iowa.markup.includes('Enter coupon code'),'coupon still works below threshold');
+
+const alaska = run({active:true,state:'below_threshold',threshold:129,subtotal:60,remaining:69});
+headlineOnce(alaska.markup,'Alaska $129 threshold');
+assert(!alaska.markup.includes('$129'),'no country rate tables in one-line message');
+
+const selectedFree = run({active:true,state:'free_shipping_available',threshold:69,subtotal:80,remaining:0});
+headlineOnce(selectedFree.markup,'free eligible but not selected');
+
+const special = run({active:true,state:'special_shipping_applies',threshold:69,subtotal:0});
+headlineOnce(special.markup,'special shipping charged');
+
+const staleBlocksOnly = run(null,{active:true,state:'automatic_unlocked',threshold:0});
+assert(!staleBlocksOnly.enhanced,'classic Cart never uses stale Blocks coupon');
+headlineOnce(staleBlocksOnly.markup,'stale Blocks');
+
 const inactive = run({active:false});
-assert(!inactive.enhanced, 'inactive promotions must preserve native Woo coupon');
-assert(css.includes('.woocommerce-cart.byl-cart-coupon-enhanced .woocommerce-cart-form .coupon'), 'native coupon hides only when enhanced code UI works');
-assert(!/\.woocommerce-cart\s+\.woocommerce-cart-form\s+\.coupon\s*\{\s*display\s*:\s*none/.test(css), 'native coupon must not be always hidden');
-console.log('PASS Cart coupon UI: unlocked, applied, inactive, Store API fallback, single native fallback');
+assert(!inactive.enhanced,'inactive promotion must preserve Woo coupon fallback');
+headlineOnce(inactive.markup,'inactive promotion');
+
+assert(css.includes('.woocommerce-cart.byl-cart-coupon-enhanced .woocommerce-cart-form .coupon'),
+  'native coupon remains hidden only when enhanced code UI works');
+assert(!/\.woocommerce-cart\s+\.woocommerce-cart-form\s+\.coupon\s*\{\s*display\s*:\s*none/.test(css),
+  'native coupon must not be always hidden');
+console.log('PASS Cart one-line shipping policy UX: active, coupon, disabled, country thresholds, specials');
