@@ -28,27 +28,38 @@ if (function_exists('WC') && WC() && WC()->cart && class_exists('WC_Shipping_Zon
     if ($count <= 0) {
         $state['kind'] = 'empty';
     } elseif (is_array($settings) && method_exists($cart, 'get_shipping_packages') &&
-        method_exists($cart, 'get_displayed_subtotal')) {
+        method_exists($cart, 'get_cart')) {
         $packages = (array) $cart->get_shipping_packages();
         if (count($packages) === 1 && is_array(reset($packages))) {
             $package = reset($packages);
             $zone = WC_Shipping_Zones::get_zone_matching_package($package);
             $zone_id = $zone && method_exists($zone, 'get_id') ? (int)$zone->get_id() : null;
-            $threshold = $zone_id !== null ? $policy::get_persisted_zone_effective_threshold($zone_id) : null;
+            $terms = $zone_id !== null && function_exists('byl_v3_fs_zone_free_terms')
+                ? byl_v3_fs_zone_free_terms($zone_id) : null;
+            $threshold = is_array($terms) ? ($terms['threshold'] ?? null) : null;
             if ($threshold !== null) {
-                $zones = WC_Shipping_Zones::get_zones();
-                $shipping_methods = (array) ($zones[$zone_id]['shipping_methods'] ?? []);
-                $supports_free = false;
-                foreach ($shipping_methods as $method) {
-                    $method_id = is_object($method) && method_exists($method, 'get_method_id')
-                        ? (string)$method->get_method_id() : (is_object($method) ? (string)($method->id ?? '') : '');
-                    if ($method_id === 'free_shipping' && (string)($method->enabled ?? 'yes') !== 'no') {
-                        $supports_free = true;
-                        break;
-                    }
-                }
+                $supports_free = true; // Verified native Woo free method.
                 $decimals = function_exists('wc_get_price_decimals') ? (int)wc_get_price_decimals() : 2;
-                $subtotal = round((float)$cart->get_displayed_subtotal(), $decimals);
+                // Never count excluded products toward ordinary free shipping.
+                // Woo's discounted line_total is authoritative; gross or
+                // displayed pre-coupon subtotal can promise free shipping
+                // to a cart that still owes ordinary or special freight.
+                $ordinary_subtotal = 0.0;
+                $ordinary_count = 0;
+                foreach ((array)$cart->get_cart() as $item) {
+                    if (!is_array($item)) { continue; }
+                    $product_id = (int)($item['product_id'] ?? 0);
+                    $product = $item['data'] ?? null;
+                    $parent_id = is_object($product) && method_exists($product, 'get_parent_id')
+                        ? (int)$product->get_parent_id() : 0;
+                    if (in_array($product_id, [9145, 9153, 32251, 38047], true)
+                        || in_array($parent_id, [9145, 9153, 32251, 38047], true)) {
+                        continue;
+                    }
+                    $ordinary_subtotal += max(0.0, (float)($item['line_total'] ?? 0));
+                    $ordinary_count++;
+                }
+                $subtotal = round($ordinary_subtotal, $decimals);
                 $threshold = round((float)$threshold, $decimals);
                 $rates = [];
                 if (method_exists(WC(), 'shipping') && WC()->shipping() &&
@@ -82,11 +93,13 @@ if (function_exists('WC') && WC() && WC()->cart && class_exists('WC_Shipping_Zon
                         }
                     }
                 }
-                $eligible = ($subtotal >= $threshold) && $coupon_ok;
+                $eligible = ($ordinary_count > 0 && $subtotal >= $threshold) && $coupon_ok;
                 $state = [
                     'kind' => !$supports_free ? 'unavailable' :
-                        ($subtotal < $threshold ? 'below' :
-                         (!$coupon_ok ? 'code_required' : 'unlocked')),
+                        ($ordinary_count === 0 ? 'special' :
+                         ($subtotal < $threshold ? 'below' :
+                         (!$coupon_ok ? 'code_required' :
+                          (!$available_free ? 'unknown' : 'unlocked')))),
                     'subtotal' => $subtotal,
                     'threshold' => $threshold,
                     'remaining' => max(0.0, round($threshold - $subtotal, $decimals)),
@@ -180,6 +193,8 @@ get_header();
               Your cart is empty. Add your favorites to see your free-shipping progress.
             <?php elseif ($state['kind'] === 'unavailable') : ?>
               Free shipping isn't available for this delivery zone. Check your shipping options in Cart.
+            <?php elseif ($state['kind'] === 'special') : ?>
+              Special items have separate shipping charges and do not qualify for ordinary free shipping. Review the special-item rules below.
             <?php else : ?>
               Your free-shipping goal depends on your delivery address. Review your cart to see the applicable shipping options.
             <?php endif; ?>
