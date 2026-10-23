@@ -34,6 +34,12 @@ $footer_groups = byl_v3_footer_groups($footer_profile);
   <div class="byl-container byl-footer-bottom">
     <p>© <?php echo esc_html(wp_date('Y')); ?> BeYourLover. All rights reserved.</p>
     <p><?php echo $footer_profile === 'landing' ? 'Secure · Discreet · Supported' : 'Discreet by design.'; ?></p>
+    <?php if (shortcode_exists('andy_currency_switcher')): ?>
+      <?php $byl_footer_currency = do_shortcode('[andy_currency_switcher style="compact" show_flag="yes" show_symbol="yes" show_code="yes"]'); ?>
+      <?php if ($byl_footer_currency !== ''): ?>
+        <div class="byl-footer-currency"><?php echo $byl_footer_currency; ?></div>
+      <?php endif; ?>
+    <?php endif; ?>
   </div>
 </footer>
 <?php wp_footer(); ?>
