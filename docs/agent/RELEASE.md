@@ -17,6 +17,13 @@
 - Payment/order steps blocked by missing sandbox or authorization remain **BLOCKED**, not PASS. No live payment or order creation merely to pass a screenshot test; use separately authorized payment/G5 Canary and end-to-end gates.
 - A CSS or Drawer UI release requires retesting affected native controls (not only page screenshots), including Woo SelectWoo Country/State and provider-owned popups when relevant. This policy does **not** grant any Dev/WWW deployment or merge approval.
 
+## Mandatory mobile performance release prerequisite
+
+- [Performance Release Gate V1](PERFORMANCE-RELEASE-GATE-V1.md) is a required independent **PERF PASS** for every affected customer-visible Dev page/template before its release or page closure, and before full Dev-to-WWW cutover. It is **not** satisfied by lint, source CI, screenshots, desktop-only scores, or an uninstalled build.
+- Use three genuine Lighthouse mobile reports for the exact installed Dev SHA and affected URL, assess median Performance >=90 and LCP/FCP/TBT/CLS budgets using `scripts/performance_gate.py`. Record page coverage, baseline, versions, LCP resource, consent/payment/Ads functionality and legitimate blocked cases. Follow risk-based coverage, including paid LPs and global asset consumers where applicable.
+- Missing reports or unable-to-load Dev URLs mean `PERF BLOCKED`; failed metrics mean `PERF FAIL`. Both block `release-ready`. Document a specific, expiring **Owner exception** if accepted; never label an exception `PERF PASS`. The usual explicit approval for main/Dev/WWW remains separate.
+- Andy plugin `wp-admin` surfaces remain Desktop-only and do not require mobile Lighthouse when no customer-facing code changes. Use desktop functionality and interaction UAT instead. Newly created Dev pages may have `NO FIELD DATA` for 28-day Core Web Vitals; do not fabricate field PASS.
+
 ## WWW cutover gate (Owner explicit approval required)
 1. Identify actual WWW hosting and deployment access; do not infer it from the Dev SSH alias.
 2. Back up current WWW files, database, DNS/Cloudflare/configuration, secrets references and restore point; verify restore procedure.

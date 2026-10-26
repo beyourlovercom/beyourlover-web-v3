@@ -20,6 +20,16 @@
 6. **Never fake capability or acceptance.** Actual Woo cart/session/shipping/tax/discount/gateway behavior is authoritative. If a native widget or gateway is blocked, report FAIL/BLOCKED, preserve the legitimate fallback, fix the integration and re-test; do not use hardcoded prices, mock payment buttons, hidden validation, or unapproved real transactions to fabricate PASS.
 7. **Maintain existing release and safety gates.** Owner functional/visual signoff is distinct from lint, isolated DOM tests, CI, Dev rollout and WWW permission. Each exact-head Dev deployment still needs applicable authorization, verified SHA, backup and rollback; no main merge, WWW, real order/payment/customer/DB/mail write without its separate gate.
 
+## Top-level mandatory standard — Mobile Performance Release Gate V1
+
+**Applies to customer-visible BYL V3 pages, shared frontend assets, and pre-release Dev validation.** Follow [Performance Release Gate V1](docs/agent/PERFORMANCE-RELEASE-GATE-V1.md) in addition to Native-First Dual UAT. This is a separate, mandatory release/page-closure decision, not a replacement for functional or visual UAT.
+
+- Public mobile candidates: three authentic Lighthouse mobile runs against the **installed exact-SHA Dev candidate**; median **Performance >=90, LCP <=2.5s, FCP <=1.8s, TBT <=200ms, CLS <=0.1**, with no single Performance run below 85. Record reports and environment/config; source-only CI does not count as a live performance PASS.
+- Test impacted page types and critical shared-template paths proportionately. Global frontend assets must cover affected home/PDP/Cart/Checkout/active paid landing pages as applicable; do not omit checkout or attribution flows to improve the score.
+- Andy plugin **admin backends are Desktop-only** and exempt from mobile Lighthouse; customer-facing cart, inquiry, checkout, marketing, product, blog and site layouts are **not exempt**.
+- A `PERF FAIL` or `PERF BLOCKED` prevents release-ready/page closure/WWW cutover. Only an explicit time-bounded Owner exception for the specific candidate can override the *performance* gate; it is **not PERF PASS** and never waives payment, security, native function, real-transaction or Production authorization gates.
+- Run the offline checker `scripts/performance_gate.py` on genuine Dev Lighthouse JSON, retain non-sensitive evidence, and preserve the existing Dev-backup/rollback and WWW hard stops. No paid service is mandated.
+
 ## Autonomous execution inside an approved work package
 - Once the Owner approves a bounded objective/design, investigate relevant code and docs, implement, run proportionate tests, fix failures, commit, push, prepare/update a PR, and run safe Dev validation without asking permission for each routine step.
 - Make reasonable implementation decisions within approved behavior. Do not silently widen product scope, change approved UI, business rules, permission models, payment routing or data ownership.

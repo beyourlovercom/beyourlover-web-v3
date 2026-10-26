@@ -65,6 +65,11 @@ jobs:
         run: python -m py_compile scripts/*.py
       - name: BYL Native-First Development & Dual UAT V1 governance
         run: python3 scripts/test_native_first_dual_uat_governance.py
+      - name: BYL Performance Release Gate V1 offline budget and governance contracts (NO DEV AUDIT)
+        run: |
+          python3 -m unittest discover -s scripts -p test_performance_release_gate.py -v
+          python3 -m py_compile scripts/performance_gate.py
+
       - name: Theme OS V1 module, SemVer and dependency validation
         run: python3 scripts/theme_os.py validate
       - name: Theme OS V1 fail-closed contracts

@@ -29,6 +29,14 @@ Select tests by impacted behavior, then ensure meaningful coverage. Faster model
 - Never create synthetic real orders simply to turn a test green; no externally charged transaction or email send without its own gate.
 - If Playwright/browser is inaccessible, state the coverage gap rather than claiming visual UAT.
 
+## Performance verification — separate mandatory public frontend gate
+
+- Follow [Performance Release Gate V1](PERFORMANCE-RELEASE-GATE-V1.md), in addition to existing Native-First/Owner Functional and Visual UAT. Measure actual **Dev installed exact SHA** rather than a fixture, source branch or legacy WWW site.
+- On relevant customer-facing pages, capture three mobile Lighthouse JSON runs and enforce **median Performance >=90, LCP <=2.5s, FCP <=1.8s, TBT <=200ms, CLS <=0.1**; no individual run may score below 85. Run `python3 scripts/performance_gate.py --url https://dev.beyourlover.com/<route>/ <run1.json> <run2.json> <run3.json>` after collecting genuine reports. The script does **not** collect reports or establish Dev deployment.
+- For global public bundles validate applicable home/category/PDP/Cart/Checkout/blog/active ad LPs, and preserve native Woo interaction, enquiry delivery and Ads attribution. Baseline/regression evidence, environment/throttling, asset culprit and errors are mandatory review details. An absent real report is `PERF BLOCKED`, not source-only PASS.
+- Plugin-only `wp-admin` work remains **Desktop-only** without unnecessary mobile Lighthouse; changes to public plugin resources or front-facing UI **are** in scope. New Dev page with no 28-day real-user data records `NO FIELD DATA` and still requires lab gate.
+- Performance exception is a named, expiring Owner approval and stays marked `OWNER-EXCEPTION — NOT PERF PASS`; does not waive payment, security, Woo integrity, real-order or separate Dev/WWW authorization.
+
 ## Evidence and closure
 - Test logs should show the actual command, exact revision, result and any excluded cases.
 - CI missing/queued is not CI PASS; Dev smoke is not Owner PASS.
