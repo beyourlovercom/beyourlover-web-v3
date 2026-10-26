@@ -16,6 +16,18 @@ defined('ABSPATH') || exit;
       <a href="<?php echo esc_url(home_url('/return-policies/')); ?>"><?php esc_html_e('Returns', 'beyourlover-v3'); ?></a>
       <a href="<?php echo esc_url(home_url('/customer-help/')); ?>"><?php esc_html_e('Support', 'beyourlover-v3'); ?></a>
     </nav>
+    <?php
+    // Reuse the Commerce-owned Footer selector. Do not add a floating control
+    // or register a second currency switching implementation inside the theme.
+    $byl_cart_currency = shortcode_exists('andy_currency_switcher')
+      ? do_shortcode('[andy_currency_switcher style="compact" show_flag="yes" show_symbol="yes" show_code="yes"]')
+      : '';
+    if ($byl_cart_currency !== '') :
+    ?>
+      <div class="byl-focus-currency" role="group" aria-label="<?php esc_attr_e('Currency selection', 'beyourlover-v3'); ?>">
+        <?php echo $byl_cart_currency; // Controlled Andy Commerce shortcode output, including its POST form. ?>
+      </div>
+    <?php endif; ?>
     <small class="byl-focus-copy">© <?php echo esc_html(wp_date('Y')); ?> BeYourLover.</small>
   </div>
 </footer>
