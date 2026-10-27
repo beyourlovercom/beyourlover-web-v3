@@ -10,12 +10,45 @@ add_action('wp_enqueue_scripts', static function (): void {
     $theme_version = wp_get_theme()->get('Version');
     $dir = get_stylesheet_directory(); $uri = get_stylesheet_directory_uri();
     $v = static function (string $r) use ($dir, $theme_version): string { $p=$dir.'/'.ltrim($r,'/'); return is_file($p)?(string)filemtime($p):(string)$theme_version; };
-    wp_enqueue_style('byl-v3-foundation', get_stylesheet_uri(), [], $v('style.css'));
-    wp_enqueue_style('byl-v3-tokens', $uri.'/assets/css/tokens.css', ['byl-v3-foundation'], $v('assets/css/tokens.css'));
-    wp_enqueue_style('byl-v3-components', $uri.'/assets/css/components.css', ['byl-v3-tokens'], $v('assets/css/components.css'));
-    wp_enqueue_style('byl-v3-component-library', $uri.'/assets/css/component-library.css', ['byl-v3-components'], $v('assets/css/component-library.css'));
-    wp_enqueue_style('byl-v3-shell', $uri.'/assets/css/shell.css', ['byl-v3-component-library'], $v('assets/css/shell.css'));
-    wp_enqueue_style('byl-v3-motion', $uri.'/assets/css/motion.css', ['byl-v3-shell'], $v('assets/css/motion.css'));
+    // Default remains the original six stylesheets. The separate Andy Speed
+    // plugin can opt into an immutable bundle only after hash verification.
+    // Every historical handle is still registered to preserve dependencies.
+    $speed_bundle_allowed = (bool) apply_filters('andy_speed_byl_v3_common_css_bundle', false);
+    $bundle_rel = 'assets/css/common.bundle.css';
+    $manifest_rel = 'assets/css/common.bundle.manifest.json';
+    $speed_bundle_ok = false;
+    if ($speed_bundle_allowed && is_file($dir.'/'.$bundle_rel) && is_file($dir.'/'.$manifest_rel)) {
+        $manifest = json_decode((string) file_get_contents($dir.'/'.$manifest_rel), true);
+        if (is_array($manifest) && isset($manifest['sources'], $manifest['bundle_sha256']) && is_array($manifest['sources'])) {
+            $expected = ['style.css', 'assets/css/tokens.css', 'assets/css/components.css', 'assets/css/component-library.css', 'assets/css/shell.css', 'assets/css/motion.css'];
+            $speed_bundle_ok = array_keys($manifest['sources']) === $expected;
+            foreach ($expected as $rel) {
+                if (!$speed_bundle_ok) { break; }
+                $path = $dir.'/'.$rel;
+                $speed_bundle_ok = is_file($path) && hash_file('sha256', $path) === $manifest['sources'][$rel];
+            }
+            if ($speed_bundle_ok) {
+                $speed_bundle_ok = hash_file('sha256', $dir.'/'.$bundle_rel) === $manifest['bundle_sha256'];
+            }
+        }
+    }
+
+    if ($speed_bundle_ok) {
+        wp_enqueue_style('byl-v3-foundation', $uri.'/'.$bundle_rel, [], $v($bundle_rel));
+        wp_register_style('byl-v3-tokens', false, ['byl-v3-foundation'], $v($bundle_rel));
+        wp_register_style('byl-v3-components', false, ['byl-v3-tokens'], $v($bundle_rel));
+        wp_register_style('byl-v3-component-library', false, ['byl-v3-components'], $v($bundle_rel));
+        wp_register_style('byl-v3-shell', false, ['byl-v3-component-library'], $v($bundle_rel));
+        wp_register_style('byl-v3-motion', false, ['byl-v3-shell'], $v($bundle_rel));
+        wp_enqueue_style('byl-v3-motion');
+    } else {
+        wp_enqueue_style('byl-v3-foundation', get_stylesheet_uri(), [], $v('style.css'));
+        wp_enqueue_style('byl-v3-tokens', $uri.'/assets/css/tokens.css', ['byl-v3-foundation'], $v('assets/css/tokens.css'));
+        wp_enqueue_style('byl-v3-components', $uri.'/assets/css/components.css', ['byl-v3-tokens'], $v('assets/css/components.css'));
+        wp_enqueue_style('byl-v3-component-library', $uri.'/assets/css/component-library.css', ['byl-v3-components'], $v('assets/css/component-library.css'));
+        wp_enqueue_style('byl-v3-shell', $uri.'/assets/css/shell.css', ['byl-v3-component-library'], $v('assets/css/shell.css'));
+        wp_enqueue_style('byl-v3-motion', $uri.'/assets/css/motion.css', ['byl-v3-shell'], $v('assets/css/motion.css'));
+    }
     wp_enqueue_script('byl-v3-shell', $uri.'/assets/js/shell.js', [], $v('assets/js/shell.js'), true);
     wp_script_add_data('byl-v3-shell', 'strategy', 'defer');
     if (is_front_page()) { wp_enqueue_style('byl-v3-homepage', $uri.'/assets/css/homepage.css', ['byl-v3-motion'], $v('assets/css/homepage.css')); }
