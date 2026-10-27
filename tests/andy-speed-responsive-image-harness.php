@@ -6,5 +6,6 @@ check(substr_count($s,'andy-speed-dev-hero-640.webp 640w')===1,'Responsive LCP h
 check(substr_count($s,'andy-speed-dev-hero-900.webp 900w')===1,'Responsive LCP hero 900w');
 check(substr_count($s,'influencers-instagram-4.webp 1141w')===1,'Original hero fallback srcset');
 check(substr_count($s,'andy-speed-dev-minaka-420.webp 420w')===1,'Responsive Minaka thumbnail');
+check(substr_count($s,'andy-speed-dev-minaka-720.webp 720w')===1,'High-DPI Minaka 720w');
 check(str_contains($s,'fetchpriority="high"'),'Priority preserved');
 echo "PASS responsive image candidate contract\n";
