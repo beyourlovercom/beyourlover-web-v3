@@ -343,7 +343,8 @@ add_action('phpmailer_init', static function ($mailer): void {
  */
 function byl_dev_marketing_fixture_checkout(): bool {
     if (wp_get_environment_type() !== 'staging'
-        || home_url() !== 'https://dev.beyourlover.com' || !is_ssl()
+        || home_url() !== 'https://dev.beyourlover.com'
+        || !function_exists('is_ssl') || !is_ssl()
         || !defined('AICC_MARKETING_DEV_UAT') || AICC_MARKETING_DEV_UAT !== true
         || !is_user_logged_in() || !current_user_can('manage_woocommerce')
         || get_option('andy_commerce_marketing_dev_uat_enabled','no') !== 'yes'
