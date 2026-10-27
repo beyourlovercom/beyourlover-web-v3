@@ -13,7 +13,7 @@ add_action('wp_enqueue_scripts', static function (): void {
     // Default remains the original six stylesheets. The separate Andy Speed
     // plugin can opt into an immutable bundle only after hash verification.
     // Every historical handle is still registered to preserve dependencies.
-    $speed_bundle_allowed = (bool) apply_filters('andy_speed_byl_v3_common_css_bundle', false);
+    $speed_bundle_allowed = function_exists('apply_filters') ? (bool) apply_filters('andy_speed_byl_v3_common_css_bundle', false) : false;
     $bundle_rel = 'assets/css/common.bundle.css';
     $manifest_rel = 'assets/css/common.bundle.manifest.json';
     $speed_bundle_ok = false;

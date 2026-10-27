@@ -23,7 +23,7 @@ class TestThemeOS(unittest.TestCase):
         self.assertEqual(r["file_count"], len(r["owner_map"]) + 1)  # includes theme-os.json itself
         self.assertEqual(r["owner_map"]["page-newsletter.php"], "pages")
         self.assertEqual(r["owner_map"]["assets/css/newsletter.css"], "pages")
-        self.assertEqual(r["version"], "0.1.0")
+        self.assertEqual(r["version"], "0.1.1")
         self.assertLess(r["module_order"].index("cart"), r["module_order"].index("checkout"))
         self.assertEqual(r["owner_map"]["woocommerce/checkout/form-checkout.php"], "checkout")
         self.assertEqual(r["owner_map"]["inc/order-pay-address.php"], "checkout")
