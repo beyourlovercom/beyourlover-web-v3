@@ -380,18 +380,18 @@ $byl_v5_category_link = static function (string $slug): string {
 <div class="byl-v5-categories" aria-label="BeYourLover collections">
 <section class="editorial-overlay women">
   <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">FOR THE MOMENTS THAT MATTER</span><h2>Let your<br>senses lead.</h2><p>The most tempting discoveries begin with a little curiosity.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-women')); ?>">EXPLORE FOR HER &nbsp; ↗</a></div>
-   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover editorial illustration" loading="lazy" decoding="async"></div></div>
  </section>
  <section class="byl-v5-live-products byl-home-section" aria-label="Live featured products"><div class="byl-container"><div class="byl-product-grid">
  <?php foreach ($popular_products as $product): echo byl_v3_product_card($product); endforeach; ?>
  </div></div></section>
  <section class="editorial-overlay men">
   <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">UNAPOLOGETIC PLEASURE</span><h2>Make<br>your move.</h2><p>Bold in every detail. Irresistible by design.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-men')); ?>">EXPLORE FOR HIM &nbsp; ↗</a></div>
-   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052543/influencers-instagram-6.webp" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052543/influencers-instagram-6.webp" alt="Original BeYourLover editorial illustration" loading="lazy" decoding="async"></div></div>
  </section>
  <section class="editorial-overlay couples">
   <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">A LITTLE CLOSER</span><h2>Closer.<br>Hotter.</h2><p>A spark worth following. Made for everything that happens next.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-couples')); ?>">EXPLORE TOGETHER &nbsp; ↗</a></div>
-   <div class="overlay-art"><img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Original BeYourLover editorial illustration" loading="lazy" decoding="async"></div></div>
  </section>
 </div>
 <!-- Original WWW lower DOM captured 2026-10-14. No bitmap replacement. -->
@@ -1167,7 +1167,7 @@ $byl_v5_category_link = static function (string $slug): string {
     <div class="models-list" role="list" aria-label="Instagram posts gallery">
         <div class="models-item" role="listitem">
             <a href="https://www.instagram.com/p/DLAk852sA8i/?img_index=1" target="_blank" rel="noopener noreferrer" aria-label="View Instagram post 1">
-                <img src="https://img.beyourlover.com/2026/06/16071043/influencers-instagram-25.png" alt="BeYourLover influencer Instagram post 1" width="300" height="300" loading="eager" decoding="async">
+                <img src="https://img.beyourlover.com/2026/06/16071043/influencers-instagram-25.png" alt="BeYourLover influencer Instagram post 1" width="300" height="300" loading="lazy" decoding="async">
             </a>
         </div>
         <div class="models-item" role="listitem">
