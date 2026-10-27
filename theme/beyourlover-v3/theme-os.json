@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "theme": "beyourlover-v3",
-  "theme_version": "0.1.0",
+  "theme_version": "0.1.1",
   "version_policy": "semver",
   "runtime_mode": "ordered-bootstrap-and-route-assets-v1",
   "release_policy": "github-exact-head-owner-gated",
@@ -25,6 +25,8 @@
         "index.php",
         "inc/components.php",
         "template-component-library.php",
+        "assets/css/common.bundle.css",
+        "assets/css/common.bundle.manifest.json",
         "assets/css/tokens.css",
         "assets/css/components.css",
         "assets/css/component-library.css",
@@ -208,7 +210,11 @@
       ]
     },
     "creator": {
-      "depends_on": ["foundation", "shell", "pages"],
+      "depends_on": [
+        "foundation",
+        "shell",
+        "pages"
+      ],
       "kind": "presentation",
       "files": [
         "template-affiliate-dashboard.php",
