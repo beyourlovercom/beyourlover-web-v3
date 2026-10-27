@@ -82,7 +82,9 @@ add_filter('woocommerce_webhook_should_deliver', static function ($allow, $webho
         return (bool) $allow;
     }
     if ($order->get_meta('_byl_dev_sandbox_p13', true) === 'yes'
-        || strtolower(trim((string) $order->get_billing_email())) === 'byl-p13@example.invalid') {
+        || $order->get_meta('_aicc_marketing_dev_uat', true) === 'yes'
+        || strtolower(trim((string) $order->get_billing_email())) === 'byl-p13@example.invalid'
+        || strtolower(trim((string) $order->get_billing_email())) === 'aicc-marketing-uat@example.invalid') {
         return false;
     }
     return (bool) $allow;
@@ -334,6 +336,61 @@ add_action('phpmailer_init', static function ($mailer): void {
     }
 }, PHP_INT_MAX);
 
+/**
+ * M-P5 Dev Marketing checkout exception. The original P1.3 gate remains
+ * untouched; this is a separate short-lived, admin-browser fixture-only COD
+ * test path. Ordinary visitors, real SKUs and any live rail remain denied.
+ */
+function byl_dev_marketing_fixture_checkout(): bool {
+    if (wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com'
+        || !function_exists('is_ssl') || !is_ssl()
+        || !defined('AICC_MARKETING_DEV_UAT') || AICC_MARKETING_DEV_UAT !== true
+        || !is_user_logged_in() || !current_user_can('manage_woocommerce')
+        || get_option('andy_commerce_marketing_dev_uat_enabled','no') !== 'yes'
+        || get_option('andy_commerce_marketing_p1_sandbox_enabled','no') !== 'yes'
+        || get_option('woocommerce_currency','') !== 'USD'
+        || !function_exists('get_woocommerce_currency')
+        || get_woocommerce_currency() !== 'USD'
+        || !class_exists('Andy_Commerce_Marketing_P1_Sandbox_Contract')
+        || !Andy_Commerce_Marketing_P1_Sandbox_Contract::current()) return false;
+
+    $expiry=(int)get_option('aicc_marketing_dev_checkout_expires_at',0);
+    if ($expiry <= time() || $expiry > time()+3600) return false;
+    if (!function_exists('WC') || !WC()) return false;
+    if (!WC()->cart && function_exists('wc_load_cart')) wc_load_cart();
+    if (!WC()->cart instanceof WC_Cart) return false;
+    $items=WC()->cart->get_cart();
+    if (!$items || count($items)>4 || WC()->cart->get_cart_contents_count()>10) return false;
+    $allowed=[40026=>true,40027=>true,40028=>true,40029=>true];
+    foreach ($items as $item) {
+        if (!is_array($item) || !is_int($item['product_id']??null)
+            || !isset($allowed[$item['product_id']])
+            || !empty($item['variation_id'])
+            || (int)($item['quantity']??0)<1
+            || !($item['data']??null) instanceof WC_Product
+            || $item['data']->get_catalog_visibility()!=='hidden'
+            || get_post_meta($item['product_id'],'_aicc_marketing_uat_fixture',true)!=='yes')
+            return false;
+    }
+    $codes=(array)WC()->cart->get_applied_coupons();
+    if (count($codes)>1) return false;
+    foreach ($codes as $code) {
+        if (!is_string($code) || !str_starts_with($code,'aicc-p2-aicc-uat-dev-')) return false;
+    }
+    if ((float)WC()->cart->get_subtotal()>500.0) return false;
+    return true;
+}
+
+/** Cap is independent of the historical P1.3 gateway test budget. */
+function byl_dev_marketing_fixture_order_room(): bool {
+    if (!function_exists('wc_get_orders')) return false;
+    return count(wc_get_orders([
+        'limit'=>12, 'return'=>'ids',
+        'meta_query'=>[['key'=>'_aicc_marketing_dev_uat','value'=>'yes']]
+    ])) < 12;
+}
+
 // P5: Store API Checkout is a distinct order-creation/payment path from classic Woo.
 // The G2 test permit is classic-checkout only. Even a valid tester grant must
 // never authorize Store API Checkout until that surface has equivalent gates.
@@ -346,6 +403,10 @@ add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
     $route = $request->get_route();
     if (!preg_match('#^/wc/store(?:/v1)?/checkout(?:/[0-9]+)?/?$#', $route)) { return $result; }
     if ($request->get_method() === 'OPTIONS') { return $result; }
+    // Only the exact current Dev Marketing fixture cart, approved admin
+    // session and expiring UAT window can reach Woo's Store API validation.
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room())
+        return $result;
     return new WP_Error(
         'byl_dev_sandbox_checkout_closed',
         'Store API Checkout is disabled on the development environment.',
@@ -354,6 +415,8 @@ add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
 }, 99, 3);
 // Ordinary visitors see no payment methods. Tester sees exactly one eligible rail.
 add_filter('woocommerce_available_payment_gateways', static function (array $gateways): array {
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room())
+        return isset($gateways['cod']) ? ['cod'=>$gateways['cod']] : [];
     $context = byl_dev_p13_checkout_gate();
     if (!$context) { return []; }
     $id = $context['gateway'];
@@ -365,6 +428,12 @@ add_filter('woocommerce_allow_tracking', '__return_false', 99);
 // Stop all checkout orders, except a narrowly scoped synthetic customer.
 // Limit the number of test orders; do not weaken server-side Woo validations.
 add_action('woocommerce_checkout_process', static function (): void {
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room()) {
+        $email=sanitize_email(wp_unslash($_POST['billing_email'] ?? ''));
+        if ($email !== 'aicc-marketing-uat@example.invalid')
+            wc_add_notice('Marketing UAT requires the isolated test email.', 'error');
+        return;
+    }
     $context = byl_dev_p13_checkout_gate();
     if ($context) {
         $email = sanitize_email(wp_unslash($_POST['billing_email'] ?? ''));
@@ -389,10 +458,30 @@ add_action('woocommerce_checkout_process', static function (): void {
 
 // Mark the order BEFORE its initial save so audit/ERP filters can recognize it.
 add_action('woocommerce_checkout_create_order', static function ($order): void {
-    if (byl_dev_p13_checkout_gate() && is_a($order, 'WC_Order')) {
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room()
+        && $order instanceof WC_Order
+        && $order->get_payment_method()==='cod'
+        && $order->get_billing_email()==='aicc-marketing-uat@example.invalid') {
+        $order->update_meta_data('_aicc_marketing_dev_uat','yes');
+        $order->update_meta_data('_aicc_marketing_dev_fixture_only','yes');
+    } elseif (byl_dev_p13_checkout_gate() && is_a($order, 'WC_Order')) {
         $order->update_meta_data('_byl_dev_sandbox_p13', 'yes');
     }
 }, 10, 1);
+
+// Store API does not invoke classic_checkout_create_order. Validate the
+// persisted request data BEFORE allowing P5 reserve or payment processing.
+add_action('woocommerce_store_api_checkout_update_order_from_request',
+    static function ($order,$request): void {
+        if (!byl_dev_marketing_fixture_checkout()
+            || !byl_dev_marketing_fixture_order_room()
+            || !($order instanceof WC_Order)
+            || $order->get_billing_email()!=='aicc-marketing-uat@example.invalid')
+            throw new RuntimeException('M_P5_DEV_STORE_API_FIXTURE_DENIED');
+        $order->set_payment_method('cod');
+        $order->update_meta_data('_aicc_marketing_dev_uat','yes');
+        $order->update_meta_data('_aicc_marketing_dev_fixture_only','yes');
+    }, 10, 2);
 
 add_action('send_headers', static function () {
     header('X-Robots-Tag: noindex, nofollow, noarchive', true);
