@@ -327,7 +327,7 @@ $byl_v5_category_link = static function (string $slug): string {
 <div class="v4">
 
 <section class="hero v5-hero" id="v5-hero">
-  <div class="v5-hero-image"><img loading="eager" src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover sensual fashion illustration" loading="eager"></div>
+  <div class="v5-hero-image"><img loading="eager" fetchpriority="high" decoding="async" src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover sensual fashion illustration"></div>
   <div class="v5-hero-veil"></div>
   <div class="v5-hero-copy">
     <span class="v5-overline">BEYOURLOVER &nbsp; / &nbsp; THE ART OF PLEASURE</span>
@@ -1158,7 +1158,7 @@ $byl_v5_category_link = static function (string $slug): string {
 		<picture>
 			<source media="(min-width: 769px)" srcset="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" type="image/webp">
 			<source media="(max-width: 768px)" srcset="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" type="image/webp">
-			<img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Sex Toys for Couples - BeYourLover Collection" width="1400" height="800" loading="eager" fetchpriority="high" decoding="async">
+			<img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Sex Toys for Couples - BeYourLover Collection" width="1400" height="800" loading="lazy" decoding="async">
 		</picture>
 	</a>
 </div>
@@ -1215,7 +1215,7 @@ $byl_v5_category_link = static function (string $slug): string {
             <div class="swiper-slide" role="group" aria-label="1 / 7">
                 <div class="red-man-box">
                     <a href="https://www.instagram.com/p/DKkQmHfKvoZ/" target="_blank" rel="noopener noreferrer" aria-label="View Instagram post by solostella_sg">
-                        <img src="https://img.beyourlover.com/2026/06/16070501/redman-img07.png" alt="Customer testimonial by solostella_sg - BeYourLover" width="400" height="400" loading="eager" fetchpriority="high" decoding="async">
+                        <img src="https://img.beyourlover.com/2026/06/16070501/redman-img07.png" alt="Customer testimonial by solostella_sg - BeYourLover" width="400" height="400" loading="lazy" decoding="async">
                     </a>
                     <div class="txt1">
                         "Hey please, can you tell what time is it?" Sure! Look here, this clock shows you the hour, but
@@ -1319,7 +1319,7 @@ $byl_v5_category_link = static function (string $slug): string {
             <div class="swiper-wrapper blogHomeSwiper-wrapper" id="blog-posts">
                 <div class="swiper-slide" role="group" aria-label="Featured post 1 of 1">
                     <a href="/blog/experience-brain-orgasm/" aria-label="Read article: Can Anyone Experience Brain Orgasm?">
-                        <img src="https://img.beyourlover.com/2025/03/20020642/Brain-Orgasm-banner.jpg" alt="Brain Orgasm - Benefits and Methods Explained" width="800" height="500" loading="eager" fetchpriority="high" decoding="async">
+                        <img src="https://img.beyourlover.com/2025/03/20020642/Brain-Orgasm-banner.jpg" alt="Brain Orgasm - Benefits and Methods Explained" width="800" height="500" loading="lazy" decoding="async">
                         <div class="swiper-text">
                             <span class="swiper-txt1">
                                 Can Anyone Experience "Brain Orgasm"? Benefits and Methods Explained!
