@@ -69,7 +69,7 @@ function byl_v3_brand_logo(): string {
         $attachment = get_page_by_path($slug, OBJECT, 'attachment');
         if ($attachment instanceof WP_Post) {
             $url = byl_v3_attachment_url((int) $attachment->ID);
-            if ($url !== '') { return '<img class="byl-brand-logo" src="'.esc_url($url).'" alt="BeYourLover®">'; }
+            if ($url !== '') { return '<img class="byl-brand-logo" src="'.esc_url($url).'" srcset="https://img.beyourlover.com/2026/10/andy-speed-dev-logo-360.webp 360w, '.esc_url($url).' 2560w" sizes="(max-width: 640px) 160px, 190px" alt="BeYourLover®">'; }
         }
     }
     return '<span class="byl-brand-fallback"><span class="byl-brand-dot" aria-hidden="true"></span>BeYourLover</span>';
