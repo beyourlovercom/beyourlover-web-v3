@@ -1917,7 +1917,16 @@ if ($byl_footer_newsletter_ready
 
 		<div class="footer-payment">
 			<div class="footer-payment-left">
-				<span class="byl-www-static-currency">$ USD</span>			</div>
+				<?php
+                $byl_footer_currency = shortcode_exists('andy_currency_switcher')
+                    ? do_shortcode('[andy_currency_switcher style="compact" show_flag="yes" show_symbol="yes" show_code="yes"]')
+                    : '';
+                if ($byl_footer_currency !== '') {
+                    echo $byl_footer_currency;
+                } else {
+                    echo '<span class="byl-www-static-currency">$ USD</span>';
+                }
+                ?>			</div>
 
 
 			<div class="footer-language-trust">
