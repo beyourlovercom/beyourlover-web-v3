@@ -400,7 +400,8 @@ function byl_dev_marketing_fixture_order_room(): bool {
 function byl_dev_r13_stripe_checkout(?WP_REST_Request $request = null): bool {
     if (wp_get_environment_type() !== 'staging'
         || home_url() !== 'https://dev.beyourlover.com'
-        || !is_ssl() || !class_exists('Andy_Commerce_Currency_R13_Dev_Canary')
+        || !function_exists('is_ssl') || !is_ssl()
+        || !class_exists('Andy_Commerce_Currency_R13_Dev_Canary')
         || !Andy_Commerce_Currency_R13_Dev_Canary::armed()
         || !Andy_Commerce_Currency_R13_Dev_Canary::payment_ready()
         || get_option('woocommerce_currency') !== 'USD'
