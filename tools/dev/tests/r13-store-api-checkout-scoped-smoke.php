@@ -108,7 +108,9 @@ foreach([
     'currency'=>'USD',
 ] as $key=>$bad){
     $old=$GLOBALS['gate'][$key];$GLOBALS['gate'][$key]=$bad;
-    ok(rejected($dispatch(null,null,$post($params))),'deny: '.$key);
+    $seen=$dispatch(null,null,$post($params));
+    ok(in_array($key,['environment','home'],true) ? $seen===null : rejected($seen),
+        'non-Dev untouched or Dev denied: '.$key);
     $GLOBALS['gate'][$key]=$old;
 }
 $old=$GLOBALS['wc']->cart->items;
