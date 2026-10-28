@@ -327,7 +327,7 @@ $byl_v5_category_link = static function (string $slug): string {
 <div class="v4">
 
 <section class="hero v5-hero" id="v5-hero">
-  <div class="v5-hero-image"><img loading="eager" fetchpriority="high" decoding="async" src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" srcset="https://img.beyourlover.com/2026/10/andy-speed-dev-hero-640.webp 640w, https://img.beyourlover.com/2026/10/andy-speed-dev-hero-900.webp 900w, https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp 1141w" sizes="(max-width: 640px) 100vw, (max-width: 900px) 70vw, 875px" alt="Original BeYourLover sensual fashion illustration"></div>
+  <div class="v5-hero-image"><img loading="eager" fetchpriority="high" decoding="async" src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" srcset="https://img.beyourlover.com/2026/10/andy-speed-dev-hero-640.webp 640w, https://img.beyourlover.com/2026/10/andy-speed-dev-hero-760.webp 760w, https://img.beyourlover.com/2026/10/andy-speed-dev-hero-900.webp 900w, https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp 1141w" sizes="(max-width: 640px) 100vw, (max-width: 900px) 70vw, 875px" alt="Original BeYourLover sensual fashion illustration"></div>
   <div class="v5-hero-veil"></div>
   <div class="v5-hero-copy">
     <span class="v5-overline">BEYOURLOVER &nbsp; / &nbsp; THE ART OF PLEASURE</span>
