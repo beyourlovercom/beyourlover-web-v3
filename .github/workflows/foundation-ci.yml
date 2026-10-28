@@ -30,6 +30,8 @@ jobs:
         run: php -l tools/dev/tests/p5-store-api-checkout-deny-smoke.php
       - name: P5 Store API Checkout fail-closed security smoke
         run: php tools/dev/tests/p5-store-api-checkout-deny-smoke.php
+      - name: R13 Dev TEST Checkout scoped allow and deny isolated regression
+        run: php -l tools/dev/tests/r13-store-api-checkout-scoped-smoke.php && php tools/dev/tests/r13-store-api-checkout-scoped-smoke.php
       - name: P7 outbound Dev Sandbox Webhook PHP syntax
         run: php -l tools/dev/tests/p7-sandbox-webhook-isolation-smoke.php
       - name: P7 outbound Dev Sandbox Webhook security smoke
