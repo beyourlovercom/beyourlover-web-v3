@@ -327,7 +327,7 @@ $byl_v5_category_link = static function (string $slug): string {
 <div class="v4">
 
 <section class="hero v5-hero" id="v5-hero">
-  <div class="v5-hero-image"><img loading="eager" src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover sensual fashion illustration" loading="eager"></div>
+  <div class="v5-hero-image"><img loading="eager" fetchpriority="high" decoding="async" src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" srcset="https://img.beyourlover.com/2026/10/andy-speed-dev-hero-640.webp 640w, https://img.beyourlover.com/2026/10/andy-speed-dev-hero-900.webp 900w, https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp 1141w" sizes="(max-width: 640px) 100vw, (max-width: 900px) 70vw, 875px" alt="Original BeYourLover sensual fashion illustration"></div>
   <div class="v5-hero-veil"></div>
   <div class="v5-hero-copy">
     <span class="v5-overline">BEYOURLOVER &nbsp; / &nbsp; THE ART OF PLEASURE</span>
@@ -369,7 +369,7 @@ $byl_v5_category_link = static function (string $slug): string {
       <div class="v5-star-info"><span>01 / THE OBJECT OF DESIRE</span><h3>TARA S2</h3><span>DISCOVER &nbsp; ↗</span></div>
     </a>
     <div class="v5-other-items">
-      <a class="v5-mini" href="<?php echo esc_url($byl_v5_product_link('minaka')); ?>"><div class="v5-mini-photo"><img loading="lazy" src="https://img.beyourlover.com/2026/06/16065328/minaka-main-pictures.png" alt="MINAKA actual product photo"></div><div class="v5-mini-label"><span>02</span><h3>MINAKA</h3><span>↗</span></div></a>
+      <a class="v5-mini" href="<?php echo esc_url($byl_v5_product_link('minaka')); ?>"><div class="v5-mini-photo"><img loading="lazy" src="https://img.beyourlover.com/2026/06/16065328/minaka-main-pictures.png" srcset="https://img.beyourlover.com/2026/10/andy-speed-dev-minaka-420.webp 420w, https://img.beyourlover.com/2026/10/andy-speed-dev-minaka-720.webp 720w, https://img.beyourlover.com/2026/06/16065328/minaka-main-pictures.png 1200w" sizes="(max-width: 600px) 48vw, 280px" alt="MINAKA actual product photo"></div><div class="v5-mini-label"><span>02</span><h3>MINAKA</h3><span>↗</span></div></a>
       <a class="v5-mini" href="<?php echo esc_url($byl_v5_product_link('naughty-clock-pink')); ?>"><div class="v5-mini-photo"><img loading="lazy" src="https://img.beyourlover.com/2026/04/10042552/main-pictures-03-1.webp" alt="NAUGHTY CLOCK PINK actual product photo"></div><div class="v5-mini-label"><span>03</span><h3>CLOCK PINK</h3><span>↗</span></div></a>
       <a class="v5-mini" href="<?php echo esc_url($byl_v5_product_link('naughty-clock-green')); ?>"><div class="v5-mini-photo"><img loading="lazy" src="https://img.beyourlover.com/2025/12/23013024/naughty-clock.png" alt="NAUGHTY CLOCK GREEN actual product photo"></div><div class="v5-mini-label"><span>04</span><h3>CLOCK GREEN</h3><span>↗</span></div></a>
     </div>
@@ -380,18 +380,18 @@ $byl_v5_category_link = static function (string $slug): string {
 <div class="byl-v5-categories" aria-label="BeYourLover collections">
 <section class="editorial-overlay women">
   <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">FOR THE MOMENTS THAT MATTER</span><h2>Let your<br>senses lead.</h2><p>The most tempting discoveries begin with a little curiosity.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-women')); ?>">EXPLORE FOR HER &nbsp; ↗</a></div>
-   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052232/influencers-instagram-4.webp" alt="Original BeYourLover editorial illustration" loading="lazy" decoding="async"></div></div>
  </section>
  <section class="byl-v5-live-products byl-home-section" aria-label="Live featured products"><div class="byl-container"><div class="byl-product-grid">
  <?php foreach ($popular_products as $product): echo byl_v3_product_card($product); endforeach; ?>
  </div></div></section>
  <section class="editorial-overlay men">
   <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">UNAPOLOGETIC PLEASURE</span><h2>Make<br>your move.</h2><p>Bold in every detail. Irresistible by design.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-men')); ?>">EXPLORE FOR HIM &nbsp; ↗</a></div>
-   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052543/influencers-instagram-6.webp" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2025/03/20052543/influencers-instagram-6.webp" alt="Original BeYourLover editorial illustration" loading="lazy" decoding="async"></div></div>
  </section>
  <section class="editorial-overlay couples">
   <div class="overlay-shell"><div class="overlay-text"><span class="eyebrow">A LITTLE CLOSER</span><h2>Closer.<br>Hotter.</h2><p>A spark worth following. Made for everything that happens next.</p><a class="line" href="<?php echo esc_url($byl_v5_category_link('sex-toys-for-couples')); ?>">EXPLORE TOGETHER &nbsp; ↗</a></div>
-   <div class="overlay-art"><img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Original BeYourLover editorial illustration" loading="eager"></div></div>
+   <div class="overlay-art"><img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Original BeYourLover editorial illustration" loading="lazy" decoding="async"></div></div>
  </section>
 </div>
 <!-- Original WWW lower DOM captured 2026-10-14. No bitmap replacement. -->
@@ -1158,7 +1158,7 @@ $byl_v5_category_link = static function (string $slug): string {
 		<picture>
 			<source media="(min-width: 769px)" srcset="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" type="image/webp">
 			<source media="(max-width: 768px)" srcset="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" type="image/webp">
-			<img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Sex Toys for Couples - BeYourLover Collection" width="1400" height="800" loading="eager" fetchpriority="high" decoding="async">
+			<img src="https://img.beyourlover.com/2026/09/14054606/creator-signed-edtions-scaled.png" alt="Sex Toys for Couples - BeYourLover Collection" width="1400" height="800" loading="lazy" decoding="async">
 		</picture>
 	</a>
 </div>
@@ -1167,7 +1167,7 @@ $byl_v5_category_link = static function (string $slug): string {
     <div class="models-list" role="list" aria-label="Instagram posts gallery">
         <div class="models-item" role="listitem">
             <a href="https://www.instagram.com/p/DLAk852sA8i/?img_index=1" target="_blank" rel="noopener noreferrer" aria-label="View Instagram post 1">
-                <img src="https://img.beyourlover.com/2026/06/16071043/influencers-instagram-25.png" alt="BeYourLover influencer Instagram post 1" width="300" height="300" loading="eager" decoding="async">
+                <img src="https://img.beyourlover.com/2026/06/16071043/influencers-instagram-25.png" alt="BeYourLover influencer Instagram post 1" width="300" height="300" loading="lazy" decoding="async">
             </a>
         </div>
         <div class="models-item" role="listitem">
@@ -1215,7 +1215,7 @@ $byl_v5_category_link = static function (string $slug): string {
             <div class="swiper-slide" role="group" aria-label="1 / 7">
                 <div class="red-man-box">
                     <a href="https://www.instagram.com/p/DKkQmHfKvoZ/" target="_blank" rel="noopener noreferrer" aria-label="View Instagram post by solostella_sg">
-                        <img src="https://img.beyourlover.com/2026/06/16070501/redman-img07.png" alt="Customer testimonial by solostella_sg - BeYourLover" width="400" height="400" loading="eager" fetchpriority="high" decoding="async">
+                        <img src="https://img.beyourlover.com/2026/06/16070501/redman-img07.png" alt="Customer testimonial by solostella_sg - BeYourLover" width="400" height="400" loading="lazy" decoding="async">
                     </a>
                     <div class="txt1">
                         "Hey please, can you tell what time is it?" Sure! Look here, this clock shows you the hour, but
@@ -1319,7 +1319,7 @@ $byl_v5_category_link = static function (string $slug): string {
             <div class="swiper-wrapper blogHomeSwiper-wrapper" id="blog-posts">
                 <div class="swiper-slide" role="group" aria-label="Featured post 1 of 1">
                     <a href="/blog/experience-brain-orgasm/" aria-label="Read article: Can Anyone Experience Brain Orgasm?">
-                        <img src="https://img.beyourlover.com/2025/03/20020642/Brain-Orgasm-banner.jpg" alt="Brain Orgasm - Benefits and Methods Explained" width="800" height="500" loading="eager" fetchpriority="high" decoding="async">
+                        <img src="https://img.beyourlover.com/2025/03/20020642/Brain-Orgasm-banner.jpg" alt="Brain Orgasm - Benefits and Methods Explained" width="800" height="500" loading="lazy" decoding="async">
                         <div class="swiper-text">
                             <span class="swiper-txt1">
                                 Can Anyone Experience "Brain Orgasm"? Benefits and Methods Explained!
@@ -1917,7 +1917,16 @@ if ($byl_footer_newsletter_ready
 
 		<div class="footer-payment">
 			<div class="footer-payment-left">
-				<span class="byl-www-static-currency">$ USD</span>			</div>
+				<?php
+                $byl_footer_currency = shortcode_exists('andy_currency_switcher')
+                    ? do_shortcode('[andy_currency_switcher style="compact" show_flag="yes" show_symbol="yes" show_code="yes"]')
+                    : '';
+                if ($byl_footer_currency !== '') {
+                    echo $byl_footer_currency;
+                } else {
+                    echo '<span class="byl-www-static-currency">$ USD</span>';
+                }
+                ?>			</div>
 
 
 			<div class="footer-language-trust">
