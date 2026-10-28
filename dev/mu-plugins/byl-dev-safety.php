@@ -547,7 +547,6 @@ add_action('woocommerce_store_api_checkout_update_order_from_request',
     }, 10, 2);
 
 
-
 // Suppress customer and administrator notification mail for the synthetic R13 order.
 foreach (['new_order','failed_order','customer_processing_order',
           'customer_completed_order','customer_on_hold_order'] as $email_id) {
