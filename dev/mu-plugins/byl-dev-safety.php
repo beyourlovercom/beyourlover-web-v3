@@ -391,6 +391,57 @@ function byl_dev_marketing_fixture_order_room(): bool {
     ])) < 12;
 }
 
+
+/**
+ * R13/P6 ONE-TIME DEV STORE API: allow only the named Woo administrator's
+ * expiring TEST session, verified existing Stripe TEST account and four
+ * existing hidden UAT fixtures. Ordinary visitors and live rails stay closed.
+ */
+function byl_dev_r13_stripe_checkout(?WP_REST_Request $request = null): bool {
+    if (wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com'
+        || !is_ssl() || !class_exists('Andy_Commerce_Currency_R13_Dev_Canary')
+        || !Andy_Commerce_Currency_R13_Dev_Canary::armed()
+        || !Andy_Commerce_Currency_R13_Dev_Canary::payment_ready()
+        || get_option('woocommerce_currency') !== 'USD'
+        || !in_array(get_woocommerce_currency(), ['EUR','GBP','AUD','CAD'], true)
+        || !is_user_logged_in() || !current_user_can('manage_woocommerce')
+        || !function_exists('WC') || !WC()) return false;
+    if (!WC()->cart && function_exists('wc_load_cart')) wc_load_cart();
+    if (!WC()->cart instanceof WC_Cart) return false;
+    $items = WC()->cart->get_cart();
+    if (count($items) < 1 || count($items) > 4 || WC()->cart->get_cart_contents_count() > 8
+        || count(WC()->cart->get_applied_coupons()) > 3
+        || (float) WC()->cart->get_subtotal() > 350.0) return false;
+    $allowed=[40026=>true,40027=>true,40028=>true,40029=>true];
+    foreach ($items as $item) {
+        $p=$item['data']??null;
+        if (!is_array($item) || !is_int($item['product_id']??null)
+            || !isset($allowed[$item['product_id']])
+            || (int)($item['quantity']??0) < 1
+            || !empty($item['variation_id'])
+            || !$p instanceof WC_Product_Simple
+            || $p->is_virtual()
+            || $p->get_catalog_visibility() !== 'hidden'
+            || get_post_meta($item['product_id'],'_aicc_marketing_uat_fixture',true) !== 'yes')
+            return false;
+    }
+    if ($request instanceof WP_REST_Request && $request->get_method() === 'POST') {
+        $billing=$request->get_param('billing_address');
+        if (!is_array($billing) ||
+            strtolower((string)($billing['email']??'')) !== 'aicc-r13-uat@example.invalid'
+            || $request->get_param('payment_method') !== 'stripe') return false;
+        $chosen=WC()->session ? WC()->session->get('chosen_shipping_methods',[]) : [];
+        if (!is_array($chosen) || ($chosen[0]??null)!=='flat_rate:10') return false;
+    }
+    return true;
+}
+function byl_dev_r13_order_room(): bool {
+    if (!function_exists('wc_get_orders')) return false;
+    return count(wc_get_orders(['limit'=>3,'return'=>'ids',
+        'meta_query'=>[['key'=>'_aicc_r13_dev_uat','value'=>'yes']]])) < 2;
+}
+
 // P5: Store API Checkout is a distinct order-creation/payment path from classic Woo.
 // The G2 test permit is classic-checkout only. Even a valid tester grant must
 // never authorize Store API Checkout until that surface has equivalent gates.
@@ -407,6 +458,8 @@ add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
     // session and expiring UAT window can reach Woo's Store API validation.
     if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room())
         return $result;
+    if (byl_dev_r13_stripe_checkout($request) && byl_dev_r13_order_room())
+        return $result;
     return new WP_Error(
         'byl_dev_sandbox_checkout_closed',
         'Store API Checkout is disabled on the development environment.',
@@ -417,6 +470,8 @@ add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
 add_filter('woocommerce_available_payment_gateways', static function (array $gateways): array {
     if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room())
         return isset($gateways['cod']) ? ['cod'=>$gateways['cod']] : [];
+    if (byl_dev_r13_stripe_checkout() && byl_dev_r13_order_room())
+        return isset($gateways['stripe']) ? ['stripe'=>$gateways['stripe']] : [];
     $context = byl_dev_p13_checkout_gate();
     if (!$context) { return []; }
     $id = $context['gateway'];
@@ -473,6 +528,14 @@ add_action('woocommerce_checkout_create_order', static function ($order): void {
 // persisted request data BEFORE allowing P5 reserve or payment processing.
 add_action('woocommerce_store_api_checkout_update_order_from_request',
     static function ($order,$request): void {
+        if (byl_dev_r13_stripe_checkout($request) && byl_dev_r13_order_room()
+            && $order instanceof WC_Order
+            && $order->get_billing_email()==='aicc-r13-uat@example.invalid') {
+            $order->set_payment_method('stripe');
+            $order->update_meta_data('_aicc_r13_dev_uat','yes');
+            $order->update_meta_data('_byl_dev_sandbox_p13','yes');
+            return;
+        }
         if (!byl_dev_marketing_fixture_checkout()
             || !byl_dev_marketing_fixture_order_room()
             || !($order instanceof WC_Order)
@@ -482,6 +545,19 @@ add_action('woocommerce_store_api_checkout_update_order_from_request',
         $order->update_meta_data('_aicc_marketing_dev_uat','yes');
         $order->update_meta_data('_aicc_marketing_dev_fixture_only','yes');
     }, 10, 2);
+
+
+
+// Suppress customer and administrator notification mail for the synthetic R13 order.
+foreach (['new_order','failed_order','customer_processing_order',
+          'customer_completed_order','customer_on_hold_order'] as $email_id) {
+    add_filter('woocommerce_email_recipient_'.$email_id,
+        static function ($recipient, $order) {
+            if ($order instanceof WC_Order
+                && $order->get_meta('_aicc_r13_dev_uat',true)==='yes') return '';
+            return $recipient;
+        }, PHP_INT_MAX, 2);
+}
 
 add_action('send_headers', static function () {
     header('X-Robots-Tag: noindex, nofollow, noarchive', true);
