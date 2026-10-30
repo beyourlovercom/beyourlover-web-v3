@@ -78,6 +78,70 @@ function byl_dev_after_discount_rate_minimum($rate): ?float {
     return is_numeric($min) ? max(0.0, (float) $min) : null;
 }
 
+/**
+ * Woo free-shipping method minima are stored in the site's base USD, while
+ * Woo cart line totals are already converted into the shopper currency by
+ * YayCurrency Pro. Forward-convert the USD threshold only; never inverse-FX
+ * cart subtotals, and never change the native shipping method/rate authority.
+ */
+function byl_dev_after_discount_display_threshold(float $usdMinimum): ?float {
+    if (!function_exists('get_option')
+        || (string)get_option('woocommerce_currency', 'USD') !== 'USD'
+        || $usdMinimum < 0 || !is_finite($usdMinimum)) {
+        return null;
+    }
+    $currency = 'USD';
+    $helper = 'Yay_Currency\\Helpers\\YayCurrencyHelper';
+    if (class_exists($helper)) {
+        if (!method_exists($helper, 'detect_current_currency')) return null;
+        try { $selected = $helper::detect_current_currency(); }
+        catch (Throwable $e) { return null; }
+        if (!is_array($selected) || (int)($selected['status'] ?? 0) !== 1) return null;
+        $currency = (string)($selected['currency'] ?? '');
+        if (!in_array($currency, ['USD','EUR','GBP','AUD','CAD'], true)) return null;
+    }
+    $amount = $usdMinimum;
+    if ($currency !== 'USD') {
+        if (!function_exists('has_filter') || has_filter('yay_currency_convert_price') === false
+            || !function_exists('apply_filters')) return null;
+        try {
+            $amount = apply_filters(
+                'yay_currency_convert_price',
+                number_format($usdMinimum, 2, '.', '')
+            );
+        } catch (Throwable $e) { return null; }
+    }
+    if (!is_scalar($amount) || !is_numeric($amount)
+        || !is_finite((float)$amount) || (float)$amount < 0
+        || (float)$amount > 1000000) return null;
+    return round((float)$amount, function_exists('wc_get_price_decimals') ? wc_get_price_decimals() : 2);
+}
+
+/**
+ * Used only for a one-cent FX rounding collision at the exact threshold.
+ * With coupons or nonstandard/dynamic prices, no USD entitlement is guessed.
+ */
+function byl_dev_after_discount_source_without_coupon(array $contents): ?float {
+    $cart = WC()->cart ?? null;
+    if (!is_object($cart) || !method_exists($cart,'get_applied_coupons')
+        || (array)$cart->get_applied_coupons()) return null;
+    $usd=0.0;
+    foreach ($contents as $item) {
+        if (!is_array($item) || !is_object($item['data'] ?? null)) return null;
+        $p=$item['data'];
+        if (!method_exists($p,'get_price')) return null;
+        $q=$item['quantity'] ?? null;
+        $base=$p->get_price('edit');
+        $view=$p->get_price('view');
+        $after=$item['line_total'] ?? null;
+        if (!is_numeric($q) || $q<=0 || $q>100
+            || !is_numeric($base) || !is_numeric($view) || !is_numeric($after)) return null;
+        if (abs(round((float)$view*(float)$q,2)-(float)$after)>0.011) return null;
+        $usd += (float)$base*(float)$q;
+    }
+    return round($usd, 2);
+}
+
 function byl_dev_after_discount_rates(array $rates, array $package): array {
     if (!byl_dev_after_discount_enabled() || byl_dev_after_discount_byl49_active()
         || ($package['byl_dev_pillow_kind'] ?? '') === 'pillow'
@@ -93,8 +157,28 @@ function byl_dev_after_discount_rates(array $rates, array $package): array {
     $postDiscount = byl_dev_after_discount_subtotal($package['contents']);
     foreach ($rates as $key => $rate) {
         $min = byl_dev_after_discount_rate_minimum($rate);
-        if ($min !== null && $postDiscount + 0.000001 < $min) {
+        if ($min === null) { continue; }
+        $minDisplayed = byl_dev_after_discount_display_threshold($min);
+        // Unsupported or unverified FX: never grant a free rate from this gate.
+        if ($minDisplayed === null || $postDiscount + 0.000001 < $minDisplayed) {
             unset($rates[$key]);
+            continue;
+        }
+        // The same rounded GBP/EUR minor unit can represent USD 68.99 and 69.
+        // Accept an equality edge only with verified no-coupon source USD.
+        $helper = 'Yay_Currency\\Helpers\\YayCurrencyHelper';
+        $selectedCurrency = 'USD';
+        if (class_exists($helper) && method_exists($helper, 'detect_current_currency')) {
+            try {
+                $selected = $helper::detect_current_currency();
+                $selectedCurrency = is_array($selected) ? (string)($selected['currency'] ?? '') : '';
+            } catch (Throwable $e) { $selectedCurrency = ''; }
+        }
+        if ($selectedCurrency !== 'USD' && abs($postDiscount - $minDisplayed) <= 0.005) {
+            $verifiedUSD = byl_dev_after_discount_source_without_coupon($package['contents']);
+            if ($verifiedUSD === null || $verifiedUSD + 0.000001 < $min) {
+                unset($rates[$key]);
+            }
         }
     }
     return $rates;
@@ -111,7 +195,19 @@ function byl_dev_after_discount_promo_correct(array $promo, array $cartItems): a
         return $promo;
     }
     $subtotal = byl_dev_after_discount_subtotal($cartItems);
-    $min = max(0.0, (float) $promo['threshold']);
+    // New Commerce exposes shopper display threshold with basis_currency=USD;
+    // legacy Commerce exposes the same field in source USD. Do not double-FX.
+    $newCommerce = ($promo['basis_currency'] ?? '') === 'USD';
+    $min = $newCommerce
+        ? max(0.0, (float)$promo['threshold'])
+        : byl_dev_after_discount_display_threshold(max(0.0, (float)$promo['threshold']));
+    if ($min === null) {
+        $promo['eligible'] = false;
+        $promo['unlocked'] = false;
+        $promo['state'] = 'unverified_fx_threshold';
+        return $promo;
+    }
+    $promo['threshold'] = $min;
     $precision = function_exists('wc_get_price_decimals') ? wc_get_price_decimals() : 2;
     $isEligible = $subtotal + 0.000001 >= $min;
     $mode = (string) ($promo['mode'] ?? 'automatic');
