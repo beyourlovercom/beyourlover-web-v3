@@ -93,7 +93,7 @@ def preflight(parent_pages, variation_snapshot):
     unexpected = sorted(set(fetched_ids) - set(refs))
     wrong_parent = sorted(
         v["id"] for v in fetched
-        if v.get("type") != "variation" or v.get("parent") != refs.get(v["id"])
+        if v["id"] in refs and (v.get("type") != "variation" or v.get("parent") != refs[v["id"]])
     )
     duplicate_combos = [
         {"parent_id": pid, "variation_ids": sorted(group)}
