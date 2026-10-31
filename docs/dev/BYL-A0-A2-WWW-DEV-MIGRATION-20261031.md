@@ -115,3 +115,58 @@ quarantine route, **not** proof that all external providers are isolated.
 **Current closure:** A0 PARTIAL, A1 PARTIAL/HOLD, A2 DRY-RUN PLAN ONLY/HOLD.
 No claim of WWW–Dev SKU parity, full R2 media parity, staging payment safety
 or successful data migration.
+
+## 2026-10-31 — A0 public variations readback / A2 deterministic public-only preflight
+
+The authorized BYL DC US Mac mini performed GET (no credentials, no write)
+for every one of the 68 variation IDs referenced by the three pages of Dev's
+public Woo Store API. **68/68 HTTP 200**; every fetched record identifies the
+expected public parent and reports type `variation`. This is NOT a WP-CLI/DB
+export of the true WooCommerce variation inventory.
+
+**Critical projection pitfall:** 68/68 fetched variation records report their
+parent's `sku` string; the Store API public SKU projection is not authoritative
+for a variation's independently configured Woo SKU. **Never** match / upsert
+these variants by that projected `sku`. Use the already-constructed trusted
+WP-CLI full A0 export for any eventual import decision, matching each verified
+native variation identity to its parent+attributes and quarantine rules.
+
+Public parent `variations[].attributes` inspection:
+- 68 variation references, across 20 public variable parents.
+- **35 references** carry at least one null/empty/wildcard attribute value,
+  among parent IDs **17168, 17169, 17170, 17171, 17172, 17185, 17237, 34861**.
+  Quarantine all 35 for native variation SKU/attribute readback. A partially
+  wildcard attribute is legal in Woo and is NOT by itself a data integrity bug.
+- **4 references under Dev parent 17168**, IDs 17173, 17180, 17181, 17182,
+  share one entirely empty public attribute combination. They cannot be
+  distinguished by public parent+attribute values. This collision requires
+  manual/native reconciliation, not automatic import.
+- Remaining **33 references** have unique, fully specified *public*
+  parent+attribute combinations; label **candidates only**, not verified
+  native Woo SKU matches, not an import allowlist.
+- Two public simple parent SKU values are empty: Dev parent IDs 24875,
+  26737. Five public parent IDs have no image: 26737, 40026, 40027,
+  40028, 40029. Earlier media HEAD 8/8 PASS was only a small sample.
+- Neither this data nor HTTP 445 from the WWW path enables a real WWW→Dev
+  product/media delta estimate.
+
+New **pure offline, public-snapshot-only, fail-closed** tool:
+`scripts/byl_a0_a2_public_dev_preflight.py` consumes the three *previously
+captured* public Dev Store API JSON parent arrays and the public-only
+`public-variations.json` receipt, emits a local JSON report. It has **no
+network call, Woo write client, database connection, import mode, or mutable
+authorization flag**. It checks parent/variation references, wildcard and
+duplicate attribute keys, mismatched/orphaned refs, blank parent SKUs and
+missing parent images. `a2_import_authorized=false` and `gate=HOLD` are
+unconditional. It reports 68 fetched variations, 35 wildcard references,
+33 public candidate combinations, one wildcard collision group with four
+variation IDs, and the two blank SKU parents.
+
+Synthetic validation: existing + new `test_byl_a0_a2*.py` tests
+**14/14 PASS** on an isolated US Mac mini checkout; actual Dev public-only
+snapshot preflight executed and returned `gate=HOLD`.
+
+**Release STOP preserved:** No WWW or Dev data writes, no real transactions,
+no private credentials. Real A0 authoritative two-site WP-CLI snapshot, A1
+payment/mail/ERP/AfterShip outbound/cron/backup gate and exact Owner-approved
+Dev migration scope remain prerequisites for A2 Canary.
