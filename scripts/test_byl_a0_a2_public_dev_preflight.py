@@ -49,6 +49,19 @@ class PublicDevPreflightTest(unittest.TestCase):
                          [{"parent_id": 20, "variation_ids": [21, 24]}])
         self.assertEqual(result["candidate_public_attribute_variation_ids"], [23])
 
+    def test_duplicate_wildcards_reported_but_never_autorouted(self):
+        pages, variants = fixture()
+        pages[0][1]["variations"].append(
+            {"id": 25, "attributes": [{"name": "Color", "value": None}]}
+        )
+        variants["products"].append(
+            {"id": 25, "type": "variation", "parent": 20, "sku": "PARENT"}
+        )
+        result = preflight(pages, variants)
+        self.assertEqual(result["quarantine"]["duplicate_wildcard_combinations"],
+                         [{"parent_id": 20, "variation_ids": [22, 25]}])
+        self.assertFalse(result["a2_import_authorized"])
+
     def test_missing_fetched_variation_is_not_candidate(self):
         pages, variants = fixture()
         variants["products"] = variants["products"][:-1]
