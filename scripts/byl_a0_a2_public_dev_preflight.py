@@ -59,6 +59,7 @@ def preflight(parent_pages, variation_snapshot):
     by_parent = {p["id"]: p for p in parents}
     refs = {}
     combo_groups = collections.defaultdict(list)
+    wildcard_combo_groups = collections.defaultdict(list)
     wildcard = []
     for parent in parents:
         if parent.get("type") not in ("simple", "variable"):
@@ -76,6 +77,15 @@ def preflight(parent_pages, variation_snapshot):
             key = _attributes_key(v.get("attributes"))
             if key is None:
                 wildcard.append(vid)
+                # Preserve null placeholders for collision diagnostics only:
+                # wildcard keys must never be used for auto matching.
+                raw_attrs = v.get("attributes") or []
+                raw_key = tuple(sorted(
+                    (str(a.get("name") or "").strip().casefold(),
+                     str(a.get("value") or "").strip().casefold() or "<wildcard>")
+                    for a in raw_attrs if isinstance(a, dict)
+                ))
+                wildcard_combo_groups[(parent["id"], raw_key)].append(vid)
             else:
                 combo_groups[(parent["id"], key)].append(vid)
     if not isinstance(variation_snapshot, dict) or (
@@ -100,6 +110,11 @@ def preflight(parent_pages, variation_snapshot):
         for (pid, _), group in combo_groups.items() if len(group) > 1
     ]
     duplicate_combos.sort(key=lambda x: (x["parent_id"], x["variation_ids"]))
+    wildcard_duplicate_combos = [
+        {"parent_id": pid, "variation_ids": sorted(group)}
+        for (pid, _), group in wildcard_combo_groups.items() if len(group) > 1
+    ]
+    wildcard_duplicate_combos.sort(key=lambda x: (x["parent_id"], x["variation_ids"]))
     duplicates = {vid for x in duplicate_combos for vid in x["variation_ids"]}
     verified_public_candidates = sorted(
         vid for vid in refs
@@ -156,6 +171,7 @@ def preflight(parent_pages, variation_snapshot):
             "no_image_parent_ids": missing_images,
             "wildcard_or_missing_attribute_variation_ids": sorted(wildcard),
             "duplicate_attribute_combinations": duplicate_combos,
+            "duplicate_wildcard_combinations": wildcard_duplicate_combos,
             "unresolved_variation_ids": unresolved,
             "unexpected_variation_ids": unexpected,
             "parent_mismatch_variation_ids": wrong_parent,
