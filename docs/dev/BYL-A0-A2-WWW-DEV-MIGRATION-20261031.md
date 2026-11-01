@@ -554,3 +554,69 @@ Using the existing protected full Dev v2 snapshot (no new export):
 A2 source/target diff still needs a current authorized WWW full
 snapshot. A2 remains `HOLD`; no Dev or WWW product/image data was
 written. This note is classification only.
+
+## 2026-11-01 evening — real Dev Action Scheduler and backup gate (read-only plus failed cleanup)
+
+**Source:** formal BYL DC Windows → existing authorized `byl-dev-hostinger`
+→ verified `https://dev.beyourlover.com`, WP-CLI. No WordPress
+scheduler run, checkout, mail or provider request was triggered.
+
+### Action Scheduler: **EXTERNAL-JOBS HOLD**
+
+- Action Scheduler **4.1.0**, `ActionScheduler_DBStore` and
+  `ActionScheduler_QueueRunner`.
+- Real DB status: **1,522 complete, 14 failed, 24 pending**.
+  Latest completion observed 2026-11-01 **09:18:34 UTC**.
+  `DISABLE_WP_CRON=true` does not by itself disable an Action Scheduler
+  runner or independent external queue.
+- All **24 pending** scheduled action hooks were enumerated without
+  arguments, recipient details or payloads. Hooks requiring risk review
+  include:
+  `affwp_retry_action_required_payouts`,
+  `affwp_monthly_email_summaries`,
+  `affwp_payout_batch_watchdog`,
+  `wcpay_store_setup_sync`,
+  `woocommerce_tracker_send_event_wrapper`,
+  plus core Woo session/order/stock-scheduled and
+  `action_scheduler_run_recurring_actions_schedule_hook` hooks.
+- All **14 failed** records show
+  `hostinger-reach/jobs/cleanup_carts/start`.
+- Recent **completed** hooks include
+  `wc_stripe_deferred_webhook`, `wcpay_store_setup_sync`,
+  AffiliateWP scheduled work, and Woo jobs. A status of
+  `complete` is **NOT** evidence of external webhook delivery,
+  customer payment, outbound email, or payout.
+- The account-level crontab's `wp-cron` keyword count previously
+  returned zero; that does not prove other Hostinger, HTTP or provider
+  schedulers absent. **Do not disable these hooks globally or drain
+  any queue without separate Owner/provider review.**
+
+### Current Dev database backup: **NOT CREATED; recovery HOLD**
+
+- Preflight: Dev `wp-content` ~335 MB, hosting filesystem
+  approximately 3.0 TB free (shared filesystem capacity is not an
+  individual Hostinger quota guarantee); DB reported ~98.96 MB.
+- A standard WP-CLI Dev-only, off-webroot, restrictive-permissions
+  database export was attempted with intended `mysqldump`-compatible
+  flags. It produced **no SQL data** and returned nonzero
+  (`255` on one direct attempt). No usable diagnostic text was
+  available. The 20-byte empty gzip container and zero-length logs
+  from the new temporary directory were verified and **removed**;
+  the directory was removed. No original backup was touched.
+- This is **not** a backup PASS. Do not repackage the rejected
+  database export through direct database credentials, alternate
+  remote tools or a second device to circumvent a security/hosting
+  gate.
+- Previously found two Oct 10 `.sql.gz` candidate archives did pass
+  gzip integrity. Still unknown: Dev site identity and SQL completeness,
+  attachment files, offloaded R2 media, backup freshness, restore
+  procedure and isolated restore verification. Existing Hostinger
+  panel backup/restore under proper Owner control is the next
+  supported path, not an improvised DB export bypass.
+
+**A1 remains HOLD** for current recoverable Dev backup, effective
+outbound mail/provider/ERP/WMS/AfterShip/affiliate behavior and
+external schedule provenance. The presence of payout/email/telemetry
+hooks does not prove those side effects occurred; it rules out a
+blanket assertion that Dev background business integrations are
+disabled. **A2 data import remains unapproved and zero.**
