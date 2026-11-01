@@ -330,3 +330,50 @@ before wider incremental sync. Do not copy WWW customers, orders,
 credentials, payment/affiliate secrets, or overwrite existing V3 Theme/
 Cart/Checkout code or local Dev edits. At present:
 `A0=PARTIAL`, `A1=PARTIAL/HOLD`, `A2=NO IMPORT AUTHORITY`.
+
+## 2026-11-01 — P0 A0 exporter bug closed at source level (v2, **not live installed**)
+
+Review of the previous v1 WP-CLI exporter found a migration-identity
+defect: WooCommerce `WC_Product_Variation::get_sku('view')` inherits the
+parent SKU when a variation has no stored SKU. Calling `get_sku()` with
+its default view context caused a SKU-less variation to masquerade as the
+parent SKU. Separately, the v1 WP_Query `post_status` list omitted
+`inherit`, which could silently exclude records having that native raw
+status. These are **source-contract bugs**, not evidence of data loss on
+WWW or Dev. WooCommerce upstream source shows the context-dependent SKU
+fallback; therefore do not use old v1 snapshots for import planning.
+
+Fix in Draft PR #168:
+- `byl_a0_a2_catalog_export.php` now queries `product` and
+  `product_variation` including `inherit`, plus publish/private/draft/
+  pending/future/trash. `auto-draft` (editor placeholder) is explicitly
+  out of scope. It exports raw post status and fails rather than silently
+  skipping an unresolved Woo product ID.
+- For every row, `sku = get_sku('edit')` and
+  `sku_origin='stored'`; parent SKU also uses edit context. Thus an
+  independent blank variation SKU **stays blank**, not parent-inherited.
+- Output now carries `byl-catalog-a0-v2`, an exact enumerated-scope
+  string, SKU provenance contract and self-checking record/variation
+  counts. **v1 snapshots are incompatible and deliberately rejected**.
+- `byl_a0_a2_catalog_diff.py` validates v2 contract, the site identity,
+  record IDs, statuses, provenance and counts before matching. Existing
+  wildcard/duplicate/unkeyed quarantine and unconditional
+  `a2_import_authorized=false` remain in place.
+- Added synthetic WordPress/Woo PHP runtime fixtures verifying that the
+  query includes `inherit`, variation `get_sku('edit')` returns an
+  independent empty SKU, parent SKU remains available, and a wrong
+  host is refused; added regressions rejecting v1 snapshots, inherited
+  SKU projections and inconsistent v2 counts.
+
+**Exact-head isolated US Mac mini verification:** PHP lint PASS;
+A0/A1/A2 Python synthetic tests **35/35 PASS**, including synthetic PHP
+runtime. No Hostinger WWW or Dev read/write; this is **not** a live v2
+snapshot or migration result. Do **not** reuse the earlier public Store
+API 235/68 collection as a v2 authorized WP-CLI snapshot. Two actual
+site-owner v2 exports are still needed once legitimate authorization and
+A1 protected runtime/backup evidence are available.
+
+**Policy reminder:** Auditing `trash`/future records does not authorize
+restoring, publishing or importing them into Dev. Approval for product
+Canary always specifies exact eligible status + SKU + field allowlist,
+with a verified backup and rollback.
