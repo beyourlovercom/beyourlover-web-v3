@@ -111,7 +111,7 @@ class CatalogExportRuntimeTest(unittest.TestCase):
                    "update_option", "delete_option", "wp_mail",
                    "wp_remote_post", "wp_remote_get", "curl_exec",
                    "file_put_contents", "wc_create_order"):
-            self.assertFalse(re.search(r"\\b" + re.escape(fn) + r"\\s*\\(", source),
+            self.assertFalse(re.search(r"\b" + re.escape(fn) + r"\s*\(", source),
                              msg="Unexpected write/network function: " + fn)
 
 
