@@ -481,3 +481,51 @@ these controls.
 
 **State: `A0 DEV PASS / WWW HOLD`; `A1 PARTIAL / HOLD`;
 `A2 PREVIEW-ONLY / IMPORT HOLD`.**
+
+## 2026-11-01 — live Dev Safety source provenance **RESOLVED** (read-only)
+
+This corrects the earlier bounded main-branch history lookup that
+could not identify the installed Dev Safety fingerprint. A targeted
+read-only Git comparison across related unmerged PRs found an **exact
+file SHA-256 match**:
+
+| Source | Safety MU SHA-256 | Status |
+| --- | --- | --- |
+| Current installed Dev | `f0979a924a83a320bfa8256ee919d133d44f2f00598757c6720d2489d004ce3b` | Authenticated Dev SSH file hash |
+| [PR #166](https://github.com/beyourlovercom/beyourlover-web-v3/pull/166) HEAD `95a48e63a8a820e755064e6f7357f4a6880ea017` | **same exact SHA-256** | Draft, unmerged, Dev-only R13 Stripe TEST scope |
+| [PR #164](https://github.com/beyourlovercom/beyourlover-web-v3/pull/164) HEAD `6125102f1b2f5366a29bf674430cb48b30c261a0` | `9824d5618ff7983013f2a480aed6f5fe122c00d9c58bf3dd10d11c7d266d7265` | Draft, earlier Marketing Dev-only gate |
+| Prior pinned GitHub main | `7b8e3bc570b259766083aed75d58d03c3ca676c5704ef69a6d07434e33826500` | Different version |
+
+**Technical source identity established.** This is *not* an approval to
+merge PR #166, a proof of formal Dev installation approval, or proof
+that all provider-side guards are currently safe. PR #166's **2026-10-28
+historical comments** reported restoration to the earlier file
+`9824d...` after an R13 experiment, so today's installed `f097...`
+requires a change-history/authorization reconciliation for any release
+closure. No source file was read from or written to WWW; Dev MU source
+has **NOT** been replaced or restarted.
+
+Further legitimate Dev-only readback:
+- `andy_commerce_marketing_dev_uat_enabled` = `no`.
+- `andy_commerce_marketing_p1_sandbox_enabled` = `no`.
+- The previously documented R13 rollback script exists off-webroot,
+  **not executed or functionally restore-tested**.
+- Both prior backup `.sql.gz` candidate archives from 2026-10-10
+  pass read-only `gzip -t` compression-integrity checks. This
+  establishes valid gzip structure only; it does NOT prove the SQL
+  content, target site identity, freshness, attached media/files, R2
+  export, or verified restore. **A current recoverable Dev backup
+  remains a blocking A1 prerequisite.**
+- R13 source gate requires an authenticated eligible administrator,
+  short-lived Canary, real eligible TEST rail and very narrow UAT
+  fixture constraints; ordinary unauthenticated Checkout denial is
+  confirmed by earlier public A1 9/9 probe. Do not activate or
+  retry R13 payment to test A1.
+
+**Revised gate:** Dev Safety **SOURCE PROVENANCE IDENTIFIED** (not
+production merge/release attestation), marketing fixture gates OFF,
+historical DB gzip integrity PASS; **A1 OVERALL HOLD** for provider-side
+outbound and polling isolation, ALL relevant gateway enablement and
+external queue/cron behavior, current full Dev backup/files/R2
+recoverability and unresolved release-approval provenance.
+**A0 WWW full authoritative catalog still absent; A2 import HOLD.**
