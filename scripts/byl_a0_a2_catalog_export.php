@@ -50,7 +50,8 @@ $page = 1;
 do {
     $query = new WP_Query([
         'post_type' => ['product', 'product_variation'],
-        'post_status' => ['publish', 'private', 'draft', 'pending'],
+        'post_status' => ['publish', 'private', 'draft', 'pending', 'future', 'inherit', 'trash'],
+        // No auto-draft (unsaved WP editor placeholders); report scope below.
         'posts_per_page' => 200,
         'paged' => $page,
         'fields' => 'ids',
@@ -61,7 +62,10 @@ do {
     ]);
     foreach ($query->posts as $id) {
         $product = wc_get_product((int) $id);
-        if (!$product) { continue; }
+        if (!$product) {
+            fwrite(STDERR, "BYL_A0_A2_FAIL: unresolved in-scope Woo product ID\n");
+            exit(2);
+        }
         $parent_id = $product->is_type('variation') ? (int) $product->get_parent_id() : 0;
         $parent = $parent_id ? wc_get_product($parent_id) : null;
         $gallery = [];
@@ -72,9 +76,13 @@ do {
             'id' => (int) $id,
             'type' => (string) $product->get_type(),
             'status' => (string) $product->get_status(),
-            'sku' => (string) $product->get_sku(),
+            'sku' => (string) $product->get_sku('edit'),
+            // Variation view-context get_sku() inherits parent SKU when blank.
+            // In migration/audit, only the OWN stored variation SKU is safe.
+            'sku_origin' => 'stored',
+            'raw_post_status' => (string) get_post_status((int) $id),
             'parent_id' => $parent_id,
-            'parent_sku' => $parent ? (string) $parent->get_sku() : '',
+            'parent_sku' => $parent ? (string) $parent->get_sku('edit') : '',
             'attributes' => byl_a0_attributes($product),
             'categories' => byl_a0_terms($parent_id ?: $id, 'product_cat'),
             'regular_price' => (string) $product->get_regular_price(),
@@ -88,7 +96,15 @@ do {
     $page++;
 } while ($has_more);
 $payload = [
-    'schema' => 'byl-catalog-a0-v1',
+    'schema' => 'byl-catalog-a0-v2',
+    'scope' => 'PRODUCT_AND_VARIATION_PUBLISH_PRIVATE_DRAFT_PENDING_FUTURE_INHERIT_TRASH_EXCLUDES_AUTO_DRAFT',
+    'sku_contract' => 'EXPLICIT_STORED_EDIT_CONTEXT_NEVER_INHERITED_VIEW',
+    'counts' => [
+        'records' => count($products),
+        'product_variations' => count(array_filter($products, static function ($item): bool {
+            return $item['type'] === 'variation';
+        })),
+    ],
     'site' => $site,
     'generated_at_utc' => gmdate('c'),
     'wp_version' => get_bloginfo('version'),
