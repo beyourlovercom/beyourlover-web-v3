@@ -170,3 +170,71 @@ snapshot preflight executed and returned `gate=HOLD`.
 no private credentials. Real A0 authoritative two-site WP-CLI snapshot, A1
 payment/mail/ERP/AfterShip outbound/cron/backup gate and exact Owner-approved
 Dev migration scope remain prerequisites for A2 Canary.
+
+## 2026-11-01 — repeatable A1 public read-only probe + authorized Dev-only runtime receipt (source-only)
+
+### Executed read-only public A1 regression
+
+New `scripts/byl_a1_dev_public_safety_probe.py` uses a **fixed**
+`https://dev.beyourlover.com` origin and exactly **9 allowlisted GET/HEAD**
+routes; never accepts credentials, arbitrary hosts, POST, cookies, checkout
+submissions or write actions. Redirects are disallowed and error details
+are sanitized. It can be executed on an allowed independent computer to
+recheck public safety **without** WordPress administration access.
+
+The real authorized US Mac mini run returned **9/9 public checks PASS**:
+Dev homepage noindex, robots disallow, orders/customers REST protected with
+exact dedicated quarantine error, two AfterShip inbound routes 403, two
+Store Checkout GET endpoints return `byl_dev_sandbox_checkout_closed`,
+and Woo public Store product API remains HTTP 200.
+
+**Scope limit:** Public access denial is *not* proof of SMTP, payment
+gateway credentials, ERP/Shipout/SM/WMS provider pulls, HTTP egress, active
+Cron or private backup/restore. The checker **always** reports
+`a1_overall=HOLD`, `a2_import_authorized=false`, and enumerates missing
+private/authorized evidence. `public_checks_all_pass=true` is not A1 PASS.
+
+### New source-only authorized Dev WP-CLI inspector
+
+`scripts/byl_a1_dev_runtime_readonly.php` is a scoped **read-only, sanitized
+Dev status collector**. It requires trusted existing WordPress WP-CLI and
+strictly enforces `https://dev.beyourlover.com` plus `staging`;
+running on WWW, a wrong Dev identity, or outside WP-CLI fails closed.
+The script reads *only* version and selected status metadata:
+- WordPress/PHP/Woo versions, theme stylesheet, number of active plugins,
+  and version/active flags for a short allowlist of named integrations;
+- the installed Dev Safety MU plugin's SHA-256 **without its path or bytes**
+  and whether known runtime sentinel/hooks are present;
+- public indexing option, non-secret WooPayments/Stripe/PayPal test
+  config hints, WP-Cron configured event counts and cron constant.
+
+**Neither gateway setting hints nor hook presence prove all real traffic is
+isolated.** In particular, the current Dev Safety source's explicit outbound
+host deny list covers AfterShip/Automizely; ERP/Shipout/SM/WMS/CRM provider
+egress and external server Cron remain independent STOP items.
+
+The inspector intentionally never returns option arrays, API tokens,
+webhook URLs, customer/order data or storage paths; no mail/payment/API
+provider call, no WordPress/DB write, no remote request and no backup
+creation. Its output must stay in private Owner-controlled evidence storage,
+**not GitHub**. Run only from an **independently authorized** Dev WP-CLI
+service-owner path; do not invoke generic DC shell, a secondary connector
+or browser to evade a previously denied privileged access. No authorized
+runtime invocation of this new inspector has occurred.
+
+The companion synthetic PHP/WordPress harness verifies host and staging
+fail-closed, output contains no synthetic secrets, and the receipt never
+asserts A1 PASS. **Full A0–A2 synthetic suite 26/26 PASS; PHP lint PASS**
+on US Mac mini. Public A1 probe also executed against real Dev with 9/9 PASS.
+This is SOURCE-ONLY for the inspector, **not Dev-installed/runtime PASS**.
+
+### Safe final barrier to A2 import
+
+A2 is still HOLD until **all** are independently obtained: current authorized
+WWW+Dev full WP-CLI catalog/variation/media diff; matching installed Dev
+Safety fingerprint and runtime provenance; independently attested test
+gateway and mail/ERP/fulfillment/provider/cron isolation; verified Dev
+backup and recoverable rollback; exact Owner-approved Dev SKU allowlist.
+Existing 35 public wildcard variants, 4 indistinguishable public variation
+identities and 2 blank parent SKUs remain quarantined.
+No WWW/Dev data was changed during this work package.
