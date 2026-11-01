@@ -529,3 +529,28 @@ outbound and polling isolation, ALL relevant gateway enablement and
 external queue/cron behavior, current full Dev backup/files/R2
 recoverability and unresolved release-approval provenance.
 **A0 WWW full authoritative catalog still absent; A2 import HOLD.**
+
+## 2026-11-01 — Dev no-primary-image records reconciled with R13 fixtures
+
+A targeted read-only WordPress admin WP-CLI check on the authorized Dev
+account confirmed that four public/no-image parents
+**40026, 40027, 40028, 40029** each have the
+`_aicc_marketing_uat_fixture=yes` marker and status `publish`.
+These are **Dev-only UAT fixtures** linked to the existing Marketing /
+R13 test contract (see PR #164 / PR #166). Exclude these IDs from
+ordinary catalog media-missing repair/migration candidate lists;
+do not auto-publish to WWW or copy them as commercial products.
+
+Using the existing protected full Dev v2 snapshot (no new export):
+- Remaining no-primary-image parents after excluding those four:
+  **Dev ID 26737**, `publish`, own SKU blank; and **Dev ID 34246**,
+  `private`, own SKU nonblank.
+- ID 26737 needs identity/manual review; no automatic title match,
+  placeholder SKU, or silent media replacement.
+- ID 34246 is private and has no primary image; preserve its draft/
+  private workflow and do not auto-publish/alter it.
+- These two are **review candidates**, not proof of WWW image loss.
+
+A2 source/target diff still needs a current authorized WWW full
+snapshot. A2 remains `HOLD`; no Dev or WWW product/image data was
+written. This note is classification only.
