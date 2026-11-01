@@ -249,3 +249,84 @@ checkout, not a remote site's loaded file hash. A legitimate trusted
 service-owner Dev WP-CLI receipt can later compare installed SHA-256 and
 the actually approved release. A mismatch is an inventory discrepancy to
 investigate, not license to overwrite the installed MU plugin.
+
+## 2026-11-01 — actual data migration readiness: source/operator handoff
+
+This is **not a request to re-run G5 synthetic payments**. Existing scoped G5
+historical evidence is held at [Issue #31](https://github.com/beyourlovercom/beyourlover-web-v3/issues/31)
+and the related Notion G5 closure dated 2026-10-11: declined card,
+3DS success/cancel, recovery payment, and sandbox isolation tests were
+accepted *at that historical Dev runtime*. Reuse those receipts, then
+independently attest current Dev mode/identity and unchanged gates, rather
+than creating another Woo order. Historical G5 did **not** prove ERP and
+external provider polling were completely isolated.
+
+**Execution path availability:** formal self-hosted BYL DC lists all four
+devices READY (registry state, not live signed health), and the authorized
+US Mac mini shell contains PHP and Git but **no local `wp` executable**.
+It has no verified Hostinger WWW/Dev WP-CLI service-owner session. Earlier
+attempts to obtain protected live WWW/Dev runtime through DC were
+`OPERATOR_TOOL_DENIED`. Never repackage a restricted private read
+as a different connector, generic shell command, or browser operation.
+Public WWW access from this Mac previously returned HTTP 445, which is
+not evidence of a site outage. No actual private snapshot was collected.
+
+### Exactly one approved two-site read-only evidence acquisition
+
+Only an independently authorized **Hostinger site service-owner** may run
+the source-approved, read-only `scripts/byl_a0_a2_catalog_export.php`
+inside each site's verified WP-CLI context. Before running, confirm
+that the terminal belongs to the **intended** site, and that `home_url()`
+matches the script's strict allowlist; do not infer the WWW webroot from
+the Dev SSH account or any similarly named directory.
+
+Save the output to a **protected local report store outside the public
+webroot**, then compare with `byl_a0_a2_catalog_diff.py` and preserve
+both report fingerprints/timestamps. No product/variation or secret
+data should be copied into GitHub/Notion or chat. This is a zero-write
+inventory run, not permission to install a plugin or modify either site.
+Source inventory query includes publish/private/draft/pending statuses;
+any archived/trash/future differences must be separately counted or
+explicitly excluded, never reported as a complete total without scope.
+
+### Exactly one authorized Dev-only A1 runtime evidence acquisition
+
+Under the same valid Dev service-owner custody (never on WWW), use the
+source-only `scripts/byl_a1_dev_runtime_readonly.php` in existing approved
+WP-CLI. It checks a strict Dev/staging identity and emits only
+non-sensitive version/module fingerprints, test-mode **hints**, active
+Hook presence and Cron count. Compare installed Dev Safety fingerprint
+to the exact approved release/source rather than overwriting it.
+No remote payment, mail or provider request is made.
+
+Independently review from existing authorized provider/ERP configuration:
+1. Payment gateway **all active methods** TEST/no real charge; timeboxed
+   synthetic permit is CLOSED; no need to perform payment UAT anew.
+2. WordPress mail/third-party mail transport DENY verified from effective
+   current config without sending an email.
+3. ERP production Woo **pull** target is WWW and never Dev. ERP
+   `WooCommerceInboundService::importAutomaticIncremental()` may query
+   Woo Orders even when Dev webhooks are disabled. Also attest
+   AfterShip/provider-side pollers, WMS, ShipOut, SM and CRM egress paths
+   (the Dev Safety MU source only has explicit HTTP host DENY for
+   AfterShip/Automizely).
+4. WP-Cron, external scheduler and Action Scheduler actions cannot
+   send real mail, submit warehouse jobs, or create real integrations.
+5. An independently verified **Dev** database+files+R2/mapping recovery
+   point exists and can be restored by a named owner. Don't assert
+   recoverability based only on backup filenames; avoid making a
+   duplicate backup if an adequate verified recovery point already
+   exists.
+
+### A2 authorization gate (nothing auto-approved)
+
+A0 complete current two-site snapshots, reviewed SKU/variation collisions
+(including 35 public wildcard and 4 indistinguishable variants), A1
+live/provider-side safety, Dev recovery evidence and an **exact
+Owner-approved SKU field-level allowlist** are each mandatory.
+Even then, require a separate one-batch Dev-only reversible Canary:
+preimage journal → apply → readback → restore exercise → idempotent rerun
+before wider incremental sync. Do not copy WWW customers, orders,
+credentials, payment/affiliate secrets, or overwrite existing V3 Theme/
+Cart/Checkout code or local Dev edits. At present:
+`A0=PARTIAL`, `A1=PARTIAL/HOLD`, `A2=NO IMPORT AUTHORITY`.
