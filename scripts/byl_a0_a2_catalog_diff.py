@@ -94,10 +94,33 @@ def compare(www, dev):
     source, src_unkeyed, src_dupes, src_broken = index_catalog(www['products'])
     target, dev_unkeyed, dev_dupes, dev_broken = index_catalog(dev['products'])
     matched = []
+    identity_conflicts = []
     for key in sorted(set(source) & set(target)):
         if len(source[key]) != 1 or len(target[key]) != 1:
             continue
         a, b = source[key][0], target[key][0]
+        # SKU alone is insufficient when a product is replaced with a
+        # different native Woo type. Do not classify as an ordinary delta.
+        if a['type'] != b['type']:
+            identity_conflicts.append({
+                'key': key, 'www_id': a['id'], 'dev_id': b['id'],
+                'reason': 'PRODUCT_TYPE_MISMATCH', 'www_type': a['type'],
+                'dev_type': b['type'],
+            })
+            continue
+        # Even an explicitly stored variation SKU can be moved between
+        # parent products. Treat parent identity drift as a hard quarantine.
+        if a['type'] == 'variation' and (
+            str(a.get('parent_sku') or '').strip().casefold()
+            != str(b.get('parent_sku') or '').strip().casefold()
+            or not str(a.get('parent_sku') or '').strip()
+            or not str(b.get('parent_sku') or '').strip()
+        ):
+            identity_conflicts.append({
+                'key': key, 'www_id': a['id'], 'dev_id': b['id'],
+                'reason': 'VARIATION_PARENT_IDENTITY_MISMATCH',
+            })
+            continue
         diffs = []
         for field in ['type', 'status', 'categories', 'attributes', 'regular_price', 'sale_price']:
             if a.get(field) != b.get(field):
@@ -109,17 +132,18 @@ def compare(www, dev):
         matched.append({'key': key, 'www_id': a['id'], 'dev_id': b['id'], 'changed_fields': diffs})
     missing = sorted(k for k in source.keys() - target.keys() if k not in src_dupes)
     extra = sorted(k for k in target.keys() - source.keys() if k not in dev_dupes)
-    blockers = bool(src_unkeyed or dev_unkeyed or src_dupes or dev_dupes or src_broken or dev_broken)
+    blockers = bool(src_unkeyed or dev_unkeyed or src_dupes or dev_dupes or src_broken or dev_broken or identity_conflicts)
     return {
         'schema': 'byl-catalog-diff-a0-v2',
         'sku_contract': SKU_CONTRACT,
         'full_snapshot_contract_v2': True,
         'source': www['site'], 'target': dev['site'],
         'counts': {'www': len(www['products']), 'dev': len(dev['products']),
-                   'matched_unique_keys': len(matched), 'missing_in_dev': len(missing),
+                   'matched_unique_keys': len(matched), 'identity_conflicts': len(identity_conflicts), 'missing_in_dev': len(missing),
                    'extra_in_dev': len(extra), 'changed_on_matching_keys': sum(bool(x['changed_fields']) for x in matched)},
         'missing_in_dev': missing, 'extra_in_dev': extra,
         'matched_changed': [x for x in matched if x['changed_fields']],
+        'identity_conflicts': identity_conflicts,
         'unkeyed': {'www_ids': src_unkeyed, 'dev_ids': dev_unkeyed},
         'duplicate_keys': {'www': src_dupes, 'dev': dev_dupes},
         'invalid_media': {'www': src_broken, 'dev': dev_broken},
