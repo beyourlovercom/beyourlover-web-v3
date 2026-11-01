@@ -377,3 +377,107 @@ A1 protected runtime/backup evidence are available.
 restoring, publishing or importing them into Dev. Approval for product
 Canary always specifies exact eligible status + SKU + field allowlist,
 with a verified backup and rollback.
+
+## 2026-11-01 — AUTHORITATIVE LIVE DEV A0 v2 + A1 sanitized service-owner receipts (WWW remains untouched)
+
+### Access provenance and zero-write controls
+
+The previously authorized **formal BYL DC → Windows → existing
+`byl-dev-hostinger` SSH alias** became usable using the installed Git for
+Windows OpenSSH client. The server account/read-only WP-CLI target were
+independently verified against WordPress `home` =
+`https://dev.beyourlover.com` and `wp_get_environment_type()=staging`.
+The Windows default `ssh` executable was absent; Git's already installed
+SSH client was available. A different China Mac alias logged into a
+different hosting account and was **not** used to inspect WordPress.
+No credentials, private keys, PHP configuration, WWW SSH or WWW DB were
+inspected; no machine/service/browser was restarted.
+
+The exporter from **pinned PR #168 source commit
+`20dac7f345e015584b0b451273be150e2a2da3ad`** was first
+remote-PHP linted, then streamed from immutable GitHub source through
+the authorized **Dev-only** WP-CLI `eval-file -`, without writing an
+executable script to the server. Output was validated before being saved
+as a private UTF-8 JSON report in the existing Windows user's local
+app-data area. **Never upload the private report to public GitHub,
+Notion, or this chat.**
+
+- Report schema and identity: **`byl-catalog-a0-v2`**,
+  `https://dev.beyourlover.com`, stored/edit-context SKU provenance.
+- Captured UTC: **2026-11-01T09:28:32Z**.
+- Local private Dev snapshot SHA-256:
+  **`7a6b337505bedbefe5678b891befa92870c1c128b442c174e92fb22013256da0`**.
+- **321 actual WP-CLI rows = 253 parent products + 68 variations.**
+  Parent raw post statuses: **235 publish, 15 private,
+  2 pending, 1 draft**; all **68 variation raw statuses publish**.
+  These counts reconcile with independent WP-CLI read-only queries.
+- Every variation's **stored/edit SKU is blank (68/68)**; the prior
+  public Store API's parent-SKU display must NEVER become a native
+  variation identity. **6 parents have blank own SKUs**.
+- Native v2 variation parent IDs: **0 orphan records**.
+  Read-only local identity preflight: **35 wildcard/unkeyed variation
+  identities**, **0 duplicate constructible native identity-key groups**.
+  **6 parents have no primary image** (a review cue, not proof of loss).
+- Source side public API earlier counted **235 public parents**, which
+  now exactly matches the **235 published WP product parents**.
+  Other 18 parents are private/pending/draft; do not publish them
+  automatically as part of migration.
+
+**Dev A0 full v2 snapshot: ACQUIRED and validated. WWW A0 snapshot:
+NOT ACQUIRED.** No full two-site diff or WWW→Dev product delta exists yet.
+
+### A1 live Dev-only, sanitized WP-CLI receipt
+
+The previously authored `scripts/byl_a1_dev_runtime_readonly.php`
+was executed with the same safe pinned-source, authorized Dev WP-CLI
+channel, and its sanitized receipt stored privately on Windows.
+Receipt SHA-256:
+**`539f7e1162890de80d8a3d400708bfd4883294cf1981abecef6523ab78123598`**.
+
+Current live Dev evidence:
+
+| Check | Observed Dev-only runtime | Meaning |
+| --- | --- | --- |
+| WordPress / Woo / environment | WP **7.1.4**, Woo **11.2.1**, `staging` | Dev identity PASS |
+| Indexing | `blog_public=0`, public noindex/robots PASS | SEO isolation sample PASS |
+| WooPayments | **enabled**, **test_mode=yes** | current TEST mode hint, no transaction |
+| Stripe | **disabled**, **testmode=yes** | current TEST mode hint, no transaction |
+| Other gateways | PayPal PPCP environment indicates SANDBOX, enablement UNKNOWN; independently installed payment plugins may exist | Full gateway inventory NOT VERIFIED |
+| Dev Safety MU loaded | exists; runtime mail/HTTP/Checkout hooks present | Hook presence only |
+| Dev Safety installed SHA-256 | **`f0979a924a83a320bfa8256ee919d133d44f2f00598757c6720d2489d004ce3b`** | **Does not match** previously pinned GitHub main source SHA `7b8e3bc570b259766083aed75d58d03c3ca676c5704ef69a6d07434e33826500`; DO NOT overwrite or claim current source parity |
+| AfterShip | active, **1.18.5** | Newer than historical G5 baseline; inbound sampled public denials still PASS |
+| WP-Cron | `DISABLE_WP_CRON=true`, **120 event records / 116 timestamps** | External Cron / Action Scheduler may still execute; no isolation PASS |
+| Protected backup directory | exists, contains **2 candidate .sql.gz** archives dated **2026-10-10** (~5.5 MB / ~7 MB) | Old candidate metadata ONLY; site identity, freshness, files, R2 and restore are **NOT VERIFIED** |
+| ERP/ShipOut/SM/AfterShip outbound/pulls, SMTP, CRM | NO provider-side/config corroboration | HOLD |
+
+A bounded comparison against the examined GitHub main history did
+not find the currently installed Dev Safety fingerprint. This does NOT
+prove tampering; it may be a separately approved deploy. A service
+owner must establish release provenance and verify effective mail,
+provider egress, webhooks and credential boundaries before A1 PASS.
+Do not try a real email/order/payment/warehouse event to shortcut
+these controls.
+
+### Explicit next gate
+
+- **WWW access boundary is unchanged.** The Owner previously declined
+  WWW SSH; do not request or probe it. Acquire a current authoritative
+  WWW product/variation/status/media export through an **already
+  approved WordPress admin / site-owner export route**. Native Woo CSV
+  is NOT identical to the v2 JSON schema; use a reviewed converter
+  before any two-site automated comparison. No WWW plugin install or
+  write without separate explicit Owner approval.
+- Reconcile the current Dev Safety MU hash to an approved release,
+  and independently attest effective mail, ERP/WMS/ShipOut/SM/AfterShip
+  egress/polling, external scheduler and a RECOVERABLE fresh Dev
+  DB/files/media backup. Historical G5 sandbox payment tests are
+  reusable; do not repeat transactions unnecessarily.
+- Preserve 6 blank-SKU parents, 35 wildcard variations and 6 no-image
+  parents as explicit exception-review cohorts, not automatic edits.
+- Only after A0 **BOTH SITES** + A1 full PASS + reviewed preimage
+  backup + Owner-approved SKU/field allowlist: propose one tiny,
+  reversible **Dev-only** A2 Canary. This work created **zero Dev/WWW
+  product, payment, email, order or warehouse writes**.
+
+**State: `A0 DEV PASS / WWW HOLD`; `A1 PARTIAL / HOLD`;
+`A2 PREVIEW-ONLY / IMPORT HOLD`.**
