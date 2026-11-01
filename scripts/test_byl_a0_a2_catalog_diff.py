@@ -93,6 +93,44 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(result['gate'], 'HOLD')
         self.assertIn(2, result['unkeyed']['www_ids'])
 
+    def test_same_sku_different_woo_type_is_identity_conflict_not_match(self):
+        www = snap('https://www.beyourlover.com', [p(11, 'SKU', kind='simple')])
+        dev = snap('https://dev.beyourlover.com', [p(22, 'sku', kind='variable')])
+        result = compare(www, dev)
+        self.assertEqual(result['gate'], 'HOLD')
+        self.assertEqual(result['counts']['identity_conflicts'], 1)
+        self.assertEqual(result['counts']['matched_unique_keys'], 0)
+        self.assertEqual(result['identity_conflicts'][0]['reason'], 'PRODUCT_TYPE_MISMATCH')
+        self.assertFalse(result['a2_import_authorized'])
+
+    def test_stored_sku_reparented_variation_is_quarantined(self):
+        www = snap('https://www.beyourlover.com', [
+            p(33, 'VSKU', kind='variation', parent_sku='PARENT-A', attrs={'pa_color':['red']})
+        ])
+        dev = snap('https://dev.beyourlover.com', [
+            p(77, 'VSKU', kind='variation', parent_sku='PARENT-B', attrs={'pa_color':['red']})
+        ])
+        result = compare(www, dev)
+        self.assertEqual(result['gate'], 'HOLD')
+        self.assertEqual(result['counts']['matched_unique_keys'], 0)
+        self.assertEqual(result['identity_conflicts'][0]['reason'], 'VARIATION_PARENT_IDENTITY_MISMATCH')
+
+    def test_stored_sku_variation_missing_parent_identity_still_holds(self):
+        www = snap('https://www.beyourlover.com', [p(2,'VAR',kind='variation',parent_sku='')])
+        dev = snap('https://dev.beyourlover.com', [p(3,'VAR',kind='variation',parent_sku='P')])
+        result = compare(www, dev)
+        self.assertEqual(result['gate'], 'HOLD')
+        self.assertEqual(result['counts']['identity_conflicts'], 1)
+
+    def test_same_stored_variation_sku_and_parent_is_eligible_to_diff_only(self):
+        www = snap('https://www.beyourlover.com', [p(2,'VAR',kind='variation',parent_sku='PaReNt')])
+        dev = snap('https://dev.beyourlover.com', [p(3,'VAR',kind='variation',parent_sku='parent')])
+        result = compare(www, dev)
+        self.assertEqual(result['gate'], 'DRY_RUN_ONLY')
+        self.assertEqual(result['counts']['matched_unique_keys'], 1)
+        self.assertEqual(result['counts']['identity_conflicts'], 0)
+        self.assertFalse(result['a2_import_authorized'])
+
     def test_missing_attachment_holds(self):
         a=p(1,'A',image={'id':5,'url':'','exists':False})
         r=compare(snap('https://www.beyourlover.com',[a]), snap('https://dev.beyourlover.com',[p(2,'A')]))
