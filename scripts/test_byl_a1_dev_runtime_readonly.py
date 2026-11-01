@@ -106,7 +106,7 @@ require $argv[1];
         for call in ("update_option", "delete_option", "wp_insert_post",
                      "wp_mail", "wp_remote_post", "wp_remote_get", "wp_schedule_event",
                      "wc_create_order", "file_put_contents", "curl_exec"):
-            self.assertFalse(re.search(r"\\b" + re.escape(call) + r"\\s*\\(", s),
+            self.assertFalse(re.search(r"\b" + re.escape(call) + r"\s*\(", s),
                              msg="Unexpected mutation or external network call: " + call)
 
 
