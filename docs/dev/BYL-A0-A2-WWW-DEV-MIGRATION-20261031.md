@@ -238,3 +238,14 @@ backup and recoverable rollback; exact Owner-approved Dev SKU allowlist.
 Existing 35 public wildcard variants, 4 indistinguishable public variation
 identities and 2 blank parent SKUs remain quarantined.
 No WWW/Dev data was changed during this work package.
+
+**Canonical public GitHub source identity for later runtime readback (not a
+Dev-installed claim):** `beyourlovercom/beyourlover-web-v3` main HEAD
+`c7b0c067f56f26279ab2987e26276f4707c1b16c`;
+`dev/mu-plugins/byl-dev-safety.php` Git source SHA-256
+`7b8e3bc570b259766083aed75d58d03c3ca676c5704ef69a6d07434e33826500`.
+This is an explicitly public-source fingerprint from an isolated Git
+checkout, not a remote site's loaded file hash. A legitimate trusted
+service-owner Dev WP-CLI receipt can later compare installed SHA-256 and
+the actually approved release. A mismatch is an inventory discrepancy to
+investigate, not license to overwrite the installed MU plugin.
