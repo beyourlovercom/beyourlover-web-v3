@@ -82,6 +82,7 @@ jobs:
         run: |
           php -l scripts/byl_a0_a2_catalog_export.php
           php -l scripts/byl_a1_dev_runtime_readonly.php
+          php -l scripts/byl_a2_dev_5sku_canary.php
           python3 -m unittest discover -s scripts -p 'test_byl_a*.py' -v
           python3 -m unittest discover -s scripts -p 'test_byl_p1*.py' -v
       - name: BYL Native-First Development & Dual UAT V1 governance
