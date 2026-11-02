@@ -143,11 +143,34 @@ def analyze(www, dev):
                 status_mismatches.append({"sku":sku,"www_id":w[0]["id"],
                     "dev_id":d[0]["id"],"www_status":w[0]["status"],
                     "dev_status":d[0]["status"]})
+    # WordPress IDs are not an authoritative cross-site identity key.
+    # However, same ID and native type with conflicting nonempty SKU is a
+    # critical *possible SKU edit drift* to quarantine, not two confirmed
+    # missing commercial products. The owner must reconcile each record.
+    www_by_id = {x["id"]: x for x in parents}
+    dev_by_id = {x["id"]: x for x in dev_parents}
+    same_id_sku_drifts = []
+    for product_id in sorted(set(www_by_id) & set(dev_by_id)):
+        w = www_by_id[product_id]
+        d = dev_by_id[product_id]
+        if w["type"] == d["type"] and w["sku"] and d["sku"] and (
+            w["sku"].strip().casefold() != d["sku"].strip().casefold()
+        ):
+            same_id_sku_drifts.append({
+                "id": product_id, "type": w["type"],
+                "www_sku": w["sku"], "dev_sku": d["sku"],
+                "www_status": w["status"], "dev_status": d["raw_post_status"],
+                "reason": "SAME_WP_ID_DIFFERENT_STORED_SKU_NOT_AUTO_IDENTITY",
+            })
     # Only rows with a single SKU can be treated as missing/extra candidates.
     only_www = sorted(s for s in skugroups.keys() - dev_sku_groups.keys()
                       if len(skugroups[s]) == 1)
     only_dev = sorted(s for s in dev_sku_groups.keys() - skugroups.keys()
                       if len(dev_sku_groups[s]) == 1)
+    drift_www = {x["www_sku"].casefold() for x in same_id_sku_drifts}
+    drift_dev = {x["dev_sku"].casefold() for x in same_id_sku_drifts}
+    only_www_after_drift = [sku for sku in only_www if sku not in drift_www]
+    only_dev_after_drift = [sku for sku in only_dev if sku not in drift_dev]
     return {
         "schema": SCHEMA,
         "source_format": "NATIVE_WOO_CSV_UNATTESTED_EXPORT_SCOPE",
@@ -171,6 +194,9 @@ def analyze(www, dev):
             "parent_sku_collisions": len(collisions),
             "parent_status_mismatches_on_provisional_matches": len(status_mismatches),
             "www_variations_with_own_stored_sku": sum(bool(x["sku"]) for x in variations),
+            "potential_same_id_sku_drift": len(same_id_sku_drifts),
+            "www_skus_without_dev_counterpart_excluding_drift": len(only_www_after_drift),
+            "dev_skus_without_www_counterpart_excluding_drift": len(only_dev_after_drift),
         },
         "candidates_private": {
             "parent_sku_www_only": only_www,
@@ -182,6 +208,9 @@ def analyze(www, dev):
             "www_duplicate_parent_sku": www_duplicates,
             "parent_provisional_matches": matched,
             "parent_status_mismatches": status_mismatches,
+            "possible_same_id_sku_drifts": same_id_sku_drifts,
+            "www_only_excluding_possible_drift": only_www_after_drift,
+            "dev_only_excluding_possible_drift": only_dev_after_drift,
             "www_variations_with_own_sku": [
                 {"id":v["id"],"sku":v["sku"],"parent_ref":v["parent_ref"]}
                 for v in variations if v["sku"]
