@@ -910,3 +910,109 @@ five-field Owner Dev-only Canary authorization, fresh readback
 immediately before any future write, and post-write/rollback receipts**.
 
 **Decision remains: WWW SKU authoritative; A2 writes HOLD.**
+
+## 2026-11-02 — A1 LIVE isolation recheck and Hostinger-managed backup handoff
+
+**Scope:** Source-only and authorized Dev read-only inspection via
+formal BYL DC Windows → already authenticated `byl-dev-hostinger`,
+plus fixed unauthenticated GET/HEAD public endpoint probe from formal
+DC US Mac mini. NO checkout attempt, Woo order/customer write, mail,
+provider webhook dispatch, Action Scheduler execution, manual DB export,
+host restore, plugin toggle, or www access. Existing Owner 5-SKU plan
+remains separately frozen and unapplied.
+
+### PASS today, precise scope only
+
+- **Fixed public Dev A1 9/9**: noindex/robots 200, native Woo
+  Orders and Customers REST 403 with expected
+  `byl_dev_g5_provider_inbound_quarantine`, AfterShip route/query
+  403, Store API checkout V1/legacy 403, public products endpoint 200.
+  All are credential-free GET/HEAD; this does not prove provider-side
+  or authenticated-client isolation beyond identified guards.
+- **Authenticated WP-CLI:** `home_url=https://dev.beyourlover.com`,
+  `wp_get_environment_type=staging`,
+  `DISABLE_WP_CRON=true`. Runtime hook presence checks passed for
+  `pre_wp_mail`, `pre_http_request`, `rest_pre_dispatch`,
+  `woocommerce_webhook_should_deliver`, and
+  `woocommerce_available_payment_gateways`.
+- **Deployed Dev Safety MU** SHA-256 remained exactly
+  `f0979a924a83a320bfa8256ee919d133d44f2f00598757c6720d2489d004ce3b`,
+  matching Draft PR #166 (NOT GitHub main).
+  Marketing two option gates still `no`; both the P13 sandbox
+  permit and newsletter one-mail permit files were absent.
+  The exact installed source has a default-deny `pre_wp_mail`
+  guard and a domain-bound `pre_http_request` AfterShip/
+  Automizely filter. These are positive **WP mail path** and
+  **specific provider-host path** controls, **not** proof of
+  blocking custom SMTP, non-WP HTTP clients, inbound credentials
+  in external systems, or independent ERP/WMS actions.
+- Dev Woo `shop_webhook` post list with any status produced
+  **zero rows**. This checks the native WP post representation
+  only; Woo webhook settings, different storage/provider queues,
+  and external pulling services remain independently scoped.
+- Active Dev plugins include **AfterShip WooCommerce Tracking,
+  AffiliateWP, WooPayments, Stripe gateway, and Advanced Media
+  Offloader**. Active plugin presence is **not** evidence of a
+  successful external delivery or transaction.
+
+### Action Scheduler: CLEAR CURRENT BLOCKER
+
+- Newest live Action Scheduler 4.1.0 / DBStore status:
+  **1,528 complete, 14 failed, 24 pending**, up from 1,522
+  complete in the previous readback. Latest complete record timestamp
+  **2026-11-01 17:15:28 UTC**. `DISABLE_WP_CRON=true` does NOT
+  make this queue inert.
+- Recent complete hook names include `wcpay_store_setup_sync`,
+  `woocommerce_cancel_unpaid_orders`,
+  `affwp_payout_batch_watchdog`, `woocommerce_tracker_send_event_wrapper`
+  and unrelated maintenance tasks. The status `complete` is NOT
+  evidence of an external payment, cancellation, payout, email, or
+  webhook successfully occurring. The queue can still run.
+- **Do not clear, drain, edit, or globally disable scheduler.**
+  Before SKU writing, the service owner must verify that Dev's
+  *product update* hooks cannot dispatch ERP/WMS/ShipOut/SM sync,
+  AffiliateWP payouts, mail, AfterShip or unrelated real-site
+  actions; verify independent provider-side jobs do not pull Dev.
+  The existing Woo Orders/Customers REST 403 is useful but
+  insufficient to certify all external integrations.
+
+### Current complete recoverable backup: BLOCKED, exactly scoped next action
+
+- The earlier failed WP-CLI database export was not retried or
+  bypassed. Its empty disposable files had been removed. Old
+  Oct-10 DB gzip archives are not a contemporary full restore point.
+- Hostinger's current official help instructions:
+  https://www.hostinger.com/support/2298928-how-to-create-backups-at-hostinger/
+  and
+  https://www.hostinger.com/support/5981435-how-to-download-backups-at-hostinger/.
+  In the hosting **owner's authenticated hPanel**, select **Websites
+  → the DEV site account → Dashboard → Backups → Create Backup**
+  (manual backup availability depends on plan). Use the **Dev
+  site/server account**, NOT WWW, then record the latest backup
+  timestamp and whether its files+database components were created.
+  Do **not** press Restore on the live Dev or WWW.
+- To verify a usable rollback independently, download (via approved
+  hPanel) a current Dev site/files `.tar.gz` and DB `.sql.gz`
+  into a protected owner-controlled location, check file sizes,
+  SHA-256, archive integrity and the proper WordPress site identity.
+  Test restore **only in a separate disposable sandbox**; never
+  overwrite active Dev or production orders. The hPanel backup might
+  cover all hosting-plan files/DB rather than only one domain;
+  double-check `dev.beyourlover.com` identity and specific database.
+- Dev has active **Advanced Media Offloader**; Hostinger hosting
+  backup alone does **not** establish that independent Cloudflare
+  R2 object bytes are backed up. Preserve DB attachment mappings,
+  and separately attest R2 object/key availability / versioning
+  or an approved object-storage recovery plan before full
+  media/restore PASS. Do not enumerate cloud credentials.
+- No authorized hPanel session/tool is currently available; **a
+  host-owner hPanel backup confirmation is the one immediate
+  external action**. No Hostinger backup or restore occurred here.
+
+**Updated A1 gate:** public boundary/Dev Safety mail and specified
+provider HTTP controls **PASS within their exact scope**;
+**Action Scheduler/ERP+provider independent pull/mail transport
+and current full Hostinger+R2 backup recovery HOLD**. The Owner's
+five exact WWW-canonical Dev SKU preimages remain 5/5 PASS
+from the previous scoped live read. **A2 actual SKU update HOLD,
+no WWW/Dev business data mutations, PR #168 stays Draft.**
