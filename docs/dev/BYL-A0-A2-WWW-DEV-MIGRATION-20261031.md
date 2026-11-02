@@ -822,3 +822,59 @@ current **recoverable** Dev DB/files/media/R2 backup, complete A1
 external integration/queue isolation, precise field+SKU target
 allowlist, and a separate explicit Owner approval for the Dev-only
 Canary. WWW remains read-only throughout this branch.
+
+## 2026-11-02 — five-record WWW-canonical SKU-only Canary plan READ-ONLY PASS
+
+Based on the Owner decision that WWW production's native SKU wins,
+we completed a deterministic, source-fingerprinted offline preimage
+check using the **real WWW WooCommerce CSV** and **actual protected
+Dev v2 WP-CLI snapshot**. No Woo/WordPress writes.
+
+- Read-only program: `scripts/byl_a2_www_sku_canary_plan.py`.
+  The WWW native CSV is fixed at SHA-256
+  `39aa0efde3ed5ffe7151c71292234e052f2933016c9f014fc5f10156ee66664b`;
+  the independently archived Dev v2 JSON is fixed at
+  `7a6b337505bedbefe5678b891befa92870c1c128b442c174e92fb22013256da0`.
+  Both source hashes verified on their respective Owner machines.
+  A restricted Dev SKU/type/status/price/attribute projection was
+  transferred in-memory, not the full sensitive source JSON.
+- Scope is **EXACTLY five existing Dev records, SKU field only**.
+  Two simple products (IDs 35550 and 36134) passed price, status, type
+  and exact-before-value checks. Three Pillow variations (38164,
+  38165, 38166) additionally passed parent ID=38047, parent
+  stored SKU `pillow`, **blue / green / grey** option, type,
+  price 59, and blank Dev stored SKU.
+- Planned target values: 35550 `VP757A`, 36134
+  `VP757A & MF414A`, 38164 `pillow-blue`, 38165
+  `pillow-green`, 38166 `pillow-grey`.
+- Plan enforces exact source row-count/status/price/parent/color
+  preconditions, no target-SKU collisions, and refuses stale source,
+  schema, before-values, variation ambiguity, or broadening the
+  allowlist. Neither media, price, title, visibility, stock,
+  parent identity nor any unrelated variation is in scope.
+- **Real-data plan: 5/5 planned preimages PASS**, immutable
+  SHA-256 `686824bab5050d519f6cb8535c9dcd830c15fd24c8354bc8c8413481ee33f387`;
+  private file on China Mac at
+  `~/.byl-private/p1-www-dev-20261102/sku-only-dev-canary-plan.json`
+  (0600).
+- Isolated regression: 53 A0/A2 tests + 13 P1 tests = **66/66
+  PASS**, including 11 new five-record preimage cases.
+
+**Implementation correction encountered and tested:** The actual
+Dev v2 JSON represents absent attributes in **228 simple products**
+as `[]`, not `{}`. The older validator rejected this real,
+legitimate Woo/PHP empty-array encoding. It now accepts `[]`
+**only for non-variation products**, treats it as equivalent to
+an empty object for a field-diff, and rejects an array for a
+variation (whose identity must be explicit). This fix was unit
+tested and used in the successful real-data plan.
+
+**Current authorization remains unchanged:** `gate=HOLD`,
+`a2_import_authorized=false`, every planned action
+`apply_allowed=false`. Before actual Dev SKU modification,
+validate a fresh live readback (all five before SKUs and parent/
+color/unique SKU invariants), current **complete recoverable Dev
+backup/restore proof**, and full A1 outbound mail, ERP/WMS,
+AffiliateWP/AfterShip, payment, queue/Cron isolation. Then obtain
+a separate exact-five `_sku` **Dev-only Owner write approval**.
+No WWW changes, no product import or live SKU changes now.
