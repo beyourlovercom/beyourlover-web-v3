@@ -34,9 +34,9 @@ def read_www_csv(path):
         for index, raw in enumerate(reader):
             if index > 5:
                 raise ValueError("Native Woo CSV header missing after leading whitespace")
-            if not raw or all(not cell.strip().strip("\\ufeff") for cell in raw):
+            if not raw or all(not cell.strip().strip(chr(0xfeff)) for cell in raw):
                 continue
-            header = [cell.strip("\\ufeff").strip() for cell in raw]
+            header = [cell.strip(chr(0xfeff)).strip() for cell in raw]
             break
         if not header or header[0] != "ID":
             raise ValueError("Not a native Woo product export header")
