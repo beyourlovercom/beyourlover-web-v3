@@ -707,3 +707,85 @@ must still reconcile custom media/R2/native statuses before A0 COMPLETE.
 
 **P1 current status: CSV audit tool PASS, actual current WWW export
 NOT ACQUIRED; A0 WWW HOLD, A1 safety/backup HOLD, A2 import HOLD.**
+
+## 2026-11-02 — P1 LIVE WWW native export and real Dev v2 provisional SKU reconciliation
+
+The Owner downloaded **two identical** current `wc-product-export-2-11-2026-*.csv`
+files into the authorized China Mac Downloads. Input SHA-256 was
+`39aa0efde3ed5ffe7151c71292234e052f2933016c9f014fc5f10156ee66664b`.
+File `wc-product-export-2-11-2026-1793587861247.csv` was selected
+for analysis. **Raw source and detailed report stayed on Owner devices.**
+
+### Native source integrity, with explicit limits
+
+- The file starts with two whitespace-only CSV records then an
+  **embedded UTF-8 BOM at the real Woo header**; header has **150
+  columns**. Rows arrive in 50-row groups of **135 / 143 / 147 / 149
+  / 150 columns**, consistent with late-discovered plugin metadata
+  columns. P1 parser recognizes this real layout, fills only missing
+  *trailing* fields for conservative SKU/status/parent checks, and
+  does NOT certify incomplete custom metadata. **Do not re-save or
+  edit this CSV in Excel**.
+- **315 unique WWW native IDs = 247 parent products (225 simple, 22
+  variable) plus 68 variations**, no duplicate parent SKU groups.
+  Parent statuses: **228 publish / 15 private / 2 draft / 2 pending**.
+- Dev existing independently authorized 2026-11-01 private
+  `byl-catalog-a0-v2` snapshot: **321 native rows = 253 parents +
+  68 variations**. To run P1 entirely on the Owner's machines,
+  Windows supplied only a minimal in-memory Dev SKU/type/status
+  projection; **not** the full private Dev JSON. All detailed output
+  remained on China Mac in
+  `~/.byl-private/p1-www-dev-20261102/www-dev-p1-provisional-diff.json`,
+  permission 0600 (directory 0700), SHA-256
+  `0e5fdb83c0d7c20cb0205e5df42e381528f0de55ce9e9d4630f911c31bc6b562`.
+  Dev full v2 source SHA-256:
+  `7a6b337505bedbefe5678b891befa92870c1c128b442c174e92fb22013256da0`.
+
+### REAL P1 conservative comparison
+
+| Check | Verified result |
+| --- | --- |
+| Parent native SKU + type provisional unique matches | **238** |
+| Matched parent publication status differences | **0** |
+| Parent duplicate non-empty SKU groups | **0** on WWW, **0** previously on Dev |
+| Native SKU-only result before same-ID drift classification | **3 WWW-only**, **5 Dev-only** |
+| Identical WP ID but conflicting native SKU, **quarantine** | **2**: ID 35550 (WWW `VP757A`, Dev `VP757B`); ID 36134 (WWW `VP757A & MF414A`, Dev `VP757B & MF414A`) |
+| After keeping possible SKU drifts separate | **1 WWW-only** draft `BX033B-1` (ID 41810); **3 Dev-only** published `S137B-purple` (32905), `SG02` (32940), `VX737A` (34470) |
+| Parent blank own SKUs | **6 on each**, with matching ID/status sets: 9128, 9132, 17085, 17286, 24875, 26737. This is an audit clue, **not** authorization to treat WP IDs as cross-site stable identities |
+| Own stored variation SKUs | **3 on WWW**: `pillow-blue` (38164), `pillow-green` (38165), `pillow-grey` (38166), parent `pillow`. **0/68 on Dev**. These are a protected variation-SKU drift exception cohort |
+| Variation attributes | **35** with null/wildcard required values in WWW; **35** on the previously reviewed Dev v2/public snapshots. **0 unresolved WWW variation parent references** |
+| Native parent CSV missing images | **2**: 26737 (publish, blank SKU), 34246 (private, `RJ238A`). These are the **same two** non-fixture Dev no-primary-image parent IDs. Four further Dev no-image records 40026–40029 are independently confirmed Dev UAT fixtures, not ordinary catalog products |
+| Protected Dev fixture exclusion | Four proven Dev R13/Marketing fixtures 40026–40029 removed from ordinary SKU candidate comparison; **249 commercial/non-fixture Dev parents vs 247 WWW parents** |
+
+**Interpretation:** The original apparent `3 WWW-only / 5 Dev-only`
+mismatch should not trigger six/eight product creations/deletions:
+**two pairs have matching WP ID but conflicting SKU**, and must be
+reconciled as potential SKU edits by an Owner or native authoritative
+product history. Current source WWW is commercially authoritative
+but this report does not claim blanket safe overwrites.
+
+### Real P1 quality gates / remaining limits
+
+The raw WWW file exposes many `Meta:` fields. Do **not** publish it
+or a derivative containing private plugin metadata. This P1
+analysis compares only unique native parent SKU and type, and checks
+status/variant-parent/declared attribute evidence. It does NOT prove
+that the native CSV covers every WP `trash` status, every media
+attachment/thumbnail/R2 key, custom product meta, or secure identities
+of SKU-less variations. These source gaps cannot be replaced by
+relabeling the CSV as the v2 WP-CLI exporter output.
+
+Current P1 implementation and tests at PR #168:
+`scripts/byl_p1_www_woo_csv_audit.py` and corresponding unit
+suite; **39 prior A0–A2 + 12 P1 = 51 isolated tests PASS** on formal
+DC. Report remains `gate=HOLD`, `a0_complete_both_sites=false`,
+`a2_import_authorized=false`. WWW was **only read from Owner's CSV
+on the Mac**; no WWW SSH/login or Dev/WWW data writes.
+
+**P1 outcome: Current WWW CSV ACQUIRED; provisional parent SKU delta
+PASS; full A0 media/R2/variation identity scope still PARTIAL.
+A1 recoverable backup and external system isolation still HOLD;
+A2 import still HOLD.** Exact next Owner decision is reconcile 35550/
+36134 native SKU direction and the WWW Pillow variation SKUs,
+then use a proper current Dev restore point before proposing any
+A2 product Canary.
