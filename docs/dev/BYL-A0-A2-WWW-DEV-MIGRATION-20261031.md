@@ -1167,3 +1167,40 @@ route explicitly approved by the tool/platform authorization checks,
 not by bypassing this denial. Re-run the same exact-file source
 integrity and 5/5 preimage/target collision checks before any
 future separate write.
+
+## 2026-11-02 late — post-denial independent 5-SKU Dev hold verification
+
+The Owner's exact-five Dev-only SKU change permission is already
+on record; no new approval was sought. This update is **read-only**
+following the platform's security denial of the earlier write call.
+No alternate execution path was used to evade that denial.
+
+Formal BYL DC → authorized existing Dev WP-CLI verified:
+- All three execution receipt files
+  `exact-five-before.json`, `exact-five-result.json`,
+  `exact-five-failed.json` are still **absent**.
+- Current native stored `_sku`: ID 35550 `VP757B`, ID 36134
+  `VP757B & MF414A`, IDs 38164/38165/38166 all **empty**.
+  They do **not** yet match the WWW canonical values.
+- The exact staged Dev-only Canary source SHA-256 remained
+  `a7e5ce0d8b0b251840009b2399f3a19c5a7b502381bd0c4c39eb7c5eb9594ed6`.
+  Its live read-only `wp eval-file` returned
+  `ready_preimages=5`, `expected_changes=5`,
+  `apply_requested=false`, `status=DRY_RUN_ONLY`.
+  Five independent identity/type/price/parent/option/target-SKU
+  constraints continue to pass without changing any record.
+- Real scheduler status is now **1,541 complete / 14 failed /
+  26 pending**, using `ActionScheduler_HybridStore` (formerly
+  `ActionScheduler_DBStore`). The last completed action still
+  shows **2026-11-02 07:59:17 UTC**, before the Dev runner hold
+  installation at 08:03:32 UTC. New pending hooks include
+  `wc_stripe_database_cache_prefetch_async` and
+  `action_scheduler/migration_hook`; both are pending,
+  **not evidence of execution**. Do not drain or resume the queue.
+- No order/payment/email/WWW or Dev product business writes.
+  The Owner's previously affirmed backup was not questioned.
+
+**State:** unchanged — `OWNER_PASS_RECORDED`,
+`5/5_CURRENT_DRY_RUN_PASS`, `WRITE_EXECUTION_BLOCKED`,
+`0_OF_5_SKU_WRITES`. Do not call it A2 Canary PASS or
+retrigger the blocked write through an alternative interface.
