@@ -1016,3 +1016,110 @@ and current full Hostinger+R2 backup recovery HOLD**. The Owner's
 five exact WWW-canonical Dev SKU preimages remain 5/5 PASS
 from the previous scoped live read. **A2 actual SKU update HOLD,
 no WWW/Dev business data mutations, PR #168 stays Draft.**
+
+## 2026-11-02 — A1 Dev-specific external isolation APPLIED, A2 exact-five live DRY RUN PASS
+
+**Owner backup statement:** Owner explicitly confirmed a Hostinger
+backup had already been completed and asked not to reconfirm it.
+Respect that instruction. This is an **Owner-attested backup**, not a
+verified complete DB/files/R2 sandbox restore. No backup commands or
+restores were run here, and the earlier failed manual DB export was
+not retried.
+
+### A1 — actual Dev-only safeguards now loaded
+
+All installations used only the **previously authorized formal BYL DC
+Windows → existing `byl-dev-hostinger` alias**, after testing exact
+immutable GitHub source commits on the US Mac mini. Each source was
+PHP-linted and SHA-256 verified before installing a **separate new
+MU file on Dev**, without replacing the current
+`byl-dev-safety.php` (PR #166 source). Production WWW was not touched.
+
+| Independent Dev MU file | SHA-256 of live installed source | Effect and limit |
+| --- | --- | --- |
+| `byl-a1-external-product-rest-isolation.php` | `faa974d87f2eb57a275752937b53d5094fcd769b876115d4e669f7c340e3f94f` | Blocks Woo `/wc/v1–v3/products` routes for external API-key clients even with privileged Woo credentials; trusted WordPress logged-in admin **cookie + valid REST nonce** still allowed; does not block public `/wc/store/v1/products` |
+| `byl-a1-action-scheduler-pause.php` | `53f3830516c1cdcbcaf6e5ece36b7252bfdc1e800b3ec663740771dab1d87340` | Dev staging Action Scheduler allowed concurrency `0`; normal async/default and WPCLI runner check is short-circuited. **Preserves** all existing task rows; no queue drain/cancel/completion. Does not disable independent host cron or custom task executors |
+| `byl-a1-jetpack-sync-pause.php` | `dceed703e1525e4825368e8212ba87a9e84334d80095c0e08abca69d4a9a568a` | Current WooPayments Jetpack **connected**; intercepts Dev product-meta enqueue hooks and sets its **normal sender** load filter false. Does not erase old Jetpack queues or revoke payment credentials; manual/external sync routes not attested |
+
+**Live UAT readback after installation:**
+
+- `GET /wp-json/wc/v3/products` / single product / variations
+  all **403** with
+  `byl_a1_dev_external_product_rest_quarantined`;
+  Store API product HEAD remains **200**, and Woo orders REST
+  still **403** under earlier Dev Safety.
+- `ActionScheduler::runner()->get_allowed_concurrent_batches()`
+  returned **0**. Installed pause file timestamp **2026-11-02
+  08:03:32 UTC**. Last observed completed action timestamp was
+  **2026-11-02 07:59:17 UTC** (BEFORE pause installation).
+  Queue snapshot after installing guards: **1,541 complete, 14
+  failed, 24 pending**. The pending records remain preserved,
+  not cancelled or marked complete.
+- `apply_filters('jetpack_sync_sender_should_load',true)` returned
+  **false**; targeted Dev
+  `jetpack_sync_before_enqueue_updated_post_meta` returned
+  **false**; Action Scheduler allowed concurrency returned 0 in
+  the same authenticated Dev WP-CLI readback.
+- Full fixed public Dev safe GET/HEAD regression still **9/9 PASS**
+  after installation: noindex, robots, Woo REST order/customer
+  deny, AfterShip routes deny, guest Checkout deny, public Store
+  Product availability.
+- The Dev product-save hook audit found only Woo core callbacks
+  on `woocommerce_update_product`, a Smart Coupons callback
+  on `save_post_product`, and WooPayments Jetpack Sync plus
+  media/Smart Coupon/cache hooks on `updated_post_meta`.
+  Jetpack had been connected, making the third guard necessary;
+  this audit cannot prove every plugin, direct `curl`, provider-side
+  puller or external scheduler is inert.
+
+**Scope conclusion:** The normal Dev WordPress ERP product-REST,
+Action Scheduler and Jetpack product metadata **migration-relevant
+paths are now guarded and live-readback verified**. This is NOT a
+blanket provider-side isolation certification. In particular, do
+not claim to have changed production ERP configuration, WMS,
+ShipOut/SM, independent host cron, SMTP outside WP, or external
+AfterShip-side polling. No tasks were run, no WP product/price/order/
+payment/email rows were changed. Restoring the scheduler/Jetpack
+queue without a separate Owner approval may release pending jobs;
+**do not casually remove these MU guards**.
+
+### A2 — actual Dev exact-five, source-fingerprinted Canary dry-run
+
+Immutable source `scripts/byl_a2_dev_5sku_canary.php` is staged
+**off-webroot** on the authorized Dev account at
+`/home/u247343654/byl-v3-staging/a2-sku-only-canary-20261102/source.php`,
+SHA-256 `a7e5ce0d8b0b251840009b2399f3a19c5a7b502381bd0c4c39eb7c5eb9594ed6`.
+The current code incorporates partial-write-inclusive rollback and
+post-rollback readback verification.
+
+A live Dev-only `wp eval-file` without write approval returned
+`ready_preimages=5`, `expected_changes=5`,
+`apply_requested=false`, `status=DRY_RUN_ONLY`.
+It verified the native *stored/edit* SKU preimages (never the
+inherited variation view), Woo object types, publish statuses,
+regular/sale prices, target uniqueness, PILLOW parent 38047 and
+the Blue/Green/Grey variant attribute identities, plus the A1
+normal-path guards above.
+
+| Dev ID | Verified stored SKU now | WWW canonical planned SKU |
+| --- | --- | --- |
+| 35550 | `VP757B` | `VP757A` |
+| 36134 | `VP757B & MF414A` | `VP757A & MF414A` |
+| 38164 | empty | `pillow-blue` |
+| 38165 | empty | `pillow-green` |
+| 38166 | empty | `pillow-grey` |
+
+**A2 WRITE NOT EXECUTED.** The script defaults to a no-write audit
+and refuses to apply without a distinct exact-five Owner authorization
+passed to its CLI invocation. No approval string has been set or
+submitted. Source-only suites: **66 Python regressions PASS**,
+**47 new A1 PHP guards PASS**; Foundation CI includes these
+plus syntax checks for the staged A2 script.
+
+**Next action requires one explicit Owner approval:** authorize
+the above **five exact Dev-only native SKU changes** and no other
+fields. Before actual execution, run fresh preflight/uniqueness;
+during apply, write a private preimage receipt off-webroot, verify
+Woo SKU lookup/readback for each ID, and if anything fails attempt
+the reverse-order rollback with readback. Do not run a payment/order,
+unpause Jetpack/Action Scheduler, or merge/deploy PR #168 to WWW.
