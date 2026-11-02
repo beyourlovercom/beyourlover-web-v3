@@ -22,22 +22,40 @@ MAX_ROWS = 50000
 
 def read_www_csv(path):
     p = Path(path)
+    # The native WWW export observed on 2026-11-02 begins with two
+    # whitespace-only CSV records, then a UTF-8 BOM *inside* the file.
+    # Its 50-row batches have 135/143/147/149/150 fields against a
+    # 150-column header (late-discovered plugin meta fields). Normalize
+    # only absent TRAILING fields to empty for limited parent SKU audit;
+    # do NOT attest custom meta, variation attributes or full R2 parity.
     with p.open("r", encoding="utf-8-sig", newline="") as handle:
-        reader = csv.DictReader(handle)
-        if not reader.fieldnames:
-            raise ValueError("Empty CSV or missing header row")
-        missing = REQUIRED_HEADERS - set(reader.fieldnames)
+        reader = csv.reader(handle)
+        header = None
+        for index, raw in enumerate(reader):
+            if index > 5:
+                raise ValueError("Native Woo CSV header missing after leading whitespace")
+            if not raw or all(not cell.strip().strip("\\ufeff") for cell in raw):
+                continue
+            header = [cell.strip("\\ufeff").strip() for cell in raw]
+            break
+        if not header or header[0] != "ID":
+            raise ValueError("Not a native Woo product export header")
+        missing = REQUIRED_HEADERS - set(header)
         if missing:
             raise ValueError("Missing Woo native product CSV fields: " + ", ".join(sorted(missing)))
-        if len(reader.fieldnames) != len(set(reader.fieldnames)):
+        if len(header) != len(set(header)):
             raise ValueError("Duplicate column headers")
+        required_max = max(header.index(k) for k in REQUIRED_HEADERS)
         records = []
         ids = set()
-        for i, row in enumerate(reader, 1):
+        for i, cells in enumerate(reader, 1):
+            if not cells or all(not cell.strip() for cell in cells):
+                continue
             if i > MAX_ROWS:
                 raise ValueError("CSV exceeds safety row limit")
-            if None in row:
-                raise ValueError("Malformed CSV row with extra columns")
+            if len(cells) > len(header) or len(cells) <= required_max:
+                raise ValueError("Malformed native Woo CSV row width")
+            row = dict(zip(header, cells + [""] * (len(header) - len(cells))))
             value = (row.get("ID") or "").strip()
             if not value.isdecimal() or int(value) < 1:
                 raise ValueError("Invalid native WWW product ID in CSV row " + str(i))
@@ -56,7 +74,6 @@ def read_www_csv(path):
                 "status": STATUS_MAP[published], "parent_ref": (row.get("Parent") or "").strip(),
                 "images_present": bool((row.get("Images") or "").strip()),
                 "categories_present": bool((row.get("Categories") or "").strip()),
-                # Preserve only the minimum field inventory in PRIVATE memory.
                 "attribute_columns": [(k, str(v or "").strip()) for k, v in row.items()
                     if k and k.startswith("Attribute ") and k.endswith(" value(s)")],
             })
