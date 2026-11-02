@@ -108,12 +108,9 @@ class NativeCsvP1SafetyTest(unittest.TestCase):
             # Woo exporter can add custom columns after emitting 50 row batches.
             writer.writerow([row(100,sku="RED")["ID"],"simple","RED","1","","","",
                              "","",""])  # 10 instead of 11 columns
-            file.write_bytes(("\\ufeff"+stream.getvalue()).encode("utf-8").replace(
-                b"\\xef\\xbb\\xbf", b"", 1))
-            # Inject the genuine file layout: two lines, BOM at header.
-            b=file.read_bytes()
-            b=b.replace(b"ID,Type", b"\\xef\\xbb\\xbfID,Type",1)
-            file.write_bytes(b)
+            # Reproduce two blank lines followed by an embedded BOM on header.
+            payload = stream.getvalue().replace("ID,Type", chr(0xfeff) + "ID,Type", 1)
+            file.write_bytes(payload.encode("utf-8"))
             rows=read_www_csv(file)
             self.assertEqual(len(rows),1)
             self.assertEqual(rows[0]["sku"],"RED")
