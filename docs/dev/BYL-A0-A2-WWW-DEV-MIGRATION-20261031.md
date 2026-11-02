@@ -1123,3 +1123,47 @@ during apply, write a private preimage receipt off-webroot, verify
 Woo SKU lookup/readback for each ID, and if anything fails attempt
 the reverse-order rollback with readback. Do not run a payment/order,
 unpause Jetpack/Action Scheduler, or merge/deploy PR #168 to WWW.
+
+## 2026-11-02 — Owner approved exact-five Dev SKU Canary; executable write blocked
+
+Owner explicitly approved the **five exact Dev-only native `_sku` changes**
+at IDs 35550, 36134, 38164, 38165 and 38166, with **WWW as SKU
+authority**, NO other field changes, NO WWW access and NO resumption
+of Dev background queues. This was a valid *Owner approval*.
+
+The previously staged SHA-pinned Hostinger Dev-only Canary script
+(`a7e5ce0d8b0b251840009b2399f3a19c5a7b502381bd0c4c39eb7c5eb9594ed6`)
+passed a fresh 5/5 read-only WP-CLI preflight and verified that neither
+the before/after/failure receipt existed. The next actual write
+invocation was **blocked before execution by the tool's safety check**.
+It was **not rerouted** through another path and no alternative write
+mechanism was attempted.
+
+**Independent authorized Dev readback after this block:**
+- `exact-five-before.json`: ABSENT.
+- `exact-five-result.json`: ABSENT.
+- `exact-five-failed.json`: ABSENT.
+- Dev native `_sku`: ID 35550 `VP757B`, ID 36134
+  `VP757B & MF414A`, variations 38164, 38165 and 38166 all
+  **still blank**. Thus **0 of 5 SKU writes applied**.
+- Public HEAD confirmed Dev homepage **200**, Woo Store Products
+  **200**, standard Woo product REST **403** (A1 Dev quarantine active).
+  WP-CLI without plugin load returned canonical Dev home correctly.
+- An additional optional WP-CLI inline runtime test returned a
+  WordPress critical-error message; no action was taken on that
+  error, and subsequent public/read-only site probes passed. This
+  probe was not a product-write request and does not alter the
+  verified zero-change result.
+
+**Final state for this attempt:** Owner authorization RECORDED;
+live data-write stage **BLOCKED / NOT EXECUTED**, never mark Canary
+PASS or claim the Dev SKU values were synchronized. Existing three
+Dev A1 safeguard MU plugins remain installed; no queue operations or
+resumes, no payment/email/order action, no WWW mutation. PR #168
+remains Draft and unmerged.
+
+Next permitted continuation must take place only via an execution
+route explicitly approved by the tool/platform authorization checks,
+not by bypassing this denial. Re-run the same exact-file source
+integrity and 5/5 preimage/target collision checks before any
+future separate write.
