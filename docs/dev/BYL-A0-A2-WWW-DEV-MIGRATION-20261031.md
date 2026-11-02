@@ -878,3 +878,35 @@ backup/restore proof**, and full A1 outbound mail, ERP/WMS,
 AffiliateWP/AfterShip, payment, queue/Cron isolation. Then obtain
 a separate exact-five `_sku` **Dev-only Owner write approval**.
 No WWW changes, no product import or live SKU changes now.
+
+## 2026-11-02 — live Dev exact-five SKU preimage/uniqueness readback PASS (no write)
+
+Authorized formal BYL DC Windows → existing Hostinger Dev WP-CLI
+performed a fresh, **read-only** direct `get_post_meta(id,'_sku',true)`
+check and WooCommerce `wc_get_product_id_by_sku(target)` lookup for
+**only the five preapproved candidate IDs**:
+
+| Dev ID | Current own stored `_sku` | Proposed authoritative WWW SKU | Target SKU already used on Dev? |
+| --- | --- | --- | --- |
+| 35550 | `VP757B` | `VP757A` | No (lookup ID 0) |
+| 36134 | `VP757B & MF414A` | `VP757A & MF414A` | No (lookup ID 0) |
+| 38164 | empty | `pillow-blue` | No (lookup ID 0) |
+| 38165 | empty | `pillow-green` | No (lookup ID 0) |
+| 38166 | empty | `pillow-grey` | No (lookup ID 0) |
+
+**Result: fresh live SKU preimage and target uniqueness checks 5/5 PASS.**
+Combined with the immutable WWW CSV + Dev v2 attribute/parent/
+price/status comparison, this is a reliable **read-only proposed
+five-field SKU patch specification**. It is not yet proof of runtime
+A1 outbound isolation nor a backup/restore guarantee.
+
+Current PR #168 contains the local-source-only validator, strict
+fail-closed tests and separate private signed-plan receipt; no Dev
+source installation, SKU mutation, variation rebuild, product
+creation, payment, mail, order or WMS action occurred. Continue to
+require **independently verified current complete Dev recovery point,
+A1 live outbound/inbound and scheduled job isolation, explicit
+five-field Owner Dev-only Canary authorization, fresh readback
+immediately before any future write, and post-write/rollback receipts**.
+
+**Decision remains: WWW SKU authoritative; A2 writes HOLD.**
