@@ -74,8 +74,15 @@ def read_www_csv(path):
                 "status": STATUS_MAP[published], "parent_ref": (row.get("Parent") or "").strip(),
                 "images_present": bool((row.get("Images") or "").strip()),
                 "categories_present": bool((row.get("Categories") or "").strip()),
-                "attribute_columns": [(k, str(v or "").strip()) for k, v in row.items()
-                    if k and k.startswith("Attribute ") and k.endswith(" value(s)")],
+                # Only actually declared attribute names count. A blank
+                # unused Attribute 2 column is NOT a wildcard attribute.
+                "attribute_columns": [
+                    (str(row.get(k) or "").strip(),
+                     str(row.get(k.replace(" name", " value(s)")) or "").strip())
+                    for k in header if k.startswith("Attribute ") and k.endswith(" name")
+                    if str(row.get(k) or "").strip() or
+                       str(row.get(k.replace(" name", " value(s)")) or "").strip()
+                ],
             })
     if not records:
         raise ValueError("Empty Woo product inventory")
@@ -104,7 +111,7 @@ def analyze(www, dev):
             unresolved_parents.append(v["id"])
         if not v["sku"] and (
             not v["attribute_columns"] or
-            any(not value for _, value in v["attribute_columns"])
+            any(not name or not value for name, value in v["attribute_columns"])
         ):
             wildcard_variations.append(v["id"])
     dev_parents = [x for x in dev["products"] if x["type"] != "variation"
@@ -115,6 +122,7 @@ def analyze(www, dev):
         if sku:
             dev_sku_groups[sku].append(x)
     matched = []
+    status_mismatches = []
     collisions = []
     for sku in sorted(set(skugroups) & set(dev_sku_groups)):
         w = skugroups[sku]
@@ -131,6 +139,10 @@ def analyze(www, dev):
             matched.append({"sku": sku, "www_id": w[0]["id"],
                             "dev_id": d[0]["id"],
                             "type": w[0]["type"]})
+            if w[0]["status"] != d[0]["status"]:
+                status_mismatches.append({"sku":sku,"www_id":w[0]["id"],
+                    "dev_id":d[0]["id"],"www_status":w[0]["status"],
+                    "dev_status":d[0]["status"]})
     # Only rows with a single SKU can be treated as missing/extra candidates.
     only_www = sorted(s for s in skugroups.keys() - dev_sku_groups.keys()
                       if len(skugroups[s]) == 1)
@@ -157,6 +169,8 @@ def analyze(www, dev):
             "parent_sku_www_only_provisional": len(only_www),
             "parent_sku_dev_only_provisional": len(only_dev),
             "parent_sku_collisions": len(collisions),
+            "parent_status_mismatches_on_provisional_matches": len(status_mismatches),
+            "www_variations_with_own_stored_sku": sum(bool(x["sku"]) for x in variations),
         },
         "candidates_private": {
             "parent_sku_www_only": only_www,
@@ -167,6 +181,11 @@ def analyze(www, dev):
             "www_blank_sku_parent_ids": sorted(p["id"] for p in parents if not p["sku"]),
             "www_duplicate_parent_sku": www_duplicates,
             "parent_provisional_matches": matched,
+            "parent_status_mismatches": status_mismatches,
+            "www_variations_with_own_sku": [
+                {"id":v["id"],"sku":v["sku"],"parent_ref":v["parent_ref"]}
+                for v in variations if v["sku"]
+            ],
         },
         "www_full_export_attested": False,
         "variation_identity_parity_attested": False,
