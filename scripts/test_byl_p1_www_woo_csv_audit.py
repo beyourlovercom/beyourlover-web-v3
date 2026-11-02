@@ -71,6 +71,20 @@ class NativeCsvP1SafetyTest(unittest.TestCase):
         self.assertEqual(reasons,{"DUPLICATE_SKU","TYPE_MISMATCH"})
         self.assertEqual(report["counts"]["parent_unique_sku_matches_provisional"],0)
 
+    def test_unused_second_attribute_is_not_false_wildcard(self):
+        www=read([row(10,"variable","P"),
+                  row(21,"variation",parent="P",attribute="Color",attr_value="Red")],
+                 headers=HEADERS)
+        rpt=analyze(www,dev(v2_item(91,"P","variable")))
+        self.assertEqual(rpt["counts"]["www_variations_missing_any_attributes"],0)
+
+    def test_provisional_status_mismatch_is_reported_not_auto_fixed(self):
+        www=read([row(10,sku="A",published="0")])
+        rpt=analyze(www,dev(v2_item(12,"A")))
+        self.assertEqual(rpt["counts"]["parent_status_mismatches_on_provisional_matches"],1)
+        self.assertFalse(rpt["a2_import_authorized"])
+        self.assertEqual(rpt["candidates_private"]["parent_status_mismatches"][0]["www_status"],"private")
+
     def test_native_status_encoding_preserved_without_guessing(self):
         www=read([row(10,"simple","P",published="1"),
                   row(11,"simple","Q",published="0"),
