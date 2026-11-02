@@ -49,6 +49,30 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(r['counts']['missing_in_dev'], 1)
         self.assertEqual(r['matched_changed'][0]['changed_fields'], ['categories'])
 
+    def test_actual_woo_simple_empty_attribute_array_validates(self):
+        a = p(11,'SKU')
+        b = p(22,'SKU')
+        a['attributes'] = []
+        report = compare(snap('https://www.beyourlover.com',[a]),
+                         snap('https://dev.beyourlover.com',[b]))
+        self.assertEqual(report['counts']['matched_unique_keys'],1)
+        self.assertEqual(report['counts']['changed_on_matching_keys'],0)
+        self.assertEqual(report['gate'],'DRY_RUN_ONLY')
+
+    def test_variation_attribute_array_is_not_identity(self):
+        a = p(11,'V',kind='variation',parent_sku='PARENT')
+        a['attributes'] = []
+        with self.assertRaisesRegex(ValueError,'Malformed Woo product/attribute'):
+            compare(snap('https://www.beyourlover.com',[a]),
+                    snap('https://dev.beyourlover.com',[]))
+
+    def test_nonempty_list_attributes_still_rejected(self):
+        a = p(11,'SKU')
+        a['attributes']=['blue']
+        with self.assertRaisesRegex(ValueError,'Malformed Woo product/attribute'):
+            compare(snap('https://www.beyourlover.com',[a]),
+                    snap('https://dev.beyourlover.com',[]))
+
     def test_v1_legacy_catalog_rejected_before_a2_diff(self):
         w = snap('https://www.beyourlover.com', [p(1, 'X')])
         d = snap('https://dev.beyourlover.com', [p(2, 'X')])
