@@ -71,7 +71,10 @@ def read_www_csv(path):
                 raise ValueError("Unknown/unsupported published status at row " + str(i))
             records.append({
                 "id": pid, "type": kind, "sku": (row.get("SKU") or "").strip(),
-                "status": STATUS_MAP[published], "parent_ref": (row.get("Parent") or "").strip(),
+                "status": STATUS_MAP[published],
+                "regular_price": (row.get("Regular price") or "").strip(),
+                "sale_price": (row.get("Sale price") or "").strip(),
+                "parent_ref": (row.get("Parent") or "").strip(),
                 "images_present": bool((row.get("Images") or "").strip()),
                 "categories_present": bool((row.get("Categories") or "").strip()),
                 # Only actually declared attribute names count. A blank
