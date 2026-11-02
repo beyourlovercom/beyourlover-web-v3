@@ -160,6 +160,9 @@ def analyze(www, dev):
                 "id": product_id, "type": w["type"],
                 "www_sku": w["sku"], "dev_sku": d["sku"],
                 "www_status": w["status"], "dev_status": d["raw_post_status"],
+                "owner_sku_authority": "WWW",
+                "proposed_dev_sku_after_verified_identity": w["sku"],
+                "application_allowed": False,
                 "reason": "SAME_WP_ID_DIFFERENT_STORED_SKU_NOT_AUTO_IDENTITY",
             })
     # Only rows with a single SKU can be treated as missing/extra candidates.
@@ -174,6 +177,13 @@ def analyze(www, dev):
     return {
         "schema": SCHEMA,
         "source_format": "NATIVE_WOO_CSV_UNATTESTED_EXPORT_SCOPE",
+        "owner_decision": {
+            "sku_authority": "WWW",
+            "rule": "WWW_STORED_SKU_WINS_FOR_VERIFIED_SAME_PRODUCT_OR_VARIATION",
+            "requires_verified_product_identity_and_owner_approved_dev_write": True,
+            "does_not_allow_auto_create_delete_or_publishing": True,
+            "applied_to_any_site": False,
+        },
         "target_format": "AUTHORIZED_DEV_A0_V2",
         "scope_caution": "Source CSV lacks verifiable full status/media/term-id/R2 coverage; only parent SKU comparisons are provisional.",
         "counts": {
@@ -212,7 +222,10 @@ def analyze(www, dev):
             "www_only_excluding_possible_drift": only_www_after_drift,
             "dev_only_excluding_possible_drift": only_dev_after_drift,
             "www_variations_with_own_sku": [
-                {"id":v["id"],"sku":v["sku"],"parent_ref":v["parent_ref"]}
+                {"id":v["id"],"sku":v["sku"],"parent_ref":v["parent_ref"],
+                 "owner_sku_authority":"WWW",
+                 "proposed_dev_sku_after_verified_variation_identity":v["sku"],
+                 "application_allowed":False}
                 for v in variations if v["sku"]
             ],
         },
