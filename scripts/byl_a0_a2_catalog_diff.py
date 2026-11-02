@@ -27,8 +27,17 @@ def validate_snapshot(data, site):
             raise ValueError('Unsafe inherited/missing SKU provenance')
         if item.get('raw_post_status') not in ALLOWED_STATUSES:
             raise ValueError('Unexpected raw WordPress post status')
-        if not isinstance(item.get('type'), str) or not isinstance(item.get('attributes'), dict):
-            raise ValueError('Malformed Woo product/attribute')
+        if not isinstance(item.get('type'), str):
+            raise ValueError('Malformed Woo product type')
+        # PHP wp_json_encode([]) represents a simple product with no
+        # attributes as JSON [] (while variable/variation attributes
+        # are objects). Accept [] ONLY as an empty non-variation
+        # attribute collection. Never interpret a variation's [] as
+        # a trustworthy attribute identity.
+        attrs = item.get('attributes')
+        if not isinstance(attrs, dict):
+            if item['type'] == 'variation' or attrs != []:
+                raise ValueError('Malformed Woo product/attribute')
         ids.append(item['id'])
     if len(set(ids)) != len(ids):
         raise ValueError('Duplicate WordPress IDs')
@@ -123,7 +132,11 @@ def compare(www, dev):
             continue
         diffs = []
         for field in ['type', 'status', 'categories', 'attributes', 'regular_price', 'sale_price']:
-            if a.get(field) != b.get(field):
+            av, bv = a.get(field), b.get(field)
+            if field == 'attributes':
+                if av == []: av = {}
+                if bv == []: bv = {}
+            if av != bv:
                 diffs.append(field)
         if media_url(a.get('image')) != media_url(b.get('image')):
             diffs.append('image')
