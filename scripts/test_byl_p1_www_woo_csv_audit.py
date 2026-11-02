@@ -96,6 +96,38 @@ class NativeCsvP1SafetyTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Unrecognized Woo product type"):
             read([row(1,type="mystery")])
 
+    def test_actual_www_bom_after_blank_preamble_and_short_batches(self):
+        import io
+        with tempfile.TemporaryDirectory() as tmp:
+            file=Path(tmp)/"www-export.csv"
+            stream=io.StringIO(newline="")
+            writer=csv.writer(stream)
+            writer.writerow([" "])
+            writer.writerow([])
+            writer.writerow(HEADERS + ["Meta: custom field 1", "Meta: custom field 2"])
+            # Woo exporter can add custom columns after emitting 50 row batches.
+            writer.writerow([row(100,sku="RED")["ID"],"simple","RED","1","","","",
+                             "","",""])  # 10 instead of 11 columns
+            file.write_bytes(("\\ufeff"+stream.getvalue()).encode("utf-8").replace(
+                b"\\xef\\xbb\\xbf", b"", 1))
+            # Inject the genuine file layout: two lines, BOM at header.
+            b=file.read_bytes()
+            b=b.replace(b"ID,Type", b"\\xef\\xbb\\xbfID,Type",1)
+            file.write_bytes(b)
+            rows=read_www_csv(file)
+            self.assertEqual(len(rows),1)
+            self.assertEqual(rows[0]["sku"],"RED")
+
+    def test_csv_extra_columns_rejected_even_when_prefix_valid(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            file=Path(tmp)/"www-export.csv"
+            with file.open("w",encoding="utf-8",newline="") as handle:
+                writer=csv.writer(handle)
+                writer.writerow(HEADERS)
+                writer.writerow(list(row(9).values())+["EXTRA"])
+            with self.assertRaisesRegex(ValueError,"Malformed native Woo CSV row width"):
+                read_www_csv(file)
+
     def test_dev_snapshot_contract_cannot_be_fooled(self):
         www=read([row(1,sku="A")])
         d=dev(v2_item(2,"A"))
