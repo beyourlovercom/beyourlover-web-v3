@@ -126,6 +126,9 @@ function byl_a2_5sku_run(): array {
     try {
         foreach (byl_a2_5sku_spec() as $id=>$spec) {
             $product=$products[$id];
+            // Include the currently attempted ID in rollback even if
+            // Woo persist succeeds but a subsequent readback fails.
+            $applied[]=$id;
             $product->set_sku($spec['after']);
             $product->save();
             $actual=wc_get_product($id);
@@ -134,7 +137,6 @@ function byl_a2_5sku_run(): array {
                 && (string)get_post_meta($id,'_sku',true)===$spec['after']
                 && (int)wc_get_product_id_by_sku($spec['after'])===$id,
                 'post-write stored SKU or lookup mismatch ID '.$id);
-            $applied[]=$id;
             $report['changes'][]=['id'=>$id,'before'=>$spec['before'],
                 'after'=>$spec['after'],'applied'=>true];
         }
@@ -151,6 +153,12 @@ function byl_a2_5sku_run(): array {
                 if (!$rollback instanceof WC_Product) { $failed=true; continue; }
                 $rollback->set_sku(byl_a2_5sku_spec()[$id]['before']);
                 $rollback->save();
+                $verified=wc_get_product($id);
+                if (!$verified instanceof WC_Product
+                    || $verified->get_sku('edit')!==byl_a2_5sku_spec()[$id]['before']
+                    || (string)get_post_meta($id,'_sku',true)!==byl_a2_5sku_spec()[$id]['before']) {
+                    $failed=true;
+                }
             } catch (Throwable $ignored) { $failed=true; }
         }
         // No claim to rollback any independent third-party effect.
