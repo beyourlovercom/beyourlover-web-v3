@@ -9,7 +9,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-from byl_a0_a2_catalog_diff import load_snapshot
+from byl_a0_a2_catalog_diff import load_snapshot, validate_snapshot
 from byl_p1_www_woo_csv_audit import read_www_csv
 
 WWW_SHA256 = "39aa0efde3ed5ffe7151c71292234e052f2933016c9f014fc5f10156ee66664b"
@@ -38,6 +38,7 @@ def _check(condition, message):
         raise ValueError("A2_SKU_PLAN_HOLD: " + message)
 
 def build_plan(www, dev):
+    validate_snapshot(dev, "https://dev.beyourlover.com")
     _check(dev.get("site") == "https://dev.beyourlover.com", "Dev site mismatch")
     _check(dev.get("sku_contract") == "EXPLICIT_STORED_EDIT_CONTEXT_NEVER_INHERITED_VIEW",
            "Unsafe variation stored SKU contract")
