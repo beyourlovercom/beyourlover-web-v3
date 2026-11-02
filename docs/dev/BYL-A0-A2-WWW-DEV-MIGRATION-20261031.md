@@ -789,3 +789,36 @@ A2 import still HOLD.** Exact next Owner decision is reconcile 35550/
 36134 native SKU direction and the WWW Pillow variation SKUs,
 then use a proper current Dev restore point before proposing any
 A2 product Canary.
+
+## 2026-11-02 — Owner decision: WWW is the canonical SKU authority
+
+The Owner explicitly decided: **when product/variation SKU anomalies
+appear between production WWW and Dev, preserve the currently approved
+WWW native stored SKU as the source of truth**. Do not let a Dev test
+snapshot silently overwrite WWW. This decision resolves the direction
+of candidate corrections; it **does not** authorize an A2 import,
+reclassify unrelated products, or establish cross-site identity by
+equal WordPress ID alone.
+
+| Candidate | Verified WWW authority | Dev observed | Planned Dev-only direction (NOT applied) |
+| --- | --- | --- | --- |
+| Parent ID 35550 | `VP757A` | `VP757B` | After independent same-product identity check, preserve WWW `VP757A` |
+| Parent ID 36134 | `VP757A & MF414A` | `VP757B & MF414A` | After identity check, preserve WWW `VP757A & MF414A` |
+| WWW PILLOW variation IDs 38164–38166 | `pillow-blue`, `pillow-green`, `pillow-grey` | Dev variations have blank stored own SKUs | Map variations by verified parent + actual option/attribute values and restore WWW independent SKU values on corresponding Dev variations; **do not assume IDs match** |
+
+The same decision also applies to future verified WWW-vs-Dev SKU
+conflicts. It does **not** imply auto-creating WWW-only draft
+`BX033B-1` on Dev, removing Dev-only published SKUs
+`S137B-purple`, `SG02`, `VX737A`, filling blank SKUs
+from guessed names, or altering existing WWW inventory.
+
+The P1 offline report now emits `owner_decision.sku_authority=WWW`
+and fields for **proposed** Dev SKU values, explicitly marked
+`application_allowed=false`. Existing
+`a2_import_authorized=false` / `gate=HOLD` remain.
+
+**Next dependency before any Dev write:** identity mapping,
+current **recoverable** Dev DB/files/media/R2 backup, complete A1
+external integration/queue isolation, precise field+SKU target
+allowlist, and a separate explicit Owner approval for the Dev-only
+Canary. WWW remains read-only throughout this branch.
