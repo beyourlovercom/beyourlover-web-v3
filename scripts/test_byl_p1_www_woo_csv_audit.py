@@ -49,10 +49,22 @@ class NativeCsvP1SafetyTest(unittest.TestCase):
         self.assertEqual(report["counts"]["dev_parents_excluding_four_uat_fixtures"],2)
         self.assertEqual(report["counts"]["www_variations"],1)
         self.assertEqual(report["counts"]["www_unresolved_variation_parents"],0)
+        self.assertFalse(report["owner_decision"]["applied_to_any_site"])
         self.assertEqual(report["gate"],"HOLD")
         self.assertFalse(report["a0_complete_both_sites"])
         self.assertFalse(report["a2_import_authorized"])
         self.assertFalse(report["media_r2_term_id_parity_attested"])
+
+    def test_www_own_variation_sku_is_recommended_only_not_writable(self):
+        www=read([row(10,"variable","PILLOW"),
+                  row(21,"variation","pillow-blue",parent="PILLOW",
+                      attribute="Color",attr_value="Blue")])
+        rpt=analyze(www,dev(v2_item(91,"PILLOW","variable")))
+        entry=rpt["candidates_private"]["www_variations_with_own_sku"][0]
+        self.assertEqual(entry["proposed_dev_sku_after_verified_variation_identity"],"pillow-blue")
+        self.assertEqual(entry["owner_sku_authority"],"WWW")
+        self.assertIs(entry["application_allowed"],False)
+        self.assertEqual(rpt["gate"],"HOLD")
 
     def test_variation_missing_parent_and_wildcard_quarantined(self):
         www = read([row(10,"variable","P"),row(21,"variation",parent="id:10",attribute="Color"),
@@ -79,6 +91,11 @@ class NativeCsvP1SafetyTest(unittest.TestCase):
         self.assertEqual(rpt["counts"]["www_skus_without_dev_counterpart_excluding_drift"],0)
         self.assertEqual(rpt["counts"]["dev_skus_without_www_counterpart_excluding_drift"],0)
         self.assertEqual(len(rpt["candidates_private"]["possible_same_id_sku_drifts"]),2)
+        self.assertEqual(rpt["owner_decision"]["sku_authority"],"WWW")
+        self.assertTrue(rpt["owner_decision"]["requires_verified_product_identity_and_owner_approved_dev_write"])
+        for x in rpt["candidates_private"]["possible_same_id_sku_drifts"]:
+            self.assertEqual(x["proposed_dev_sku_after_verified_identity"],x["www_sku"])
+            self.assertIs(x["application_allowed"],False)
         self.assertFalse(rpt["a2_import_authorized"])
 
     def test_unused_second_attribute_is_not_false_wildcard(self):
