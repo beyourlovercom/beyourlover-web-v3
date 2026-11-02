@@ -71,6 +71,16 @@ class NativeCsvP1SafetyTest(unittest.TestCase):
         self.assertEqual(reasons,{"DUPLICATE_SKU","TYPE_MISMATCH"})
         self.assertEqual(report["counts"]["parent_unique_sku_matches_provisional"],0)
 
+    def test_same_post_id_changed_sku_is_quarantined_not_auto_synced(self):
+        www=read([row(35550,sku="VP757A"),row(36134,sku="VP757A & MF414A")])
+        devv=dev(v2_item(35550,"VP757B"),v2_item(36134,"VP757B & MF414A"))
+        rpt=analyze(www,devv)
+        self.assertEqual(rpt["counts"]["potential_same_id_sku_drift"],2)
+        self.assertEqual(rpt["counts"]["www_skus_without_dev_counterpart_excluding_drift"],0)
+        self.assertEqual(rpt["counts"]["dev_skus_without_www_counterpart_excluding_drift"],0)
+        self.assertEqual(len(rpt["candidates_private"]["possible_same_id_sku_drifts"]),2)
+        self.assertFalse(rpt["a2_import_authorized"])
+
     def test_unused_second_attribute_is_not_false_wildcard(self):
         www=read([row(10,"variable","P"),
                   row(21,"variation",parent="P",attribute="Color",attr_value="Red")],
