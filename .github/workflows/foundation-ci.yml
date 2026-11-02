@@ -63,6 +63,11 @@ jobs:
         run: php -l theme/beyourlover-v3/page-newsletter.php && php -l tools/dev/tests/newsletter-m3-render-harness.php && node --check scripts/test_newsletter_m3_contract.js && node scripts/test_newsletter_m3_contract.js
       - name: Python syntax
         run: python -m py_compile scripts/*.py
+      - name: Dev A1 external Woo product REST isolation smoke
+        run: |
+          php -l dev/mu-plugins/byl-a1-external-product-rest-isolation.php
+          php -l tools/dev/tests/a1-product-rest-quarantine-smoke.php
+          php tools/dev/tests/a1-product-rest-quarantine-smoke.php
       - name: BYL A0-A2 and P1 source-only fail-closed contracts
         run: |
           php -l scripts/byl_a0_a2_catalog_export.php
