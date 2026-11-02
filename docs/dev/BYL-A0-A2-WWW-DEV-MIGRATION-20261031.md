@@ -620,3 +620,90 @@ external schedule provenance. The presence of payout/email/telemetry
 hooks does not prove those side effects occurred; it rules out a
 blanket assertion that Dev background business integrations are
 disabled. **A2 data import remains unapproved and zero.**
+
+## 2026-11-02 — P1 WWW product export preflight (source acquisition HOLD)
+
+**Request:** execute P1 (current, authorized WWW product/variation
+inventory and provisional Dev comparison). Source is WWW WordPress admin;
+no WWW SSH, production plugin changes, API token/cookie extraction, or
+unapproved alternative egress.
+
+### Verified access / historical candidate discovery
+
+- The native ChatGPT browser connection could not list the user's
+  browser tabs without its originating extension context. The
+  authorized China Mac's existing Chrome session contained **no WWW
+  WordPress admin tab** (no Chrome restart or new tab opened).
+  Windows/007Windows Downloads had no identifiable current product
+  export. No logged-in WWW admin session was obtained.
+- China Mac Downloads had **historical**, unsuitable files: some
+  `wc-product-export-24-8-2026-...` exports from 2026-08-24
+  with **116 rows and selectively reduced columns** (or 0 rows);
+  `wc-products-report-export-17923975957923.csv` from 2026-10-19
+  with **103 rows and a nonnative analytics header**. These are
+  NOT current comprehensive WWW inventory, and are deliberately
+  excluded from P1 parity claims.
+- Dev authoritative `byl-catalog-a0-v2` 321-record, private Windows
+  snapshot remains available at the previously attested SHA. No WWW
+  inventory at the same scope/time was collected in this P1 attempt.
+
+### WooCommerce official native CSV scope and limits
+
+The current WooCommerce built-in exporter uses the **edit context**
+for most raw product fields, including `sku`, and can export variable
+products and variations. Its native export query includes publish,
+private, draft, future and pending statuses; it does **not** itself
+certify trash/attachment database completeness, R2 offload metadata,
+native image attachment ID equality or all plugin product custom
+fields. Product status `Published` encodings are 1=publish,
+0=private, -1=draft, 2=pending. Verify the actual WWW WordPress
+export version if these assumptions are material.
+
+A native CSV is **NOT** a JSON `byl-catalog-a0-v2` export and must
+never be falsely relabeled/repackaged as v2. A complete authoritative
+source v2 or reviewed read-only field-specific adjunct would still be
+needed for final media/R2 and raw-status parity.
+
+### Prepared/offline-tested P1 safe comparison
+
+New `scripts/byl_p1_www_woo_csv_audit.py` reads an **unaltered
+native WWW Products CSV**, validates IDs, required columns and native
+statuses, and compares **only unique parent SKU + Woo type**
+provisionally against the already authorized Dev v2 snapshot.
+It checks unkeyed/duplicate parent SKUs, variation missing parent
+references, null attributes and missing images, and excludes the
+four proven Dev R13/Marketing fixtures 40026–40029 from ordinary
+commercial product comparisons.
+
+It intentionally **does not** claim native variation identity parity,
+taxonomy/term ID parity, media attachment/R2 parity, complete WWW
+coverage, or allow any Dev product writes. Its report unconditionally
+contains `a0_complete_both_sites=false`,
+`a2_import_authorized=false`, `gate=HOLD`. Detailed SKU/ID
+results are for private local storage only; stdout reports aggregate
+counts. New P1 synthetic tests **7/7 PASS**; previously verified
+A0–A2 tests **39/39 PASS** on US Mac mini. Foundation CI workflow
+now runs both sets, with zero WP or external API calls.
+
+### Exact one-time authorized native WWW export gate
+
+In an **already authenticated WWW WordPress administrator session**,
+navigate to **Products → All Products → Export**, choose **all columns,
+all products, all categories, all product types** and keep custom
+metadata unchecked (to avoid exporting private plugin secrets).
+Export native CSV with parent and variation rows included, preserving
+file bytes as downloaded (do not open/resave in Excel).
+Do not install a plugin or edit a product. An operator must verify
+the resulting header contains ID, Type, SKU, Published, Parent,
+Categories and Images and record Woo admin count by status / variant
+scope. Do not send credentials, API keys or cookies.
+
+If downloaded onto the already authorized China Mac, use its private
+Downloads folder for local-only CSV review. Once the file exists,
+execute the source-only audit against the existing protected Dev v2
+JSON, preserving all detailed reports privately; do not push them to
+GitHub/Notion. A later WWW full WP-CLI-style v2 or reviewed alternative
+must still reconcile custom media/R2/native statuses before A0 COMPLETE.
+
+**P1 current status: CSV audit tool PASS, actual current WWW export
+NOT ACQUIRED; A0 WWW HOLD, A1 safety/backup HOLD, A2 import HOLD.**
