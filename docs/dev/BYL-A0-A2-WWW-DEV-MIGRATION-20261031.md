@@ -1204,3 +1204,87 @@ Formal BYL DC → authorized existing Dev WP-CLI verified:
 `5/5_CURRENT_DRY_RUN_PASS`, `WRITE_EXECUTION_BLOCKED`,
 `0_OF_5_SKU_WRITES`. Do not call it A2 Canary PASS or
 retrigger the blocked write through an alternative interface.
+
+## 2026-11-02 late — A3 content/SEO DEV baseline acquired (WWW source HOLD)
+
+**Scope:** A2 exact-five native Dev SKU write remains BLOCKED by
+platform execution safety review. Do NOT reroute, reattempt or claim
+any SKU write. To keep safe progress, A3 started **read-only Dev
+content and SEO baseline** in parallel; no production content, slug,
+menu, WordPress option or redirect was changed.
+
+### Actual current Dev WP-CLI source inventory (authenticated)
+
+- Authenticated existing formal BYL DC Windows → authorized
+  `byl-dev-hostinger`; verified target
+  `https://dev.beyourlover.com`.
+- Current `post,page` statuses
+  `publish,draft,pending,private,future,trash`, total **388**.
+  Pages **96** = 78 publish, 5 draft, 13 private.
+  Posts **292** = 281 publish, 9 draft, 2 private.
+  No rows of the other queried statuses returned.
+- A deterministic, strictly read-only metadata-only Dev snapshot
+  (ID, type, status, slug, parent, modified UTC, no post body,
+  no customers/orders or WP passwords) is privately saved on the
+  Owner's Windows computer:
+  `LOCALAPPDATA/BYL-A3-Private/dev-content-index-20261102.json`.
+  **388 unique IDs**, length **81,443 bytes**, SHA-256
+  `29bb88fa907df4ac2865eef521cbc7916137549439b5bcb4d1452e06c82a769e`.
+  It has `import_authorized=false`; raw content stays private.
+- Dev native WP menu groups **10**. Current group
+  `Main-Header-2026` (`term_id=652`) has **85 items**,
+  assigned to both `primary` and `mobile` menu locations.
+  Other menu groups: `blogmenu` (7), `COMPANY` (3),
+  `CONTACT` (3), `faq` (7), `LEGAL` (5),
+  `Nested Pages` (65), `New Releases` (1),
+  `Secondary Menu` (1), `SUPPORT` (3).
+  The native menu location registry declares `primary`,
+  `mobile`, `footer`; menu group list showed no menu
+  assigned to the footer location. This does NOT prove that
+  footer links are absent from theme/widget/block settings.
+- Post permalink format `/blog/%postname%/`;
+  `blog_public=0`, `show_on_front=page`,
+  `page_on_front=3`, `page_for_posts=0`.
+  Categories **11** (8 with nonzero post counts);
+  post tags **1,457** (1,373 with nonzero counts).
+- Active plugin `permalink-manager-pro` version
+  **2.5.1.2**; WordPress options include
+  `permalink-manager`, `permalink-manager-permastructs`,
+  `permalink-manager-uris`. Values were intentionally NOT
+  extracted in a public record. A3 must preserve native/custom
+  URL identity, canonical/301 rules and menu destinations; copying
+  page slugs alone is insufficient.
+- The active Dev plugin list did not identify an active Yoast,
+  Rank Math or AIOSEO plugin during this inventory. A stale
+  `aioseo_activation_redirect` option does not prove AIOSEO
+  is currently active. SEO meta, theme-based canonicals and
+  plugin custom URL mapping still need direct source scrutiny.
+
+### WWW source access limitation
+
+- Existing authorized US Mac mini public HTTP probes to
+  `www.beyourlover.com` returned **HTTP 445** for WP REST
+  `/wp-json/wp/v2/{pages,posts,categories,tags}`, sitemap
+  and robots endpoints. This is **access denied / unavailable
+  evidence**, not 0 WWW pages or a valid source inventory.
+- China Mac existing Chrome tabs contained no WWW WordPress
+  administrator session; Downloads/Desktop showed no recent
+  WordPress native WXR/ZIP content export candidate. No WWW SSH
+  was used, no session cookies/keys retrieved, and no HTTP
+  route/proxy/access control was bypassed.
+- **Owner source action when convenient:** In an already authorized
+  WWW WordPress admin, use **Tools → Export → Posts** (all
+  dates/categories/authors/statuses where the exporter permits)
+  and a separate **Tools → Export → Pages**. Preserve each
+  original `.xml` unmodified in China Mac Downloads. Do
+  **NOT** select `All content` because unrelated private
+  Woo custom types/order/customer data may be included.
+  Menus, Permalink Manager options, SEO meta/canonical and 301
+  mappings require separate safely scoped extraction/review;
+  do not assume Posts+Pages WXR proves them complete.
+
+**A3 outcome:** Dev scoped content baseline/index **PASS**;
+WWW current Posts+Pages WXR source **HOLD**;
+cross-site URLs/content/media/menu/SEO/301 delta **HOLD**.
+A3 actual sync/writes **NOT STARTED**, A2 SKU write remains
+**BLOCKED / 0 of 5 applied**, PR #168 remains Draft/unmerged.
