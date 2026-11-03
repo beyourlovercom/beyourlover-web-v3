@@ -1393,3 +1393,90 @@ blindly import native WXR attachment entries or old offloader data.
 **A3 source/identity comparison status: PASS read-only; content/SEO/
 media compatibility PARTIAL; actual A3 post import 0; WWW and Dev
 WordPress business data unchanged.** PR #168 stays Draft/unmerged.
+
+## 2026-11-03 — A3-C1 exact 40-post WWW→Dev taxonomy/media/SEO field mapping COMPLETE (no writes)
+
+**Scope:** Owner requested execution of A3-C1. This is authorizing
+read-only source mapping, not approving creation of WP posts, tags,
+attachments or restoration of Dev scheduler/Jetpack. A2 previously
+security-denied SKU write remains 0/5; A3 shall not route around it.
+
+### Evidence, verified on real authorized Dev
+
+- Original WordPress Posts WXR input SHA256
+  `b4e17b669b2f7071514ddd8a8e959f2f4372df8280df6b8201063c9761eb5453`;
+  fixed WWW-only 40 post IDs (38 publish + 2 draft).
+- Existing authorized BYL DC Windows → Hostinger Dev WPCLI returned
+  real 7/7 WWW article category slugs present in Dev:
+  `sex-educations=121`, `sex-tips-advice=120`,
+  `relationships=825`, `sex-positions=954`,
+  `sex-toy-guides=827`, `sexual-wellness=940`,
+  `uncategorized=1`.
+  **Always map by slug**, do not copy source `term_id`.
+- WWW 40 articles reference **259 unique tag slugs**. Dev had **80**
+  corresponding term IDs; **179 are missing**. Their exact slugs
+  and per-post usage counts are in the sanitized, locally generated
+  `BYL-A3-C1-179-MISSING-TAGS-2026-11-03.csv`. A private Dev
+  term-map snapshot is on Owner Windows under
+  `LOCALAPPDATA/BYL-A3-Private/a3c1-dev-tag-map-20261103.json`,
+  file SHA256 `d6cacf0c1d2bf6b80c2a94fbd198c138b165ca2dcfdd1bcc41f5a1e8ab0b2a50`.
+  Among 38 publish posts, **37 need at least one missing tag**.
+  No term was created.
+- Dev has 292 current posts; confirmed **0 collisions** across the
+  38 nonempty WWW-only article slugs. Two WXR draft items have
+  empty slugs; no source permalink should be synthesized for them.
+- 38 published posts contain 38 source featured-media attachment
+  IDs. **None of those source numeric IDs exist in Dev**, and a
+  separate read-only scan of **6,036** Dev
+  `_wp_attached_file` metadata rows found **0 filename matches**
+  for the 38 source featured-media files. Do not copy original
+  `_thumbnail_id` to Dev. This does not prove Dev has no other
+  CDN mapping but means **Dev featured attachments need explicit,
+  fresh target mapping and post-write verification**.
+- From authorized US Mac mini, read-only HTTP HEAD:
+  **38/38** original R2/CDN featured image URLs returned **200**,
+  and **99/99** unique inline `img.beyourlover.com` URLs returned
+  **200**, **137/137 total**. Not a byte-integrity or storage-bucket
+  provenance certificate; a few other WWW/external page links were
+  not validated under the R2 image-only probe. Never transfer raw
+  offloader bucket keys or rewrite CDN URLs blindly.
+- Source SEO mapping: **38/38** published posts have Rank Math
+  `title`, `focus_keyword`, and `primary_category` fields;
+  **0/40** expose an explicit `rank_math_description`. Convert
+  primary category through source category slug → Dev term ID.
+  Exclude historic `rank_math_analytic_object_id`,
+  `rank_math_seo_score`, old offloader meta, and source attachment
+  IDs.
+- WXR draft IDs **40168** and **40169** share the same title and
+  normalized reader-visible body text as WWW published ID **40171**
+  (`best-sex-pillow-positions`); raw HTML bytes differ. They are
+  **HOLD as historical duplicate drafts**, not approved to auto
+  create/publish; the 38 genuine published posts are the eventual
+  migration candidate set.
+- The 40 white-listed rows and 137 role-specific media mappings
+  were emitted as sanitized CSVs and a source fingerprinted Markdown
+  audit in this conversation, **not the raw WXR, comments,
+  customer/author emails, credential/offloader keys, or article
+  body payload**. The authorized Dev data remained untouched.
+
+### Proposed first isolated Canary (NOT executed)
+
+WWW Post **41548** `sex-during-pregnancy`:
+- Already published on WWW; **0 missing Dev tags**; 3 category
+  slugs all mapped; zero Dev article slug collision.
+- Original featured CDN URL
+  `https://img.beyourlover.com/2026/10/16084011/sex-with-a-pregnant-partner.png`
+  and five inline CDN images returned HTTP **200**.
+- Still requires a Dev-specific featured attachment and inline WP
+  block-attachment remapping; no Dev write was attempted.
+- Before any post/attachment write, Owner must approve **the exact
+  Dev-only Canary, IDs, field scope and reversible execution**,
+  verify A1 external isolation stays effective, and avoid restoring
+  pending jobs or modifying WWW. **C1 is a mapping gate, not
+  C4 import permission.**
+
+**C1 STATUS:** Exact field map **PASS (source-only)**; tags and
+Dev featured-media links **NEED CREATION AFTER APPROVAL**;
+A3 actual imports **0**, tag writes **0**, attachment writes **0**,
+WWW/Dev live content unchanged. A3 earlier 378 shared records
+and 11 Dev-only pages remain protected. PR stays Draft; no merge.
