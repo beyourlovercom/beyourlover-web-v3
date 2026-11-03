@@ -1,0 +1,867 @@
+<?php
+/**
+ * Plugin Name: BYL Dev Safety
+ * Description: Fail-closed staging environment; tightly scoped P1.3 sandbox checkout UAT.
+ *
+ * Source: dev/mu-plugins/byl-dev-safety.php in beyourlover-web-v3.
+ * Deploy to dev.beyourlover.com/wp-content/mu-plugins ONLY, not www.
+ */
+defined('ABSPATH') || exit;
+if (wp_get_environment_type() !== 'staging') { return; }
+
+// Owner-approved Dev-only G5 lifetime cap: previous 6 + 5 = 11.
+// The same bound applies to both checkout and normal admin approval.
+const BYL_DEV_P13_MAX_SYNTHETIC_ORDERS = 11;
+
+/**
+ * Dev-only EUR local method Canary. Each grant is one explicit rail, not a
+ * general WooPayments allowlist. An empty country is the legacy card rail.
+ */
+function byl_dev_p13_gateway_country(string $gateway): ?string {
+    return [
+        'woocommerce_payments' => '',
+        'woocommerce_payments_bancontact' => 'BE',
+        'woocommerce_payments_eps' => 'AT',
+        'woocommerce_payments_ideal' => 'NL',
+    ][$gateway] ?? null;
+}
+
+/**
+ * Fail closed for the first EUR payment Canary: one exact test product,
+ * one unit, no coupons, one approved country and EUR 113.38 total.
+ * The static amount is deliberately restrictive and must NOT ship to WWW.
+ */
+function byl_dev_p13_eur_canary_matches(string $gateway): bool {
+    $country = byl_dev_p13_gateway_country($gateway);
+    if ($country === null || $country === '') { return false; }
+    if (!function_exists('WC') || !WC()->cart || !WC()->customer
+        || get_woocommerce_currency() !== 'EUR') { return false; }
+    if (strtoupper((string) WC()->customer->get_billing_country()) !== $country
+        || strtoupper((string) WC()->customer->get_shipping_country()) !== $country) { return false; }
+    $cart = WC()->cart;
+    $items = $cart->get_cart();
+    if (count($items) !== 1 || $cart->get_cart_contents_count() !== 1
+        || count($cart->get_applied_coupons()) !== 0) { return false; }
+    $item = reset($items);
+    if (!is_array($item) || (int) ($item['product_id'] ?? 0) !== 36089
+        || (int) ($item['quantity'] ?? 0) !== 1) { return false; }
+    return (int) round(((float) $cart->get_total('edit')) * 100) === 11338;
+}
+
+/**
+ * Permission for one synthetic test customer + one sandbox gateway only.
+ * The gate config is outside the webroot and is absent/expired by default.
+ * No credentials, identity tokens or account IDs are part of this source.
+ */
+function byl_dev_p13_checkout_gate(): array {
+    static $result = null;
+    if ($result !== null) { return $result; }
+    $result = [];
+    if (home_url() !== 'https://dev.beyourlover.com' || !is_ssl()) { return $result; }
+
+    $file = '/home/u247343654/byl-v3-staging/p13-sandbox-gate.json';
+    if (!is_readable($file)) { return $result; }
+    $raw = file_get_contents($file);
+    $config = is_string($raw) ? json_decode($raw, true) : null;
+    if (!is_array($config) || empty($config['enabled']) ||
+        !isset($config['expires_at'], $config['customer_id'], $config['cookie_hash'], $config['gateway'])) {
+        return $result;
+    }
+
+    $expires = (int) $config['expires_at'];
+    if ($expires <= time() || $expires > time() + 3600) { return $result; }
+    $user_id = get_current_user_id();
+    if (!$user_id || $user_id !== (int) $config['customer_id']) { return $result; }
+    if (!byl_dev_p13_is_synthetic_customer($user_id)) { return $result; }
+    $cookie = $_COOKIE['byl_p13_sandbox'] ?? '';
+    if (!is_string($cookie) || strlen($cookie) < 40 || strlen($cookie) > 256 ||
+        !hash_equals((string) $config['cookie_hash'], hash('sha256', $cookie))) {
+        return $result;
+    }
+
+    $gateway = (string) $config['gateway'];
+    $country = byl_dev_p13_gateway_country($gateway);
+    if ($country === null || ($country !== '' && !byl_dev_p13_eur_canary_matches($gateway))) {
+        return $result;
+    }
+    $mode = false;
+    if ($gateway === 'stripe') {
+        $settings = (array) get_option('woocommerce_stripe_settings', []);
+        $mode = ($settings['testmode'] ?? 'no') === 'yes';
+    } elseif ($gateway === 'woocommerce_payments' || in_array($gateway, [
+        'woocommerce_payments_bancontact', 'woocommerce_payments_eps', 'woocommerce_payments_ideal',
+    ], true)) {
+        $settings = (array) get_option('woocommerce_woocommerce_payments_settings', []);
+        $mode = ($settings['test_mode'] ?? 'no') === 'yes';
+    } elseif ($gateway === 'ppcp') {
+        $settings = (array) get_option('woocommerce_ppcp_api_settings', []);
+        $mode = ($settings['environment'] ?? '') === 'sandbox';
+    }
+    if (!$mode) { return $result; }
+    $result = ['customer_id' => $user_id, 'gateway' => $gateway];
+    return $result;
+}
+
+// P7: keep AfterShip / Automizely Woo webhooks for real orders intact,
+// but never emit the isolated Dev Sandbox order via Woo's outbound webhook path.
+// This filter runs in WC_Webhook::process() BEFORE remote HTTP delivery.
+add_filter('woocommerce_webhook_should_deliver', static function ($allow, $webhook, $arg): bool {
+    // CLI/WP-Cron dispatch may have no HTTPS request context: match the configured site, not is_ssl().
+    if (wp_get_environment_type() !== 'staging' || home_url() !== 'https://dev.beyourlover.com'
+        || !is_object($webhook) || !method_exists($webhook, 'get_topic')) {
+        return (bool) $allow;
+    }
+    // An order ID must not be interpreted as a product/customer webhook.
+    $topic = (string) $webhook->get_topic();
+    if (!str_starts_with($topic, 'order.')) {
+        return (bool) $allow;
+    }
+    $order = $arg instanceof WC_Order ? $arg : (
+        is_numeric($arg) && (int) $arg > 0 && function_exists('wc_get_order') ? wc_get_order((int) $arg) : null
+    );
+    if (!$order instanceof WC_Order) {
+        return (bool) $allow;
+    }
+    if ($order->get_meta('_byl_dev_sandbox_p13', true) === 'yes'
+        || $order->get_meta('_aicc_marketing_dev_uat', true) === 'yes'
+        || strtolower(trim((string) $order->get_billing_email())) === 'byl-p13@example.invalid'
+        || strtolower(trim((string) $order->get_billing_email())) === 'aicc-marketing-uat@example.invalid') {
+        return false;
+    }
+    return (bool) $allow;
+}, PHP_INT_MAX, 3);
+
+// G5: Dev-only outbound isolation for AfterShip / Automizely HTTP API hosts.
+// Native Woo order webhook isolation above is necessary but not sufficient:
+// third-party plugins can also call WP HTTP directly (including in WP-Cron).
+// This filter is network-preemptive; it never initiates an external request.
+// Provider-side jobs already running outside Dev WordPress are NOT covered.
+add_filter('pre_http_request', static function ($pre, $args, $url) {
+    if ($pre !== false || wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com' || !is_string($url)) {
+        return $pre;
+    }
+    $host = wp_parse_url($url, PHP_URL_HOST);
+    if (!is_string($host) || $host === '') { return $pre; }
+    $host = strtolower(rtrim($host, '.'));
+    foreach (['automizely.com', 'aftership.com'] as $providerDomain) {
+        // Dot boundary forbids hosts like api.aftership.com.evil.example.
+        if ($host === $providerDomain || str_ends_with($host, '.' . $providerDomain)) {
+            return new WP_Error(
+                'byl_dev_aftership_outbound_closed',
+                'AfterShip/Automizely external HTTP requests are disabled on Dev.'
+            );
+        }
+    }
+    // Critical: WooPayments/Stripe APIs and every unrelated host untouched.
+    return $pre;
+}, PHP_INT_MAX, 3);
+
+/**
+ * G5 Dev-only inbound Provider quarantine.
+ *
+ * AfterShip exposes /aftership-api/vN/orders AND query-var alias routes;
+ * outbound HTTP filtering never stops an authenticated Provider from
+ * pulling /wc/v3/orders with its existing read_write Woo API key.
+ *
+ * Deliberately restrict only Dev order/customer API surfaces, not wp-admin
+ * pages or internal PHP WC_Order reads. This may interrupt external Dev
+ * API clients and should be kept until G5 closes, then reviewed for rollback.
+ * Does not revoke/delete credentials or affect WWW.
+ */
+function byl_dev_g5_aftership_inbound_path(string $uri, array $queryVars = [], array $query = []): bool {
+    $path = wp_parse_url($uri, PHP_URL_PATH);
+    if (is_string($path) && preg_match('#(?:^|/)aftership-api(?:/|$)#i', $path)) {
+        return true;
+    }
+    // Rewrite-free equivalent: /?aftership-api-route=/orders
+    // or legacy /?aftership-api=...
+    foreach (['aftership-api-route', 'aftership-api'] as $name) {
+        if (array_key_exists($name, $queryVars) || array_key_exists($name, $query)) {
+            return true;
+        }
+    }
+    return false;
+}
+add_action('parse_request', static function ($wp): void {
+    if (wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com') {
+        return;
+    }
+    $uri = (string) ($_SERVER['REQUEST_URI'] ?? '');
+    $vars = is_object($wp) && isset($wp->query_vars) && is_array($wp->query_vars)
+        ? $wp->query_vars : [];
+    if (!byl_dev_g5_aftership_inbound_path($uri, $vars, $_GET)) {
+        return;
+    }
+    status_header(403);
+    nocache_headers();
+    exit;
+}, -999, 1);
+
+// Prevent a previously connected AfterShip/Woo consumer_key from polling
+// the native Woo REST Orders and Customers collections or mutating records.
+// Store API Cart and WooPayments internal server-side processing remain intact.
+add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
+    if ($result !== null || !($request instanceof WP_REST_Request)
+        || wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com') {
+        return $result;
+    }
+    if (!preg_match('#^/wc/(?:v1|v2|v3)/(?:orders|customers)(?:/|$)#', $request->get_route())) {
+        return $result;
+    }
+    return new WP_Error(
+        'byl_dev_g5_provider_inbound_quarantine',
+        'Woo Orders/Customers REST API is quarantined on Dev for G5 payment UAT.',
+        ['status' => 403]
+    );
+}, 98, 3);
+
+/**
+ * Shared staging email guard. Default DENY for every WordPress mail,
+ * including test orders, Woo, and background tasks.
+ *
+ * Newsletter Canary: an independently reviewed, one-use permit can allow
+ * precisely one confirmation message through native wp_mail() from WP-CLI.
+ * No public API can create a permit. Code-only; no permit exists by default.
+ * Never deploy this proposed change before shared Dev Safety/G5 Owner review.
+ */
+function byl_dev_newsletter_mail_match(array $mail, string $recipient_hash): bool {
+    if (count(array_diff(array_keys($mail), ['to', 'subject', 'message', 'headers', 'attachments', 'embeds'])) > 0) {
+        return false;
+    }
+    $to = $mail['to'] ?? null;
+    $to = is_array($to) ? $to : [$to];
+    if (count($to) !== 1 || !is_string($to[0]) || !is_email($to[0]) ||
+        !hash_equals($recipient_hash, hash('sha256', strtolower(trim($to[0]))))) {
+        return false;
+    }
+    if (($mail['subject'] ?? null) !== 'Confirm your newsletter subscription') {
+        return false;
+    }
+    if (!empty($mail['headers']) || !empty($mail['attachments']) || !empty($mail['embeds'])) {
+        return false;
+    }
+    $message = $mail['message'] ?? null;
+    if (!is_string($message) || strlen($message) > 4096 ||
+        !preg_match('~\APlease confirm your email subscription by visiting:\n' .
+            '(https://dev\.beyourlover\.com/\?yby_newsletter_action=confirm&token=([a-f0-9]{64}))\n\n' .
+            'If you did not request this, ignore this email\. You can unsubscribe using:\n' .
+            '(https://dev\.beyourlover\.com/\?yby_newsletter_action=unsubscribe&token=([a-f0-9]{64}))\z~D',
+            $message, $tokens)) {
+        return false;
+    }
+    return !hash_equals($tokens[2], $tokens[4]);
+}
+
+function byl_dev_newsletter_mail_consume_once(array $mail): bool {
+    static $attempted = false;
+    if ($attempted || !defined('WP_CLI') || WP_CLI !== true ||
+        wp_get_environment_type() !== 'staging' ||
+        home_url() !== 'https://dev.beyourlover.com') {
+        return false;
+    }
+    // Same protected host directory as the existing G5 gate, separate file/lock.
+    // Permit is manually issued ONLY after separate Owner grant + backup/UAT review.
+    $dir = '/home/u247343654/byl-v3-staging';
+    $path = $dir . '/newsletter-one-mail-permit.json';
+    if (!is_dir($dir) || !is_file($path) || is_link($path) ||
+        !is_readable($path) || (fileperms($path) & 0777) !== 0600) {
+        return false;
+    }
+    $lockPath = $dir . '/newsletter-one-mail-permit.lock';
+    $lock = fopen($lockPath, 'c');
+    if (!$lock) { return false; }
+    chmod($lockPath, 0600);
+    try {
+        if (!flock($lock, LOCK_EX)) { return false; }
+        // Re-check under lock: a separately issued ticket may have been revoked.
+        if (!is_file($path) || is_link($path) ||
+            (fileperms($path) & 0777) !== 0600) { return false; }
+        $json = file_get_contents($path);
+        $ticket = is_string($json) && strlen($json) <= 2048 ? json_decode($json, true) : null;
+        if (!is_array($ticket) ||
+            ($ticket['purpose'] ?? null) !== 'newsletter-confirmation-canary' ||
+            ($ticket['site'] ?? null) !== 'https://dev.beyourlover.com' ||
+            ($ticket['state'] ?? null) !== 'approved' ||
+            ($ticket['approved_by_owner'] ?? null) !== true ||
+            ($ticket['max_messages'] ?? null) !== 1 ||
+            !is_string($ticket['ticket_id'] ?? null) ||
+            !preg_match('/^[a-f0-9]{32}$/D', $ticket['ticket_id']) ||
+            !is_string($ticket['backup_sha256'] ?? null) ||
+            !preg_match('/^[a-f0-9]{64}$/D', $ticket['backup_sha256']) ||
+            !is_string($ticket['recipient_sha256'] ?? null) ||
+            !preg_match('/^[a-f0-9]{64}$/D', $ticket['recipient_sha256']) ||
+            !is_string($ticket['backup_path'] ?? null) ||
+            !preg_match('~^/home/u247343654/backups/newsletter-m37-dev-pretest-[0-9]{8}T[0-9]{6}Z-[A-Za-z0-9]{6}/dev-pretest\\.sql\\.gz$~D',
+                $ticket['backup_path'])) {
+            return false;
+        }
+        $issued = $ticket['issued_at'] ?? null;
+        $expires = $ticket['expires_at'] ?? null;
+        if (!is_int($issued) || !is_int($expires) ||
+            $issued > time() || $issued < time() - 300 ||
+            $expires <= time() || $expires > $issued + 300 ||
+            !byl_dev_newsletter_mail_match($mail, $ticket['recipient_sha256'])) {
+            return false;
+        }
+        // Check the previously verified pre-test backup again before any send.
+        $backup = $ticket['backup_path'];
+        if (is_link($backup) || !is_file($backup) || !is_readable($backup) ||
+            realpath($backup) !== $backup || filesize($backup) < 1024 ||
+            !hash_equals($ticket['backup_sha256'], (string) hash_file('sha256', $backup))) {
+            return false;
+        }
+        // Consume BEFORE attempting transport. A failed or uncertain delivery
+        // cannot be retried with the same grant; concurrency is lock-protected.
+        $ticket['state'] = 'consumed';
+        $ticket['consumed_at'] = time();
+        $next = wp_json_encode($ticket, JSON_UNESCAPED_SLASHES);
+        if (!is_string($next)) { return false; }
+        $tmp = tempnam($dir, 'newsletter-once-');
+        if (!$tmp) { return false; }
+        chmod($tmp, 0600);
+        if (file_put_contents($tmp, $next, LOCK_EX) === false ||
+            !rename($tmp, $path)) {
+            @unlink($tmp);
+            return false;
+        }
+        $attempted = true;
+        $GLOBALS['byl_dev_newsletter_canary_armed'] = $ticket['recipient_sha256'];
+        return true;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+}
+
+add_filter('pre_wp_mail', static function ($pre, $mail) {
+    // Respect any prior deny: no replacement or bypass of other mail gates.
+    if ($pre !== null || !is_array($mail) ||
+        !byl_dev_newsletter_mail_consume_once($mail)) {
+        return false;
+    }
+    return null; // allow exactly this native wp_mail attempt, not a synthetic success
+}, 99, 2);
+
+// A second terminal guard preserves the final DENY decision even if any
+// intermediate WordPress callback tries to overwrite the first gate.
+add_filter('pre_wp_mail', static function ($pre, $mail) {
+    $recipient_hash = $GLOBALS['byl_dev_newsletter_canary_armed'] ?? null;
+    return $pre === null && is_array($mail) && is_string($recipient_hash) &&
+        byl_dev_newsletter_mail_match($mail, $recipient_hash) ? null : false;
+}, PHP_INT_MAX, 2);
+
+// Defence in depth: later mailer hooks must not add any recipients.
+add_action('phpmailer_init', static function ($mailer): void {
+    $hash = $GLOBALS['byl_dev_newsletter_canary_armed'] ?? null;
+    if (!is_string($hash)) { return; }
+    if (!is_object($mailer) || !method_exists($mailer, 'getToAddresses') ||
+        !method_exists($mailer, 'getCcAddresses') ||
+        !method_exists($mailer, 'getBccAddresses') ||
+        !method_exists($mailer, 'getReplyToAddresses') ||
+        !method_exists($mailer, 'getAttachments')) {
+        throw new RuntimeException('Newsletter Canary transport verification unavailable.');
+    }
+    $to = $mailer->getToAddresses();
+    if (!is_array($to) || count($to) !== 1 || !is_array($to[0]) ||
+        !is_string($to[0][0] ?? null) ||
+        !hash_equals($hash, hash('sha256', strtolower(trim($to[0][0])))) ||
+        ($mailer->Subject ?? null) !== 'Confirm your newsletter subscription' ||
+        count($mailer->getCcAddresses()) !== 0 ||
+        count($mailer->getBccAddresses()) !== 0 ||
+        count($mailer->getReplyToAddresses()) !== 0 ||
+        count($mailer->getAttachments()) !== 0) {
+        throw new RuntimeException('Newsletter Canary transport recipients mismatch.');
+    }
+}, PHP_INT_MAX);
+
+/**
+ * M-P5 Dev Marketing checkout exception. The original P1.3 gate remains
+ * untouched; this is a separate short-lived, admin-browser fixture-only COD
+ * test path. Ordinary visitors, real SKUs and any live rail remain denied.
+ */
+function byl_dev_marketing_fixture_checkout(): bool {
+    if (wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com'
+        || !function_exists('is_ssl') || !is_ssl()
+        || !defined('AICC_MARKETING_DEV_UAT') || AICC_MARKETING_DEV_UAT !== true
+        || !is_user_logged_in() || !current_user_can('manage_woocommerce')
+        || get_option('andy_commerce_marketing_dev_uat_enabled','no') !== 'yes'
+        || get_option('andy_commerce_marketing_p1_sandbox_enabled','no') !== 'yes'
+        || get_option('woocommerce_currency','') !== 'USD'
+        || !function_exists('get_woocommerce_currency')
+        || get_woocommerce_currency() !== 'USD'
+        || !class_exists('Andy_Commerce_Marketing_P1_Sandbox_Contract')
+        || !Andy_Commerce_Marketing_P1_Sandbox_Contract::current()) return false;
+
+    $expiry=(int)get_option('aicc_marketing_dev_checkout_expires_at',0);
+    if ($expiry <= time() || $expiry > time()+3600) return false;
+    if (!function_exists('WC') || !WC()) return false;
+    if (!WC()->cart && function_exists('wc_load_cart')) wc_load_cart();
+    if (!WC()->cart instanceof WC_Cart) return false;
+    $items=WC()->cart->get_cart();
+    if (!$items || count($items)>4 || WC()->cart->get_cart_contents_count()>10) return false;
+    $allowed=[40026=>true,40027=>true,40028=>true,40029=>true];
+    foreach ($items as $item) {
+        if (!is_array($item) || !is_int($item['product_id']??null)
+            || !isset($allowed[$item['product_id']])
+            || !empty($item['variation_id'])
+            || (int)($item['quantity']??0)<1
+            || !($item['data']??null) instanceof WC_Product
+            || $item['data']->get_catalog_visibility()!=='hidden'
+            || get_post_meta($item['product_id'],'_aicc_marketing_uat_fixture',true)!=='yes')
+            return false;
+    }
+    $codes=(array)WC()->cart->get_applied_coupons();
+    if (count($codes)>1) return false;
+    foreach ($codes as $code) {
+        if (!is_string($code) || !str_starts_with($code,'aicc-p2-aicc-uat-dev-')) return false;
+    }
+    if ((float)WC()->cart->get_subtotal()>500.0) return false;
+    return true;
+}
+
+/** Cap is independent of the historical P1.3 gateway test budget. */
+function byl_dev_marketing_fixture_order_room(): bool {
+    if (!function_exists('wc_get_orders')) return false;
+    return count(wc_get_orders([
+        'limit'=>12, 'return'=>'ids',
+        'meta_query'=>[['key'=>'_aicc_marketing_dev_uat','value'=>'yes']]
+    ])) < 12;
+}
+
+
+/**
+ * R13/P6 ONE-TIME DEV STORE API: allow only the named Woo administrator's
+ * expiring TEST session, verified existing Stripe TEST account and four
+ * existing hidden UAT fixtures. Ordinary visitors and live rails stay closed.
+ */
+function byl_dev_r13_stripe_checkout(?WP_REST_Request $request = null): bool {
+    if (wp_get_environment_type() !== 'staging'
+        || home_url() !== 'https://dev.beyourlover.com'
+        || !function_exists('is_ssl') || !is_ssl()
+        || !class_exists('Andy_Commerce_Currency_R13_Dev_Canary')
+        || !Andy_Commerce_Currency_R13_Dev_Canary::armed()
+        || !Andy_Commerce_Currency_R13_Dev_Canary::payment_ready()
+        || get_option('woocommerce_currency') !== 'USD'
+        || !in_array(get_woocommerce_currency(), ['EUR','GBP','AUD','CAD'], true)
+        || !is_user_logged_in() || !current_user_can('manage_woocommerce')
+        || !function_exists('WC') || !WC()) return false;
+    if (!WC()->cart && function_exists('wc_load_cart')) wc_load_cart();
+    if (!WC()->cart instanceof WC_Cart) return false;
+    $items = WC()->cart->get_cart();
+    if (count($items) < 1 || count($items) > 4 || WC()->cart->get_cart_contents_count() > 8
+        || count(WC()->cart->get_applied_coupons()) > 3
+        || (float) WC()->cart->get_subtotal() > 350.0) return false;
+    $allowed=[40026=>true,40027=>true,40028=>true,40029=>true];
+    foreach ($items as $item) {
+        $p=$item['data']??null;
+        if (!is_array($item) || !is_int($item['product_id']??null)
+            || !isset($allowed[$item['product_id']])
+            || (int)($item['quantity']??0) < 1
+            || !empty($item['variation_id'])
+            || !$p instanceof WC_Product_Simple
+            || $p->is_virtual()
+            || $p->get_catalog_visibility() !== 'hidden'
+            || get_post_meta($item['product_id'],'_aicc_marketing_uat_fixture',true) !== 'yes')
+            return false;
+    }
+    if ($request instanceof WP_REST_Request && $request->get_method() === 'POST') {
+        $billing=$request->get_param('billing_address');
+        if (!is_array($billing) ||
+            strtolower((string)($billing['email']??'')) !== 'aicc-r13-uat@example.invalid'
+            || $request->get_param('payment_method') !== 'stripe') return false;
+        $chosen=WC()->session ? WC()->session->get('chosen_shipping_methods',[]) : [];
+        if (!is_array($chosen) || ($chosen[0]??null)!=='flat_rate:10') return false;
+    }
+    return true;
+}
+function byl_dev_r13_order_room(): bool {
+    if (!function_exists('wc_get_orders')) return false;
+    return count(wc_get_orders(['limit'=>3,'return'=>'ids',
+        'meta_query'=>[['key'=>'_aicc_r13_dev_uat','value'=>'yes']]])) < 2;
+}
+
+// P5: Store API Checkout is a distinct order-creation/payment path from classic Woo.
+// The G2 test permit is classic-checkout only. Even a valid tester grant must
+// never authorize Store API Checkout until that surface has equivalent gates.
+// OPTIONS only advertises route metadata; never create/payment process here.
+add_filter('rest_pre_dispatch', static function ($result, $server, $request) {
+    if ($result !== null || !($request instanceof WP_REST_Request)) { return $result; }
+    if (wp_get_environment_type() !== 'staging' || home_url() !== 'https://dev.beyourlover.com') {
+        return $result;
+    }
+    $route = $request->get_route();
+    if (!preg_match('#^/wc/store(?:/v1)?/checkout(?:/[0-9]+)?/?$#', $route)) { return $result; }
+    if ($request->get_method() === 'OPTIONS') { return $result; }
+    // Only the exact current Dev Marketing fixture cart, approved admin
+    // session and expiring UAT window can reach Woo's Store API validation.
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room())
+        return $result;
+    if (byl_dev_r13_stripe_checkout($request) && byl_dev_r13_order_room())
+        return $result;
+    return new WP_Error(
+        'byl_dev_sandbox_checkout_closed',
+        'Store API Checkout is disabled on the development environment.',
+        ['status' => 403]
+    );
+}, 99, 3);
+// Ordinary visitors see no payment methods. Tester sees exactly one eligible rail.
+add_filter('woocommerce_available_payment_gateways', static function (array $gateways): array {
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room())
+        return isset($gateways['cod']) ? ['cod'=>$gateways['cod']] : [];
+    if (byl_dev_r13_stripe_checkout() && byl_dev_r13_order_room())
+        return isset($gateways['stripe']) ? ['stripe'=>$gateways['stripe']] : [];
+    $context = byl_dev_p13_checkout_gate();
+    if (!$context) { return []; }
+    $id = $context['gateway'];
+    return isset($gateways[$id]) ? [$id => $gateways[$id]] : [];
+}, 99);
+
+add_filter('woocommerce_allow_tracking', '__return_false', 99);
+
+// Stop all checkout orders, except a narrowly scoped synthetic customer.
+// Limit the number of test orders; do not weaken server-side Woo validations.
+add_action('woocommerce_checkout_process', static function (): void {
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room()) {
+        $email=sanitize_email(wp_unslash($_POST['billing_email'] ?? ''));
+        if ($email !== 'aicc-marketing-uat@example.invalid')
+            wc_add_notice('Marketing UAT requires the isolated test email.', 'error');
+        return;
+    }
+    $context = byl_dev_p13_checkout_gate();
+    if ($context) {
+        $email = sanitize_email(wp_unslash($_POST['billing_email'] ?? ''));
+        if ($email !== 'byl-p13@example.invalid') {
+            wc_add_notice('Sandbox order requires the isolated testing identity.', 'error');
+            return;
+        }
+        $existing = wc_get_orders([
+            'customer_id' => $context['customer_id'],
+            'limit' => BYL_DEV_P13_MAX_SYNTHETIC_ORDERS,
+            'return' => 'ids',
+        ]);
+        if (count($existing) >= BYL_DEV_P13_MAX_SYNTHETIC_ORDERS) {
+            wc_add_notice('Sandbox order limit reached. No additional orders allowed.', 'error');
+        }
+        return;
+    }
+    if (function_exists('wc_add_notice')) {
+        wc_add_notice('Orders are disabled on the development environment.', 'error');
+    }
+}, PHP_INT_MAX);
+
+// Mark the order BEFORE its initial save so audit/ERP filters can recognize it.
+add_action('woocommerce_checkout_create_order', static function ($order): void {
+    if (byl_dev_marketing_fixture_checkout() && byl_dev_marketing_fixture_order_room()
+        && $order instanceof WC_Order
+        && $order->get_payment_method()==='cod'
+        && $order->get_billing_email()==='aicc-marketing-uat@example.invalid') {
+        $order->update_meta_data('_aicc_marketing_dev_uat','yes');
+        $order->update_meta_data('_aicc_marketing_dev_fixture_only','yes');
+    } elseif (byl_dev_p13_checkout_gate() && is_a($order, 'WC_Order')) {
+        $order->update_meta_data('_byl_dev_sandbox_p13', 'yes');
+    }
+}, 10, 1);
+
+// Store API does not invoke classic_checkout_create_order. Validate the
+// persisted request data BEFORE allowing P5 reserve or payment processing.
+add_action('woocommerce_store_api_checkout_update_order_from_request',
+    static function ($order,$request): void {
+        if (byl_dev_r13_stripe_checkout($request) && byl_dev_r13_order_room()
+            && $order instanceof WC_Order
+            && $order->get_billing_email()==='aicc-r13-uat@example.invalid') {
+            $order->set_payment_method('stripe');
+            $order->update_meta_data('_aicc_r13_dev_uat','yes');
+            $order->update_meta_data('_byl_dev_sandbox_p13','yes');
+            return;
+        }
+        if (!byl_dev_marketing_fixture_checkout()
+            || !byl_dev_marketing_fixture_order_room()
+            || !($order instanceof WC_Order)
+            || $order->get_billing_email()!=='aicc-marketing-uat@example.invalid')
+            throw new RuntimeException('M_P5_DEV_STORE_API_FIXTURE_DENIED');
+        $order->set_payment_method('cod');
+        $order->update_meta_data('_aicc_marketing_dev_uat','yes');
+        $order->update_meta_data('_aicc_marketing_dev_fixture_only','yes');
+    }, 10, 2);
+
+
+// Suppress customer and administrator notification mail for the synthetic R13 order.
+foreach (['new_order','failed_order','customer_processing_order',
+          'customer_completed_order','customer_on_hold_order'] as $email_id) {
+    add_filter('woocommerce_email_recipient_'.$email_id,
+        static function ($recipient, $order) {
+            if ($order instanceof WC_Order
+                && $order->get_meta('_aicc_r13_dev_uat',true)==='yes') return '';
+            return $recipient;
+        }, PHP_INT_MAX, 2);
+}
+
+add_action('send_headers', static function () {
+    header('X-Robots-Tag: noindex, nofollow, noarchive', true);
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0', true);
+    header('Pragma: no-cache', true);
+    header('X-LiteSpeed-Cache-Control: no-cache', true);
+});
+add_filter('wp_robots', static function (array $robots): array {
+    $robots['noindex'] = true;
+    $robots['nofollow'] = true;
+    $robots['noarchive'] = true;
+    return $robots;
+});
+
+add_filter('wp_get_attachment_url', static function ($url, $attachment_id) {
+    $attachment_id = (int) $attachment_id;
+    $relative = get_post_meta($attachment_id, '_wp_attached_file', true);
+    if (!is_string($relative) || $relative === '') { return $url; }
+    $uploads = wp_get_upload_dir();
+    $local = trailingslashit($uploads['basedir']) . ltrim($relative, '/');
+    if (is_file($local)) { return $url; }
+    $offloaded = get_post_meta($attachment_id, 'advmo_offloaded', true);
+    $r2_path = get_post_meta($attachment_id, 'advmo_path', true);
+    if ((string) $offloaded === '1' && is_string($r2_path) && $r2_path !== '') {
+        return 'https://img.beyourlover.com/' . trim($r2_path, '/') . '/' . wp_basename($relative);
+    }
+    return $url;
+}, 50, 2);
+
+
+/**
+ * P1.3 G2: human-authorized, browser-bound Sandbox activation.
+ *
+ * This extends the EXISTING Dev Safety MU plugin, and never operates on www.
+ * Approval only queues a permit (no cookie_hash => checkout remains closed).
+ * The real logged-in synthetic customer must POST a nonce-protected activation
+ * form on My Account to receive the Secure/HttpOnly/host-only cookie. Neither
+ * user credentials nor cookie values are exposed to admin or tool output.
+ */
+function byl_dev_p13_runtime_ready(): bool {
+    return wp_get_environment_type() === 'staging'
+        && home_url() === 'https://dev.beyourlover.com'
+        && is_ssl();
+}
+
+function byl_dev_p13_is_synthetic_customer(int $id): bool {
+    if ($id < 1) { return false; }
+    $user = get_userdata($id);
+    if (!$user || strtolower((string) $user->user_email) !== 'byl-p13@example.invalid') {
+        return false;
+    }
+    $roles = (array) $user->roles;
+    return in_array('customer', $roles, true)
+        && !array_intersect($roles, ['administrator', 'shop_manager', 'editor'])
+        // Custom roles or capabilities must never turn a privileged user into a tester.
+        && !user_can($user, 'manage_options')
+        && !user_can($user, 'manage_woocommerce');
+}
+
+function byl_dev_p13_synthetic_customer() {
+    $user = get_user_by('email', 'byl-p13@example.invalid');
+    return $user && byl_dev_p13_is_synthetic_customer((int) $user->ID) ? $user : null;
+}
+
+function byl_dev_p13_permit_path(): string {
+    return '/home/u247343654/byl-v3-staging/p13-sandbox-gate.json';
+}
+
+function byl_dev_p13_read_permit(): array {
+    $path = byl_dev_p13_permit_path();
+    if (!is_file($path) || !is_readable($path)) { return []; }
+    $raw = file_get_contents($path);
+    $value = is_string($raw) ? json_decode($raw, true) : null;
+    return is_array($value) ? $value : [];
+}
+
+/**
+ * Serialized updates with atomic 0600 file replacement. A rejected callback
+ * returns false; null revokes by unlinking under the same lock. This file is
+ * deliberately outside webroot. No cookie plaintext is ever stored here.
+ */
+function byl_dev_p13_change_permit(callable $decide): bool {
+    if (!byl_dev_p13_runtime_ready()) { return false; }
+    $path = byl_dev_p13_permit_path();
+    $dir = dirname($path);
+    if (!is_dir($dir) || !is_writable($dir)) { return false; }
+    $lock = fopen($dir . '/p13-sandbox-gate.lock', 'c');
+    if (!$lock) { return false; }
+    chmod($dir . '/p13-sandbox-gate.lock', 0600);
+    try {
+        if (!flock($lock, LOCK_EX)) { return false; }
+        $next = $decide(byl_dev_p13_read_permit());
+        if ($next === false) { return false; }
+        if ($next === null) { return !is_file($path) || unlink($path); }
+        if (!is_array($next)) { return false; }
+        $json = wp_json_encode($next, JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) { return false; }
+        $tmp = tempnam($dir, 'p13-grant-');
+        if (!$tmp) { return false; }
+        chmod($tmp, 0600);
+        if (file_put_contents($tmp, $json, LOCK_EX) === false) {
+            unlink($tmp);
+            return false;
+        }
+        if (!rename($tmp, $path)) {
+            unlink($tmp);
+            return false;
+        }
+        return true;
+    } finally {
+        flock($lock, LOCK_UN);
+        fclose($lock);
+    }
+}
+
+function byl_dev_p13_is_live_permit(array $permit): bool {
+    return !empty($permit['enabled'])
+        && isset($permit['expires_at'], $permit['customer_id'], $permit['gateway'])
+        && (int) $permit['expires_at'] > time()
+        && (int) $permit['expires_at'] <= time() + 3600
+        && is_string($permit['gateway'])
+        && byl_dev_p13_gateway_country($permit['gateway']) !== null
+        && byl_dev_p13_is_synthetic_customer((int) $permit['customer_id']);
+}
+
+function byl_dev_p13_admin_guard(string $nonce): void {
+    if (!byl_dev_p13_runtime_ready() || !current_user_can('manage_options')) {
+        wp_die('Sandbox approval is restricted to the Dev administrator.', '', ['response' => 403]);
+    }
+    check_admin_referer($nonce);
+}
+
+add_action('admin_menu', static function (): void {
+    if (!byl_dev_p13_runtime_ready()) { return; }
+    add_management_page('BYL Sandbox UAT', 'BYL Sandbox UAT', 'manage_options', 'byl-p13-sandbox', 'byl_dev_p13_admin_page');
+});
+
+function byl_dev_p13_admin_page(): void {
+    if (!byl_dev_p13_runtime_ready() || !current_user_can('manage_options')) { return; }
+    $permit = byl_dev_p13_read_permit();
+    $live = byl_dev_p13_is_live_permit($permit);
+    $state = !$live ? 'Closed' : (empty($permit['cookie_hash']) ? 'Awaiting tester activation' : 'Tester activated');
+    echo '<div class="wrap"><h1>BYL Dev Sandbox UAT</h1>';
+    echo '<p>Dev-only, WooPayments Test Mode, one synthetic customer, 30-minute maximum. No Live payment.</p>';
+    echo '<p><strong>Gate status: ' . esc_html($state) . '</strong></p>';
+    if (!$live) {
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        echo '<input type="hidden" name="action" value="byl_p13_approve">';
+        echo '<label for="byl-p13-gateway">One sandbox rail:</label> <select id="byl-p13-gateway" name="byl_p13_gateway">';
+        foreach (['woocommerce_payments' => 'Card (legacy)', 'woocommerce_payments_bancontact' => 'Bancontact · BE',
+            'woocommerce_payments_eps' => 'EPS · AT', 'woocommerce_payments_ideal' => 'iDEAL / Wero · NL'] as $method => $name) {
+            echo '<option value="' . esc_attr($method) . '">' . esc_html($name) . '</option>';
+        }
+        echo '</select>';
+        wp_nonce_field('byl_p13_approve');
+        echo '<button type="submit" class="button button-primary">Approve 30-minute test window</button></form>';
+    } else {
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        echo '<input type="hidden" name="action" value="byl_p13_revoke">';
+        wp_nonce_field('byl_p13_revoke');
+        echo '<button type="submit" class="button">Revoke authorization immediately</button></form>';
+    }
+    echo '</div>';
+}
+
+add_action('admin_post_byl_p13_approve', static function (): void {
+    byl_dev_p13_admin_guard('byl_p13_approve');
+    $user = byl_dev_p13_synthetic_customer();
+    $gateway = sanitize_text_field(wp_unslash($_POST['byl_p13_gateway'] ?? 'woocommerce_payments'));
+    if (byl_dev_p13_gateway_country($gateway) === null) {
+        wp_die('Unsupported sandbox rail.', '', ['response' => 403]);
+    }
+    $registered = function_exists('WC') && WC()->payment_gateways()
+        ? WC()->payment_gateways()->payment_gateways() : [];
+    if (!isset($registered[$gateway]) || $registered[$gateway]->enabled !== 'yes') {
+        wp_die('The selected test rail is not enabled.', '', ['response' => 403]);
+    }
+    $settings = (array) get_option('woocommerce_woocommerce_payments_settings', []);
+    if (!$user || !function_exists('wc_get_orders')
+        || ($settings['enabled'] ?? '') !== 'yes' || ($settings['test_mode'] ?? '') !== 'yes'
+        || count(wc_get_orders(['customer_id' => $user->ID, 'limit' => BYL_DEV_P13_MAX_SYNTHETIC_ORDERS, 'return' => 'ids'])) >= BYL_DEV_P13_MAX_SYNTHETIC_ORDERS) {
+        wp_die('Sandbox preflight failed; no grant issued.', '', ['response' => 403]);
+    }
+    $ok = byl_dev_p13_change_permit(static function (array $current) use ($user, $gateway): array|bool {
+        if (byl_dev_p13_is_live_permit($current)) { return false; }
+        // No cookie_hash: approval alone NEVER enables checkout.
+        return [
+            'enabled' => true,
+            'expires_at' => time() + 1800,
+            'customer_id' => (int) $user->ID,
+            'gateway' => $gateway,
+            'approved_by' => get_current_user_id(),
+        ];
+    });
+    if (!$ok) { wp_die('Sandbox grant was not written; gate remains closed.', '', ['response' => 403]); }
+    wp_safe_redirect(admin_url('tools.php?page=byl-p13-sandbox'));
+    exit;
+});
+
+add_action('admin_post_byl_p13_revoke', static function (): void {
+    byl_dev_p13_admin_guard('byl_p13_revoke');
+    if (!byl_dev_p13_change_permit(static fn (array $current) => null)) {
+        wp_die('Could not revoke sandbox authorization.', '', ['response' => 500]);
+    }
+    wp_safe_redirect(admin_url('tools.php?page=byl-p13-sandbox'));
+    exit;
+});
+
+// Render only inside the normal, logged-in WooCommerce My Account dashboard.
+add_action('woocommerce_account_dashboard', static function (): void {
+    if (!byl_dev_p13_runtime_ready()
+        || !byl_dev_p13_is_synthetic_customer(get_current_user_id())) { return; }
+    $permit = byl_dev_p13_read_permit();
+    echo '<section class="byl-p13-sandbox"><h3>Sandbox Payment Test</h3>';
+    if (!byl_dev_p13_is_live_permit($permit)
+        || (int) $permit['customer_id'] !== get_current_user_id()) {
+        echo '<p>Awaiting Dev administrator approval. No payment methods are enabled.</p>';
+    } elseif (!empty($permit['cookie_hash'])) {
+        echo '<p>Approval activated. Use Checkout for the approved WooPayments Test Mode scenario.</p>';
+    } else {
+        echo '<p>An administrator approved a short-lived sandbox test. Activate it in this browser only.</p>';
+        echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+        echo '<input type="hidden" name="action" value="byl_p13_activate">';
+        wp_nonce_field('byl_p13_activate');
+        echo '<button type="submit">Activate Sandbox Test</button></form>';
+    }
+    echo '</section>';
+});
+
+add_action('admin_post_byl_p13_activate', static function (): void {
+    if (!byl_dev_p13_runtime_ready()
+        || !byl_dev_p13_is_synthetic_customer(get_current_user_id())) {
+        wp_die('Only the logged-in synthetic customer may activate.', '', ['response' => 403]);
+    }
+    check_admin_referer('byl_p13_activate');
+    try {
+        $secret = bin2hex(random_bytes(32));
+    } catch (Throwable $e) {
+        wp_die('Secure random generator unavailable; gate remains closed.', '', ['response' => 500]);
+    }
+    $expires = 0;
+    $ok = byl_dev_p13_change_permit(static function (array $permit) use ($secret, &$expires): array|bool {
+        if (!byl_dev_p13_is_live_permit($permit)
+            || (int) $permit['customer_id'] !== get_current_user_id()
+            || !empty($permit['cookie_hash'])) { return false; }
+        $expires = (int) $permit['expires_at'];
+        $permit['cookie_hash'] = hash('sha256', $secret);
+        return $permit;
+    });
+    if (!$ok || $expires <= time()) {
+        wp_die('Approval unavailable, expired or already activated.', '', ['response' => 403]);
+    }
+    if (!setcookie('byl_p13_sandbox', $secret, [
+        'expires' => $expires,
+        'path' => '/',
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Strict',
+    ])) {
+        // Never leave an active server-side grant without a browser cookie.
+        byl_dev_p13_change_permit(static fn (array $permit) => null);
+        wp_die('Browser cookie could not be established; authorization revoked.', '', ['response' => 500]);
+    }
+    wp_safe_redirect(home_url('/my-account/'));
+    exit;
+});
