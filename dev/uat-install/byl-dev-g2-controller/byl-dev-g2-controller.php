@@ -2,7 +2,7 @@
 /**
  * Plugin Name: BYL Dev G2 Canary Controller
  * Description: Admin-only, hash-pinned Dev MU G2 test patch and rollback. Never deploy to WWW.
- * Version: 0.1.0-dev
+ * Version: 0.1.1-dev
  */
 defined('ABSPATH') || exit;
 function byl_dev_g2ctl_env(): bool {
@@ -20,8 +20,8 @@ function byl_dev_g2ctl_paths(): array {
 }
 function byl_dev_g2ctl_hashes(): array {
     return [
-        'original' => '7b8e3bc570b259766083aed75d58d03c3ca676c5704ef69a6d07434e33826500',
-        'patched' => '024281fb0100aaf20e8111e41b33147b6827ad09392ca1ea7e6992de9e3748fb',
+        'original' => 'f0979a924a83a320bfa8256ee919d133d44f2f00598757c6720d2489d004ce3b',
+        'patched' => '3dd579a0a36a2ae81eae8efb14052f72545bbd78c9ae57d0c3e6798f67297ff4',
     ];
 }
 function byl_dev_g2ctl_hash(string $path): string {
