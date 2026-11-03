@@ -14,6 +14,41 @@ if (wp_get_environment_type() !== 'staging') { return; }
 const BYL_DEV_P13_MAX_SYNTHETIC_ORDERS = 11;
 
 /**
+ * Dev-only EUR local method Canary. Each grant is one explicit rail, not a
+ * general WooPayments allowlist. An empty country is the legacy card rail.
+ */
+function byl_dev_p13_gateway_country(string $gateway): ?string {
+    return [
+        'woocommerce_payments' => '',
+        'woocommerce_payments_bancontact' => 'BE',
+        'woocommerce_payments_eps' => 'AT',
+        'woocommerce_payments_ideal' => 'NL',
+    ][$gateway] ?? null;
+}
+
+/**
+ * Fail closed for the first EUR payment Canary: one exact test product,
+ * one unit, no coupons, one approved country and EUR 113.38 total.
+ * The static amount is deliberately restrictive and must NOT ship to WWW.
+ */
+function byl_dev_p13_eur_canary_matches(string $gateway): bool {
+    $country = byl_dev_p13_gateway_country($gateway);
+    if ($country === null || $country === '') { return false; }
+    if (!function_exists('WC') || !WC()->cart || !WC()->customer
+        || get_woocommerce_currency() !== 'EUR') { return false; }
+    if (strtoupper((string) WC()->customer->get_billing_country()) !== $country
+        || strtoupper((string) WC()->customer->get_shipping_country()) !== $country) { return false; }
+    $cart = WC()->cart;
+    $items = $cart->get_cart();
+    if (count($items) !== 1 || $cart->get_cart_contents_count() !== 1
+        || count($cart->get_applied_coupons()) !== 0) { return false; }
+    $item = reset($items);
+    if (!is_array($item) || (int) ($item['product_id'] ?? 0) !== 36089
+        || (int) ($item['quantity'] ?? 0) !== 1) { return false; }
+    return (int) round(((float) $cart->get_total('edit')) * 100) === 11338;
+}
+
+/**
  * Permission for one synthetic test customer + one sandbox gateway only.
  * The gate config is outside the webroot and is absent/expired by default.
  * No credentials, identity tokens or account IDs are part of this source.
@@ -45,11 +80,17 @@ function byl_dev_p13_checkout_gate(): array {
     }
 
     $gateway = (string) $config['gateway'];
+    $country = byl_dev_p13_gateway_country($gateway);
+    if ($country === null || ($country !== '' && !byl_dev_p13_eur_canary_matches($gateway))) {
+        return $result;
+    }
     $mode = false;
     if ($gateway === 'stripe') {
         $settings = (array) get_option('woocommerce_stripe_settings', []);
         $mode = ($settings['testmode'] ?? 'no') === 'yes';
-    } elseif ($gateway === 'woocommerce_payments') {
+    } elseif ($gateway === 'woocommerce_payments' || in_array($gateway, [
+        'woocommerce_payments_bancontact', 'woocommerce_payments_eps', 'woocommerce_payments_ideal',
+    ], true)) {
         $settings = (array) get_option('woocommerce_woocommerce_payments_settings', []);
         $mode = ($settings['test_mode'] ?? 'no') === 'yes';
     } elseif ($gateway === 'ppcp') {
@@ -513,7 +554,8 @@ function byl_dev_p13_is_live_permit(array $permit): bool {
         && isset($permit['expires_at'], $permit['customer_id'], $permit['gateway'])
         && (int) $permit['expires_at'] > time()
         && (int) $permit['expires_at'] <= time() + 3600
-        && $permit['gateway'] === 'woocommerce_payments'
+        && is_string($permit['gateway'])
+        && byl_dev_p13_gateway_country($permit['gateway']) !== null
         && byl_dev_p13_is_synthetic_customer((int) $permit['customer_id']);
 }
 
@@ -540,6 +582,12 @@ function byl_dev_p13_admin_page(): void {
     if (!$live) {
         echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
         echo '<input type="hidden" name="action" value="byl_p13_approve">';
+        echo '<label for="byl-p13-gateway">One sandbox rail:</label> <select id="byl-p13-gateway" name="byl_p13_gateway">';
+        foreach (['woocommerce_payments' => 'Card (legacy)', 'woocommerce_payments_bancontact' => 'Bancontact · BE',
+            'woocommerce_payments_eps' => 'EPS · AT', 'woocommerce_payments_ideal' => 'iDEAL / Wero · NL'] as $method => $name) {
+            echo '<option value="' . esc_attr($method) . '">' . esc_html($name) . '</option>';
+        }
+        echo '</select>';
         wp_nonce_field('byl_p13_approve');
         echo '<button type="submit" class="button button-primary">Approve 30-minute test window</button></form>';
     } else {
@@ -554,20 +602,29 @@ function byl_dev_p13_admin_page(): void {
 add_action('admin_post_byl_p13_approve', static function (): void {
     byl_dev_p13_admin_guard('byl_p13_approve');
     $user = byl_dev_p13_synthetic_customer();
+    $gateway = sanitize_text_field(wp_unslash($_POST['byl_p13_gateway'] ?? 'woocommerce_payments'));
+    if (byl_dev_p13_gateway_country($gateway) === null) {
+        wp_die('Unsupported sandbox rail.', '', ['response' => 403]);
+    }
+    $registered = function_exists('WC') && WC()->payment_gateways()
+        ? WC()->payment_gateways()->payment_gateways() : [];
+    if (!isset($registered[$gateway]) || $registered[$gateway]->enabled !== 'yes') {
+        wp_die('The selected test rail is not enabled.', '', ['response' => 403]);
+    }
     $settings = (array) get_option('woocommerce_woocommerce_payments_settings', []);
     if (!$user || !function_exists('wc_get_orders')
         || ($settings['enabled'] ?? '') !== 'yes' || ($settings['test_mode'] ?? '') !== 'yes'
         || count(wc_get_orders(['customer_id' => $user->ID, 'limit' => BYL_DEV_P13_MAX_SYNTHETIC_ORDERS, 'return' => 'ids'])) >= BYL_DEV_P13_MAX_SYNTHETIC_ORDERS) {
         wp_die('Sandbox preflight failed; no grant issued.', '', ['response' => 403]);
     }
-    $ok = byl_dev_p13_change_permit(static function (array $current) use ($user): array|bool {
+    $ok = byl_dev_p13_change_permit(static function (array $current) use ($user, $gateway): array|bool {
         if (byl_dev_p13_is_live_permit($current)) { return false; }
         // No cookie_hash: approval alone NEVER enables checkout.
         return [
             'enabled' => true,
             'expires_at' => time() + 1800,
             'customer_id' => (int) $user->ID,
-            'gateway' => 'woocommerce_payments',
+            'gateway' => $gateway,
             'approved_by' => get_current_user_id(),
         ];
     });
