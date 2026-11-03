@@ -72,6 +72,23 @@ function get_user_by($field, $value) {
     return $field === 'email' && $value === 'byl-p13@example.invalid'
         ? get_userdata(17) : null;
 }
+// Offline WordPress functions invoked by the G2 rail selector.
+function wp_unslash($value) { return is_string($value) ? stripslashes($value) : $value; }
+function sanitize_text_field($value): string { return trim(strip_tags((string) $value)); }
+final class G2RegisteredGateways {
+    public function payment_gateways(): array {
+        return [
+            'woocommerce_payments' => (object) ['enabled' => 'yes'],
+            'woocommerce_payments_bancontact' => (object) ['enabled' => 'yes'],
+            'woocommerce_payments_eps' => (object) ['enabled' => 'yes'],
+            'woocommerce_payments_ideal' => (object) ['enabled' => 'yes'],
+        ];
+    }
+}
+final class G2MockWC {
+    public function payment_gateways(): G2RegisteredGateways { return new G2RegisteredGateways(); }
+}
+function WC(): G2MockWC { return new G2MockWC(); }
 function get_option($key, $default = []) {
     return $key === 'woocommerce_woocommerce_payments_settings'
         ? ['enabled' => 'yes', 'test_mode' => $GLOBALS['testState']['testmode'] ? 'yes' : 'no']
