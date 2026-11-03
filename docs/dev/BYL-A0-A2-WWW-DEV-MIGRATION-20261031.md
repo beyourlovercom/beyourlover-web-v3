@@ -1288,3 +1288,108 @@ WWW current Posts+Pages WXR source **HOLD**;
 cross-site URLs/content/media/menu/SEO/301 delta **HOLD**.
 A3 actual sync/writes **NOT STARTED**, A2 SKU write remains
 **BLOCKED / 0 of 5 applied**, PR #168 remains Draft/unmerged.
+
+## 2026-11-03 — A3 authoritative WWW Posts/Pages WXR ACQUIRED; real Dev comparison
+
+Owner confirmed Hostinger's temporary server security restriction was released for authorized WWW WordPress Tools → Export. Owner attached two **native WordPress WXR 1.2** XML exports to the conversation, produced 2026-11-03 03:45 UTC. Parsed and verified local immutable sources; no WWW HTTP/SSH was used.
+
+### Original source provenance, NOT uploaded to GitHub
+
+| User source | Content rows | Auto-included attachment rows | SHA-256 |
+| --- | ---: | ---: | --- |
+| `beyourlover.WordPress.2026-11-03 (1).xml` — Posts | 332 posts | 1391 attachments | `b4e17b669b2f7071514ddd8a8e959f2f4372df8280df6b8201063c9761eb5453` |
+| `beyourlover.WordPress.2026-11-03 (2).xml` — Pages | 86 pages | 35 attachments | `6ffd70be02d6ef0368f61299f10c14d35c8fc30763eb33d21c26a0a89ba339cf` |
+
+The two files carry 1426 attachment entries (1424 distinct IDs;
+two cross-export duplicate attachment IDs) and 2943 historical blog
+comment records including junk comments, personal identifiers and
+remote media/offloader metadata. These **are not approved for import**.
+Original WXR bytes and detailed manifests were not committed to GitHub.
+
+### Counts: 2026-11-03 live Dev snapshot supersedes old 2026-11-02 index
+
+- WWW Posts: **332** = 319 publish, 11 draft, 2 private.
+- WWW Pages: **86** = 71 publish, 3 draft, 12 private.
+- Current Dev Posts: **292** = 281 publish, 9 draft, 2 private.
+- Current Dev Pages: **97** = 78 publish, 6 draft, 13 private.
+- Dev **389** current post/page rows (prior Nov-02 index held 388).
+  New Dev draft `black-friday` page native ID **40122** was last
+  modified 2026-11-03 02:58:15 UTC and MUST be preserved. Raw
+  `auto-draft` ID 40016 is excluded from current
+  publish/draft/private/future/pending/trash index, not a missing
+  ordinary article.
+- Updated private Dev metadata-only index remains on Owner Windows:
+  `LOCALAPPDATA/BYL-A3-Private/dev-content-index-20261103.json`,
+  SHA-256 `4c98879602f2f479abd17c54a7c6b8c7f1d62d438096b15d646d48ab24a08491`,
+  389 unique native IDs; previous Nov-02 388-row index preserved.
+  None of the 388 pre-existing Dev index rows changed their
+  type/status/slug/parent/modified metadata between the two reads.
+
+### Cross-site confirmed candidate delta (native IDs as evidence, not an import key)
+
+| Cohort | Count | Treatment |
+| --- | ---: | --- |
+| WWW-only Posts | **40** | 38 `publish` and 2 `draft`; plan precise new-article candidate allowlist |
+| WWW-only Pages | **0** | No WWW source page is absent by ID |
+| Dev-only Posts | **0** | Keep existing |
+| Dev-only Pages | **11** | **PRESERVE** all: 7 published, 3 drafts, 1 private |
+| Shared Post/Page native IDs | **378** | All native types, statuses, slugs, and parent IDs match exactly |
+
+Owner-private sanitized CSVs for the 40 WWW-only Posts, 11 Dev-only
+Pages, 7 modified-time exceptions, and 378 shared content-check flags
+are available in the associated ChatGPT conversation artifacts; do
+not upload the raw XMLs to GitHub/Notion.
+
+The **7** shared modified-time exceptions are:
+- WWW newer: Post IDs **12990**, **13410**, **14575**, and
+  Page **12884** (`affiliates`).
+- Dev newer: Page **12** (`cart`), **7271**
+  (`privacy-policies`), and **11735**
+  (`terms-and-conditions`). Protect Dev Cart/Legal improvements.
+
+Every remaining **371/378** shared record has the same
+`post_modified_gmt` string. This is a metadata-level equality,
+**NOT evidence that actual content or SEO meta is identical**.
+
+### Critical native post_content byte-level finding: no bulk overwrite
+
+A Dev-only, read-only, live MySQL `SHA2(post_content,256)`
+comparison with each WXR `content:encoded` payload (only digest
+prefixes retained, no Dev body sent to GitHub) gave **48/378 exact
+raw-body digest matches and 330/378 differences**:
+- **286** shared Posts and **44** shared Pages differ at raw byte level.
+- Reasons may include WordPress exporter transformations,
+  old editor/HTML/media URL normalization, or true divergent edits.
+  Raw digest inequality **does not by itself prove 330 semantic
+  conflicts**. The 7 modified-time exceptions independently need
+  proper field-by-field and UX review.
+- No direct rewrite of these 330 bodies, no automatic overwriting of
+  SEO fields, no treating equal native IDs as safe target insert IDs.
+
+WWW WXR Posts/Pages contain Rank Math SEO meta including titles,
+descriptions, robots/primary categories and historical
+`_wp_old_slug`, while Dev operates with Permalink Manager Pro
+custom URL settings. A3 requires separate current canonical/301,
+SEO-meta and media URL/R2 key mapping verification, and must never
+blindly import native WXR attachment entries or old offloader data.
+
+### Safe next stage (no write authority inferred)
+
+1. Prepare a strict **40-row, post-only** Dev import proposal:
+   38 published + 2 drafts stay drafts; preserve original publish
+   date, slug, taxonomy and useful editorial fields. No import of
+   historical comment records, raw authors/accounts, native attachment
+   IDs, unrelated plugin meta or cloud media bucket keys.
+2. Audit R2/media links and category/tag/SEO mapping for those 40,
+   with a tiny Dev-only Canary after a separate precise Owner pass.
+   Existing 11 Dev-only Pages including `black-friday` are protected.
+3. Quarantine 330 common-body byte mismatches for targeted sampling
+   and special-case 7 modified-time exceptions. No mass copy.
+4. Preserve the existing A1 Dev safety MUs, paused Action Scheduler
+   and Jetpack sync. A2's separately Owner-approved five-SKU write
+   remains **0/5 NOT EXECUTED**, tool security-blocked; do NOT
+   repurpose A3 as a bypass route to perform that blocked A2 write.
+
+**A3 source/identity comparison status: PASS read-only; content/SEO/
+media compatibility PARTIAL; actual A3 post import 0; WWW and Dev
+WordPress business data unchanged.** PR #168 stays Draft/unmerged.
