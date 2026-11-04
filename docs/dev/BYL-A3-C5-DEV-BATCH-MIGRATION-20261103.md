@@ -1,6 +1,6 @@
 # BYL WWW → Dev — A3-C5 Dev-only batch migration (2026-11-03)
 
-**CURRENT STATUS (2026-11-04): A3-C5 CLOSED — 37/37 PASS. A3-C6 TECHNICAL UAT PASS — 37/37, visual review PENDING.** This document records executed work, not a claim that all 37 are complete. PR #168 remains **Draft**, no merge/deployment.
+**FINAL STATUS (2026-11-04): A3-C5 CLOSED — 37/37 PASS. A3-C6 CLOSED — technical 37/37 PASS, Owner representative visual samples PASS.** This document records executed work, not a claim that all 37 are complete. PR #168 remains **Draft**, no merge/deployment.
 
 ## Source and authority
 
@@ -80,3 +80,8 @@ A strict source-versus-Dev CDN GET audit was run for all 130 images beyond the p
 **Final image fidelity:** 123/130 byte-identical; 7/130 byte-different but pixel-identical; **130/130 visually lossless**. For archival purposes, exact original bytes remain accessible at the source CDN URLs; this new Dev copy is not claimed to be bit-for-bit identical for those seven media. No R2 object overwrite was attempted. Private Windows evidence: `a3c6-media-bytehash-130.json`, `a3c6-media-lossless-pixel-diffs-7.json`, and revised `a3c5-final-c6-technical-receipt-20261104.json` (SHA-256: `52d67ac019c55a0cf95717e07f6a3e4f4153d4927240a136de44c2084daa6c5b`).
 
 **Latest stage state:** A3-C5 **CLOSED**; A3-C6 content, SEO, images and draft-isolation technical UAT **PASS**. Authenticated browser-layout/visual inspection remains **PENDING OWNER**, therefore no claim of full visual approval or article publication. All original Dev isolation MU hashes were rechecked unchanged; `blog_public=0`, `DISABLE_WP_CRON=1`, PR #168 Draft/unmerged.
+
+
+## Final Owner sign-off — 2026-11-04
+
+Owner explicitly replied **`pass`** following representative Dev article visual UAT. Final stage status: **A3-C5 CLOSED; A3-C6 CLOSED / PASS.** The C6 technical gates covered all 37 Dev draft posts, 130 images (123 bit-identical plus 7 pixel-identical PNGs), all source taxonomy / SEO checks, and draft-only isolation. This sign-off accepts the representative visual samples; it is not a claim of automated screenshot comparisons across all 37 posts. Historical `PENDING OWNER` entries above are superseded. **No WWW writes, no Dev post publishing, no action-queue reactivation, and no GitHub PR merge.** PR #168 stays Draft. Source XML/media evidence remains in the private owner-controlled locations.
