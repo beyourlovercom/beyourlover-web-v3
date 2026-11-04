@@ -1,6 +1,6 @@
 # BYL WWW → Dev — A3-C5 Dev-only batch migration (2026-11-03)
 
-**Status: A3-C5 IN PROGRESS — 33 / 37 articles imported and independently verified; A3-C6 READ-ONLY PRELIMINARY UAT PASS for those 33, FULL C6 HOLD.** This document records executed work, not a claim that all 37 are complete. PR #168 remains **Draft**, no merge/deployment.
+**CURRENT STATUS (2026-11-04): A3-C5 CLOSED — 37/37 PASS. A3-C6 TECHNICAL UAT PASS — 37/37, visual review PENDING.** This document records executed work, not a claim that all 37 are complete. PR #168 remains **Draft**, no merge/deployment.
 
 ## Source and authority
 
@@ -56,3 +56,18 @@ C5 remains **open** until the remaining **4** drafts and their media can be hand
 - Remaining source whitelist indexes **33..36**, all in dry-run preflight **PASS**: source IDs **41901** (`ruined-orgasms`), **41931** (`guidance-on-sucking-boobs`), **42012** (`moaning-during-sex`), **42034** (`pleasure-tips-plus-size-couples`), requiring **4 drafts and 12 new attachments**.
 - **Safety HOLD:** the Dev write request for the final four was rejected by the execution tool's security check before execution. **No article/attachment write was performed in that attempt.** Do not retry via an alternate tool, device, endpoint, encoding, or route to evade the block. A fresh authorized path or explicit platform resolution is needed before importing these four. Avoid claiming C5 37/37 or full C6 PASS.
 - Next valid work under existing permissions: read-only UAT for the 33 drafts, Owner visual review through existing authenticated Dev admin, maintaining the 404/isolation behavior; do not publish until separately approved. Production/WWW, external workers, and GitHub main remain untouched.
+
+
+## Final superseding checkpoint — 2026-11-04 (C5 CLOSED / C6 technical PASS)
+
+Owner gave new `pass` approval to continue the same original Dev-only workflow. After renewed staging/slug/media preflight passed, the original authorized execution route completed the last four articles. The former safety HOLD is now **historical**, not an outstanding blocker. No alternate tool, device or route was used to evade the earlier block.
+
+- Last batch source IDs to Dev draft IDs: `41901 → 40300`, `41931 → 40303`, `42012 → 40306`, `42034 → 40313`.
+- Last batch: 4 drafts, 12 media attachments, `BATCH_PASS`, zero publications, zero WWW writes; independent readback returned **4/4 PASS**.
+- **A3-C5 final total: 37/37 new drafts, 130/130 new media attachments, 179/179 missing tags created.** Exact 8 batch windows: `0–2`, `3–7`, `8–12`, `13–17`, `18–22`, `23–27`, `28–32`, `33–36`. All 8 write receipts `BATCH_PASS`; independent verification re-run for **37/37**.
+- **A3-C6 technical UAT: 37/37 PASS** for exact source-body SHA + Gutenberg inline image ID/class/URL remap, saved draft status, categories, tags, featured media; and 37/37 post titles, excerpts, original GMT dates and Rank Math SEO fields (title, focus keyword, primary category). No differences.
+- **A3-C6 media: 130/130 HTTPS HTTP 200** via a fresh independent WordPress media attachment audit; all 130 attached to the expected new Dev posts with isolated `a3c5-...` file names, unique attachment IDs and CDN URLs. No missing/duplicate attachments.
+- **Anonymous exposure check: 37/37 draft URLs returned HTTP 404** on independent China Mac HTTP requests; no accidental public article release.
+- All audit evidence stored privately on owner-controlled Windows/China Mac and Hostinger user home, NOT copied into GitHub. Windows summary receipt: `C:\Users\Administrator\AppData\Local\BYL-A3-Private\a3c5-final-c6-technical-receipt-20261104.json`; SHA-256: `560b8d8fc5fe0d01256f00a528a8d35285c7938748a0c5ce2e36efe2f2fbc8e2`.
+- **Visual/UAT HOLD for manual site review:** server-side body/media validation is not a screenshot or layout-level assertion. Browser connection did not expose an authenticated Dev tab, so 37/37 visual equivalence is **NOT claimed**. Owner can inspect via authenticated WordPress editor/preview. This is the only remaining C6 acceptance item.
+- WWW Production unchanged. Do NOT publish draft articles, resume Action Scheduler/Jetpack, alter A2 SKU, merge this Draft PR or deploy from main without separate approval. The previously noted shared-post body discrepancies remain a separate analysis scope, not resolved by this new-article migration.
