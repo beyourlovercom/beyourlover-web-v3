@@ -317,9 +317,29 @@
     document.documentElement.classList.remove('byl-drawer-open');
     if(lastFocus?.isConnected && typeof lastFocus.focus === 'function') lastFocus.focus();
   }
+  // One cart entrypoint across the shell, checkout back-links and old templates.
+  // Match only a plain same-origin Woo cart URL. Never swallow add-to-cart,
+  // remove-item, coupon, checkout, modified-click or external navigation.
+  const cartPageUrl = new URL(String(config.cartUrl), window.location.href);
+  const canonicalPath = path => path.replace(/\/+$/, '') || '/';
+  const isPlainCartLink = link => {
+    try {
+      const uri = new URL(link.href, window.location.href);
+      return uri.origin === cartPageUrl.origin &&
+        canonicalPath(uri.pathname) === canonicalPath(cartPageUrl.pathname) &&
+        !uri.search && !uri.hash;
+    } catch (_) { return false; }
+  };
   document.addEventListener('click',ev=>{
-    const openLink=ev.target.closest('a.byl-shell-cart, a[data-byl-drawer-open]');
-    if (openLink) {ev.preventDefault();open();return;}
+    if (ev.defaultPrevented || (typeof ev.button === 'number' && ev.button !== 0) ||
+        ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    const link = ev.target?.closest?.('a[href]');
+    if (!link || link.hasAttribute?.('download') ||
+        (link.target && link.target !== '_self')) return;
+    if (!link.matches('a.byl-shell-cart, a.byl-focus-cart-icon, a[data-byl-drawer-open]') &&
+        !isPlainCartLink(link)) return;
+    ev.preventDefault();
+    open();
   });
   root.addEventListener('click',event=>{
     if (event.target.closest('[data-drawer-close]')) {close();return;}
@@ -386,9 +406,17 @@
     else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
   });
   window.BYL_Cart_Drawer_Preview={open,close,refresh:()=>update('',null)};
-  // Ordinary Dev visitors start with a closed Drawer. Only the explicit
-  // Dev visual-preview URL auto-opens; the header cart icon opens on demand.
-  if (new URL(window.location.href).searchParams.get('byl_cart_drawer_preview') === '1') {
+  // Direct /cart/ visits now show the Drawer first, with the unchanged Woo
+  // page underneath as the working fallback (also when JS cannot initialize).
+  // ?byl_native_cart=1 explicitly bypasses automatic opening for recovery.
+  const locationUrl = new URL(window.location.href);
+  const isCartPage = locationUrl.origin === cartPageUrl.origin &&
+    canonicalPath(locationUrl.pathname) === canonicalPath(cartPageUrl.pathname);
+  if (locationUrl.searchParams.get('byl_cart_drawer_preview') === '1' ||
+      (isCartPage && locationUrl.searchParams.get('byl_native_cart') !== '1' &&
+        !locationUrl.searchParams.has('add-to-cart') &&
+        !locationUrl.searchParams.has('remove_item') &&
+        !locationUrl.searchParams.has('undo_item'))) {
     open();
   }
 })();
