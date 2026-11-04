@@ -195,8 +195,10 @@ async function main() {
   assert.equal(normal.root.hidden,true,'normal Dev Drawer starts closed');
   assert.equal(calls.length,beforeNormalCalls,'normal page must not fetch cart until opened');
   let prevented=false;
+  const headerLink={href:'https://dev.example.invalid/cart/',target:'',
+    hasAttribute:()=>false,matches:s=>s.includes('a.byl-shell-cart')};
   events['document.click']({
-    target:{closest(selector){return selector==='a.byl-shell-cart, a[data-byl-drawer-open]'?{}:null;}},
+    target:{closest:s=>s==='a[href]'?headerLink:null},
     preventDefault(){prevented=true;}
   });
   await waitFor(()=>normal.el['[data-drawer-items]'].innerHTML.includes('Safe Product'));
@@ -205,6 +207,31 @@ async function main() {
   assert.ok(calls.length>beforeNormalCalls,'opening Drawer fetches Woo-authoritative cart');
   events['document.keydown']({key:'Escape',preventDefault(){}});
   assert.equal(normal.root.hidden,true,'Escape closes normal Dev Drawer');
+
+  // The real /cart/ route defaults to Drawer, but the native full-cart query
+  // must remain a working manual recovery page even with scripts enabled.
+  const onCart=fixture('https://dev.example.invalid/cart/');
+  vm.runInContext(source,vm.createContext({window:onCart.window,
+    document:onCart.document,fetch,URL,Intl,Math,Number,String,
+    Promise,Set,Map,Array,Object,Error,setTimeout,clearTimeout,console}));
+  await waitFor(()=>onCart.root.hidden===false);
+  assert.equal(onCart.root.hidden,false,'/cart/ defaults to Drawer');
+  const fallback=fixture('https://dev.example.invalid/cart/?byl_native_cart=1');
+  vm.runInContext(source,vm.createContext({window:fallback.window,
+    document:fallback.document,fetch,URL,Intl,Math,Number,String,
+    Promise,Set,Map,Array,Object,Error,setTimeout,clearTimeout,console}));
+  assert.equal(fallback.root.hidden,true,'native full-cart bypass keeps original page');
+  let intercepted=false;
+  const mutationLink={href:'https://dev.example.invalid/cart/?add-to-cart=71',
+    target:'',hasAttribute:()=>false,matches:()=>false};
+  events['document.click']({target:{closest:s=>s==='a[href]'?mutationLink:null},
+    preventDefault(){intercepted=true;}});
+  assert.equal(intercepted,false,'add-to-cart links must remain native');
+  const plainCartLink={href:'https://dev.example.invalid/cart/',
+    target:'',hasAttribute:()=>false,matches:()=>false};
+  events['document.click']({ctrlKey:true,target:{closest:s=>s==='a[href]'?plainCartLink:null},
+    preventDefault(){intercepted=true;}});
+  assert.equal(intercepted,false,'modified click must preserve browser navigation');
 
   // Explicitly active Free Gift remains a hard stop, not a way to launch gifts.
   const forbidden=fixture();
