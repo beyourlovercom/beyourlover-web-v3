@@ -65,6 +65,28 @@ jobs:
         run: php -l theme/beyourlover-v3/page-newsletter.php && php -l tools/dev/tests/newsletter-m3-render-harness.php && node --check scripts/test_newsletter_m3_contract.js && node scripts/test_newsletter_m3_contract.js
       - name: Python syntax
         run: python -m py_compile scripts/*.py
+      - name: Dev A1 external Woo product REST isolation smoke
+        run: |
+          php -l dev/mu-plugins/byl-a1-external-product-rest-isolation.php
+          php -l tools/dev/tests/a1-product-rest-quarantine-smoke.php
+          php tools/dev/tests/a1-product-rest-quarantine-smoke.php
+      - name: Dev A1 Action Scheduler queue retention and pause smoke
+        run: |
+          php -l dev/mu-plugins/byl-a1-action-scheduler-pause.php
+          php -l tools/dev/tests/a1-action-scheduler-pause-smoke.php
+          php tools/dev/tests/a1-action-scheduler-pause-smoke.php
+      - name: Dev A1 Jetpack Sync sender and metadata event pause smoke
+        run: |
+          php -l dev/mu-plugins/byl-a1-jetpack-sync-pause.php
+          php -l tools/dev/tests/a1-jetpack-sync-pause-smoke.php
+          php tools/dev/tests/a1-jetpack-sync-pause-smoke.php
+      - name: BYL A0-A2 and P1 source-only fail-closed contracts
+        run: |
+          php -l scripts/byl_a0_a2_catalog_export.php
+          php -l scripts/byl_a1_dev_runtime_readonly.php
+          php -l scripts/byl_a2_dev_5sku_canary.php
+          python3 -m unittest discover -s scripts -p 'test_byl_a*.py' -v
+          python3 -m unittest discover -s scripts -p 'test_byl_p1*.py' -v
       - name: BYL Native-First Development & Dual UAT V1 governance
         run: python3 scripts/test_native_first_dual_uat_governance.py
       - name: Theme OS V1 module, SemVer and dependency validation
