@@ -95,9 +95,27 @@
         bind(data);
     }
 
+  // Woo REST coupon notices can contain escaped HTML entities. Decode only
+  // the text data; the caller uses textContent, never innerHTML.
+  function decodeWooErrorText(value) {
+    return String(value == null ? '' : value).replace(
+      /&(#x[0-9a-f]+|#[0-9]+|amp|lt|gt|quot|apos);/gi,
+      (match, raw) => {
+        const entity = raw.toLowerCase();
+        if (entity.charAt(0) === '#') {
+          const code = entity.charAt(1) === 'x'
+            ? parseInt(entity.slice(2), 16) : parseInt(entity.slice(1), 10);
+          return Number.isInteger(code) && code >= 32 && code <= 0x10ffff &&
+            !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : match;
+        }
+        return {amp:'&', lt:'<', gt:'>', quot:'"', apos:"'"}[entity] ?? match;
+      }
+    );
+  }
+
     function showError(message) {
         var error = root && root.querySelector('.byl-cart-promotion__error');
-        if (error) { error.textContent = message; error.hidden = !message; }
+        if (error) { error.textContent = decodeWooErrorText(message); error.hidden = !message; }
     }
 
     function bind(data) {
