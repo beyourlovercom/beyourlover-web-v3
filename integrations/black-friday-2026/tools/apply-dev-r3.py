@@ -2,8 +2,6 @@
 """BYL BF2026 Promotion UI V1 — guarded Dev deployment, never WWW.
 Run only for the Owner-approved R0–R3 Dev integration.
 """
-from __future__ import annotations
-
 import argparse
 import hashlib
 import os
