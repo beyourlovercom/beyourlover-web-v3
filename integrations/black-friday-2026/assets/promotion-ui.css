@@ -1,0 +1,13 @@
+/* BYL BF2026 Promotion UI v1 — scoped only; no existing Woo styles overridden. */
+.byl-bf2026-announcement{box-sizing:border-box;position:sticky;top:0;z-index:10020;min-height:44px;background:#9b3749;color:#fff;font-family:inherit}
+.byl-bf2026-announcement[hidden]{display:none!important}
+.byl-bf2026-announcement__link{display:flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:8px 18px;color:#fff!important;text-decoration:none!important;text-align:center;font-size:13px;font-weight:700}
+.byl-bf2026-announcement__headline{letter-spacing:.035em;white-space:nowrap}
+.byl-bf2026-announcement__time{font-variant-numeric:tabular-nums;white-space:nowrap;opacity:.95}
+.byl-bf2026-announcement__link:is(:hover,:focus-visible) .byl-bf2026-announcement__headline{text-decoration:underline;text-underline-offset:4px}
+.byl-bf2026-sale-badge{display:inline-flex!important;align-items:center;vertical-align:middle;margin-inline-start:9px;padding:4px 8px;border-radius:4px;background:#9b3749;color:#fff!important;font-family:inherit;font-size:10px;font-weight:700;line-height:1.3;letter-spacing:.015em;white-space:nowrap;max-width:100%;box-sizing:border-box}
+.byl-bf2026-sale-badge[data-byl-bf-percent="0"]{background:#702836}
+.byl-drawer__item-price + .byl-bf2026-sale-badge{margin:4px 0 0}
+.byl-bf2026-sticky-badge{margin-inline-start:8px}
+@media(max-width:640px){.byl-bf2026-announcement__link{gap:8px;flex-wrap:wrap;padding:7px 10px;font-size:11px;line-height:1.4}.byl-bf2026-announcement__headline{white-space:normal}.byl-bf2026-announcement__time{font-size:11px}.byl-bf2026-sale-badge{font-size:9px;letter-spacing:0;padding:4px 6px;margin-inline-start:6px}}
+@media(prefers-reduced-motion:reduce){.byl-bf2026-announcement__link{scroll-behavior:auto}}
