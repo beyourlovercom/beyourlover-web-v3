@@ -6,7 +6,7 @@
 if (!defined('ABSPATH')) { exit; }
 
 final class BYL_BF2026_Promotion_UI {
-    const VERSION = '1.0.0-dev-rc1';
+    const VERSION = '1.1.0-dev-rc2';
     const OPTION = 'byl_bf2026_promotion_ui_v1';
     const SETTINGS_SLUG = 'byl-bf2026-promotion-ui';
     private static $booted = false;
@@ -28,7 +28,7 @@ final class BYL_BF2026_Promotion_UI {
         $defaults = [
             'enabled'=>'no', 'start'=>'2026-11-10 00:00', 'end'=>'2026-12-01 00:00',
             'announcement'=>'yes','product'=>'yes','cart'=>'yes','drawer'=>'yes','sticky'=>'yes',
-            'headline'=>'BLACK FRIDAY SALE',
+            'headline'=>'Black Friday Sale',
         ];
         $stored = function_exists('get_option') ? get_option(self::OPTION, []) : [];
         return array_merge($defaults, is_array($stored) ? $stored : []);
@@ -89,7 +89,7 @@ final class BYL_BF2026_Promotion_UI {
     public static function announcement(): void {
         if (!self::enabled('announcement')) { return; }
         $headline = sanitize_text_field((string)self::settings()['headline']);
-        if ($headline==='') { $headline='BLACK FRIDAY SALE'; }
+        if ($headline==='') { $headline='Black Friday Sale'; }
         echo '<aside class="byl-bf2026-announcement" data-byl-bf-banner hidden role="region" aria-label="Black Friday promotion">';
         echo '<a class="byl-bf2026-announcement__link" href="'.esc_url(home_url('/holiday/black-friday/')).'">';
         echo '<span class="byl-bf2026-announcement__headline">'.esc_html($headline).'</span>';
@@ -108,7 +108,7 @@ final class BYL_BF2026_Promotion_UI {
             $percent = self::discount_percent($product->get_regular_price(),$product->get_price());
         }
         if ($percent<=0 && !$product->is_type('variable')) { return ''; }
-        $text=$percent>0 ? sprintf('BLACK FRIDAY · %d%% OFF',$percent) : 'BLACK FRIDAY DEAL';
+        $text=$percent>0 ? sprintf('Black Friday · %d%% OFF',$percent) : 'Black Friday Deal';
         return '<span class="byl-bf2026-sale-badge" data-byl-bf-badge data-byl-bf-percent="'.esc_attr((string)$percent).'">'.esc_html($text).'</span>';
     }
     public static function price_html($html,$product) {
