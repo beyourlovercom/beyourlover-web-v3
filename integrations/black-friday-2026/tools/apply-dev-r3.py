@@ -67,7 +67,7 @@ def run() -> None:
         if (target / rel).exists():
             die("unexpected existing module path " + rel)
     php = staging / RELATIVE_FILES[0]
-    check = subprocess.run(["php", "-l", str(php)], check=False, capture_output=True, text=True)
+    check = subprocess.run(["php", "-l", str(php)], check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     if check.returncode:
         die("PHP lint failed: " + check.stdout + check.stderr)
     next_main = original.replace(
