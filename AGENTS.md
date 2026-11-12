@@ -1,6 +1,17 @@
 # BYL Website V3 — Agent Governance V2
 > Applies to this repository and the new BeYourLover website only. The Owner-approved operating model is Dev-first. Do not inherit a generic Local-first mandate from shared-plugin repositories.
 
+## Owner P0 — 007 Windows-only admin execution (2026-11-12)
+
+**Owner priority: highest project-operational priority for admin-device selection** across both `dev.beyourlover.com` and `www.beyourlover.com`. This rule governs where an authorized operation runs; it does **not** elevate accounts, override security policy or bypass any existing release/Owner-approval gate.
+
+- **Exclusive host:** All actions that require opening, logging into, viewing or interacting with the BYL Dev or WWW backend/admin interface must use the **dedicated `007windows` computer** through the formal BYL self-hosted Desktop Commander connection. This includes WordPress `/wp-admin/`, WooCommerce orders, menus, theme/plugin settings, content/media management, admin-based Dev/Production UAT, and browser-based backend configuration.
+- **Forbidden substitutes:** Do not use `china-mac` (China Mac), `windows` (the separate general Windows host), `us-macmini` or any other machine to open/operate BYL Dev/WWW backend pages—even if already logged in there. Do not silently reuse an existing Chrome admin session on those hosts.
+- **Other work:** GitHub/source inspection, read-only public-site checks, isolated development and CLI work that does not open or operate backend sessions may still follow their own approved device/runtime policies.
+- **Unavailable host:** First confirm `007windows` is reachable and the intended site/account/session is correct. If it is not usable, mark the backend action **BLOCKED** and report the blocker. Do not fall back to the China Mac, another Windows machine or US Mac mini without a newer explicit Owner directive.
+- **Session safety:** Reuse the existing authorized 007 Windows Chrome session/profile. Never restart a READY device, Chrome, or DC services merely to perform this task; do not fabricate an access or execution result.
+- **Authority:** The Owner's WWW/Production write approvals, customer/payment safeguards and source-of-truth requirements remain fully in force. This policy supersedes older *device-choice* guidance that permitted Dev/WWW admin access from China Mac or a different Windows Chrome profile.
+
 ## Mission and source of truth
 - Build **the complete new website** on `https://dev.beyourlover.com`; tune theme, plugins, content, integrations and business flows together until full Owner UAT passes.
 - **GitHub is the only code source of truth.** Work on a scoped branch/worktree; no untracked or direct Dev-only source fixes. Record exact commit SHA for deployed code.
