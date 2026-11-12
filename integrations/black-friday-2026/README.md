@@ -1,5 +1,11 @@
 # Black Friday 2026 · Promotion UI V1 (R0–R3)
 
+## Promotion UI v1.1 visual revision — 2026-11-12
+
+Owner rejected the original dark-burgundy banner, 9–10px uppercase type and squared sale badges as visually unattractive. Updated **Dev only** to a bright magenta gradient, cream-white high-contrast type, translucent pill timer, and black/pink rounded split sale badges. Text is now `Black Friday Sale` and `Black Friday · 30% OFF`. Source module constant `1.1.0-dev-rc2` handles CSS/JS browser cache busting. Only the module's PHP display class, CSS, and JS changed; Woo data/calculation/gift/cart/checkout code untouched.
+
+Deployment preflight and audit: exact baseline SHA for all 3 UI files, plugin entrypoint SHA guard, PHP lint PASS, backup `/home/u247343654/bf2026-r3-backups/skin-v11-20261112T074310Z`, readback PASS. 007 Windows authenticated Dev admin saved the title-case announcement headline. Live desktop 1440 and mobile 390 product page PASS (scrollWidth == innerWidth), real cart session Add to cart → Drawer → /cart/ label PASS, and no price recalculation observed. Dev plugin remains active `0.2.3-dev-rc4-promo-ui1`. GitHub PR draft/Owner visual PASS remains pending; WWW not modified.
+
 ## Latest status — 2026-11-12
 
 - **R0 reference audit:** DONE — Lovense-style announcement, discount badge, cart, sticky patterns; original BYL implementation, no third-party proprietary source copied.
