@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 EXPECTED_MAIN_SHA256 = "fb57d51946b1e9c74a7892f5494c5015c04fc601a75b4cd996465f4c13f0b6a3"
-EXPECTED_HEAD = "03d2c72be25313f71ec2ae3b930423f5fbd46152"
+MODULE_SOURCE_COMMIT = "03d2c72be25313f71ec2ae3b930423f5fbd46152"
 ANCHOR = "require_once __DIR__ . '/includes/class-byl-bf2026-r8-readiness.php';"
 BOOTSTRAP = """// BYL_BF2026_PROMOTION_UI_R3: presentation-only module, switches default OFF.
 require_once __DIR__ . '/includes/class-byl-bf2026-promotion-ui.php';
@@ -96,7 +96,7 @@ def run() -> None:
     atomic_write(main, next_main.encode())
     if "BYL_BF2026_PROMOTION_UI_R3" not in main.read_text():
         die("main write readback failed; restore using backup=" + str(backup))
-    print("PASS deployed_head=" + EXPECTED_HEAD)
+    print("PASS module_source_commit=" + MODULE_SOURCE_COMMIT)
     print("PASS backup=" + str(backup))
     print("PASS main_sha256=" + sha(main))
     for rel in RELATIVE_FILES:
