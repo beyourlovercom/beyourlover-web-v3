@@ -21,7 +21,7 @@
     el.className = 'byl-bf2026-sale-badge';
     el.setAttribute('data-byl-bf-badge','');
     el.setAttribute('data-byl-bf-percent',String(value));
-    el.textContent = 'BLACK FRIDAY · ' + value + '% OFF';
+    el.textContent = 'Black Friday · ' + value + '% OFF';
     return el;
   }
   function stop() {
