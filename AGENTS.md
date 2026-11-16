@@ -12,6 +12,10 @@
 - **Session safety:** Reuse the existing authorized 007 Windows Chrome session/profile. Never restart a READY device, Chrome, or DC services merely to perform this task; do not fabricate an access or execution result.
 - **Authority:** The Owner's WWW/Production write approvals, customer/payment safeguards and source-of-truth requirements remain fully in force. This policy supersedes older *device-choice* guidance that permitted Dev/WWW admin access from China Mac or a different Windows Chrome profile.
 
+## Owner P0 — Press Room image rights (2026-11-16)
+
+**BYL_PR_IMAGE_RIGHTS_V1:** No photo showing an identifiable person may appear on BeYourLover Press Room pages without explicit, documented portrait authorization for that PR use. Prefer face-free product photos, media assets with verified reuse rights, or original face-free typographic visuals. Existing influencer relationships or previously published photos do **not** establish PR consent. This applies to every hero, card, detail page and preview image. Missing rights evidence requires a safe replacement before Dev acceptance or any WWW release. **Read and enforce** [Press Room Image Rights V1](docs/agent/PRESS-ROOM-IMAGE-RIGHTS-V1.md) for all Press Room work.
+
 ## Mission and source of truth
 - Build **the complete new website** on `https://dev.beyourlover.com`; tune theme, plugins, content, integrations and business flows together until full Owner UAT passes.
 - **GitHub is the only code source of truth.** Work on a scoped branch/worktree; no untracked or direct Dev-only source fixes. Record exact commit SHA for deployed code.
