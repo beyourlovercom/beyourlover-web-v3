@@ -1,0 +1,47 @@
+name: BYL Translation Dashboard V1 — Dev-only read-only contract
+
+on:
+  pull_request:
+    paths:
+      - 'dev/mu-plugins/byl-translation-dashboard.php'
+      - 'dev/tests/translation-dashboard-offline-smoke.php'
+      - '.github/workflows/translation-dashboard-dev-ci.yml'
+  push:
+    branches:
+      - 'feat/byl-translation-dashboard-*'
+    paths:
+      - 'dev/mu-plugins/byl-translation-dashboard.php'
+      - 'dev/tests/translation-dashboard-offline-smoke.php'
+      - '.github/workflows/translation-dashboard-dev-ci.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline-only:
+    name: PHP syntax, fail-closed host, no QA95 inflation — NO DEPLOY
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: One-file MU syntax and offline regression
+        run: |
+          set -euo pipefail
+          php -l dev/mu-plugins/byl-translation-dashboard.php
+          php -l dev/tests/translation-dashboard-offline-smoke.php
+          php dev/tests/translation-dashboard-offline-smoke.php
+          BYL_TD_TEST_ENV=production php dev/tests/translation-dashboard-offline-smoke.php
+          BYL_TD_TEST_HOME=https://www.beyourlover.com php dev/tests/translation-dashboard-offline-smoke.php
+      - name: Disallow mutating WordPress and paid translate calls in read-only MU
+        run: |
+          set -euo pipefail
+          if grep -En '(wp_insert_post|wp_update_post|update_post_meta|add_post_meta|delete_post_meta|\$wpdb->(insert|update|delete|query)\(|wp_remote_post|curl_exec|trp_translate)' dev/mu-plugins/byl-translation-dashboard.php; then
+            echo 'Read-only contract violation in MU file'
+            exit 1
+          fi
+          echo 'Read-only operation whitelist PASS; no deployment step exists.'
