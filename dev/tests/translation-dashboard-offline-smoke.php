@@ -14,11 +14,27 @@ function get_option($name, $default = array()) {
         'translation-languages'=>array('en_US','es_ES','de_DE','../evil')) : $default;
 }
 function wp_strip_all_tags($text) { return strip_tags($text); }
+function get_permalink($post) { return 'https://dev.beyourlover.com/blog/' . $post->ID . '/'; }
+function wp_parse_url($url, $component) { return parse_url($url, $component); }
 function sanitize_key($value) { return preg_replace('/[^a-z0-9_\-]/', '', strtolower($value)); }
 function sanitize_text_field($value) { return trim((string) $value); }
 function wp_unslash($value) { return stripslashes($value); }
 function absint($value) { return abs((int) $value); }
 function apply_filters($hook, $default, $post_id, $lang) { return $GLOBALS['byl_td_filter_result']; }
+
+class BYL_TD_Test_Converter {
+    public function get_url_for_language($language, $url, $marker) {
+        if ($marker !== '') { throw new RuntimeException('Browser URL must not contain internal markers'); }
+        return str_replace('https://dev.beyourlover.com/',
+            'https://dev.beyourlover.com/' . strtolower(substr($language, 0, 2)) . '/', $url);
+    }
+}
+class TRP_Translate_Press {
+    public static function get_trp_instance() { return new self(); }
+    public function get_component($component) {
+        return $component === 'url_converter' ? new BYL_TD_Test_Converter() : null;
+    }
+}
 
 class WP_Query {
     public $args;
@@ -66,6 +82,10 @@ byl_td_assert(byl_td_table('en_US', 'de_DE') === '', 'Unknown language table is 
 
 $post = (object) array('ID'=>38168, 'post_title'=>'Using the product safely', 'post_content'=>
     '<p>Please review instructions carefully</p><p>Cleaning and care information</p>');
+byl_td_assert(byl_td_frontend_url($post, 'es_ES') === 'https://dev.beyourlover.com/es/blog/38168/',
+    'Frontend locale link derives from the installed TranslatePress converter');
+byl_td_assert(byl_td_frontend_url($post, 'en_US') === '' && byl_td_frontend_url($post, '../evil') === '',
+    'Source and unconfigured locale URLs are never invented');
 $inspection = byl_td_inspect($post, 'en_US','es_ES');
 byl_td_assert($inspection['recognized'] === 3 && $inspection['translated'] === 2,
     'Read only dictionary status is classified from original/translated/status');
