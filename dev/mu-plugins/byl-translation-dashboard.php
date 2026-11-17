@@ -21,6 +21,47 @@ if (!defined('BYL_TRANSLATION_DASHBOARD_V1')) {
     define('BYL_TRANSLATION_DASHBOARD_V1', '1.0.0-dev');
 }
 
+/**
+ * Optional Andy Core module: registry owns the ON/OFF setting, while this MU
+ * file remains a separate read-only feature with no TranslatePress hard boot.
+ * The translation Worker and the Dev SEO Gate are deliberately unaffected.
+ */
+if (!function_exists('byl_td_translatepress_available')) {
+    function byl_td_translatepress_available() {
+        return class_exists('TRP_Translate_Press', false)
+            && is_callable(array('TRP_Translate_Press', 'get_trp_instance'));
+    }
+}
+if (!function_exists('byl_td_register_andy_module')) {
+    function byl_td_register_andy_module() {
+        if (!class_exists('YBY_Module_Registry')) {
+            return;
+        }
+        YBY_Module_Registry::register('translation_dashboard', array(
+            'name' => '翻译进度看板',
+            'description' => '只读翻译进度、QA95 证据和语言前台预览。前置条件：安装并启用 TranslatePress 插件。关闭不影响翻译 Worker。',
+            'version' => BYL_TRANSLATION_DASHBOARD_V1,
+            'status' => 'ready',
+            'default_enabled' => false,
+            'capability' => 'manage_options',
+            'availability' => 'byl_td_translatepress_available',
+            'availability_message' => '缺少前置插件：请先安装并启用 TranslatePress，然后刷新页面。',
+            'dependencies' => array('module_registry'),
+            'settings' => array('page' => 'byl-translation-dashboard'),
+        ));
+    }
+}
+add_action('andy_core_register_modules', 'byl_td_register_andy_module');
+
+if (!function_exists('byl_td_module_enabled')) {
+    function byl_td_module_enabled() {
+        return class_exists('YBY_Module_Registry')
+            && byl_td_translatepress_available()
+            && YBY_Module_Registry::is_enabled('translation_dashboard')
+            && YBY_Module_Registry::dependencies_met('translation_dashboard');
+    }
+}
+
 if (!function_exists('byl_td_languages')) {
     function byl_td_languages() {
         $settings = get_option('trp_settings', array());
@@ -234,6 +275,10 @@ if (!function_exists('byl_td_admin_page')) {
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
         }
+        if (!byl_td_module_enabled()) {
+            wp_die('翻译看板未启用，或尚未安装并启用 TranslatePress。请在 Andy Core 模块管理中检查。',
+                '翻译看板不可用', array('response' => 403));
+        }
         // Andy Core V2.2 renders the existing Content L3 navigation server-side.
         // Wrap only this authorized dashboard's body; do not create a new L1/L2
         // item or duplicate/reparent another WordPress controller's markup.
@@ -307,6 +352,9 @@ if (!function_exists('byl_td_admin_page_body')) {
 }
 
 add_action('admin_menu', static function () {
+    if (!byl_td_module_enabled()) {
+        return;
+    }
     // Hidden native controller. Andy Core renders the visible Content L3 link;
     // this module must not introduce a second top-level WordPress menu.
     add_submenu_page(null, '翻译进度看板', '翻译看板', 'manage_options',
@@ -314,7 +362,7 @@ add_action('admin_menu', static function () {
 });
 
 add_action('admin_post_byl_td_csv', static function () {
-    if (!current_user_can('manage_options')) {
+    if (!current_user_can('manage_options') || !byl_td_module_enabled()) {
         wp_die('Forbidden', '', array('response' => 403));
     }
     check_admin_referer('byl_td_csv');
@@ -358,7 +406,8 @@ add_action('admin_post_byl_td_csv', static function () {
 });
 
 add_action('admin_head', static function () {
-    if (!isset($_GET['page']) || sanitize_key(wp_unslash($_GET['page'])) !== 'byl-translation-dashboard') {
+    if (!byl_td_module_enabled() || !isset($_GET['page'])
+        || sanitize_key(wp_unslash($_GET['page'])) !== 'byl-translation-dashboard') {
         return;
     }
     ?>
