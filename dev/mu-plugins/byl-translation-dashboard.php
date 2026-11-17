@@ -234,6 +234,21 @@ if (!function_exists('byl_td_admin_page')) {
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('Sorry, you are not allowed to access this page.'));
         }
+        // Andy Core V2.2 renders the existing Content L3 navigation server-side.
+        // Wrap only this authorized dashboard's body; do not create a new L1/L2
+        // item or duplicate/reparent another WordPress controller's markup.
+        if (class_exists('YBY_Andy_Admin_Shell_V22')
+            && is_callable(array('YBY_Andy_Admin_Shell_V22', 'render'))) {
+            YBY_Andy_Admin_Shell_V22::render('byl-translation-dashboard',
+                '内容 · 翻译', 'byl_td_admin_page_body');
+            return;
+        }
+        byl_td_admin_page_body();
+    }
+}
+
+if (!function_exists('byl_td_admin_page_body')) {
+    function byl_td_admin_page_body() {
         list($source, $languages) = byl_td_languages();
         $query = byl_td_query();
         $selected_lang = isset($_GET['byl_lang']) ? sanitize_text_field(wp_unslash($_GET['byl_lang'])) : 'all';
