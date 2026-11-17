@@ -17,6 +17,7 @@ function wp_strip_all_tags($text) { return strip_tags($text); }
 function get_permalink($post) { return 'https://dev.beyourlover.com/blog/' . $post->ID . '/'; }
 function wp_parse_url($url, $component) { return parse_url($url, $component); }
 function add_query_arg($key, $value, $url) { return $url . (strpos($url, '?') === false ? '?' : '&') . rawurlencode($key) . '=' . rawurlencode($value); }
+function current_user_can($cap) { return $cap === 'manage_options'; }
 function byl_trp_gate_active() { return !empty($GLOBALS['byl_td_gate_active']); }
 function byl_trp_localized_url($post_id, $language) { return $GLOBALS['byl_td_approved_urls'][$language] ?? ''; }
 function sanitize_key($value) { return preg_replace('/[^a-z0-9_\-]/', '', strtolower($value)); }
@@ -36,6 +37,12 @@ class TRP_Translate_Press {
     public static function get_trp_instance() { return new self(); }
     public function get_component($component) {
         return $component === 'url_converter' ? new BYL_TD_Test_Converter() : null;
+    }
+}
+class YBY_Andy_Admin_Shell_V22 {
+    public static $invocation = array();
+    public static function render($page, $heading, $body) {
+        self::$invocation = array($page, $heading, $body);
     }
 }
 
@@ -78,6 +85,10 @@ if (wp_get_environment_type() !== 'staging' || home_url() !== 'https://dev.beyou
 }
 
 byl_td_assert(count($GLOBALS['byl_td_hooks']) === 3, 'Only admin/read-only hooks are registered');
+byl_td_admin_page();
+byl_td_assert(YBY_Andy_Admin_Shell_V22::$invocation === array('byl-translation-dashboard',
+    '内容 · 翻译', 'byl_td_admin_page_body'),
+    'Dashboard delegates once to Andy Core server-rendered Content L3 shell');
 list($source, $langs) = byl_td_languages();
 byl_td_assert($source === 'en_US' && $langs === array('es_ES','de_DE'), 'Languages derive from TranslatePress; invalid codes excluded');
 byl_td_assert(byl_td_table('en_US', '../evil') === '', 'Reject unsafe dictionary table identifier');
