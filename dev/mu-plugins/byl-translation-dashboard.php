@@ -151,6 +151,39 @@ if (!function_exists('byl_td_qa')) {
     }
 }
 
+if (!function_exists('byl_td_frontend_url')) {
+    /**
+     * Use TranslatePress's own converter so localized SEO slugs, base paths,
+     * and its installed language settings remain authoritative.
+     */
+    function byl_td_frontend_url($post, $language) {
+        if (!is_object($post) || !isset($post->ID) || !class_exists('TRP_Translate_Press')) {
+            return '';
+        }
+        list($source, $targets) = byl_td_languages();
+        if ($language === $source || !in_array($language, $targets, true)) {
+            return '';
+        }
+        $original = get_permalink($post);
+        if (!is_string($original) || $original === '') {
+            return '';
+        }
+        $instance = TRP_Translate_Press::get_trp_instance();
+        $converter = is_object($instance) ? $instance->get_component('url_converter') : null;
+        if (!is_object($converter) || !is_callable(array($converter, 'get_url_for_language'))) {
+            return '';
+        }
+        // The empty third argument prevents a TranslatePress internal marker
+        // from leaking into a browser-facing href.
+        $translated = $converter->get_url_for_language($language, $original, '');
+        if (!is_string($translated) || $translated === ''
+            || wp_parse_url($translated, PHP_URL_HOST) !== 'dev.beyourlover.com') {
+            return '';
+        }
+        return $translated;
+    }
+}
+
 if (!function_exists('byl_td_query')) {
     function byl_td_query($export = false) {
         $type = isset($_GET['byl_type']) ? sanitize_key(wp_unslash($_GET['byl_type'])) : 'all';
@@ -207,7 +240,7 @@ if (!function_exists('byl_td_admin_page')) {
                 <div class="byl-td-card"><span>理论翻译任务</span><strong><?php echo esc_html(number_format_i18n($total * $target_count)); ?></strong><small>不代表已翻译条目</small></div>
                 <div class="byl-td-card"><span>当前页内容</span><strong><?php echo esc_html($shown); ?></strong><small>每页 20 条 · 只读</small></div>
             </div>
-            <div class="notice notice-info inline byl-td-notice"><p><strong>数据口径：</strong>百分比仅为<strong>已匹配字符串的翻译占比</strong>，不是文章全文完成率；TranslatePress 的机器翻译标记也不等于 Dev QA95。只有具备来源分数、P0=0 和 Dev 页面 200 读回的 QA 账本才可显示 QA95 PASS。</p></div>
+            <div class="notice notice-info inline byl-td-notice"><p><strong>数据口径：</strong>百分比仅为<strong>已匹配字符串的翻译占比</strong>，不是文章全文完成率；TranslatePress 的机器翻译标记也不等于 Dev QA95。只有具备来源分数、P0=0 和 Dev 页面 200 读回的 QA 账本才可显示 QA95 PASS。语言前台链接仅供查看，不代表已完成校对。</p></div>
             <form method="get" class="byl-td-filter">
                 <input type="hidden" name="page" value="byl-translation-dashboard">
                 <input type="search" name="byl_search" placeholder="搜索标题 / 关键词 / #文章ID" value="<?php echo esc_attr(isset($_GET['byl_search']) ? sanitize_text_field(wp_unslash($_GET['byl_search'])) : ''); ?>">
@@ -221,10 +254,11 @@ if (!function_exists('byl_td_admin_page')) {
             <?php foreach ($query->posts as $post) { ?>
                 <tr><td class="byl-td-title"><strong><?php echo esc_html(get_the_title($post)); ?></strong><small>#<?php echo esc_html($post->ID); ?> · <?php echo esc_html($post->post_type); ?> · <?php echo esc_html(get_the_date('Y-m-d', $post)); ?></small></td>
                     <td><span class="byl-td-pill green">EN · 源文章</span></td>
-                    <?php foreach ($visible as $code) { $info = byl_td_inspect($post, $source, $code); $qa = byl_td_qa($post->ID, $code); ?>
+                    <?php foreach ($visible as $code) { $info = byl_td_inspect($post, $source, $code); $qa = byl_td_qa($post->ID, $code); $frontend_url = byl_td_frontend_url($post, $code); $language_names = array('es_ES'=>'西语','ko_KR'=>'韩语','ru_RU'=>'俄语'); $language_name = isset($language_names[$code]) ? $language_names[$code] : $code; ?>
                         <td><div class="byl-td-cell"><span class="byl-td-pill <?php echo esc_attr($info['code']); ?>"><?php echo esc_html($info['label']); ?></span>
                         <?php if ($info['percent'] !== null) { ?><div class="byl-td-meter"><span style="width:<?php echo esc_attr($info['percent']); ?>%"></span></div><small><?php echo esc_html($info['percent']); ?>% · <?php echo esc_html($info['translated']); ?>/<?php echo esc_html($info['recognized']); ?> 已匹配</small><?php } else { ?><small>进度未知 · 不做推断</small><?php } ?>
-                        <small title="<?php echo esc_attr($info['note']); ?>"><?php echo esc_html($qa['label']); ?></small></div></td>
+                        <small title="<?php echo esc_attr($info['note']); ?>"><?php echo esc_html($qa['label']); ?></small>
+                        <?php if ($frontend_url !== '') { ?><a class="byl-td-frontend-link" href="<?php echo esc_url($frontend_url); ?>" target="_blank" rel="noopener noreferrer">查看<?php echo esc_html($language_name); ?>前台 ↗</a><?php } else { ?><small>语言前台链接不可用</small><?php } ?></div></td>
                     <?php } ?>
                     <td><span class="byl-td-pill muted"><?php echo esc_html($post->post_status); ?></span></td>
                     <td><a href="<?php echo esc_url(get_edit_post_link($post->ID)); ?>">编辑原文</a> · <a href="<?php echo esc_url(get_permalink($post)); ?>" target="_blank" rel="noopener noreferrer">查看</a></td>
@@ -240,7 +274,10 @@ if (!function_exists('byl_td_admin_page')) {
 }
 
 add_action('admin_menu', static function () {
-    add_menu_page('翻译进度看板', '翻译看板', 'manage_options', 'byl-translation-dashboard', 'byl_td_admin_page', 'dashicons-translation', 59);
+    // Hidden native controller. Andy Core renders the visible Content L3 link;
+    // this module must not introduce a second top-level WordPress menu.
+    add_submenu_page(null, '翻译进度看板', '翻译看板', 'manage_options',
+        'byl-translation-dashboard', 'byl_td_admin_page');
 });
 
 add_action('admin_post_byl_td_csv', static function () {
@@ -293,7 +330,7 @@ add_action('admin_head', static function () {
     }
     ?>
     <style>
-    .byl-td{max-width:1700px;margin:24px 28px 24px 8px;color:#233047}.byl-td-head{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px}.byl-td-head h1{font-size:29px;font-weight:750;line-height:1.3;margin:8px 0 5px}.byl-td-head p{color:#718096;font-size:13px;margin:0}.byl-td-eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;color:#7156cb}.byl-td-version{display:inline-block;letter-spacing:0;border-radius:30px;padding:4px 9px;margin-left:7px;color:#7055c7;background:#eee8ff}.byl-td-subtitle{font-size:13px;font-weight:400;color:#8590a4;margin-left:8px}.byl-td-head .button-primary{background:#7057d2;border-color:#7057d2;border-radius:8px;padding:4px 18px}.byl-td-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:20px}.byl-td-card{background:#fff;border:1px solid #e7e9f1;border-radius:12px;padding:18px 20px;box-shadow:0 3px 14px rgba(39,47,78,.035)}.byl-td-card span{display:block;color:#8290a5;font-size:12px;margin-bottom:12px}.byl-td-card strong{display:block;font-size:29px;line-height:1.1;color:#28344c}.byl-td-card small{display:block;color:#a0a9b8;margin-top:10px;font-size:11px}.byl-td-notice{border-radius:8px;margin:0 0 18px!important}.byl-td-notice p{font-size:12px}.byl-td-filter{display:flex;align-items:center;gap:10px;margin:0 0 15px;flex-wrap:wrap}.byl-td-filter input[type=search]{width:270px}.byl-td-filter input,.byl-td-filter select{border-color:#dae0e8;border-radius:7px;min-height:35px}.byl-td-filter .button{border-radius:7px;min-height:35px}.byl-td-table-wrap{background:#fff;border:1px solid #e7e9f1;border-radius:12px;overflow:auto}.byl-td-table{border:0;box-shadow:none;border-collapse:collapse;table-layout:auto}.byl-td-table th{background:#f8f9fc;color:#718097;font-size:11px;font-weight:700;white-space:nowrap;padding:14px 16px}.byl-td-table td{padding:13px 16px;vertical-align:middle;border-top:1px solid #f0f1f5}.byl-td-table td:not(:first-child){min-width:135px}.byl-td-table .byl-td-title{min-width:260px;max-width:340px}.byl-td-title strong{display:block;font-size:12px;font-weight:650;line-height:1.45}.byl-td-title small,.byl-td-cell small{display:block;font-size:10px;color:#94a0b2;margin-top:7px}.byl-td-pill{display:inline-block;font-size:10px;font-weight:700;white-space:nowrap;border-radius:6px;padding:5px 9px;background:#f0eefb;color:#745fba}.byl-td-pill.green{background:#e8f8f0;color:#188758}.byl-td-pill.partial{background:#fff3d7;color:#ac7411}.byl-td-pill.missing,.byl-td-pill.untranslated{background:#fff0ef;color:#c4544f}.byl-td-pill.unmapped,.byl-td-pill.unknown,.byl-td-pill.muted{background:#f1f3f7;color:#79869c}.byl-td-meter{background:#f0f0f6;border-radius:9px;height:5px;width:108px;margin-top:9px;overflow:hidden}.byl-td-meter span{display:block;background:#8567dd;height:100%;border-radius:9px}.byl-td-cell{max-width:195px}.byl-td-foot{display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:12px;color:#8894a8;padding:16px 3px}.byl-td-foot .page-numbers{display:inline-block;text-decoration:none;background:#fff;border:1px solid #e3e6ee;border-radius:6px;padding:7px 11px;margin-left:4px}.byl-td-foot .page-numbers.current{color:#fff;background:#7459d0;border-color:#7459d0}@media(max-width:1050px){.byl-td-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.byl-td{margin-right:10px}.byl-td-cards{grid-template-columns:1fr}.byl-td-head{align-items:flex-start}.byl-td-subtitle{display:block;margin:3px 0}.byl-td-filter input[type=search]{width:100%}.byl-td-head h1{font-size:24px}}
+    .byl-td{max-width:1700px;margin:24px 28px 24px 8px;color:#233047}.byl-td-head{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px}.byl-td-head h1{font-size:29px;font-weight:750;line-height:1.3;margin:8px 0 5px}.byl-td-head p{color:#718096;font-size:13px;margin:0}.byl-td-eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;color:#7156cb}.byl-td-version{display:inline-block;letter-spacing:0;border-radius:30px;padding:4px 9px;margin-left:7px;color:#7055c7;background:#eee8ff}.byl-td-subtitle{font-size:13px;font-weight:400;color:#8590a4;margin-left:8px}.byl-td-head .button-primary{background:#7057d2;border-color:#7057d2;border-radius:8px;padding:4px 18px}.byl-td-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:20px}.byl-td-card{background:#fff;border:1px solid #e7e9f1;border-radius:12px;padding:18px 20px;box-shadow:0 3px 14px rgba(39,47,78,.035)}.byl-td-card span{display:block;color:#8290a5;font-size:12px;margin-bottom:12px}.byl-td-card strong{display:block;font-size:29px;line-height:1.1;color:#28344c}.byl-td-card small{display:block;color:#a0a9b8;margin-top:10px;font-size:11px}.byl-td-notice{border-radius:8px;margin:0 0 18px!important}.byl-td-notice p{font-size:12px}.byl-td-filter{display:flex;align-items:center;gap:10px;margin:0 0 15px;flex-wrap:wrap}.byl-td-filter input[type=search]{width:270px}.byl-td-filter input,.byl-td-filter select{border-color:#dae0e8;border-radius:7px;min-height:35px}.byl-td-filter .button{border-radius:7px;min-height:35px}.byl-td-table-wrap{background:#fff;border:1px solid #e7e9f1;border-radius:12px;overflow:auto}.byl-td-table{border:0;box-shadow:none;border-collapse:collapse;table-layout:auto}.byl-td-table th{background:#f8f9fc;color:#718097;font-size:11px;font-weight:700;white-space:nowrap;padding:14px 16px}.byl-td-table td{padding:13px 16px;vertical-align:middle;border-top:1px solid #f0f1f5}.byl-td-table td:not(:first-child){min-width:135px}.byl-td-table .byl-td-title{min-width:260px;max-width:340px}.byl-td-title strong{display:block;font-size:12px;font-weight:650;line-height:1.45}.byl-td-title small,.byl-td-cell small{display:block;font-size:10px;color:#94a0b2;margin-top:7px}.byl-td-pill{display:inline-block;font-size:10px;font-weight:700;white-space:nowrap;border-radius:6px;padding:5px 9px;background:#f0eefb;color:#745fba}.byl-td-pill.green{background:#e8f8f0;color:#188758}.byl-td-pill.partial{background:#fff3d7;color:#ac7411}.byl-td-pill.missing,.byl-td-pill.untranslated{background:#fff0ef;color:#c4544f}.byl-td-pill.unmapped,.byl-td-pill.unknown,.byl-td-pill.muted{background:#f1f3f7;color:#79869c}.byl-td-meter{background:#f0f0f6;border-radius:9px;height:5px;width:108px;margin-top:9px;overflow:hidden}.byl-td-meter span{display:block;background:#8567dd;height:100%;border-radius:9px}.byl-td-cell{max-width:195px}.byl-td-frontend-link{display:inline-block;margin-top:9px;color:#6954c8;text-decoration:none;font-size:11px;font-weight:700}.byl-td-frontend-link:hover{text-decoration:underline}.byl-td-foot{display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:12px;color:#8894a8;padding:16px 3px}.byl-td-foot .page-numbers{display:inline-block;text-decoration:none;background:#fff;border:1px solid #e3e6ee;border-radius:6px;padding:7px 11px;margin-left:4px}.byl-td-foot .page-numbers.current{color:#fff;background:#7459d0;border-color:#7459d0}@media(max-width:1050px){.byl-td-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:650px){.byl-td{margin-right:10px}.byl-td-cards{grid-template-columns:1fr}.byl-td-head{align-items:flex-start}.byl-td-subtitle{display:block;margin:3px 0}.byl-td-filter input[type=search]{width:100%}.byl-td-head h1{font-size:24px}}
     </style>
     <?php
 });
