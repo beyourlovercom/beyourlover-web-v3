@@ -28,7 +28,12 @@ class BYL_TD_FakeDB {
     public $prefix = 'wp_';
     public $queries = array();
     public function esc_like($value) { return $value; }
-    public function prepare($sql, $args) { return $sql; }
+    public function prepare($sql, $args) {
+        $args = is_array($args) ? $args : array($args);
+        return vsprintf($sql, array_map(static function ($value) {
+            return "'" . str_replace("'", "''", (string) $value) . "'";
+        }, $args));
+    }
     public function get_var($sql) { return strpos($sql, 'es_es') !== false ? 'wp_trp_dictionary_en_us_es_es' : null; }
     public function get_results($sql, $mode) {
         $this->queries[] = $sql;
