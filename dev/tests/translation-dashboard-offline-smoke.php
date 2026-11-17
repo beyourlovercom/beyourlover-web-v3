@@ -16,6 +16,9 @@ function get_option($name, $default = array()) {
 function wp_strip_all_tags($text) { return strip_tags($text); }
 function get_permalink($post) { return 'https://dev.beyourlover.com/blog/' . $post->ID . '/'; }
 function wp_parse_url($url, $component) { return parse_url($url, $component); }
+function add_query_arg($key, $value, $url) { return $url . (strpos($url, '?') === false ? '?' : '&') . rawurlencode($key) . '=' . rawurlencode($value); }
+function byl_trp_gate_active() { return !empty($GLOBALS['byl_td_gate_active']); }
+function byl_trp_localized_url($post_id, $language) { return $GLOBALS['byl_td_approved_urls'][$language] ?? ''; }
 function sanitize_key($value) { return preg_replace('/[^a-z0-9_\-]/', '', strtolower($value)); }
 function sanitize_text_field($value) { return trim((string) $value); }
 function wp_unslash($value) { return stripslashes($value); }
@@ -86,6 +89,19 @@ byl_td_assert(byl_td_frontend_url($post, 'es_ES') === 'https://dev.beyourlover.c
     'Frontend locale link derives from the installed TranslatePress converter');
 byl_td_assert(byl_td_frontend_url($post, 'en_US') === '' && byl_td_frontend_url($post, '../evil') === '',
     'Source and unconfigured locale URLs are never invented');
+$GLOBALS['byl_td_gate_active'] = true;
+byl_td_assert(byl_td_frontend_url($post, 'es_ES') === 'https://dev.beyourlover.com/es/blog/38168/?byl-trp-preview=1',
+    'Unapproved locale uses existing edit_post-only Dev SEO Gate preview');
+$GLOBALS['byl_td_approved_urls']['es_ES'] = 'https://dev.beyourlover.com/es/blog/reviewed-spanish-url/';
+byl_td_assert(byl_td_frontend_url($post, 'es_ES') === 'https://dev.beyourlover.com/es/blog/reviewed-spanish-url/',
+    'Reviewed locale uses the exact approved URL without a preview override');
+$GLOBALS['byl_td_approved_urls']['es_ES'] = 'https://www.beyourlover.com/es/blog/untrusted/';
+byl_td_assert(byl_td_frontend_url($post, 'es_ES') === 'https://dev.beyourlover.com/es/blog/38168/?byl-trp-preview=1',
+    'Only Dev-host approved URLs can be surfaced');
+$post->post_status = 'draft';
+byl_td_assert(byl_td_frontend_url($post, 'es_ES') === '', 'Draft source never gets a misleading frontend link');
+$post->post_status = 'publish';
+$GLOBALS['byl_td_gate_active'] = false;
 $inspection = byl_td_inspect($post, 'en_US','es_ES');
 byl_td_assert($inspection['recognized'] === 3 && $inspection['translated'] === 2,
     'Read only dictionary status is classified from original/translated/status');
