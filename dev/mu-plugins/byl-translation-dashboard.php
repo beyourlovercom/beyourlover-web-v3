@@ -160,6 +160,11 @@ if (!function_exists('byl_td_frontend_url')) {
         if (!is_object($post) || !isset($post->ID) || !class_exists('TRP_Translate_Press')) {
             return '';
         }
+        // A draft does not have a public translated frontend. Do not mislabel
+        // its WordPress preview or homepage as a completed translation.
+        if (isset($post->post_status) && $post->post_status !== 'publish') {
+            return '';
+        }
         list($source, $targets) = byl_td_languages();
         if ($language === $source || !in_array($language, $targets, true)) {
             return '';
@@ -179,6 +184,19 @@ if (!function_exists('byl_td_frontend_url')) {
         if (!is_string($translated) || $translated === ''
             || wp_parse_url($translated, PHP_URL_HOST) !== 'dev.beyourlover.com') {
             return '';
+        }
+        // BYL's existing Dev SEO Gate deliberately returns 404 for translations
+        // without a fully approved review. It already supports a logged-in,
+        // edit_post-only preview query. Reuse that guard; never disable it or
+        // expose unapproved content to anonymous visitors.
+        if (function_exists('byl_trp_gate_active') && byl_trp_gate_active()) {
+            $approved = function_exists('byl_trp_localized_url')
+                ? byl_trp_localized_url((int) $post->ID, $language) : '';
+            if (is_string($approved) && $approved !== ''
+                && wp_parse_url($approved, PHP_URL_HOST) === 'dev.beyourlover.com') {
+                return $approved;
+            }
+            return add_query_arg('byl-trp-preview', '1', $translated);
         }
         return $translated;
     }
@@ -240,7 +258,7 @@ if (!function_exists('byl_td_admin_page')) {
                 <div class="byl-td-card"><span>理论翻译任务</span><strong><?php echo esc_html(number_format_i18n($total * $target_count)); ?></strong><small>不代表已翻译条目</small></div>
                 <div class="byl-td-card"><span>当前页内容</span><strong><?php echo esc_html($shown); ?></strong><small>每页 20 条 · 只读</small></div>
             </div>
-            <div class="notice notice-info inline byl-td-notice"><p><strong>数据口径：</strong>百分比仅为<strong>已匹配字符串的翻译占比</strong>，不是文章全文完成率；TranslatePress 的机器翻译标记也不等于 Dev QA95。只有具备来源分数、P0=0 和 Dev 页面 200 读回的 QA 账本才可显示 QA95 PASS。语言前台链接仅供查看，不代表已完成校对。</p></div>
+            <div class="notice notice-info inline byl-td-notice"><p><strong>数据口径：</strong>百分比仅为<strong>已匹配字符串的翻译占比</strong>，不是文章全文完成率；TranslatePress 的机器翻译标记也不等于 Dev QA95。只有具备来源分数、P0=0 和 Dev 页面 200 读回的 QA 账本才可显示 QA95 PASS。未审批语言页面采用<strong>仅登录编辑者可访问的 Dev 预览</strong>；不代表已完成校对或对公众发布。</p></div>
             <form method="get" class="byl-td-filter">
                 <input type="hidden" name="page" value="byl-translation-dashboard">
                 <input type="search" name="byl_search" placeholder="搜索标题 / 关键词 / #文章ID" value="<?php echo esc_attr(isset($_GET['byl_search']) ? sanitize_text_field(wp_unslash($_GET['byl_search'])) : ''); ?>">
@@ -258,7 +276,7 @@ if (!function_exists('byl_td_admin_page')) {
                         <td><div class="byl-td-cell"><span class="byl-td-pill <?php echo esc_attr($info['code']); ?>"><?php echo esc_html($info['label']); ?></span>
                         <?php if ($info['percent'] !== null) { ?><div class="byl-td-meter"><span style="width:<?php echo esc_attr($info['percent']); ?>%"></span></div><small><?php echo esc_html($info['percent']); ?>% · <?php echo esc_html($info['translated']); ?>/<?php echo esc_html($info['recognized']); ?> 已匹配</small><?php } else { ?><small>进度未知 · 不做推断</small><?php } ?>
                         <small title="<?php echo esc_attr($info['note']); ?>"><?php echo esc_html($qa['label']); ?></small>
-                        <?php if ($frontend_url !== '') { ?><a class="byl-td-frontend-link" href="<?php echo esc_url($frontend_url); ?>" target="_blank" rel="noopener noreferrer">查看<?php echo esc_html($language_name); ?>前台 ↗</a><?php } else { ?><small>语言前台链接不可用</small><?php } ?></div></td>
+                        <?php if ($frontend_url !== '') { $is_preview = strpos($frontend_url, 'byl-trp-preview=1') !== false; ?><a class="byl-td-frontend-link" href="<?php echo esc_url($frontend_url); ?>" target="_blank" rel="noopener noreferrer">查看<?php echo esc_html($language_name); ?>前台<?php echo $is_preview ? '（Dev 预览）' : ''; ?> ↗</a><?php } else { ?><small>语言前台链接不可用<?php echo $post->post_status !== 'publish' ? '（原文未发布）' : ''; ?></small><?php } ?></div></td>
                     <?php } ?>
                     <td><span class="byl-td-pill muted"><?php echo esc_html($post->post_status); ?></span></td>
                     <td><a href="<?php echo esc_url(get_edit_post_link($post->ID)); ?>">编辑原文</a> · <a href="<?php echo esc_url(get_permalink($post)); ?>" target="_blank" rel="noopener noreferrer">查看</a></td>
