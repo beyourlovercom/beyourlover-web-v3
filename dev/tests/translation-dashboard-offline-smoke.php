@@ -39,6 +39,13 @@ class TRP_Translate_Press {
         return $component === 'url_converter' ? new BYL_TD_Test_Converter() : null;
     }
 }
+class YBY_Module_Registry {
+    public static $registered = array();
+    public static $enabled = true;
+    public static function register($id, $metadata) { self::$registered[$id] = $metadata; return true; }
+    public static function is_enabled($id) { return $id === 'translation_dashboard' && self::$enabled; }
+    public static function dependencies_met($id) { return self::is_enabled($id); }
+}
 class YBY_Andy_Admin_Shell_V22 {
     public static $invocation = array();
     public static function render($page, $heading, $body) {
@@ -84,7 +91,17 @@ if (wp_get_environment_type() !== 'staging' || home_url() !== 'https://dev.beyou
     exit(0);
 }
 
-byl_td_assert(count($GLOBALS['byl_td_hooks']) === 3, 'Only admin/read-only hooks are registered');
+byl_td_assert(count($GLOBALS['byl_td_hooks']) === 4, 'Only Andy Core registration and admin/read-only hooks exist');
+byl_td_register_andy_module();
+$module = YBY_Module_Registry::$registered['translation_dashboard'] ?? array();
+byl_td_assert(!empty($module) && $module['default_enabled'] === false
+    && strpos($module['availability_message'], 'TranslatePress') !== false
+    && $module['availability'] === 'byl_td_translatepress_available',
+    'TranslatePress remains an optional, default-OFF Andy Core module with a prerequisite warning');
+byl_td_assert(byl_td_module_enabled() === true, 'Available and enabled module exposes the dashboard');
+YBY_Module_Registry::$enabled = false;
+byl_td_assert(byl_td_module_enabled() === false, 'Turning module OFF gates dashboard access');
+YBY_Module_Registry::$enabled = true;
 byl_td_admin_page();
 byl_td_assert(YBY_Andy_Admin_Shell_V22::$invocation === array('byl-translation-dashboard',
     '内容 · 翻译', 'byl_td_admin_page_body'),
