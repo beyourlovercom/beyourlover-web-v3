@@ -101,6 +101,7 @@ require_once get_stylesheet_directory().'/inc/theme-os-assets.php';
 
 // Standalone guarded creator account UI; AffiliateWP remains data authority.
 require_once get_stylesheet_directory().'/inc/affiliate-dashboard.php';
+require_once get_stylesheet_directory().'/inc/affiliate-welcome-v3.php';
 
 require_once get_stylesheet_directory().'/inc/free-shipping-v2-policy.php';
 
