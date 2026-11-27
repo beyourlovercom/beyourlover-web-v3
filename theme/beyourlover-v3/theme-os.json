@@ -214,6 +214,8 @@
         "template-affiliate-dashboard.php",
         "inc/affiliate-dashboard.php",
         "inc/affiliate-remote-bridge.php",
+        "inc/affiliate-welcome-v3.php",
+        "inc/affiliate-welcome-v3.html",
         "assets/css/affiliate-dashboard.css",
         "assets/js/affiliate-dashboard.js",
         "assets/images/affiliate-hero-creator-v1.webp",

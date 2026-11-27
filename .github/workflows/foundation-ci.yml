@@ -13,6 +13,8 @@ jobs:
           php-version: '8.2'
       - name: PHP syntax
         run: find theme platform -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Affiliate welcome V3 offline provider and deduplication contract
+        run: php -l scripts/test_affiliate_welcome_v3.php && php scripts/test_affiliate_welcome_v3.php
       - name: Legacy WWW Shoptimizer Order Pay address isolated safety contract
         run: |
           php -l release/byl-www-orderpay-v1.php
